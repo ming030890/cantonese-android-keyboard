@@ -2,6 +2,8 @@
     <color name="surface">#FFF8F2E8</color>
     <color name="surface_alt">#FFE9DDCC</color>
     <color name="primary">#FF0F6D49</color>
+    <color name="primary_dark">#FF0A5338</color>
     <color name="on_primary">#FFFFFFFF</color>
     <color name="on_surface">#FF1F1B16</color>
+    <color name="outline">#FFD4C6B6</color>
 </resources>

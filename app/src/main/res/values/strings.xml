@@ -2,40 +2,51 @@
     <string name="app_name">Cantonese Voice Input</string>
     <string name="ime_name">Cantonese Voice IME</string>
 
-    <string name="intro_title">Qwen3-ASR 0.6B Native JNI (Step 1)</string>
-    <string name="intro_body">This build uses native C/C++ inference through JNI on Android. No FastAPI service and no Python runtime.</string>
+    <string name="intro_kicker">Cantonese Voice IME</string>
+    <string name="intro_title">Speak straight into any text field.</string>
+    <string name="intro_body">Turn on the keyboard once, then tap the mic whenever you want to dictate.</string>
 
-    <string name="status_idle">Tap Mic to start</string>
-    <string name="status_idle_local">Local ASR engine loaded. Tap Start and speak.</string>
-    <string name="status_listening">Listening...</string>
-    <string name="status_transcribing">Transcribing...</string>
-    <string name="status_busy_transcribing">Still transcribing previous audio…</string>
-    <string name="status_model_loading">Loading local model...</string>
-    <string name="status_model_ready">Local model files found</string>
-    <string name="status_model_bundled_pending">Bundled model found in assets. It will be installed on first use.</string>
-    <string name="status_model_installing_assets">Installing bundled model from assets...</string>
-    <string name="status_model_assets_missing">Bundled model assets missing. Rebuild app with model files under app/src/main/assets/models/qwen3-asr-0.6b.</string>
-    <string name="status_model_missing">Model files missing. Copy Qwen3-ASR safetensors + vocab + merges files to app files/models/qwen3-asr-0.6b.</string>
-    <string name="status_model_error">Model init failed: %1$s</string>
-    <string name="status_step1_ready">Step 1 ready: native JNI inference module initialized.</string>
-    <string name="status_permission_required_ime">Microphone permission missing. Open app and tap \"Grant microphone permission\" first.</string>
-    <string name="status_no_speech">No speech detected. Try speaking louder or closer to the mic.</string>
-    <string name="status_transcribing_with_length">Transcribing %.1fs audio with streaming mode...</string>
-    <string name="status_inserted_done">Inserted recognized text.</string>
+    <string name="setup_ready_title">Ready to type</string>
+    <string name="setup_ready_body">Open any app, place the cursor, and start speaking.</string>
+    <string name="setup_picker_title">Choose the keyboard</string>
+    <string name="setup_picker_body">Pick Cantonese Voice IME from the keyboard switcher.</string>
+    <string name="setup_enable_title">Enable the keyboard</string>
+    <string name="setup_enable_body">Turn on Cantonese Voice IME in system keyboard settings.</string>
+    <string name="setup_permission_title">Allow microphone access</string>
+    <string name="setup_permission_body">The keyboard needs microphone permission before it can listen.</string>
 
-    <string name="action_mic">Start</string>
+    <string name="ime_surface_title">Cantonese voice</string>
+    <string name="state_ready">Ready</string>
+    <string name="state_preparing">Preparing</string>
+    <string name="state_listening">Listening</string>
+    <string name="state_finishing">Finishing</string>
+    <string name="state_permission">Permission</string>
+    <string name="state_unavailable">Unavailable</string>
+    <string name="state_try_again">Try again</string>
+    <string name="state_inserted">Inserted</string>
+    <string name="state_working">Working</string>
+
+    <string name="helper_ready">Tap Speak and start talking.</string>
+    <string name="helper_preparing">Getting voice input ready.</string>
+    <string name="helper_listening">Words will appear in the page as they settle.</string>
+    <string name="helper_finishing">Wrapping up your last phrase.</string>
+    <string name="helper_permission">Open the app and allow microphone access first.</string>
+    <string name="helper_unavailable">Open the app once, then try again.</string>
+    <string name="helper_no_speech">I did not catch anything that time.</string>
+    <string name="helper_inserted">Tap Speak to add more text.</string>
+    <string name="helper_busy">Finishing your previous phrase.</string>
+    <string name="helper_microphone_unavailable">The microphone is not available right now.</string>
+
+    <string name="action_mic">Speak</string>
     <string name="action_stop">Stop</string>
     <string name="action_space">Space</string>
     <string name="action_backspace">Del</string>
-    <string name="action_enter">Enter</string>
-    <string name="preview_empty">Recognized text will appear here…</string>
-    <string name="preview_transcribing">Streaming decode in progress…</string>
+    <string name="action_enter">Return</string>
 
-    <string name="grant_mic_permission">Grant microphone permission</string>
-    <string name="open_ime_settings">Open keyboard settings</string>
-    <string name="show_ime_picker">Show keyboard picker</string>
-
-    <string name="permission_needed_message">Microphone permission is required.</string>
-    <string name="permission_granted_message">Microphone permission granted.</string>
-    <string name="model_dir_label">Model directory: %1$s</string>
+    <string name="grant_mic_permission">Allow microphone</string>
+    <string name="grant_mic_permission_done">Microphone allowed</string>
+    <string name="open_ime_settings">Enable keyboard</string>
+    <string name="open_ime_settings_done">Keyboard enabled</string>
+    <string name="show_ime_picker">Choose keyboard</string>
+    <string name="show_ime_picker_done">Keyboard selected</string>
 </resources>

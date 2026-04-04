@@ -1,6 +1,7 @@
 package com.example.cantonesevoiceinput
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,41 +13,48 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var modelStatus: TextView
+    private lateinit var setupHeadline: TextView
+    private lateinit var setupBody: TextView
+    private lateinit var micPermissionButton: Button
+    private lateinit var openImeSettingsButton: Button
+    private lateinit var showImePickerButton: Button
 
     private val micPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        val messageRes = if (granted) {
-            R.string.permission_granted_message
-        } else {
-            R.string.permission_needed_message
-        }
-        modelStatus.append("\n\n" + getString(messageRes))
+    ) {
+        renderSetupState()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        modelStatus = findViewById(R.id.tvModelStatus)
+        setupHeadline = findViewById(R.id.tvSetupHeadline)
+        setupBody = findViewById(R.id.tvSetupBody)
+        micPermissionButton = findViewById(R.id.btnMicPermission)
+        openImeSettingsButton = findViewById(R.id.btnOpenImeSettings)
+        showImePickerButton = findViewById(R.id.btnShowImePicker)
         bindButtons()
-        renderModelStatus()
+        renderSetupState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        renderSetupState()
     }
 
     private fun bindButtons() {
-        findViewById<Button>(R.id.btnMicPermission).setOnClickListener {
+        micPermissionButton.setOnClickListener {
             requestMicPermission()
         }
 
-        findViewById<Button>(R.id.btnOpenImeSettings).setOnClickListener {
+        openImeSettingsButton.setOnClickListener {
             startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
         }
 
-        findViewById<Button>(R.id.btnShowImePicker).setOnClickListener {
+        showImePickerButton.setOnClickListener {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showInputMethodPicker()
         }
@@ -55,42 +63,86 @@ class MainActivity : AppCompatActivity() {
     private fun requestMicPermission() {
         val permissionState = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
         if (permissionState == PackageManager.PERMISSION_GRANTED) {
-            modelStatus.append("\n\n" + getString(R.string.permission_granted_message))
+            renderSetupState()
             return
         }
         micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
 
-    private fun renderModelStatus() {
-        val modelDir = File(filesDir, MODEL_DIR_NAME)
-        val bundled = ModelAssetInstaller.hasBundledModel(assets)
-        val modelFile = File(modelDir, "model.safetensors")
-        val vocabFile = File(modelDir, "vocab.json")
-        val mergesFile = File(modelDir, "merges.txt")
-        val configFile = File(modelDir, "config.json")
-        val weightFormat = ModelAssetInstaller.detectInstalledWeightFormat(modelDir)
+    private fun renderSetupState() {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+        val imeEnabled = isImeEnabled()
+        val imeSelected = isImeSelected()
 
-        val ready = modelFile.exists() && vocabFile.exists() && mergesFile.exists() && configFile.exists()
-        val statusText = when {
-            ready -> getString(R.string.status_model_ready)
-            bundled -> getString(R.string.status_model_bundled_pending)
-            else -> getString(R.string.status_model_assets_missing)
+        val headlineRes: Int
+        val bodyRes: Int
+
+        when {
+            hasPermission && imeEnabled && imeSelected -> {
+                headlineRes = R.string.setup_ready_title
+                bodyRes = R.string.setup_ready_body
+            }
+
+            hasPermission && imeEnabled -> {
+                headlineRes = R.string.setup_picker_title
+                bodyRes = R.string.setup_picker_body
+            }
+
+            hasPermission -> {
+                headlineRes = R.string.setup_enable_title
+                bodyRes = R.string.setup_enable_body
+            }
+
+            else -> {
+                headlineRes = R.string.setup_permission_title
+                bodyRes = R.string.setup_permission_body
+            }
         }
 
-        modelStatus.text = buildString {
-            append(statusText)
-            append("\n")
-            append(getString(R.string.model_dir_label, modelDir.absolutePath))
-            append("\n")
-            append("assets: ${if (bundled) "bundled" else "missing"}")
-            append(" | ")
-            append("weights: $weightFormat")
-            append(" | ")
-            append("safetensors: ${if (modelFile.exists()) "ok" else "missing"}")
-            append(" | vocab: ${if (vocabFile.exists()) "ok" else "missing"}")
-            append(" | merges: ${if (mergesFile.exists()) "ok" else "missing"}")
-            append(" | config: ${if (configFile.exists()) "ok" else "missing"}")
-        }
+        setupHeadline.setText(headlineRes)
+        setupBody.setText(bodyRes)
+
+        micPermissionButton.text = getString(
+            if (hasPermission) R.string.grant_mic_permission_done else R.string.grant_mic_permission
+        )
+        micPermissionButton.isEnabled = !hasPermission
+        micPermissionButton.alpha = if (hasPermission) 0.65f else 1f
+
+        openImeSettingsButton.text = getString(
+            if (imeEnabled) R.string.open_ime_settings_done else R.string.open_ime_settings
+        )
+
+        showImePickerButton.text = getString(
+            if (imeSelected) R.string.show_ime_picker_done else R.string.show_ime_picker
+        )
+        showImePickerButton.isEnabled = imeEnabled
+        showImePickerButton.alpha = if (imeEnabled) 1f else 0.65f
+    }
+
+    private fun isImeEnabled(): Boolean {
+        val enabledInputMethods = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ENABLED_INPUT_METHODS
+        ) ?: return false
+
+        val ime = ComponentName(this, VoiceImeService::class.java)
+        val candidates = setOf(ime.flattenToString(), ime.flattenToShortString())
+        return enabledInputMethods
+            .split(':')
+            .any { it in candidates }
+    }
+
+    private fun isImeSelected(): Boolean {
+        val selected = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.DEFAULT_INPUT_METHOD
+        ) ?: return false
+
+        val ime = ComponentName(this, VoiceImeService::class.java)
+        return selected == ime.flattenToString() || selected == ime.flattenToShortString()
     }
 
     companion object {

@@ -27,12 +27,13 @@ import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 class VoiceImeService : InputMethodService() {
-    private var statusText: TextView? = null
-    private var transcriptPreview: TextView? = null
+    private var statusBadge: TextView? = null
+    private var helperText: TextView? = null
     private var micButton: Button? = null
 
     private var localEngine: NativeQwenAsrEngine? = null
     private var engineError: String? = null
+    private var streamedTranscript = ""
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
@@ -92,13 +93,14 @@ class VoiceImeService : InputMethodService() {
 
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
             val navBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            v.setPadding(baseLeft, baseTop, baseRight, baseBottom + navBottom)
+            val gestureBottom = insets.getInsets(WindowInsetsCompat.Type.systemGestures()).bottom
+            v.setPadding(baseLeft, baseTop, baseRight, baseBottom + max(navBottom, gestureBottom))
             insets
         }
         ViewCompat.requestApplyInsets(view)
 
-        statusText = view.findViewById(R.id.statusText)
-        transcriptPreview = view.findViewById(R.id.transcriptPreview)
+        statusBadge = view.findViewById(R.id.statusBadge)
+        helperText = view.findViewById(R.id.helperText)
         micButton = view.findViewById(R.id.btnMic)
 
         view.findViewById<Button>(R.id.btnMic).setOnClickListener { onMicPressed() }
@@ -130,7 +132,7 @@ class VoiceImeService : InputMethodService() {
 
         engineError = null
         engineInitJob = serviceScope.launch {
-            statusText?.text = getString(R.string.status_model_installing_assets)
+            renderInlineState(R.string.state_preparing, R.string.helper_preparing)
 
             val result = withContext(Dispatchers.IO) {
                 runCatching {
@@ -157,10 +159,7 @@ class VoiceImeService : InputMethodService() {
                 }
                 .onFailure { throwable ->
                     localEngine = null
-                    engineError = getString(
-                        R.string.status_model_error,
-                        throwable.message ?: "unknown"
-                    )
+                    engineError = throwable.message ?: "unknown"
                 }
 
             renderEngineState()
@@ -170,23 +169,19 @@ class VoiceImeService : InputMethodService() {
     private fun renderEngineState() {
         when {
             localEngine != null -> {
-                statusText?.text = getString(R.string.status_idle_local)
-                transcriptPreview?.text = getString(R.string.preview_empty)
+                renderInlineState(R.string.state_ready, R.string.helper_ready)
             }
 
             engineInitJob?.isActive == true -> {
-                statusText?.text = getString(R.string.status_model_installing_assets)
-                transcriptPreview?.text = getString(R.string.preview_empty)
+                renderInlineState(R.string.state_preparing, R.string.helper_preparing)
             }
 
             engineError != null -> {
-                statusText?.text = engineError
-                transcriptPreview?.text = getString(R.string.preview_empty)
+                renderInlineState(R.string.state_unavailable, R.string.helper_unavailable)
             }
 
             else -> {
-                statusText?.text = getString(R.string.status_model_loading)
-                transcriptPreview?.text = getString(R.string.preview_empty)
+                renderInlineState(R.string.state_preparing, R.string.helper_preparing)
             }
         }
 
@@ -198,16 +193,16 @@ class VoiceImeService : InputMethodService() {
 
         val engine = localEngine
         if (engine == null) {
-            statusText?.text = if (engineInitJob?.isActive == true) {
-                getString(R.string.status_model_installing_assets)
+            if (engineInitJob?.isActive == true) {
+                renderInlineState(R.string.state_preparing, R.string.helper_preparing)
             } else {
-                engineError ?: getString(R.string.status_model_assets_missing)
+                renderInlineState(R.string.state_unavailable, R.string.helper_unavailable)
             }
             return
         }
 
         if (!hasMicPermission()) {
-            statusText?.text = getString(R.string.status_permission_required_ime)
+            renderInlineState(R.string.state_permission, R.string.helper_permission)
             return
         }
 
@@ -217,7 +212,7 @@ class VoiceImeService : InputMethodService() {
         }
 
         if (transcribeJob?.isActive == true) {
-            statusText?.text = getString(R.string.status_busy_transcribing)
+            renderInlineState(R.string.state_working, R.string.helper_busy)
             return
         }
 
@@ -234,7 +229,7 @@ class VoiceImeService : InputMethodService() {
         )
 
         if (minBufferSize <= 0) {
-            statusText?.text = getString(R.string.status_model_error, "AudioRecord init failed")
+            renderInlineState(R.string.state_unavailable, R.string.helper_microphone_unavailable)
             return
         }
 
@@ -249,24 +244,24 @@ class VoiceImeService : InputMethodService() {
 
         if (recorder.state != AudioRecord.STATE_INITIALIZED) {
             recorder.release()
-            statusText?.text = getString(R.string.status_model_error, "Microphone unavailable")
+            renderInlineState(R.string.state_unavailable, R.string.helper_microphone_unavailable)
             return
         }
 
+        streamedTranscript = ""
         val liveSession = runCatching {
             engine.createLiveTranscriptionSession(forceLanguage = true) { partialText ->
-                transcriptPreview?.post {
-                    if (partialText.isNotBlank()) {
-                        transcriptPreview?.text = partialText
-                    }
+                if (partialText.isBlank()) {
+                    return@createLiveTranscriptionSession
+                }
+                serviceScope.launch(Dispatchers.Main.immediate) {
+                    commitStreamingDelta(partialText)
                 }
             }
         }.getOrElse { throwable ->
             recorder.release()
-            statusText?.text = getString(
-                R.string.status_model_error,
-                throwable.message ?: "Live streaming init failed"
-            )
+            engineError = throwable.message ?: "stream init failed"
+            renderInlineState(R.string.state_unavailable, R.string.helper_unavailable)
             return
         }
 
@@ -275,8 +270,7 @@ class VoiceImeService : InputMethodService() {
         audioRecord = recorder
         isRecording = true
         updateMicButtonUi()
-        statusText?.text = getString(R.string.status_listening)
-        transcriptPreview?.text = getString(R.string.preview_empty)
+        renderInlineState(R.string.state_listening, R.string.helper_listening)
 
         transcribeJob = serviceScope.launch(Dispatchers.Default) {
             val result = runCatching {
@@ -291,20 +285,16 @@ class VoiceImeService : InputMethodService() {
             withContext(Dispatchers.Main.immediate) {
                 result
                     .onSuccess { text ->
-                        if (text.isBlank()) {
-                            statusText?.text = getString(R.string.status_no_speech)
-                            transcriptPreview?.text = getString(R.string.preview_empty)
+                        if (text.isBlank() && streamedTranscript.isBlank()) {
+                            renderInlineState(R.string.state_try_again, R.string.helper_no_speech)
                         } else {
-                            currentInputConnection?.commitText(text, 1)
-                            statusText?.text = getString(R.string.status_inserted_done)
-                            transcriptPreview?.text = text
+                            commitFinalTranscript(text)
+                            renderInlineState(R.string.state_inserted, R.string.helper_inserted)
                         }
                     }
                     .onFailure { throwable ->
-                        statusText?.text = getString(
-                            R.string.status_model_error,
-                            throwable.message ?: "transcription failed"
-                        )
+                        engineError = throwable.message ?: "transcription failed"
+                        renderInlineState(R.string.state_unavailable, R.string.helper_unavailable)
                     }
 
                 transcribeJob = null
@@ -344,14 +334,9 @@ class VoiceImeService : InputMethodService() {
             readJob?.join()
 
             if (capturedSampleCount <= 0) {
-                statusText?.text = getString(R.string.status_no_speech)
-                transcriptPreview?.text = getString(R.string.preview_empty)
+                renderInlineState(R.string.state_try_again, R.string.helper_no_speech)
             } else {
-                val audioSec = capturedSampleCount / 16_000f
-                statusText?.text = getString(R.string.status_transcribing_with_length, audioSec)
-                if (transcriptPreview?.text.isNullOrBlank()) {
-                    transcriptPreview?.text = getString(R.string.preview_transcribing)
-                }
+                renderInlineState(R.string.state_finishing, R.string.helper_finishing)
             }
             liveSession?.finishInput()
         }
@@ -378,8 +363,8 @@ class VoiceImeService : InputMethodService() {
         }
 
         button.text = getString(R.string.action_mic)
-        button.setBackgroundResource(R.drawable.bg_key)
-        button.setTextColor(ContextCompat.getColor(this, R.color.on_surface))
+        button.setBackgroundResource(R.drawable.bg_mic_idle)
+        button.setTextColor(ContextCompat.getColor(this, R.color.on_primary))
     }
 
     private fun hasMicPermission(): Boolean {
@@ -387,5 +372,42 @@ class VoiceImeService : InputMethodService() {
             this,
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun renderInlineState(labelRes: Int, helperRes: Int) {
+        statusBadge?.setText(labelRes)
+        helperText?.setText(helperRes)
+    }
+
+    private fun commitStreamingDelta(partialText: String) {
+        val delta = when {
+            partialText == streamedTranscript -> ""
+            partialText.startsWith(streamedTranscript) -> partialText.removePrefix(streamedTranscript)
+            else -> ""
+        }
+
+        if (delta.isNotEmpty()) {
+            currentInputConnection?.commitText(delta, 1)
+        }
+        if (partialText.startsWith(streamedTranscript) || streamedTranscript.isEmpty()) {
+            streamedTranscript = partialText
+        }
+    }
+
+    private fun commitFinalTranscript(text: String) {
+        val delta = when {
+            text.isBlank() -> ""
+            streamedTranscript.isBlank() -> text
+            text == streamedTranscript -> ""
+            text.startsWith(streamedTranscript) -> text.removePrefix(streamedTranscript)
+            else -> ""
+        }
+
+        if (delta.isNotEmpty()) {
+            currentInputConnection?.commitText(delta, 1)
+        }
+        if (text.isNotBlank()) {
+            streamedTranscript = text
+        }
     }
 }
