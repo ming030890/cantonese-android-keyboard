@@ -27,33 +27,30 @@ elseif(ANDROID_ABI MATCHES "x86_64|x86")
     list(APPEND QWEN_ASR_SRCS ${QWEN_ASR_DIR}/qwen_asr_kernels_avx.c)
 endif()
 
-set(QWEN_ASR_READY TRUE)
 foreach(src_file IN LISTS QWEN_ASR_SRCS)
     if(NOT EXISTS ${src_file})
-        set(QWEN_ASR_READY FALSE)
+        message(FATAL_ERROR "Missing required qwen-asr source: ${src_file}. Initialize the submodule under ${QWEN_ASR_DIR}.")
     endif()
 endforeach()
 
-if(EXISTS ${QWEN_ASR_DIR}/qwen_asr.h AND EXISTS ${QWEN_ASR_DIR}/qwen_asr_kernels.h AND QWEN_ASR_READY)
-    add_library(qwen_asr_core STATIC ${QWEN_ASR_SRCS})
-    target_include_directories(qwen_asr_core PUBLIC ${QWEN_ASR_DIR})
-    target_compile_options(qwen_asr_core PRIVATE -O3 -ffast-math)
-
-    target_compile_definitions(qwen_asr_jni PRIVATE HAVE_QWEN_ASR=1)
-    target_include_directories(qwen_asr_jni PRIVATE ${QWEN_ASR_DIR})
-
-    target_link_libraries(
-        qwen_asr_jni
-        PRIVATE
-        qwen_asr_core
-        ${log-lib}
-        m
-    )
-else()
-    message(WARNING "qwen-asr sources are incomplete under ${QWEN_ASR_DIR}. JNI library will build in stub mode.")
-    target_link_libraries(
-        qwen_asr_jni
-        PRIVATE
-        ${log-lib}
-    )
+if(NOT EXISTS ${QWEN_ASR_DIR}/qwen_asr.h)
+    message(FATAL_ERROR "Missing required qwen-asr header: ${QWEN_ASR_DIR}/qwen_asr.h. Initialize the submodule.")
 endif()
+
+if(NOT EXISTS ${QWEN_ASR_DIR}/qwen_asr_kernels.h)
+    message(FATAL_ERROR "Missing required qwen-asr header: ${QWEN_ASR_DIR}/qwen_asr_kernels.h. Initialize the submodule.")
+endif()
+
+add_library(qwen_asr_core STATIC ${QWEN_ASR_SRCS})
+target_include_directories(qwen_asr_core PUBLIC ${QWEN_ASR_DIR})
+target_compile_options(qwen_asr_core PRIVATE -O3 -ffast-math)
+
+target_include_directories(qwen_asr_jni PRIVATE ${QWEN_ASR_DIR})
+
+target_link_libraries(
+    qwen_asr_jni
+    PRIVATE
+    qwen_asr_core
+    ${log-lib}
+    m
+)

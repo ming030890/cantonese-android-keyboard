@@ -8,12 +8,10 @@
 
 #include <android/log.h>
 
-#if HAVE_QWEN_ASR
 extern "C" {
 #include "qwen_asr.h"
 #include "qwen_asr_kernels.h"
 }
-#endif
 
 namespace {
 constexpr const char* kTag = "QwenAsrJni";
@@ -41,7 +39,6 @@ jstring to_jstring(JNIEnv* env, const std::string& value) {
     return env->NewStringUTF(value.c_str());
 }
 
-#if HAVE_QWEN_ASR
 struct NativeEngine {
     qwen_ctx_t* ctx = nullptr;
     std::string forced_language;
@@ -154,7 +151,6 @@ jobject to_trace_object(JNIEnv* env, const NativeTrace& trace) {
     env->DeleteLocalRef(trace_class);
     return out;
 }
-#endif
 }  // namespace
 
 extern "C" JNIEXPORT jlong JNICALL
@@ -165,7 +161,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeCreate(
     jstring language,
     jint threads
 ) {
-#if HAVE_QWEN_ASR
     const char* model_dir_chars = env->GetStringUTFChars(model_dir, nullptr);
     const char* language_chars = env->GetStringUTFChars(language, nullptr);
 
@@ -204,14 +199,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeCreate(
     }
 
     return reinterpret_cast<jlong>(engine);
-#else
-    (void)env;
-    (void)model_dir;
-    (void)language;
-    (void)threads;
-    set_last_error("qwen-asr native sources are missing. Vendor sources into app/src/main/cpp/third_party/qwen-asr.");
-    return 0;
-#endif
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -223,7 +210,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeConfigu
     jfloat search_sec,
     jboolean past_text_conditioning
 ) {
-#if HAVE_QWEN_ASR
     auto* engine = reinterpret_cast<NativeEngine*>(handle);
     if (engine == nullptr || engine->ctx == nullptr) {
         return;
@@ -237,12 +223,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeConfigu
         engine->ctx->search_sec = search_sec;
     }
     engine->ctx->past_text_conditioning = (past_text_conditioning == JNI_TRUE) ? 1 : 0;
-#else
-    (void)handle;
-    (void)segment_sec;
-    (void)search_sec;
-    (void)past_text_conditioning;
-#endif
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -255,7 +235,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeConfigu
     jint unfixed_chunks,
     jint max_new_tokens
 ) {
-#if HAVE_QWEN_ASR
     auto* engine = reinterpret_cast<NativeEngine*>(handle);
     if (engine == nullptr || engine->ctx == nullptr) {
         return;
@@ -274,13 +253,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeConfigu
     if (max_new_tokens > 0) {
         engine->ctx->stream_max_new_tokens = static_cast<int>(max_new_tokens);
     }
-#else
-    (void)handle;
-    (void)chunk_sec;
-    (void)rollback_tokens;
-    (void)unfixed_chunks;
-    (void)max_new_tokens;
-#endif
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -289,7 +261,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeDestroy
     jobject /* thiz */,
     jlong handle
 ) {
-#if HAVE_QWEN_ASR
     auto* engine = reinterpret_cast<NativeEngine*>(handle);
     if (engine == nullptr) {
         return;
@@ -300,9 +271,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeDestroy
         engine->ctx = nullptr;
     }
     delete engine;
-#else
-    (void)handle;
-#endif
 }
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -313,7 +281,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
     jfloatArray pcm16k_mono,
     jboolean force_language
 ) {
-#if HAVE_QWEN_ASR
     auto* engine = reinterpret_cast<NativeEngine*>(handle);
     if (engine == nullptr || engine->ctx == nullptr) {
         return to_jstring(env, "");
@@ -321,12 +288,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
 
     NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, false);
     return to_jstring(env, trace.text);
-#else
-    (void)handle;
-    (void)pcm16k_mono;
-    (void)force_language;
-    return to_jstring(env, "");
-#endif
 }
 
 extern "C" JNIEXPORT jobject JNICALL
@@ -337,7 +298,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
     jfloatArray pcm16k_mono,
     jboolean force_language
 ) {
-#if HAVE_QWEN_ASR
     auto* engine = reinterpret_cast<NativeEngine*>(handle);
     if (engine == nullptr || engine->ctx == nullptr) {
         return nullptr;
@@ -345,13 +305,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
 
     NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, false);
     return to_trace_object(env, trace);
-#else
-    (void)env;
-    (void)handle;
-    (void)pcm16k_mono;
-    (void)force_language;
-    return nullptr;
-#endif
 }
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -362,7 +315,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
     jfloatArray pcm16k_mono,
     jboolean force_language
 ) {
-#if HAVE_QWEN_ASR
     auto* engine = reinterpret_cast<NativeEngine*>(handle);
     if (engine == nullptr || engine->ctx == nullptr) {
         return to_jstring(env, "");
@@ -370,12 +322,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
 
     NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, true);
     return to_jstring(env, trace.text);
-#else
-    (void)handle;
-    (void)pcm16k_mono;
-    (void)force_language;
-    return to_jstring(env, "");
-#endif
 }
 
 extern "C" JNIEXPORT jobject JNICALL
@@ -386,7 +332,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
     jfloatArray pcm16k_mono,
     jboolean force_language
 ) {
-#if HAVE_QWEN_ASR
     auto* engine = reinterpret_cast<NativeEngine*>(handle);
     if (engine == nullptr || engine->ctx == nullptr) {
         return nullptr;
@@ -394,13 +339,6 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
 
     NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, true);
     return to_trace_object(env, trace);
-#else
-    (void)env;
-    (void)handle;
-    (void)pcm16k_mono;
-    (void)force_language;
-    return nullptr;
-#endif
 }
 
 extern "C" JNIEXPORT jstring JNICALL
