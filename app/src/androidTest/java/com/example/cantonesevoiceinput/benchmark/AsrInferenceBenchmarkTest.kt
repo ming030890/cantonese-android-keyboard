@@ -135,7 +135,7 @@ class AsrInferenceBenchmarkTest {
         return NativeQwenAsrEngine(
             modelDir = modelDir,
             language = "Cantonese",
-            threads = 4,
+            threads = 0,
             segmentSec = 30f,
             searchSec = 3f,
             pastTextConditioning = true,

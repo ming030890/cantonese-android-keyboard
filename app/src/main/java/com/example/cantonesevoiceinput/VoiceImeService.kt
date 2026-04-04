@@ -22,6 +22,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
@@ -35,16 +36,17 @@ class VoiceImeService : InputMethodService() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    private val recordLock = Any()
-    private val recordedPcm = FloatAccumulator()
-
     @Volatile
     private var isRecording = false
+
+    @Volatile
+    private var capturedSampleCount = 0
 
     private var audioRecord: AudioRecord? = null
     private var recordingJob: Job? = null
     private var transcribeJob: Job? = null
     private var engineInitJob: Job? = null
+    private var liveTranscriptionSession: NativeQwenAsrEngine.LiveSession? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -54,12 +56,30 @@ class VoiceImeService : InputMethodService() {
     override fun onDestroy() {
         isRecording = false
         stopAndReleaseAudioRecord()
+        liveTranscriptionSession?.finishInput()
+
+        val pendingEngine = localEngine
+        localEngine = null
+        val pendingTranscribe = transcribeJob
+
         runCatching {
             serviceScope.cancel()
         }
 
-        localEngine?.close()
-        localEngine = null
+        if (pendingEngine != null && pendingTranscribe?.isActive == true) {
+            Thread {
+                runCatching {
+                    runBlocking {
+                        pendingTranscribe.join()
+                    }
+                }
+                runCatching {
+                    pendingEngine.close()
+                }
+            }.start()
+        } else {
+            pendingEngine?.close()
+        }
         super.onDestroy()
     }
 
@@ -98,8 +118,7 @@ class VoiceImeService : InputMethodService() {
 
     override fun onFinishInputView(finishingInput: Boolean) {
         if (isRecording) {
-            isRecording = false
-            stopAndReleaseAudioRecord()
+            stopRecordingAndFinalizeTranscription()
         }
         super.onFinishInputView(finishingInput)
     }
@@ -119,7 +138,7 @@ class VoiceImeService : InputMethodService() {
                     NativeQwenAsrEngine(
                         modelDir = modelDir,
                         language = "Cantonese",
-                        threads = 4,
+                        threads = 0,
                         segmentSec = 30f,
                         searchSec = 3f,
                         pastTextConditioning = true,
@@ -192,21 +211,21 @@ class VoiceImeService : InputMethodService() {
             return
         }
 
+        if (isRecording) {
+            stopRecordingAndFinalizeTranscription()
+            return
+        }
+
         if (transcribeJob?.isActive == true) {
             statusText?.text = getString(R.string.status_busy_transcribing)
             return
         }
 
-        if (!isRecording) {
-            startRecording()
-            return
-        }
-
-        stopRecordingAndTranscribe(engine)
+        startRecording(engine)
     }
 
     @SuppressLint("MissingPermission")
-    private fun startRecording() {
+    private fun startRecording(engine: NativeQwenAsrEngine) {
         val sampleRate = 16_000
         val minBufferSize = AudioRecord.getMinBufferSize(
             sampleRate,
@@ -234,15 +253,64 @@ class VoiceImeService : InputMethodService() {
             return
         }
 
-        synchronized(recordLock) {
-            recordedPcm.clear()
+        val liveSession = runCatching {
+            engine.createLiveTranscriptionSession(forceLanguage = true) { partialText ->
+                transcriptPreview?.post {
+                    if (partialText.isNotBlank()) {
+                        transcriptPreview?.text = partialText
+                    }
+                }
+            }
+        }.getOrElse { throwable ->
+            recorder.release()
+            statusText?.text = getString(
+                R.string.status_model_error,
+                throwable.message ?: "Live streaming init failed"
+            )
+            return
         }
 
+        liveTranscriptionSession = liveSession
+        capturedSampleCount = 0
         audioRecord = recorder
         isRecording = true
         updateMicButtonUi()
         statusText?.text = getString(R.string.status_listening)
         transcriptPreview?.text = getString(R.string.preview_empty)
+
+        transcribeJob = serviceScope.launch(Dispatchers.Default) {
+            val result = runCatching {
+                liveSession.runBlocking()
+            }
+
+            if (liveTranscriptionSession === liveSession) {
+                liveTranscriptionSession = null
+            }
+            liveSession.close()
+
+            withContext(Dispatchers.Main.immediate) {
+                result
+                    .onSuccess { text ->
+                        if (text.isBlank()) {
+                            statusText?.text = getString(R.string.status_no_speech)
+                            transcriptPreview?.text = getString(R.string.preview_empty)
+                        } else {
+                            currentInputConnection?.commitText(text, 1)
+                            statusText?.text = getString(R.string.status_inserted_done)
+                            transcriptPreview?.text = text
+                        }
+                    }
+                    .onFailure { throwable ->
+                        statusText?.text = getString(
+                            R.string.status_model_error,
+                            throwable.message ?: "transcription failed"
+                        )
+                    }
+
+                transcribeJob = null
+                updateMicButtonUi()
+            }
+        }
 
         recorder.startRecording()
         recordingJob = serviceScope.launch(Dispatchers.IO) {
@@ -250,9 +318,12 @@ class VoiceImeService : InputMethodService() {
             while (isActive && isRecording) {
                 val read = recorder.read(shortBuffer, 0, shortBuffer.size)
                 if (read > 0) {
-                    synchronized(recordLock) {
-                        recordedPcm.append(shortBuffer, read)
+                    val floatChunk = FloatArray(read)
+                    for (i in 0 until read) {
+                        floatChunk[i] = shortBuffer[i] / 32768.0f
                     }
+                    capturedSampleCount += read
+                    liveSession.appendPcm16kMono(floatChunk)
                 } else if (read == AudioRecord.ERROR_BAD_VALUE || read == AudioRecord.ERROR_INVALID_OPERATION) {
                     break
                 }
@@ -260,58 +331,29 @@ class VoiceImeService : InputMethodService() {
         }
     }
 
-    private fun stopRecordingAndTranscribe(engine: NativeQwenAsrEngine) {
+    private fun stopRecordingAndFinalizeTranscription() {
         isRecording = false
         updateMicButtonUi()
         stopAndReleaseAudioRecord()
 
         val readJob = recordingJob
         recordingJob = null
+        val liveSession = liveTranscriptionSession
 
-        transcribeJob = serviceScope.launch {
+        serviceScope.launch {
             readJob?.join()
 
-            val samples = synchronized(recordLock) {
-                recordedPcm.toArrayAndClear()
-            }
-
-            if (samples.isEmpty()) {
+            if (capturedSampleCount <= 0) {
                 statusText?.text = getString(R.string.status_no_speech)
                 transcriptPreview?.text = getString(R.string.preview_empty)
-                updateMicButtonUi()
-                return@launch
-            }
-
-            val audioSec = samples.size / 16_000f
-            statusText?.text = getString(R.string.status_transcribing_with_length, audioSec)
-            transcriptPreview?.text = getString(R.string.preview_transcribing)
-            updateMicButtonUi()
-
-            val result = withContext(Dispatchers.Default) {
-                runCatching {
-                    engine.transcribeStreamPcm16kMono(samples, forceLanguage = true)
+            } else {
+                val audioSec = capturedSampleCount / 16_000f
+                statusText?.text = getString(R.string.status_transcribing_with_length, audioSec)
+                if (transcriptPreview?.text.isNullOrBlank()) {
+                    transcriptPreview?.text = getString(R.string.preview_transcribing)
                 }
             }
-
-            result
-                .onSuccess { text ->
-                    if (text.isBlank()) {
-                        statusText?.text = getString(R.string.status_no_speech)
-                        transcriptPreview?.text = getString(R.string.preview_empty)
-                    } else {
-                        currentInputConnection?.commitText(text, 1)
-                        statusText?.text = getString(R.string.status_inserted_done)
-                        transcriptPreview?.text = text
-                    }
-                }
-                .onFailure { throwable ->
-                    statusText?.text = getString(
-                        R.string.status_model_error,
-                        throwable.message ?: "transcription failed"
-                    )
-                }
-
-            updateMicButtonUi()
+            liveSession?.finishInput()
         }
     }
 
@@ -345,39 +387,5 @@ class VoiceImeService : InputMethodService() {
             this,
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private class FloatAccumulator(initialCapacity: Int = 16_000) {
-        private var data = FloatArray(initialCapacity)
-        private var size = 0
-
-        fun append(samples: ShortArray, count: Int) {
-            ensureCapacity(size + count)
-            for (i in 0 until count) {
-                data[size + i] = samples[i] / 32768.0f
-            }
-            size += count
-        }
-
-        fun toArrayAndClear(): FloatArray {
-            val out = data.copyOf(size)
-            size = 0
-            return out
-        }
-
-        fun clear() {
-            size = 0
-        }
-
-        private fun ensureCapacity(required: Int) {
-            if (required <= data.size) {
-                return
-            }
-            var newCapacity = data.size
-            while (newCapacity < required) {
-                newCapacity *= 2
-            }
-            data = data.copyOf(newCapacity)
-        }
     }
 }
