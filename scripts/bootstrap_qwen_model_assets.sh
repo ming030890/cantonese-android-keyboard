@@ -8,6 +8,15 @@ TMP_DIR="${TMPDIR:-/tmp}/qwen3-asr-0.6b-q8"
 LOCAL_MODEL_DIR="$ROOT_DIR/models/qwen3-asr-0.6b"
 ASSET_MODEL_DIR="$ROOT_DIR/app/src/main/assets/models/qwen3-asr-0.6b"
 
+ensure_submodule() {
+  if [[ -d "$SUBMODULE_DIR/.git" || -f "$SUBMODULE_DIR/.git" ]]; then
+    return
+  fi
+
+  echo "Initializing qwen-asr submodule..."
+  git -C "$ROOT_DIR" submodule update --init --recursive
+}
+
 require_file() {
   local path="$1"
   if [[ ! -f "$path" ]]; then
@@ -16,11 +25,8 @@ require_file() {
   fi
 }
 
-if [[ ! -d "$SUBMODULE_DIR/.git" && ! -f "$SUBMODULE_DIR/.git" ]]; then
-  echo "qwen-asr submodule is not initialized" >&2
-  echo "run: git submodule update --init --recursive" >&2
-  exit 1
-fi
+ensure_submodule
+require_file "$SUBMODULE_DIR/quantize_checkpoint.py"
 
 if [[ ! -d "$SRC_DIR" ]]; then
   echo "missing BF16 source model dir: $SRC_DIR" >&2

@@ -9,21 +9,19 @@
 
 ## Setup workflow
 
-1. Initialize the submodule:
-   `git submodule update --init --recursive`
-2. Put the upstream BF16 checkpoint in:
-   `models/qwen3-asr-0.6b-bf16/`
-3. Generate the local Q8 model file:
-   `./scripts/generate_q8_model.sh`
+Run a single setup step:
+`./scripts/bootstrap_qwen_model_assets.sh`
 
-The generation script:
+Before running it, place the upstream BF16 checkpoint in:
+`models/qwen3-asr-0.6b-bf16/`
 
+The script is the local bootstrap for model setup. It:
+
+- requires the `qwen-asr` submodule to be initialized
 - uses the submodule's `quantize_checkpoint.py`
-- writes a local Q8 `model.safetensors`
-- copies that generated file into:
-  - `models/qwen3-asr-0.6b/model.safetensors`
-  - `app/src/main/assets/models/qwen3-asr-0.6b/model.safetensors`
-- refreshes the tokenizer/config sidecar files from the BF16 source dir
+- generates the local Q8 `model.safetensors`
+- copies that file into `models/qwen3-asr-0.6b/` and `app/src/main/assets/models/qwen3-asr-0.6b/`
+- refreshes tokenizer/config sidecar files from the BF16 source dir
 
 ## Build and test workflow
 
