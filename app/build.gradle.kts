@@ -14,7 +14,7 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
 
         externalNativeBuild {
             cmake {
@@ -35,6 +35,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
         }
     }
 
@@ -57,6 +63,12 @@ android {
             version = "3.22.1"
         }
     }
+
+    testBuildType = "benchmark"
+
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -66,4 +78,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    add("benchmarkImplementation", "androidx.benchmark:benchmark-common:1.3.4")
+    androidTestImplementation("androidx.benchmark:benchmark-junit4:1.3.4")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
 }

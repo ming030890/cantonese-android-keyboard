@@ -1,5 +1,6 @@
 #include <jni.h>
 
+#include <chrono>
 #include <cstdlib>
 #include <mutex>
 #include <string>
@@ -30,6 +31,12 @@ std::string get_last_error() {
     return g_last_error;
 }
 
+using SteadyClock = std::chrono::steady_clock;
+
+int64_t elapsed_ns(const SteadyClock::time_point& start, const SteadyClock::time_point& end) {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+}
+
 jstring to_jstring(JNIEnv* env, const std::string& value) {
     return env->NewStringUTF(value.c_str());
 }
@@ -39,6 +46,14 @@ struct NativeEngine {
     qwen_ctx_t* ctx = nullptr;
     std::string forced_language;
     std::mutex lock;
+};
+
+struct NativeTrace {
+    std::string text;
+    int sample_count = 0;
+    int64_t input_copy_ns = 0;
+    int64_t native_inference_ns = 0;
+    int64_t total_ns = 0;
 };
 
 std::string normalize_language_for_qwen(const std::string& value) {
@@ -65,6 +80,79 @@ void restore_force_language_override(NativeEngine* engine, jboolean force_langua
     if (force_language == JNI_FALSE && !engine->forced_language.empty()) {
         qwen_set_force_language(engine->ctx, engine->forced_language.c_str());
     }
+}
+
+NativeTrace run_transcription(
+    JNIEnv* env,
+    NativeEngine* engine,
+    jfloatArray pcm16k_mono,
+    jboolean force_language,
+    bool streaming
+) {
+    NativeTrace trace;
+    const auto total_start = SteadyClock::now();
+
+    const jsize length = env->GetArrayLength(pcm16k_mono);
+    trace.sample_count = static_cast<int>(length);
+    if (length <= 0) {
+        trace.total_ns = elapsed_ns(total_start, SteadyClock::now());
+        return trace;
+    }
+
+    const auto copy_start = SteadyClock::now();
+    std::vector<float> samples(static_cast<size_t>(length));
+    env->GetFloatArrayRegion(pcm16k_mono, 0, length, samples.data());
+    trace.input_copy_ns = elapsed_ns(copy_start, SteadyClock::now());
+
+    std::lock_guard<std::mutex> lock(engine->lock);
+    apply_force_language_override(engine, force_language);
+
+    const auto native_start = SteadyClock::now();
+    char* text = streaming
+        ? qwen_transcribe_stream(engine->ctx, samples.data(), static_cast<int>(samples.size()))
+        : qwen_transcribe_audio(engine->ctx, samples.data(), static_cast<int>(samples.size()));
+    trace.native_inference_ns = elapsed_ns(native_start, SteadyClock::now());
+
+    restore_force_language_override(engine, force_language);
+
+    if (text == nullptr) {
+        set_last_error(streaming
+            ? "qwen_transcribe_stream returned null."
+            : "qwen_transcribe_audio returned null.");
+        trace.total_ns = elapsed_ns(total_start, SteadyClock::now());
+        return trace;
+    }
+
+    trace.text.assign(text);
+    free(text);
+    trace.total_ns = elapsed_ns(total_start, SteadyClock::now());
+    return trace;
+}
+
+jobject to_trace_object(JNIEnv* env, const NativeTrace& trace) {
+    jclass trace_class = env->FindClass("com/example/cantonesevoiceinput/inference/NativeTranscriptionTrace");
+    if (trace_class == nullptr) {
+        return nullptr;
+    }
+
+    jmethodID ctor = env->GetMethodID(trace_class, "<init>", "(Ljava/lang/String;IJJJ)V");
+    if (ctor == nullptr) {
+        return nullptr;
+    }
+
+    jstring text = to_jstring(env, trace.text);
+    jobject out = env->NewObject(
+        trace_class,
+        ctor,
+        text,
+        static_cast<jint>(trace.sample_count),
+        static_cast<jlong>(trace.input_copy_ns),
+        static_cast<jlong>(trace.native_inference_ns),
+        static_cast<jlong>(trace.total_ns)
+    );
+    env->DeleteLocalRef(text);
+    env->DeleteLocalRef(trace_class);
+    return out;
 }
 #endif
 }  // namespace
@@ -231,33 +319,38 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
         return to_jstring(env, "");
     }
 
-    const jsize length = env->GetArrayLength(pcm16k_mono);
-    if (length <= 0) {
-        return to_jstring(env, "");
-    }
-
-    std::vector<float> samples(static_cast<size_t>(length));
-    env->GetFloatArrayRegion(pcm16k_mono, 0, length, samples.data());
-
-    std::lock_guard<std::mutex> lock(engine->lock);
-    apply_force_language_override(engine, force_language);
-
-    char* text = qwen_transcribe_audio(engine->ctx, samples.data(), static_cast<int>(samples.size()));
-    restore_force_language_override(engine, force_language);
-
-    if (text == nullptr) {
-        set_last_error("qwen_transcribe_audio returned null.");
-        return to_jstring(env, "");
-    }
-
-    std::string result(text);
-    free(text);
-    return to_jstring(env, result);
+    NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, false);
+    return to_jstring(env, trace.text);
 #else
     (void)handle;
     (void)pcm16k_mono;
     (void)force_language;
     return to_jstring(env, "");
+#endif
+}
+
+extern "C" JNIEXPORT jobject JNICALL
+Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscribeProfiled(
+    JNIEnv* env,
+    jobject /* thiz */,
+    jlong handle,
+    jfloatArray pcm16k_mono,
+    jboolean force_language
+) {
+#if HAVE_QWEN_ASR
+    auto* engine = reinterpret_cast<NativeEngine*>(handle);
+    if (engine == nullptr || engine->ctx == nullptr) {
+        return nullptr;
+    }
+
+    NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, false);
+    return to_trace_object(env, trace);
+#else
+    (void)env;
+    (void)handle;
+    (void)pcm16k_mono;
+    (void)force_language;
+    return nullptr;
 #endif
 }
 
@@ -275,33 +368,38 @@ Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscr
         return to_jstring(env, "");
     }
 
-    const jsize length = env->GetArrayLength(pcm16k_mono);
-    if (length <= 0) {
-        return to_jstring(env, "");
-    }
-
-    std::vector<float> samples(static_cast<size_t>(length));
-    env->GetFloatArrayRegion(pcm16k_mono, 0, length, samples.data());
-
-    std::lock_guard<std::mutex> lock(engine->lock);
-    apply_force_language_override(engine, force_language);
-
-    char* text = qwen_transcribe_stream(engine->ctx, samples.data(), static_cast<int>(samples.size()));
-    restore_force_language_override(engine, force_language);
-
-    if (text == nullptr) {
-        set_last_error("qwen_transcribe_stream returned null.");
-        return to_jstring(env, "");
-    }
-
-    std::string result(text);
-    free(text);
-    return to_jstring(env, result);
+    NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, true);
+    return to_jstring(env, trace.text);
 #else
     (void)handle;
     (void)pcm16k_mono;
     (void)force_language;
     return to_jstring(env, "");
+#endif
+}
+
+extern "C" JNIEXPORT jobject JNICALL
+Java_com_example_cantonesevoiceinput_inference_NativeQwenAsrEngine_nativeTranscribeStreamProfiled(
+    JNIEnv* env,
+    jobject /* thiz */,
+    jlong handle,
+    jfloatArray pcm16k_mono,
+    jboolean force_language
+) {
+#if HAVE_QWEN_ASR
+    auto* engine = reinterpret_cast<NativeEngine*>(handle);
+    if (engine == nullptr || engine->ctx == nullptr) {
+        return nullptr;
+    }
+
+    NativeTrace trace = run_transcription(env, engine, pcm16k_mono, force_language, true);
+    return to_trace_object(env, trace);
+#else
+    (void)env;
+    (void)handle;
+    (void)pcm16k_mono;
+    (void)force_language;
+    return nullptr;
 #endif
 }
 

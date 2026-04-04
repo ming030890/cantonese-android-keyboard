@@ -55,12 +55,34 @@ class NativeQwenAsrEngine(
         return nativeTranscribe(handle, samples, forceLanguage)
     }
 
+    fun transcribePcm16kMonoProfiled(
+        samples: FloatArray,
+        forceLanguage: Boolean = true
+    ): NativeTranscriptionTrace {
+        check(handle != 0L) { "Native engine already closed" }
+        if (samples.isEmpty()) {
+            return NativeTranscriptionTrace("", 0, 0L, 0L, 0L)
+        }
+        return nativeTranscribeProfiled(handle, samples, forceLanguage)
+    }
+
     fun transcribeStreamPcm16kMono(samples: FloatArray, forceLanguage: Boolean = true): String {
         check(handle != 0L) { "Native engine already closed" }
         if (samples.isEmpty()) {
             return ""
         }
         return nativeTranscribeStream(handle, samples, forceLanguage)
+    }
+
+    fun transcribeStreamPcm16kMonoProfiled(
+        samples: FloatArray,
+        forceLanguage: Boolean = true
+    ): NativeTranscriptionTrace {
+        check(handle != 0L) { "Native engine already closed" }
+        if (samples.isEmpty()) {
+            return NativeTranscriptionTrace("", 0, 0L, 0L, 0L)
+        }
+        return nativeTranscribeStreamProfiled(handle, samples, forceLanguage)
     }
 
     override fun close() {
@@ -86,7 +108,17 @@ class NativeQwenAsrEngine(
     )
     private external fun nativeDestroy(handle: Long)
     private external fun nativeTranscribe(handle: Long, pcm16kMono: FloatArray, forceLanguage: Boolean): String
+    private external fun nativeTranscribeProfiled(
+        handle: Long,
+        pcm16kMono: FloatArray,
+        forceLanguage: Boolean
+    ): NativeTranscriptionTrace
     private external fun nativeTranscribeStream(handle: Long, pcm16kMono: FloatArray, forceLanguage: Boolean): String
+    private external fun nativeTranscribeStreamProfiled(
+        handle: Long,
+        pcm16kMono: FloatArray,
+        forceLanguage: Boolean
+    ): NativeTranscriptionTrace
     private external fun nativeGetGlobalLastError(): String
 
     companion object {

@@ -31,9 +31,12 @@ The script is the local bootstrap for model setup. It:
   `./gradlew :app:assembleDebug`
 - Install to device:
   `adb install -r app/build/outputs/apk/debug/app-debug.apk`
+- ASR performance benchmarking:
+  use `skills/asr-benchmark/SKILL.md`
 
 ## Notes
 
 - Streaming mode is used by the app when transcribing captured audio.
 - The expected regression text is:
   `Hello，你好吗？已经坐低咗啦。`
+- For on-device ASR slowness triage, prefer the benchmark workflow in `skills/asr-benchmark/SKILL.md` over ad hoc timing.
