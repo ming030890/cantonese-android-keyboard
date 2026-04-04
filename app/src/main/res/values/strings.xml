@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">Cantonese Voice Input</string>
+    <string name="ime_name">Cantonese Voice IME</string>
+
+    <string name="intro_title">Qwen3-ASR 0.6B Native JNI (Step 1)</string>
+    <string name="intro_body">This build uses native C/C++ inference through JNI on Android. No FastAPI service and no Python runtime.</string>
+
+    <string name="status_idle">Tap Mic to start</string>
+    <string name="status_idle_local">Local ASR engine loaded. Tap Start and speak.</string>
+    <string name="status_listening">Listening...</string>
+    <string name="status_transcribing">Transcribing...</string>
+    <string name="status_busy_transcribing">Still transcribing previous audio…</string>
+    <string name="status_model_loading">Loading local model...</string>
+    <string name="status_model_ready">Local model files found</string>
+    <string name="status_model_bundled_pending">Bundled model found in assets. It will be installed on first use.</string>
+    <string name="status_model_installing_assets">Installing bundled model from assets...</string>
+    <string name="status_model_assets_missing">Bundled model assets missing. Rebuild app with model files under app/src/main/assets/models/qwen3-asr-0.6b.</string>
+    <string name="status_model_missing">Model files missing. Copy Qwen3-ASR safetensors + vocab + merges files to app files/models/qwen3-asr-0.6b.</string>
+    <string name="status_model_error">Model init failed: %1$s</string>
+    <string name="status_step1_ready">Step 1 ready: native JNI inference module initialized.</string>
+    <string name="status_permission_required_ime">Microphone permission missing. Open app and tap \"Grant microphone permission\" first.</string>
+    <string name="status_no_speech">No speech detected. Try speaking louder or closer to the mic.</string>
+    <string name="status_transcribing_with_length">Transcribing %.1fs audio with streaming mode...</string>
+    <string name="status_inserted_done">Inserted recognized text.</string>
+
+    <string name="action_mic">Start</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_space">Space</string>
+    <string name="action_backspace">Del</string>
+    <string name="action_enter">Enter</string>
+    <string name="preview_empty">Recognized text will appear here…</string>
+    <string name="preview_transcribing">Streaming decode in progress…</string>
+
+    <string name="grant_mic_permission">Grant microphone permission</string>
+    <string name="open_ime_settings">Open keyboard settings</string>
+    <string name="show_ime_picker">Show keyboard picker</string>
+
+    <string name="permission_needed_message">Microphone permission is required.</string>
+    <string name="permission_granted_message">Microphone permission granted.</string>
+    <string name="model_dir_label">Model directory: %1$s</string>
+</resources>

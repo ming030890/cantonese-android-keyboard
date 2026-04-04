@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.CantoneseVoiceInput" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="android:colorBackground">@color/surface</item>
+    </style>
+</resources>

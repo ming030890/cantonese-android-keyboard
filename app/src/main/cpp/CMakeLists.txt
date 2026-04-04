@@ -1,0 +1,59 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(qwen_asr_jni LANGUAGES C CXX)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_library(qwen_asr_jni SHARED NativeQwenAsrJni.cpp)
+
+find_library(log-lib log)
+
+set(QWEN_ASR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/qwen-asr)
+set(QWEN_ASR_SRCS
+    ${QWEN_ASR_DIR}/qwen_asr.c
+    ${QWEN_ASR_DIR}/qwen_asr_encoder.c
+    ${QWEN_ASR_DIR}/qwen_asr_decoder.c
+    ${QWEN_ASR_DIR}/qwen_asr_tokenizer.c
+    ${QWEN_ASR_DIR}/qwen_asr_safetensors.c
+    ${QWEN_ASR_DIR}/qwen_asr_kernels.c
+    ${QWEN_ASR_DIR}/qwen_asr_kernels_generic.c
+    ${QWEN_ASR_DIR}/qwen_asr_audio.c
+)
+
+if(ANDROID_ABI MATCHES "arm64-v8a|armeabi-v7a")
+    list(APPEND QWEN_ASR_SRCS ${QWEN_ASR_DIR}/qwen_asr_kernels_neon.c)
+elseif(ANDROID_ABI MATCHES "x86_64|x86")
+    list(APPEND QWEN_ASR_SRCS ${QWEN_ASR_DIR}/qwen_asr_kernels_avx.c)
+endif()
+
+set(QWEN_ASR_READY TRUE)
+foreach(src_file IN LISTS QWEN_ASR_SRCS)
+    if(NOT EXISTS ${src_file})
+        set(QWEN_ASR_READY FALSE)
+    endif()
+endforeach()
+
+if(EXISTS ${QWEN_ASR_DIR}/qwen_asr.h AND EXISTS ${QWEN_ASR_DIR}/qwen_asr_kernels.h AND QWEN_ASR_READY)
+    add_library(qwen_asr_core STATIC ${QWEN_ASR_SRCS})
+    target_include_directories(qwen_asr_core PUBLIC ${QWEN_ASR_DIR})
+    target_compile_options(qwen_asr_core PRIVATE -O3 -ffast-math)
+
+    target_compile_definitions(qwen_asr_jni PRIVATE HAVE_QWEN_ASR=1)
+    target_include_directories(qwen_asr_jni PRIVATE ${QWEN_ASR_DIR})
+
+    target_link_libraries(
+        qwen_asr_jni
+        PRIVATE
+        qwen_asr_core
+        ${log-lib}
+        m
+    )
+else()
+    message(WARNING "qwen-asr sources are incomplete under ${QWEN_ASR_DIR}. JNI library will build in stub mode.")
+    target_link_libraries(
+        qwen_asr_jni
+        PRIVATE
+        ${log-lib}
+    )
+endif()

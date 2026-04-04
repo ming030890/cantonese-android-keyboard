@@ -1,0 +1,15 @@
+.gradle/
+.gradle-user-home/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/app/build/
+/app/.cxx/
+/tests/out/
+/.kotlin/
+/backend/.venv/
+/models/qwen3-asr-0.6b/model.safetensors
+/app/src/main/assets/models/qwen3-asr-0.6b/model.safetensors
+__pycache__/
+*.pyc

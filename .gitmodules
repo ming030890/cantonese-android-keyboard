@@ -1,0 +1,3 @@
+[submodule "app/src/main/cpp/third_party/qwen-asr"]
+	path = app/src/main/cpp/third_party/qwen-asr
+	url = https://github.com/ming030890/qwen-asr
