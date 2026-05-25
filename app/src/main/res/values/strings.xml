@@ -4,31 +4,50 @@
     <string name="subtype_name">Cantonese Voice Input (local)</string>
 
     <!-- Setup Main Screen Strings -->
-    <string name="app_header_title">廣東話語音輸入鍵盤</string>
-    <string name="app_header_subtitle">極速本地離線語音識別</string>
+    <string name="app_header_title">Cantonese Voice Keyboard</string>
+    <string name="app_header_subtitle">Ultra-fast Local Offline Speech Recognition</string>
 
-    <string name="setup_step_completed">已就緒</string>
+    <string name="setup_step_completed">Ready</string>
 
-    <string name="setup_step_1_title">啟用麥克風權限</string>
-    <string name="setup_step_1_desc">進行語音輸入需要錄音權限，請授權麥克風。</string>
-    <string name="setup_step_1_action">授權</string>
+    <string name="setup_step_1_title">Enable Microphone Permission</string>
+    <string name="setup_step_1_desc">Audio recording permission is required for voice input. Please authorize the microphone.</string>
+    <string name="setup_step_1_action">Grant</string>
 
-    <string name="setup_step_2_title">在系統中啟用鍵盤</string>
-    <string name="setup_step_2_desc">請前往系統設定，開啟「粵語語音輸入法」開關。</string>
-    <string name="setup_step_2_action">啟用</string>
+    <string name="setup_step_2_title">Enable Keyboard in System</string>
+    <string name="setup_step_2_desc">Go to system settings and turn on the "Cantonese Voice Keyboard" switch.</string>
+    <string name="setup_step_2_action">Enable</string>
 
-    <string name="setup_step_3_title">設定為預設輸入法</string>
-    <string name="setup_step_3_desc">點擊切換，並將「粵語語音輸入法」設定為您的默認鍵盤。</string>
-    <string name="setup_step_3_action">切換</string>
+    <string name="setup_step_3_title">Set as Default Input Method</string>
+    <string name="setup_step_3_desc">Tap to switch and set "Cantonese Voice Keyboard" as your default keyboard.</string>
+    <string name="setup_step_3_action">Switch</string>
 
     <!-- Model Status Strings -->
-    <string name="model_status_title">Qwen ASR 語音模型</string>
-    <string name="model_status_ready">語音模型已就緒，可進行本地高精度識別。</string>
-    <string name="model_status_missing">尚未檢測到語音模型！請連接電腦並執行 `deploy.sh` 進行同步。</string>
+    <string name="model_status_title">Qwen ASR Speech Model</string>
+    <string name="model_status_ready">Speech model is ready for high-precision local offline recognition.</string>
+    <string name="model_status_missing">Speech model not detected! Please connect your computer and run `deploy.sh` to sync.</string>
 
     <!-- Sandbox Strings -->
-    <string name="sandbox_title">粵語語音輸入測試沙盒 (Sandbox)</string>
-    <string name="sandbox_desc">點擊下方輸入框以喚起鍵盤，長按藍色的語音按鈕並說粵語進行測試：</string>
-    <string name="sandbox_placeholder">喺度試下語音輸入啦... (例如說：「今日天氣幾好呀」)</string>
-    <string name="sandbox_clear">清空內容</string>
+    <string name="sandbox_title">Cantonese Voice Input Sandbox</string>
+    <string name="sandbox_desc">Tap the input field below to show the keyboard, hold down the blue voice button and speak Cantonese to test:</string>
+    <string name="sandbox_placeholder">Try voice typing here... (e.g. say "Today's weather is so nice")</string>
+    <string name="sandbox_clear">Clear Content</string>
+
+    <!-- Keyboard Screen IME Strings -->
+    <string name="keyboard_status_idle">Cantonese Voice Input (HK)</string>
+    <string name="keyboard_status_loading_model">Loading speech model...</string>
+    <string name="keyboard_status_recording">Listening... Cantonese dictation</string>
+    <string name="keyboard_status_transcribing">Performing speech recognition...</string>
+    <string name="keyboard_status_error_setup">Tap to open settings for configuration</string>
+    <string name="keyboard_key_space">Space</string>
+    <string name="keyboard_key_enter">Enter</string>
+
+    <!-- Input Method Service Error Strings -->
+    <string name="error_external_storage_unavailable">External storage not available.</string>
+    <string name="error_model_not_found">Model files not found! Sync model using deploy.sh.</string>
+    <string name="error_failed_initialize_asr">Failed to initialize ASR Engine.</string>
+    <string name="error_recording_permission_required">Recording permission required. Open settings.</string>
+    <string name="error_audio_format_failed">Audio format setup failed.</string>
+    <string name="error_audio_permission_missing">Audio recording permission missing.</string>
+    <string name="error_microphone_init_failed">Microphone initialization failed.</string>
+    <string name="error_failed_access_microphone">Failed to access microphone.</string>
 </resources>

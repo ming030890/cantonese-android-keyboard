@@ -27,6 +27,7 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.example.cantonesevoicekeyboard.R
 import com.example.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 import com.example.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
 import com.qwenasr.QAsrEngine
@@ -98,6 +99,12 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     override fun onCreateInputView(): View {
+        window?.window?.decorView?.let { decorView ->
+            decorView.setViewTreeLifecycleOwner(this)
+            decorView.setViewTreeViewModelStoreOwner(this)
+            decorView.setViewTreeSavedStateRegistryOwner(this)
+        }
+
         val composeView = ComposeView(this).apply {
             setViewTreeLifecycleOwner(this@CantoneseInputMethodService)
             setViewTreeViewModelStoreOwner(this@CantoneseInputMethodService)
@@ -130,27 +137,28 @@ class CantoneseInputMethodService : InputMethodService(),
             modelLoadingJob = CoroutineScope(Dispatchers.Default).launch {
                 val externalDir = getExternalFilesDir(null)
                 if (externalDir == null) {
-                    _uiState.value = KeyboardUiState.Error("External storage not available.")
+                    _uiState.value = KeyboardUiState.Error(getString(R.string.error_external_storage_unavailable))
                     return@launch
                 }
                 
                 val modelDir = File(externalDir, "qwen-asr-int8dec")
                 if (!modelDir.exists()) {
                     Log.w(TAG, "Model directory not found at: ${modelDir.absolutePath}")
-                    _uiState.value = KeyboardUiState.Error("Model files not found! Sync model using deploy.sh.")
+                    _uiState.value = KeyboardUiState.Error(getString(R.string.error_model_not_found))
                     return@launch
                 }
                 
                 Log.i(TAG, "Loading model from: ${modelDir.absolutePath}")
-                val success = qAsrEngine.loadModel(modelDir.absolutePath, 4)
+                val success = qAsrEngine.loadModel(modelDir.absolutePath, 1)
                 if (success) {
-                    qAsrEngine.setLanguage("yue")
-                    qAsrEngine.setSegmentSec(15.0f)
+                    qAsrEngine.setLanguage("Auto")
+                    qAsrEngine.setPrompt("音频是粤语，可能夹杂英语")
+                    qAsrEngine.setSegmentSec(0.0f)
                     isModelLoaded = true
                     _uiState.value = KeyboardUiState.Idle
                     Log.i(TAG, "Model loaded successfully!")
                 } else {
-                    _uiState.value = KeyboardUiState.Error("Failed to initialize ASR Engine.")
+                    _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
                     Log.e(TAG, "Failed to load model!")
                 }
             }
@@ -199,7 +207,7 @@ class CantoneseInputMethodService : InputMethodService(),
 
         // Check recording permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            _uiState.value = KeyboardUiState.Error("Recording permission required. Open settings.")
+            _uiState.value = KeyboardUiState.Error(getString(R.string.error_recording_permission_required))
             return
         }
 
@@ -212,70 +220,59 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun startRecordingInternal() {
         if (isRecording) return
+
+        val minBufferSize = AudioRecord.getMinBufferSize(
+            SAMPLE_RATE,
+            AudioFormat.CHANNEL_IN_MONO,
+            AudioFormat.ENCODING_PCM_16BIT
+        )
+
+        if (minBufferSize == AudioRecord.ERROR || minBufferSize == AudioRecord.ERROR_BAD_VALUE) {
+            Log.e(TAG, "Invalid audio parameters for AudioRecord setup.")
+            _uiState.value = KeyboardUiState.Error(getString(R.string.error_audio_format_failed))
+            return
+        }
+
+        val audioRecord = try {
+            AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                SAMPLE_RATE,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                minBufferSize * 2
+            )
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Audio recording security exception", e)
+            _uiState.value = KeyboardUiState.Error(getString(R.string.error_audio_permission_missing))
+            return
+        }
+
+        if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
+            Log.e(TAG, "AudioRecord failed to initialize.")
+            _uiState.value = KeyboardUiState.Error(getString(R.string.error_microphone_init_failed))
+            audioRecord.release()
+            return
+        }
+
+        try {
+            audioRecord.startRecording()
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "Failed to start AudioRecord", e)
+            _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_access_microphone))
+            audioRecord.release()
+            return
+        }
+
         isRecording = true
         _uiState.value = KeyboardUiState.Recording
         totalSamplesRecorded = 0
 
         audioRecordJob = CoroutineScope(Dispatchers.IO).launch {
-            val minBufferSize = AudioRecord.getMinBufferSize(
-                SAMPLE_RATE,
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT
-            )
-
-            if (minBufferSize == AudioRecord.ERROR || minBufferSize == AudioRecord.ERROR_BAD_VALUE) {
-                Log.e(TAG, "Invalid audio parameters for AudioRecord setup.")
-                withContext(Dispatchers.Main) {
-                    _uiState.value = KeyboardUiState.Error("Audio format setup failed.")
-                }
-                isRecording = false
-                return@launch
-            }
-
-            val audioRecord = try {
-                AudioRecord(
-                    MediaRecorder.AudioSource.MIC,
-                    SAMPLE_RATE,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    minBufferSize * 2
-                )
-            } catch (e: SecurityException) {
-                Log.e(TAG, "Audio recording security exception", e)
-                withContext(Dispatchers.Main) {
-                    _uiState.value = KeyboardUiState.Error("Audio recording permission missing.")
-                }
-                isRecording = false
-                return@launch
-            }
-
-            if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
-                Log.e(TAG, "AudioRecord failed to initialize.")
-                withContext(Dispatchers.Main) {
-                    _uiState.value = KeyboardUiState.Error("Microphone initialization failed.")
-                }
-                audioRecord.release()
-                isRecording = false
-                return@launch
-            }
-
-            try {
-                audioRecord.startRecording()
-            } catch (e: IllegalStateException) {
-                Log.e(TAG, "Failed to start AudioRecord", e)
-                withContext(Dispatchers.Main) {
-                    _uiState.value = KeyboardUiState.Error("Failed to access microphone.")
-                }
-                audioRecord.release()
-                isRecording = false
-                return@launch
-            }
-
             val shortBuffer = ShortArray(1024)
             val floatBuffer = directAudioBuffer.asFloatBuffer()
             floatBuffer.clear()
 
-            Log.i(TAG, "Recording started...")
+            Log.i(TAG, "Recording started and mic is live...")
 
             while (isRecording && totalSamplesRecorded < MAX_SAMPLES) {
                 val readShorts = audioRecord.read(shortBuffer, 0, shortBuffer.size)

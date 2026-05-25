@@ -14,13 +14,13 @@ class MainScreenTest {
 
   @Before
   fun setup() {
-    composeTestRule.setContent { MainScreen(FAKE_DATA) }
+    composeTestRule.setContent { MainScreen(onItemClick = {}) }
   }
 
   @Test
   fun firstItem_exists() {
-    FAKE_DATA.forEach { composeTestRule.onNodeWithText("Hello $it!").assertExists() }
+    // Assert elements of the setup walkthrough app exist
+    composeTestRule.onNodeWithText("Cantonese Voice Keyboard").assertExists()
   }
 }
 
-private val FAKE_DATA = listOf("Sample1", "Sample2", "Sample3")

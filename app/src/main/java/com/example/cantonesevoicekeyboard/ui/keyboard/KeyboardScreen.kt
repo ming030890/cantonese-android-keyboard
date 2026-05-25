@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cantonesevoicekeyboard.KeyboardUiState
+import com.example.cantonesevoicekeyboard.R
+import androidx.compose.ui.res.stringResource
+import com.example.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.sin
 
@@ -40,6 +44,13 @@ fun KeyboardScreen(
     val state by uiState.collectAsState()
     val volume by volumeLevel.collectAsState()
 
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val outlineColor = MaterialTheme.colorScheme.outline
+    val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val errorColor = MaterialTheme.colorScheme.error
+
     // Main Keyboard container with premium glassmorphic/charcoal aesthetics
     Box(
         modifier = Modifier
@@ -48,8 +59,8 @@ fun KeyboardScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1E1E24), // Sleek deep charcoal
-                        Color(0xFF121215)  // Dark carbon black
+                        surfaceColor,     // Sleek deep charcoal
+                        backgroundColor   // Dark carbon black
                     )
                 )
             )
@@ -70,8 +81,8 @@ fun KeyboardScreen(
                 when (val current = state) {
                     KeyboardUiState.Idle -> {
                         Text(
-                            text = "粵語語音輸入 (廣東話)",
-                            color = Color(0xFF8E8E9F),
+                            text = stringResource(R.string.keyboard_status_idle),
+                            color = textVariantColor,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             letterSpacing = 0.5.sp
@@ -84,13 +95,13 @@ fun KeyboardScreen(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(16.dp),
-                                color = Color(0xFF00E5FF),
+                                color = primaryColor,
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "正在載入語音模組...",
-                                color = Color(0xFF00E5FF),
+                                text = stringResource(R.string.keyboard_status_loading_model),
+                                color = primaryColor,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Normal
                             )
@@ -102,8 +113,8 @@ fun KeyboardScreen(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "正在聆聽... 廣東話 dictation",
-                                color = Color(0xFFFF2D55),
+                                text = stringResource(R.string.keyboard_status_recording),
+                                color = errorColor,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 letterSpacing = 0.5.sp
@@ -119,13 +130,13 @@ fun KeyboardScreen(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(16.dp),
-                                color = Color(0xFFFFD600),
+                                color = TranscribeYellow,
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "正在進行語音識別...",
-                                color = Color(0xFFFFD600),
+                                text = stringResource(R.string.keyboard_status_transcribing),
+                                color = TranscribeYellow,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Normal
                             )
@@ -138,7 +149,7 @@ fun KeyboardScreen(
                         ) {
                             Text(
                                 text = current.message,
-                                color = Color(0xFFFF3B30),
+                                color = errorColor,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Normal,
                                 textAlign = TextAlign.Center,
@@ -146,8 +157,8 @@ fun KeyboardScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "點擊開啟設定 app 進行配置",
-                                color = Color(0xFF0A84FF),
+                                text = stringResource(R.string.keyboard_status_error_setup),
+                                color = SystemBlue,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.clickable { onOpenSettings() }
@@ -183,7 +194,7 @@ fun KeyboardScreen(
                     modifier = Modifier.weight(1f),
                     onClick = onSwitchKeyboard
                 ) {
-                    GlobeIcon(modifier = Modifier.size(20.dp), color = Color(0xFFD1D1D6))
+                    GlobeIcon(modifier = Modifier.size(20.dp), color = IconGray)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -192,10 +203,10 @@ fun KeyboardScreen(
                 KeyboardUtilityKey(
                     modifier = Modifier.weight(2.5f),
                     onClick = onSendSpace,
-                    backgroundColor = Color(0xFF2C2C35) // Lighter key cap
+                    backgroundColor = outlineColor // Lighter key cap using outline color role
                 ) {
                     Text(
-                        text = "空格",
+                        text = stringResource(R.string.keyboard_key_space),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -209,7 +220,7 @@ fun KeyboardScreen(
                     modifier = Modifier.weight(1.2f),
                     onClick = onDeleteSurroundingText
                 ) {
-                    BackspaceIcon(modifier = Modifier.size(20.dp), color = Color(0xFFD1D1D6))
+                    BackspaceIcon(modifier = Modifier.size(20.dp), color = IconGray)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -218,12 +229,12 @@ fun KeyboardScreen(
                 KeyboardUtilityKey(
                     modifier = Modifier.weight(1.3f),
                     onClick = onSendEnter,
-                    backgroundColor = Color(0xFF00E5FF).copy(alpha = 0.15f),
-                    borderColor = Color(0xFF00E5FF).copy(alpha = 0.4f)
+                    backgroundColor = primaryColor.copy(alpha = 0.15f),
+                    borderColor = primaryColor.copy(alpha = 0.4f)
                 ) {
                     Text(
-                        text = "換行",
-                        color = Color(0xFF00E5FF),
+                        text = stringResource(R.string.keyboard_key_enter),
+                        color = primaryColor,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -261,18 +272,22 @@ fun RecordTriggerButton(
         label = "alpha"
     )
 
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val outlineColor = MaterialTheme.colorScheme.outline
+    val errorColor = MaterialTheme.colorScheme.error
+
     // Button colors dynamically based on status
     val buttonColor = when (state) {
-        KeyboardUiState.Recording -> Color(0xFFFF2D55) // Pulsing active red
-        KeyboardUiState.Transcribing -> Color(0xFFFFD600) // Transcribing yellow
-        KeyboardUiState.LoadingModel -> Color(0xFF2C2C35) // Loading state gray
-        is KeyboardUiState.Error -> Color(0xFF3A2024) // Error state deep red
-        KeyboardUiState.Idle -> Color(0xFF00E5FF) // Idle glowing cyan
+        KeyboardUiState.Recording -> errorColor // Pulsing active red
+        KeyboardUiState.Transcribing -> TranscribeYellow // Transcribing yellow
+        KeyboardUiState.LoadingModel -> outlineColor // Loading state gray
+        is KeyboardUiState.Error -> errorColor.copy(alpha = 0.25f) // Error state deep red
+        KeyboardUiState.Idle -> primaryColor // Idle glowing cyan
     }
 
     val iconColor = when (state) {
         KeyboardUiState.Recording -> Color.White
-        is KeyboardUiState.Error -> Color(0xFFFF3B30)
+        is KeyboardUiState.Error -> errorColor
         else -> Color.Black
     }
 
@@ -342,6 +357,8 @@ fun VoiceWaveform(volume: Float) {
         label = "offset"
     )
 
+    val errorColor = MaterialTheme.colorScheme.error
+
     Canvas(
         modifier = Modifier
             .fillMaxWidth(0.8f)
@@ -364,7 +381,7 @@ fun VoiceWaveform(volume: Float) {
 
         drawPath(
             path = path,
-            color = Color(0xFFFF2D55),
+            color = errorColor,
             style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
         )
     }
@@ -373,16 +390,18 @@ fun VoiceWaveform(volume: Float) {
 @Composable
 fun KeyboardUtilityKey(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color(0xFF1E1E24),
-    borderColor: Color = Color(0xFF2C2C35),
+    backgroundColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
     onClick: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
+    val finalBgColor = if (backgroundColor == Color.Unspecified) MaterialTheme.colorScheme.surface else backgroundColor
+
     Box(
         modifier = modifier
             .fillMaxHeight()
             .clip(RoundedCornerShape(8.dp))
-            .background(backgroundColor)
+            .background(finalBgColor)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center,

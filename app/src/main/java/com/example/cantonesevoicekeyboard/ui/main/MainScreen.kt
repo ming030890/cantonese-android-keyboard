@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +42,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.compose.ui.res.stringResource
 import com.example.cantonesevoicekeyboard.R
 import com.example.cantonesevoicekeyboard.data.DefaultDataRepository
-import com.example.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
+import com.example.cantonesevoicekeyboard.theme.*
 import java.io.File
 
 @Composable
@@ -76,9 +77,12 @@ fun MainScreen(
     }
   }
 
-  // Initial check
-  LaunchedEffect(Unit) {
-    refreshStatus()
+  // Refresh status when window gains focus (e.g. returning from system dialog overlays like the IME picker)
+  val windowInfo = LocalWindowInfo.current
+  LaunchedEffect(windowInfo.isWindowFocused) {
+    if (windowInfo.isWindowFocused) {
+      refreshStatus()
+    }
   }
 
   // Observe lifecycle to reload when returning from system Settings page
@@ -110,8 +114,8 @@ fun MainScreen(
       .background(
         brush = Brush.verticalGradient(
           colors = listOf(
-            Color(0xFF0F0F1A), // Deep indigo midnight
-            Color(0xFF06060A)  // Dark carbon black
+            DarkMidnight, // Deep indigo midnight
+            CarbonBlack  // Dark carbon black
           )
         )
       )
@@ -191,7 +195,7 @@ fun AppHeader(modifier: Modifier = Modifier) {
     Spacer(modifier = Modifier.height(4.dp))
     Text(
       text = stringResource(id = R.string.app_header_subtitle),
-      color = Color(0xFF00E5FF),
+      color = MaterialTheme.colorScheme.primary,
       fontSize = 12.sp,
       fontWeight = FontWeight.SemiBold,
       letterSpacing = 2.sp
@@ -213,6 +217,11 @@ fun MicLogo(modifier: Modifier = Modifier) {
     label = "logoPulse"
   )
 
+  val primaryColor = MaterialTheme.colorScheme.primary
+  val outlineColor = MaterialTheme.colorScheme.outline
+  val surfaceColor = MaterialTheme.colorScheme.surface
+  val backgroundColor = MaterialTheme.colorScheme.background
+
   Box(
     modifier = modifier,
     contentAlignment = Alignment.Center
@@ -222,8 +231,8 @@ fun MicLogo(modifier: Modifier = Modifier) {
       modifier = Modifier
         .size(90.dp * scale)
         .clip(CircleShape)
-        .background(Color(0xFF00E5FF).copy(alpha = 0.08f))
-        .border(1.5.dp, Color(0xFF00E5FF).copy(alpha = 0.2f), CircleShape)
+        .background(primaryColor.copy(alpha = 0.08f))
+        .border(1.5.dp, primaryColor.copy(alpha = 0.2f), CircleShape)
     )
     
     // Inner logo container
@@ -234,12 +243,12 @@ fun MicLogo(modifier: Modifier = Modifier) {
         .background(
           brush = Brush.radialGradient(
             colors = listOf(
-              Color(0xFF1E1E24),
-              Color(0xFF121215)
+              surfaceColor,
+              backgroundColor
             )
           )
         )
-        .border(1.dp, Color(0xFF2C2C35), CircleShape),
+        .border(1.dp, outlineColor, CircleShape),
       contentAlignment = Alignment.Center
     ) {
       Canvas(modifier = Modifier.size(32.dp)) {
@@ -253,7 +262,7 @@ fun MicLogo(modifier: Modifier = Modifier) {
         val micY = h * 0.16f
 
         drawRoundRect(
-          color = Color(0xFF00E5FF),
+          color = primaryColor,
           topLeft = Offset(micX, micY),
           size = Size(micW, micH),
           cornerRadius = CornerRadius(micW / 2f, micW / 2f)
@@ -275,7 +284,7 @@ fun MicLogo(modifier: Modifier = Modifier) {
 
         drawPath(
           path = standPath,
-          color = Color(0xFF00E5FF),
+          color = primaryColor,
           style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
         )
 
@@ -284,7 +293,7 @@ fun MicLogo(modifier: Modifier = Modifier) {
         val stemYEnd = h * 0.82f
 
         drawLine(
-          color = Color(0xFF00E5FF),
+          color = primaryColor,
           start = Offset(stemX, stemYStart),
           end = Offset(stemX, stemYEnd),
           strokeWidth = 2.5.dp.toPx(),
@@ -294,7 +303,7 @@ fun MicLogo(modifier: Modifier = Modifier) {
         val baseXStart = w * 0.32f
         val baseXEnd = w * 0.68f
         drawLine(
-          color = Color(0xFF00E5FF),
+          color = primaryColor,
           start = Offset(baseXStart, stemYEnd),
           end = Offset(baseXEnd, stemYEnd),
           strokeWidth = 2.5.dp.toPx(),
@@ -315,17 +324,20 @@ fun SetupStepCard(
   onActionClick: () -> Unit,
   modifier: Modifier = Modifier
 ) {
+  val outlineColor = MaterialTheme.colorScheme.outline
+  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+
   Card(
     modifier = modifier
       .fillMaxWidth()
       .padding(vertical = 6.dp),
     shape = RoundedCornerShape(16.dp),
     colors = CardDefaults.cardColors(
-      containerColor = Color(0xFF1E1E28)
+      containerColor = MaterialTheme.colorScheme.surface
     ),
     border = BorderStroke(
       width = 1.dp,
-      color = if (isCompleted) Color(0xFF00E676).copy(alpha = 0.3f) else Color(0xFF2C2C35)
+      color = if (isCompleted) SuccessGreen.copy(alpha = 0.3f) else outlineColor
     )
   ) {
     Row(
@@ -345,20 +357,20 @@ fun SetupStepCard(
             .size(36.dp)
             .clip(CircleShape)
             .background(
-              if (isCompleted) Color(0xFF00E676).copy(alpha = 0.15f)
-              else Color(0xFF2C2C35)
+              if (isCompleted) SuccessGreen.copy(alpha = 0.15f)
+              else outlineColor
             )
             .border(
               width = 1.5.dp,
-              color = if (isCompleted) Color(0xFF00E676) else Color(0xFF8E8E9F),
+              color = if (isCompleted) SuccessGreen else textVariantColor,
               shape = CircleShape
             ),
           contentAlignment = Alignment.Center
         ) {
           if (isCompleted) {
-            Text("✓", color = Color(0xFF00E676), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 16.sp)
           } else {
-            Text(stepNumber.toString(), color = Color(0xFF8E8E9F), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(stepNumber.toString(), color = textVariantColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
           }
         }
         
@@ -375,7 +387,7 @@ fun SetupStepCard(
           Spacer(modifier = Modifier.height(2.dp))
           Text(
             text = description,
-            color = Color(0xFF8E8E9F),
+            color = textVariantColor,
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal
           )
@@ -388,7 +400,7 @@ fun SetupStepCard(
       if (isCompleted) {
         Text(
           text = stringResource(id = R.string.setup_step_completed),
-          color = Color(0xFF00E676),
+          color = SuccessGreen,
           fontSize = 14.sp,
           fontWeight = FontWeight.Bold,
           modifier = Modifier.padding(horizontal = 8.dp)
@@ -396,15 +408,11 @@ fun SetupStepCard(
       } else {
         Button(
           onClick = onActionClick,
-          colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF00E5FF)
-          ),
           shape = RoundedCornerShape(20.dp),
           contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
           Text(
             text = actionText,
-            color = Color.Black,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold
           )
@@ -419,17 +427,19 @@ fun ModelStatusCard(
   isSynced: Boolean,
   modifier: Modifier = Modifier
 ) {
+  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+
   Card(
     modifier = modifier
       .fillMaxWidth()
       .padding(vertical = 6.dp),
     shape = RoundedCornerShape(16.dp),
     colors = CardDefaults.cardColors(
-      containerColor = Color(0xFF1E1E28)
+      containerColor = MaterialTheme.colorScheme.surface
     ),
     border = BorderStroke(
       width = 1.dp,
-      color = if (isSynced) Color(0xFF00E676).copy(alpha = 0.3f) else Color(0xFFFFA000).copy(alpha = 0.3f)
+      color = if (isSynced) SuccessGreen.copy(alpha = 0.3f) else AlertAmber.copy(alpha = 0.3f)
     )
   ) {
     Row(
@@ -443,20 +453,20 @@ fun ModelStatusCard(
           .size(36.dp)
           .clip(CircleShape)
           .background(
-            if (isSynced) Color(0xFF00E676).copy(alpha = 0.15f)
-            else Color(0xFFFFA000).copy(alpha = 0.15f)
+            if (isSynced) SuccessGreen.copy(alpha = 0.15f)
+            else AlertAmber.copy(alpha = 0.15f)
           )
           .border(
             width = 1.5.dp,
-            color = if (isSynced) Color(0xFF00E676) else Color(0xFFFFA000),
+            color = if (isSynced) SuccessGreen else AlertAmber,
             shape = CircleShape
           ),
         contentAlignment = Alignment.Center
       ) {
         if (isSynced) {
-          Text("✓", color = Color(0xFF00E676), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         } else {
-          Text("⚠", color = Color(0xFFFFA000), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+          Text("⚠", color = AlertAmber, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
       }
       
@@ -473,7 +483,7 @@ fun ModelStatusCard(
         Text(
           text = if (isSynced) stringResource(id = R.string.model_status_ready)
                  else stringResource(id = R.string.model_status_missing),
-          color = Color(0xFF8E8E9F),
+          color = textVariantColor,
           fontSize = 12.sp,
           fontWeight = FontWeight.Normal
         )
@@ -487,16 +497,21 @@ fun TestSandboxCard(
   modifier: Modifier = Modifier
 ) {
   var textState by remember { mutableStateOf("") }
-  
+  val primaryColor = MaterialTheme.colorScheme.primary
+  val outlineColor = MaterialTheme.colorScheme.outline
+  val errorColor = MaterialTheme.colorScheme.error
+  val surfaceColor = MaterialTheme.colorScheme.surface
+  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+
   Card(
     modifier = modifier
       .fillMaxWidth()
       .padding(vertical = 12.dp),
     shape = RoundedCornerShape(20.dp),
     colors = CardDefaults.cardColors(
-      containerColor = Color(0xFF1E1E28).copy(alpha = 0.8f)
+      containerColor = surfaceColor.copy(alpha = 0.8f)
     ),
-    border = BorderStroke(1.dp, Color(0xFF2C2C35))
+    border = BorderStroke(1.dp, outlineColor)
   ) {
     Column(
       modifier = Modifier.padding(16.dp)
@@ -510,7 +525,7 @@ fun TestSandboxCard(
       Spacer(modifier = Modifier.height(4.dp))
       Text(
         text = stringResource(id = R.string.sandbox_desc),
-        color = Color(0xFF8E8E9F),
+        color = textVariantColor,
         fontSize = 12.sp,
         lineHeight = 16.sp
       )
@@ -526,16 +541,16 @@ fun TestSandboxCard(
         placeholder = {
           Text(
             text = stringResource(id = R.string.sandbox_placeholder),
-            color = Color(0xFF5A5A6A),
+            color = PlaceholderGray,
             fontSize = 14.sp
           )
         },
         textStyle = TextStyle(color = Color.White, fontSize = 15.sp),
         colors = OutlinedTextFieldDefaults.colors(
-          focusedBorderColor = Color(0xFF00E5FF),
-          unfocusedBorderColor = Color(0xFF2C2C35),
-          focusedContainerColor = Color(0xFF121215).copy(alpha = 0.5f),
-          unfocusedContainerColor = Color(0xFF121215).copy(alpha = 0.5f)
+          focusedBorderColor = primaryColor,
+          unfocusedBorderColor = outlineColor,
+          focusedContainerColor = CarbonBlack.copy(alpha = 0.5f),
+          unfocusedContainerColor = CarbonBlack.copy(alpha = 0.5f)
         ),
         shape = RoundedCornerShape(12.dp)
       )
@@ -548,7 +563,7 @@ fun TestSandboxCard(
         ) {
           TextButton(
             onClick = { textState = "" },
-            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFF2D55))
+            colors = ButtonDefaults.textButtonColors(contentColor = errorColor)
           ) {
             Text(stringResource(id = R.string.sandbox_clear), fontSize = 12.sp, fontWeight = FontWeight.Bold)
           }
