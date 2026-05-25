@@ -1,15 +1,55 @@
+# Gradle files
+.gradle/
+build/
+/*/build/
+build.log
+.gradle-tasks/
+
+# Android Studio / IntelliJ IDEA
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+*.ipr
+*.iws
+.idea/caches/
+.idea/libraries/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/modules.xml
+
+# Local configuration
 local.properties
+/local.properties
+/*/local.properties
+
+# OS/System files
+.DS_Store
+Thumbs.db
+
+# Native C++ / JNI build outputs
+.externalNativeBuild/
+.cxx/
+/obj/
+/libs/
+*.so
+*.o
+*.a
+
+# Testing and Captures
+/captures/
+*.hprof
+
+# Signing files (Keystores)
+*.jks
+*.keystore
+*.pk8
+*.pem
+
+# Crashlytics / Google Services
+google-services.json
+
+# Backup/Temporary files
+*~
+*.swp
+*.bak
