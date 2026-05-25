@@ -12,8 +12,8 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 - [x] Implement language/segment configurations (`nativeSetLanguage`, `nativeSetSegmentSec`) and memory release (`nativeFree`) in Rust.
 
 ## 2. Kotlin Engine Wrapper
-- [ ] Create JNI folder structures (`app/src/main/jniLibs/arm64-v8a`) inside the Android project to host the compiled native library.
-- [ ] Implement the Kotlin engine wrapper class `QAsrEngine.kt` to load the `.so` library and expose JNI methods.
+- [x] Create JNI folder structures (`app/src/main/jniLibs/arm64-v8a`) inside the Android project to host the compiled native library.
+- [x] Implement the Kotlin engine wrapper class `QAsrEngine.kt` to load the `.so` library and expose JNI methods.
 
 ## 3. Android Input Method Editor (IME) Service
 - [ ] Create standard keyboard registration resources (`app/src/main/res/xml/method.xml` and key metadata).

@@ -9,10 +9,11 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.example.cantonesevoicekeyboard"
-        minSdk = 24
+        minSdk = 32
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
