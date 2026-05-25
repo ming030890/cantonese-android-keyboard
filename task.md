@@ -5,11 +5,11 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 ---
 
 ## 1. Native Build & Rust-JNI Bridge
-- [ ] Set up the standard `jni` crate dependency in `Cargo.toml` of `QwenASR` project.
-- [ ] Refactor `crates/qwen-asr/src/jni_api.rs` to replace the raw null-pointer stubs with real implementations.
-- [ ] Implement `nativeLoadModel` in Rust to load the model context and return the heap pointer as `jlong`.
-- [ ] Implement zero-copy `nativeTranscribePcmDirect` in Rust using direct pointer access via `GetDirectBufferAddress`.
-- [ ] Implement language/segment configurations (`nativeSetLanguage`, `nativeSetSegmentSec`) and memory release (`nativeFree`) in Rust.
+- [x] Set up the standard `jni` crate dependency in `Cargo.toml` of `QwenASR` project.
+- [x] Refactor `crates/qwen-asr/src/jni_api.rs` to replace the raw null-pointer stubs with real implementations.
+- [x] Implement `nativeLoadModel` in Rust to load the model context and return the heap pointer as `jlong`.
+- [x] Implement zero-copy `nativeTranscribePcmDirect` in Rust using direct pointer access via `GetDirectBufferAddress`.
+- [x] Implement language/segment configurations (`nativeSetLanguage`, `nativeSetSegmentSec`) and memory release (`nativeFree`) in Rust.
 
 ## 2. Kotlin Engine Wrapper
 - [ ] Create JNI folder structures (`app/src/main/jniLibs/arm64-v8a`) inside the Android project to host the compiled native library.
