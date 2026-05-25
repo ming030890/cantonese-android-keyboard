@@ -98,10 +98,13 @@ class QAsrEngine {
      * Free native memory allocations and release native engine resources.
      */
     fun free() {
-        if (nativeHandle != 0L) {
-            Log.i(TAG, "Freeing native model context with handle: $nativeHandle")
-            nativeFree(nativeHandle)
-            nativeHandle = 0L
+        synchronized(this) {
+            val handle = nativeHandle
+            if (handle != 0L) {
+                nativeHandle = 0L
+                Log.i(TAG, "Freeing native model context with handle: $handle")
+                nativeFree(handle)
+            }
         }
     }
 

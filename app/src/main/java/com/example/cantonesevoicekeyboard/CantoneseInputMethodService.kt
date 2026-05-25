@@ -187,8 +187,6 @@ class CantoneseInputMethodService : InputMethodService(),
 
     override fun onWindowHidden() {
         super.onWindowHidden()
-        // Ensure engine is freed when window hides completely
-        onFinishInputView(true)
     }
 
     override fun onDestroy() {
