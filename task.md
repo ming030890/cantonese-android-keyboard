@@ -16,15 +16,15 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 - [x] Implement the Kotlin engine wrapper class `QAsrEngine.kt` to load the `.so` library and expose JNI methods.
 
 ## 3. Android Input Method Editor (IME) Service
-- [ ] Create standard keyboard registration resources (`app/src/main/res/xml/method.xml` and key metadata).
-- [ ] Add the `RECORD_AUDIO` permission and register the IME service inside `app/src/main/AndroidManifest.xml`.
-- [ ] Implement `CantoneseInputMethodService.kt` extending `InputMethodService`.
-- [ ] Implement visible-only memory optimization (loading in `onStartInputView` and freeing in `onFinishInputView` / `onWindowHidden`).
-- [ ] Build the Jetpack Compose keyboard interface featuring the Hold-to-Speak button, sound wave animation, and editing keys.
+- [x] Create standard keyboard registration resources (`app/src/main/res/xml/method.xml` and key metadata).
+- [x] Add the `RECORD_AUDIO` permission and register the IME service inside `app/src/main/AndroidManifest.xml`.
+- [x] Implement `CantoneseInputMethodService.kt` extending `InputMethodService`.
+- [x] Implement visible-only memory optimization (loading in `onStartInputView` and freeing in `onFinishInputView` / `onWindowHidden`).
+- [x] Build the Jetpack Compose keyboard interface featuring the Tap-to-Speak button, sound wave animation, and editing keys.
 
 ## 4. Setup & Sandbox Companion Application
-- [ ] Build the 3-step setup walkthrough inside `MainActivity.kt` using Jetpack Compose (Permissions, Activation, Picker).
-- [ ] Implement the interactive Cantonese voice dictation sandbox input field inside `MainActivity` to test the keyboard.
+- [x] Build the 3-step setup walkthrough inside `MainActivity.kt` using Jetpack Compose (Permissions, Activation, Picker).
+- [x] Implement the interactive Cantonese voice dictation sandbox input field inside `MainActivity` to test the keyboard.
 
 ## 5. Deployment & Verification Script
 - [ ] Create the comprehensive compilation, asset synchronization, building, and running shell script `deploy.sh` in the project root.
