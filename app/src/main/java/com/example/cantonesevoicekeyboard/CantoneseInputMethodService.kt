@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputConnection
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -344,7 +345,16 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     private fun deleteSurroundingText() {
-        currentInputConnection?.deleteSurroundingText(1, 0)
+        currentInputConnection?.deleteSelectionOrPreviousCharacter()
+    }
+
+    private fun InputConnection.deleteSelectionOrPreviousCharacter() {
+        val selectedText = getSelectedText(0)
+        if (!selectedText.isNullOrEmpty()) {
+            commitText("", 1)
+        } else {
+            deleteSurroundingText(1, 0)
+        }
     }
 
     private fun sendSpace() {

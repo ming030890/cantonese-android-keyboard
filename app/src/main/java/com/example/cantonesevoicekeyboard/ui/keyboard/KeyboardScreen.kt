@@ -4,6 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,7 @@ import com.example.cantonesevoicekeyboard.KeyboardUiState
 import com.example.cantonesevoicekeyboard.R
 import androidx.compose.ui.res.stringResource
 import com.example.cantonesevoicekeyboard.theme.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.sin
 
@@ -50,6 +53,17 @@ fun KeyboardScreen(
     val outlineColor = MaterialTheme.colorScheme.outline
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
     val errorColor = MaterialTheme.colorScheme.error
+    var isDeleting by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isDeleting) {
+        if (isDeleting) {
+            delay(450)
+            while (isDeleting) {
+                onDeleteSurroundingText()
+                delay(55)
+            }
+        }
+    }
 
     // Main Keyboard container with premium glassmorphic/charcoal aesthetics
     Box(
@@ -64,6 +78,7 @@ fun KeyboardScreen(
                     )
                 )
             )
+            .navigationBarsPadding()
             .padding(12.dp)
     ) {
         Column(
@@ -217,8 +232,22 @@ fun KeyboardScreen(
 
                 // Delete Key
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(1.2f),
-                    onClick = onDeleteSurroundingText
+                    modifier = Modifier
+                        .weight(1.2f)
+                        .pointerInput(onDeleteSurroundingText) {
+                            detectTapGestures(
+                                onPress = {
+                                    onDeleteSurroundingText()
+                                    isDeleting = true
+                                    try {
+                                        tryAwaitRelease()
+                                    } finally {
+                                        isDeleting = false
+                                    }
+                                }
+                            )
+                        },
+                    onClick = null
                 ) {
                     BackspaceIcon(modifier = Modifier.size(20.dp), color = IconGray)
                 }
@@ -392,17 +421,22 @@ fun KeyboardUtilityKey(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     content: @Composable BoxScope.() -> Unit
 ) {
     val finalBgColor = if (backgroundColor == Color.Unspecified) MaterialTheme.colorScheme.surface else backgroundColor
+    val keyModifier = if (onClick != null) {
+        Modifier.clickable(onClick = onClick)
+    } else {
+        Modifier
+    }
 
     Box(
         modifier = modifier
             .fillMaxHeight()
             .clip(RoundedCornerShape(8.dp))
             .background(finalBgColor)
-            .clickable(onClick = onClick)
+            .then(keyModifier)
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center,
         content = content
