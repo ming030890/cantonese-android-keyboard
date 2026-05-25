@@ -141,6 +141,11 @@ We will implement the keyboard service in strict accordance with **Modern Androi
 3. **Jetpack Compose UI Layout**:
    Use declarative Compose elements with proper State Hoisting to ensure the layout remains testable, clean, and decoupling UI logic from system service binders.
 
+### Dynamic Visibility Memory Lifecycle (RAM Optimization)
+Since model load time is extremely fast (~128 ms) and background memory retention is costly, we will dynamically manage model loading based on keyboard visibility:
+- **Load Model on Show**: Inside `onStartInputView(...)` (when the keyboard becomes visible on screen), we will initiate an asynchronous Kotlin coroutine to load `QAsrEngine` from external files.
+- **Free Model on Hide**: Inside `onFinishInputView(...)` or `onWindowHidden()` (when the keyboard is hidden from the user), we will immediately call `QAsrEngine.free()` to release native pointers and free all ASR memory (~500MB+ RAM), ensuring our idle footprint is near zero.
+
 ### Service Registration (`AndroidManifest.xml`)
 ```xml
 <service
