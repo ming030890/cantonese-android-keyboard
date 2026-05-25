@@ -182,7 +182,28 @@ Because a keyboard cannot directly launch a permission dialog while active, we w
 
 ---
 
-## Verification Plan
+## Verification & Deployment Plan
+
+### Automated Deploy & Run Script (`deploy.sh`)
+
+We will create a robust shell script `deploy.sh` in the root of the project to completely automate native compilation, model asset preparation, APK building, installation, and launching in a single command.
+
+#### [NEW] [deploy.sh](file:///Users/tony/Documents/keyboard/cantonese-voice-keyboard/deploy.sh)
+The script will perform the following actions:
+1. **Compile Rust JNI Library**: Runs `cargo ndk` with baseline features (`blas`, `android`) and target options (`+dotprod`) statically linked with OpenBLAS inside the `QwenASR` crate workspace, outputting the generated `libqwen_asr.so` to `/app/src/main/jniLibs/arm64-v8a/`.
+2. **Push Model via ADB**: Automatically verifies/creates the destination path on the connected device and syncs the pre-quantized Cantonese model (`qwen-asr-int8dec`):
+   ```bash
+   adb shell "mkdir -p /sdcard/Android/data/com.example.cantonesevoicekeyboard/files"
+   adb push /Volumes/SSD/qwen-asr-int8dec /sdcard/Android/data/com.example.cantonesevoicekeyboard/files/
+   ```
+3. **Build & Install APK**: Compiles the Gradle project and installs the debug app:
+   ```bash
+   ./gradlew installDebug
+   ```
+4. **Launch Main Setup App**: Opens the main configuration activity:
+   ```bash
+   adb shell am start -n com.example.cantonesevoicekeyboard/.MainActivity
+   ```
 
 ### Real End-to-End Instrumented Test
 We will implement an on-device instrumented test (`QAsrEngineE2ETest`) that runs on a physical target or high-performance arm64 emulator without mocking:
@@ -192,3 +213,4 @@ We will implement an on-device instrumented test (`QAsrEngineE2ETest`) that runs
 3. **Performance & Latency Benchmark**:
    - The test measures total time elapsed during the `transcribePcmDirect` call.
    - It asserts that the median inference latency is in line with the baseline (e.g. **< 1.7 seconds** for the common voice benchmark dataset) to ensure target optimizations (`+dotprod` and transient prefill dequantization) are actively compiling and executing successfully.
+
