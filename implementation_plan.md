@@ -219,3 +219,19 @@ We will implement an on-device instrumented test (`QAsrEngineE2ETest`) that runs
    - The test measures total time elapsed during the `transcribePcmDirect` call.
    - It asserts that the median inference latency is in line with the baseline (e.g. **< 1.7 seconds** for the common voice benchmark dataset) to ensure target optimizations (`+dotprod` and transient prefill dequantization) are actively compiling and executing successfully.
 
+### Compose Screenshot Testing
+
+We will implement Compose Screenshot Testing in accordance with Android Studio specifications to verify our premium keyboard layouts and ensure there are no visual regressions in our glassmorphic panel styling across different screen resolutions and light/dark theme combinations:
+
+1. **Gradle Configuration**: We will add the screenshot testing plugin inside `app/build.gradle.kts` and define dependency rules:
+   ```kotlin
+   plugins {
+       id("com.android.compose.screenshot") version "0.0.1-alpha08" // Or latest preview version
+   }
+   ```
+2. **Declaring Screenshot Tests**: We will create preview screenshots inside `app/src/screenshotTest/kotlin/` using `@Preview` configurations for the keyboard in `Idle`, `Recording` (pulsing states), and `Transcribing` states.
+3. **Execution Commands**:
+   * **Update Reference Images**: Run `./gradlew updateDebugScreenshotTest` to generate reference baseline images.
+   * **Verify Correctness**: Run `./gradlew validateDebugScreenshotTest` to capture current layout outputs and perform high-precision pixel-by-pixel comparisons against baselines.
+
+

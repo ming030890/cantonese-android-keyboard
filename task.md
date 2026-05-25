@@ -29,3 +29,5 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 ## 5. Deployment & Verification Script
 - [ ] Create the comprehensive compilation, asset synchronization, building, and running shell script `deploy.sh` in the project root.
 - [ ] Implement a full on-device instrumented End-to-End Test `QAsrEngineE2ETest` to verify transcription correctness and measure latency against the best baseline (~1.56s).
+- [ ] Configure the Compose Screenshot Testing plugin and write screenshot verification tests for key visual states (Idle, Recording, Transcribing).
+
