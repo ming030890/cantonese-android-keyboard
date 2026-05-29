@@ -58,7 +58,7 @@ class QAsrEngineE2ETest {
 
         try {
             // 4. Configure engine
-            engine.setLanguage("Auto")
+            engine.setLanguage("yue")
             engine.setPrompt("音频是粤语，可能夹杂英语")
             engine.setSegmentSec(0f) // disable segmenting for whole-file benchmark
 

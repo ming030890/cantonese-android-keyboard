@@ -152,7 +152,7 @@ class CantoneseInputMethodService : InputMethodService(),
                 Log.i(TAG, "Loading model from: ${modelDir.absolutePath}")
                 val success = qAsrEngine.loadModel(modelDir.absolutePath, 1)
                 if (success) {
-                    qAsrEngine.setLanguage("Auto")
+                    qAsrEngine.setLanguage("yue")
                     qAsrEngine.setPrompt("音频是粤语，可能夹杂英语")
                     qAsrEngine.setSegmentSec(0.0f)
                     isModelLoaded = true
@@ -234,7 +234,7 @@ class CantoneseInputMethodService : InputMethodService(),
 
         val audioRecord = try {
             AudioRecord(
-                MediaRecorder.AudioSource.MIC,
+                MediaRecorder.AudioSource.VOICE_RECOGNITION,
                 SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
