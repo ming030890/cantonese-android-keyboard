@@ -67,7 +67,7 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     data class AutoSendConfig(
-        val silenceTimeoutMs: Long = 1200,
+        val silenceTimeoutMs: Long = 700,
         val speechThresholdRms: Float = 0.001f,
         val preRollMs: Long = 300,
         val minUtteranceMs: Long = 500,
