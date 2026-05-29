@@ -32,10 +32,12 @@ import com.example.cantonesevoicekeyboard.R
 import com.example.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 import com.example.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
 import com.qwenasr.QAsrEngine
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.joinAll
@@ -46,6 +48,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.max
 
 class CantoneseInputMethodService : InputMethodService(),
     LifecycleOwner,
@@ -59,7 +63,23 @@ class CantoneseInputMethodService : InputMethodService(),
         private const val MAX_SAMPLES = SAMPLE_RATE * MAX_RECORD_SECONDS
         private const val FLOAT_SIZE = 4
         private const val DIRECT_BUFFER_SIZE = MAX_SAMPLES * FLOAT_SIZE
+        private const val MAX_PROMPT_CHARS = 160
     }
+
+    data class AutoSendConfig(
+        val silenceTimeoutMs: Long = 1200,
+        val speechThresholdRms: Float = 0.001f,
+        val preRollMs: Long = 300,
+        val minUtteranceMs: Long = 500,
+        val maxUtteranceMs: Long = 30_000,
+        val appendSpaceBetweenUtterances: Boolean = true,
+    )
+
+    private data class FrozenAudioSegment(
+        val buffer: ByteBuffer,
+        val samples: Int,
+        val session: Long,
+    )
 
     // Lifecycle, ViewModel, SavedState bridges for Compose support
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -82,13 +102,20 @@ class CantoneseInputMethodService : InputMethodService(),
     private val engineMutex = Mutex()
     private var isModelLoaded = false
     private var modelLoadingJob: Job? = null
-    private var transcriptionJob: Job? = null
+    private var asrWorkerJob: Job? = null
     private var inputViewSession = 0L
     @Volatile
     private var isInputViewVisible = false
 
     private lateinit var directAudioBuffer: ByteBuffer
     private var totalSamplesRecorded = 0
+    private val autoSendConfig = AutoSendConfig()
+    private var previousUtterancePrompt: String = ""
+    private var speechActive = false
+    private var speechStartSample = 0
+    private var lastSpeechSample = 0
+    private val pendingSegments = Channel<FrozenAudioSegment>(capacity = Channel.UNLIMITED)
+    private val pendingSegmentCount = AtomicInteger(0)
 
     // UI States
     private val _uiState = MutableStateFlow<KeyboardUiState>(KeyboardUiState.Idle)
@@ -171,7 +198,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     val loaded = qAsrEngine.loadModel(modelDir.absolutePath, 1)
                     if (loaded) {
                         qAsrEngine.setLanguage("yue")
-                        qAsrEngine.setPrompt("音频是粤语，可能夹杂英语")
+                        qAsrEngine.setPrompt("")
                         qAsrEngine.setSegmentSec(0.0f)
                     }
                     loaded
@@ -207,11 +234,12 @@ class CantoneseInputMethodService : InputMethodService(),
         stopRecordingInternal(discard = true)
         modelLoadingJob?.cancel()
         modelLoadingJob = null
+        asrWorkerJob?.cancel()
 
         // Reclaim RAM optimization: free model allocations when keyboard is hidden
         serviceScope.launch(Dispatchers.Default) {
             audioRecordJob?.join()
-            transcriptionJob?.join()
+            asrWorkerJob?.join()
             if (!isInputViewVisible && finishingSession == inputViewSession) {
                 Log.i(TAG, "Freeing model to reclaim RAM...")
                 engineMutex.withLock {
@@ -236,7 +264,8 @@ class CantoneseInputMethodService : InputMethodService(),
         
         // Final safety cleanup
         serviceScope.launch(Dispatchers.Default) {
-            listOfNotNull(audioRecordJob, transcriptionJob, modelLoadingJob).joinAll()
+            asrWorkerJob?.cancel()
+            listOfNotNull(audioRecordJob, asrWorkerJob, modelLoadingJob).joinAll()
             engineMutex.withLock {
                 qAsrEngine.free()
             }
@@ -312,6 +341,10 @@ class CantoneseInputMethodService : InputMethodService(),
         activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
         totalSamplesRecorded = 0
+        previousUtterancePrompt = ""
+        resetVadState()
+        drainPendingSegments()
+        ensureAsrWorker()
 
         audioRecordJob = serviceScope.launch(Dispatchers.IO) {
             val shortBuffer = ShortArray(1024)
@@ -320,25 +353,24 @@ class CantoneseInputMethodService : InputMethodService(),
 
             Log.i(TAG, "Recording started and mic is live...")
 
-            while (isRecording && totalSamplesRecorded < MAX_SAMPLES) {
+            while (isRecording) {
                 val readShorts = audioRecord.read(shortBuffer, 0, shortBuffer.size)
                 if (readShorts > 0) {
                     var sumSquare = 0.0
-                    floatBuffer.position(totalSamplesRecorded)
+                    val chunkStartSample = totalSamplesRecorded
                     for (i in 0 until readShorts) {
-                        if (totalSamplesRecorded < MAX_SAMPLES) {
-                            val sample = shortBuffer[i]
-                            val floatSample = sample / 32768.0f
-                            floatBuffer.put(floatSample)
-                            totalSamplesRecorded++
-                            sumSquare += floatSample * floatSample
-                        }
+                        val sample = shortBuffer[i]
+                        val floatSample = sample / 32768.0f
+                        floatBuffer.put(totalSamplesRecorded % MAX_SAMPLES, floatSample)
+                        totalSamplesRecorded++
+                        sumSquare += floatSample * floatSample
                     }
 
                     // Calculate real-time RMS for waveform visuals
                     val rms = if (readShorts > 0) Math.sqrt(sumSquare / readShorts) else 0.0
                     val normalizedVolume = (rms * 3.0).toFloat().coerceIn(0f, 1f) // boost visually
                     _volumeLevel.value = normalizedVolume
+                    updateVad(rms.toFloat(), chunkStartSample, readShorts)
                 } else if (readShorts < 0) {
                     Log.e(TAG, "Error reading audio data: $readShorts")
                     break
@@ -362,6 +394,9 @@ class CantoneseInputMethodService : InputMethodService(),
     private fun stopRecordingInternal(discard: Boolean) {
         val recorderJob = audioRecordJob
         if (!isRecording && recorderJob == null) return
+        if (!discard) {
+            flushActiveSpeechSegment(force = true)
+        }
         isRecording = false
         try {
             activeAudioRecord?.stop()
@@ -372,6 +407,9 @@ class CantoneseInputMethodService : InputMethodService(),
 
         if (discard) {
             _uiState.value = KeyboardUiState.Idle
+            asrWorkerJob?.cancel()
+            drainPendingSegments()
+            resetVadState()
             serviceScope.launch(Dispatchers.IO) {
                 recorderJob?.join()
                 if (audioRecordJob === recorderJob) {
@@ -382,36 +420,168 @@ class CantoneseInputMethodService : InputMethodService(),
         }
 
         _uiState.value = KeyboardUiState.Transcribing
-        val session = inputViewSession
-
-        transcriptionJob = serviceScope.launch(Dispatchers.Default) {
+        serviceScope.launch(Dispatchers.Default) {
             recorderJob?.join()
             if (audioRecordJob === recorderJob) {
                 audioRecordJob = null
             }
-
-            val samplesRecorded = totalSamplesRecorded
-            if (samplesRecorded <= 0) {
-                withContext(Dispatchers.Main) {
-                    _uiState.value = KeyboardUiState.Idle
-                }
-                return@launch
-            }
-
-            Log.i(TAG, "Starting transcription of $samplesRecorded samples...")
-            val result = engineMutex.withLock {
-                qAsrEngine.transcribePcmDirect(directAudioBuffer, samplesRecorded)
-            }
-            Log.i(TAG, "Transcription complete. Result: $result")
-
-            withContext(Dispatchers.Main) {
-                if (isInputViewVisible && session == inputViewSession && !result.isNullOrEmpty()) {
-                    currentInputConnection?.commitText(result, 1)
-                }
+            if (pendingSegmentCount.get() == 0) {
                 _uiState.value = KeyboardUiState.Idle
             }
-            transcriptionJob = null
         }
+    }
+
+    private fun ensureAsrWorker() {
+        val existingWorker = asrWorkerJob
+        if (existingWorker?.isActive == true) return
+
+        asrWorkerJob = serviceScope.launch(Dispatchers.Default) {
+            try {
+                for (segment in pendingSegments) {
+                    try {
+                        transcribeFrozenSegment(segment)
+                    } finally {
+                        val remainingSegments = pendingSegmentCount.updateAndGet { count ->
+                            (count - 1).coerceAtLeast(0)
+                        }
+                        if (!isRecording && remainingSegments == 0) {
+                            withContext(Dispatchers.Main) {
+                                _uiState.value = KeyboardUiState.Idle
+                            }
+                        }
+                    }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "ASR worker failed", e)
+                withContext(Dispatchers.Main) {
+                    if (isInputViewVisible) {
+                        _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun transcribeFrozenSegment(segment: FrozenAudioSegment) {
+        if (segment.samples <= 0) return
+
+        Log.i(TAG, "Starting transcription of ${segment.samples} frozen samples...")
+        val result = engineMutex.withLock {
+            qAsrEngine.setPrompt(previousUtterancePrompt)
+            qAsrEngine.transcribePcmDirect(segment.buffer, segment.samples)
+        }
+        Log.i(TAG, "Transcription complete. Result: $result")
+
+        val finalText = result?.trim().orEmpty()
+
+        if (finalText.isEmpty()) return
+
+        withContext(Dispatchers.Main) {
+            if (isInputViewVisible && segment.session == inputViewSession) {
+                val textToCommit = if (
+                    autoSendConfig.appendSpaceBetweenUtterances &&
+                    previousUtterancePrompt.isNotEmpty()
+                ) {
+                    " $finalText"
+                } else {
+                    finalText
+                }
+                currentInputConnection?.commitText(textToCommit, 1)
+                previousUtterancePrompt = finalText.takeLast(MAX_PROMPT_CHARS)
+            }
+        }
+    }
+
+    private fun updateVad(rms: Float, chunkStartSample: Int, readSamples: Int) {
+        val chunkEndSampleExclusive = chunkStartSample + readSamples
+        val isSpeech = rms >= autoSendConfig.speechThresholdRms
+        val silenceSamples = msToSamples(autoSendConfig.silenceTimeoutMs)
+        val maxUtteranceSamples = msToSamples(autoSendConfig.maxUtteranceMs)
+
+        if (isSpeech) {
+            if (!speechActive) {
+                speechActive = true
+                speechStartSample = max(0, chunkStartSample - msToSamples(autoSendConfig.preRollMs))
+                Log.d(TAG, "Speech started at sample $speechStartSample")
+            }
+            lastSpeechSample = chunkEndSampleExclusive
+        }
+
+        if (!speechActive) return
+
+        val speechDuration = chunkEndSampleExclusive - speechStartSample
+        val silenceDuration = chunkEndSampleExclusive - lastSpeechSample
+        if (speechDuration >= maxUtteranceSamples || (!isSpeech && silenceDuration >= silenceSamples)) {
+            flushActiveSpeechSegment(force = false)
+        }
+    }
+
+    private fun flushActiveSpeechSegment(force: Boolean) {
+        if (!speechActive) return
+
+        val segmentEndSample = if (force) totalSamplesRecorded else lastSpeechSample
+        val segmentStartSample = speechStartSample.coerceAtLeast(max(0, segmentEndSample - MAX_SAMPLES))
+        val segmentSamples = segmentEndSample - segmentStartSample
+        val minUtteranceSamples = msToSamples(autoSendConfig.minUtteranceMs)
+
+        if (segmentSamples >= minUtteranceSamples) {
+            freezeSegment(segmentStartSample, segmentSamples)
+        } else {
+            Log.i(TAG, "Discarding short utterance: $segmentSamples samples")
+        }
+
+        speechActive = false
+        speechStartSample = 0
+        lastSpeechSample = 0
+    }
+
+    private fun freezeSegment(startSample: Int, sampleCount: Int) {
+        val frozenBuffer = ByteBuffer
+            .allocateDirect(sampleCount * FLOAT_SIZE)
+            .order(ByteOrder.nativeOrder())
+        val liveFloatBuffer = directAudioBuffer.asFloatBuffer()
+        val frozenFloatBuffer = frozenBuffer.asFloatBuffer()
+
+        for (offset in 0 until sampleCount) {
+            val sourceIndex = (startSample + offset) % MAX_SAMPLES
+            frozenFloatBuffer.put(liveFloatBuffer.get(sourceIndex))
+        }
+        frozenBuffer.position(0)
+        frozenBuffer.limit(sampleCount * FLOAT_SIZE)
+
+        val segment = FrozenAudioSegment(
+            buffer = frozenBuffer,
+            samples = sampleCount,
+            session = inputViewSession,
+        )
+        pendingSegmentCount.incrementAndGet()
+        val result = pendingSegments.trySend(segment)
+        if (result.isSuccess) {
+            Log.i(TAG, "Queued frozen utterance: $sampleCount samples")
+            ensureAsrWorker()
+        } else {
+            pendingSegmentCount.decrementAndGet()
+            Log.e(TAG, "Failed to queue frozen utterance", result.exceptionOrNull())
+        }
+    }
+
+    private fun resetVadState() {
+        speechActive = false
+        speechStartSample = 0
+        lastSpeechSample = 0
+    }
+
+    private fun drainPendingSegments() {
+        while (true) {
+            pendingSegments.tryReceive().getOrNull() ?: break
+        }
+        pendingSegmentCount.set(0)
+    }
+
+    private fun msToSamples(ms: Long): Int {
+        return ((SAMPLE_RATE * ms) / 1000L).toInt()
     }
 
     private fun deleteSurroundingText() {
