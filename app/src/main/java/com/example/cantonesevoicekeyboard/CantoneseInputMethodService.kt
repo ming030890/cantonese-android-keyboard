@@ -35,9 +35,13 @@ import com.qwenasr.QAsrEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.ByteBuffer
@@ -73,8 +77,15 @@ class CantoneseInputMethodService : InputMethodService(),
 
     // ASR Engine & Audio State
     private val qAsrEngine = QAsrEngine()
+    private val serviceJob = SupervisorJob()
+    private val serviceScope = CoroutineScope(serviceJob + Dispatchers.Main.immediate)
+    private val engineMutex = Mutex()
     private var isModelLoaded = false
     private var modelLoadingJob: Job? = null
+    private var transcriptionJob: Job? = null
+    private var inputViewSession = 0L
+    @Volatile
+    private var isInputViewVisible = false
 
     private lateinit var directAudioBuffer: ByteBuffer
     private var totalSamplesRecorded = 0
@@ -87,6 +98,8 @@ class CantoneseInputMethodService : InputMethodService(),
     val volumeLevel = _volumeLevel.asStateFlow()
 
     private var audioRecordJob: Job? = null
+    @Volatile
+    private var activeAudioRecord: AudioRecord? = null
     @Volatile
     private var isRecording = false
 
@@ -131,14 +144,17 @@ class CantoneseInputMethodService : InputMethodService(),
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        isInputViewVisible = true
+        val session = ++inputViewSession
         
         // Dynamically load the model asynchronously when keyboard opens
         if (!isModelLoaded && modelLoadingJob == null) {
             _uiState.value = KeyboardUiState.LoadingModel
-            modelLoadingJob = CoroutineScope(Dispatchers.Default).launch {
+            modelLoadingJob = serviceScope.launch(Dispatchers.Default) {
                 val externalDir = getExternalFilesDir(null)
                 if (externalDir == null) {
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_external_storage_unavailable))
+                    modelLoadingJob = null
                     return@launch
                 }
                 
@@ -146,22 +162,37 @@ class CantoneseInputMethodService : InputMethodService(),
                 if (!modelDir.exists()) {
                     Log.w(TAG, "Model directory not found at: ${modelDir.absolutePath}")
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_model_not_found))
+                    modelLoadingJob = null
                     return@launch
                 }
                 
                 Log.i(TAG, "Loading model from: ${modelDir.absolutePath}")
-                val success = qAsrEngine.loadModel(modelDir.absolutePath, 1)
+                val success = engineMutex.withLock {
+                    val loaded = qAsrEngine.loadModel(modelDir.absolutePath, 1)
+                    if (loaded) {
+                        qAsrEngine.setLanguage("yue")
+                        qAsrEngine.setPrompt("音频是粤语，可能夹杂英语")
+                        qAsrEngine.setSegmentSec(0.0f)
+                    }
+                    loaded
+                }
                 if (success) {
-                    qAsrEngine.setLanguage("yue")
-                    qAsrEngine.setPrompt("音频是粤语，可能夹杂英语")
-                    qAsrEngine.setSegmentSec(0.0f)
-                    isModelLoaded = true
-                    _uiState.value = KeyboardUiState.Idle
-                    Log.i(TAG, "Model loaded successfully!")
+                    if (isInputViewVisible && session == inputViewSession) {
+                        isModelLoaded = true
+                        _uiState.value = KeyboardUiState.Idle
+                        Log.i(TAG, "Model loaded successfully!")
+                    } else {
+                        Log.i(TAG, "Model loaded after keyboard hidden; freeing immediately.")
+                        engineMutex.withLock {
+                            qAsrEngine.free()
+                        }
+                        isModelLoaded = false
+                    }
                 } else {
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
                     Log.e(TAG, "Failed to load model!")
                 }
+                modelLoadingJob = null
             }
         }
     }
@@ -169,6 +200,8 @@ class CantoneseInputMethodService : InputMethodService(),
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        isInputViewVisible = false
+        val finishingSession = inputViewSession
 
         // Cancel active recording or loading jobs if active
         stopRecordingInternal(discard = true)
@@ -176,10 +209,14 @@ class CantoneseInputMethodService : InputMethodService(),
         modelLoadingJob = null
 
         // Reclaim RAM optimization: free model allocations when keyboard is hidden
-        if (isModelLoaded) {
-            CoroutineScope(Dispatchers.Default).launch {
+        serviceScope.launch(Dispatchers.Default) {
+            audioRecordJob?.join()
+            transcriptionJob?.join()
+            if (!isInputViewVisible && finishingSession == inputViewSession) {
                 Log.i(TAG, "Freeing model to reclaim RAM...")
-                qAsrEngine.free()
+                engineMutex.withLock {
+                    qAsrEngine.free()
+                }
                 isModelLoaded = false
                 _uiState.value = KeyboardUiState.Idle
             }
@@ -194,9 +231,18 @@ class CantoneseInputMethodService : InputMethodService(),
         super.onDestroy()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         store.clear()
+        isInputViewVisible = false
+        stopRecordingInternal(discard = true)
         
         // Final safety cleanup
-        qAsrEngine.free()
+        serviceScope.launch(Dispatchers.Default) {
+            listOfNotNull(audioRecordJob, transcriptionJob, modelLoadingJob).joinAll()
+            engineMutex.withLock {
+                qAsrEngine.free()
+            }
+            isModelLoaded = false
+            serviceJob.cancel()
+        }
     }
 
     private fun toggleRecording() {
@@ -263,10 +309,11 @@ class CantoneseInputMethodService : InputMethodService(),
         }
 
         isRecording = true
+        activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
         totalSamplesRecorded = 0
 
-        audioRecordJob = CoroutineScope(Dispatchers.IO).launch {
+        audioRecordJob = serviceScope.launch(Dispatchers.IO) {
             val shortBuffer = ShortArray(1024)
             val floatBuffer = directAudioBuffer.asFloatBuffer()
             floatBuffer.clear()
@@ -304,43 +351,66 @@ class CantoneseInputMethodService : InputMethodService(),
                 Log.w(TAG, "Error stopping AudioRecord", e)
             } finally {
                 audioRecord.release()
+                if (activeAudioRecord === audioRecord) {
+                    activeAudioRecord = null
+                }
             }
             Log.i(TAG, "Recording finished. Recorded samples: $totalSamplesRecorded")
         }
     }
 
     private fun stopRecordingInternal(discard: Boolean) {
-        if (!isRecording) return
+        val recorderJob = audioRecordJob
+        if (!isRecording && recorderJob == null) return
         isRecording = false
-        audioRecordJob?.cancel()
-        audioRecordJob = null
+        try {
+            activeAudioRecord?.stop()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error requesting AudioRecord stop", e)
+        }
         _volumeLevel.value = 0f
 
         if (discard) {
             _uiState.value = KeyboardUiState.Idle
+            serviceScope.launch(Dispatchers.IO) {
+                recorderJob?.join()
+                if (audioRecordJob === recorderJob) {
+                    audioRecordJob = null
+                }
+            }
             return
         }
 
         _uiState.value = KeyboardUiState.Transcribing
+        val session = inputViewSession
 
-        CoroutineScope(Dispatchers.Default).launch {
-            if (totalSamplesRecorded <= 0) {
+        transcriptionJob = serviceScope.launch(Dispatchers.Default) {
+            recorderJob?.join()
+            if (audioRecordJob === recorderJob) {
+                audioRecordJob = null
+            }
+
+            val samplesRecorded = totalSamplesRecorded
+            if (samplesRecorded <= 0) {
                 withContext(Dispatchers.Main) {
                     _uiState.value = KeyboardUiState.Idle
                 }
                 return@launch
             }
 
-            Log.i(TAG, "Starting transcription of $totalSamplesRecorded samples...")
-            val result = qAsrEngine.transcribePcmDirect(directAudioBuffer, totalSamplesRecorded)
+            Log.i(TAG, "Starting transcription of $samplesRecorded samples...")
+            val result = engineMutex.withLock {
+                qAsrEngine.transcribePcmDirect(directAudioBuffer, samplesRecorded)
+            }
             Log.i(TAG, "Transcription complete. Result: $result")
 
             withContext(Dispatchers.Main) {
-                if (!result.isNullOrEmpty()) {
+                if (isInputViewVisible && session == inputViewSession && !result.isNullOrEmpty()) {
                     currentInputConnection?.commitText(result, 1)
                 }
                 _uiState.value = KeyboardUiState.Idle
             }
+            transcriptionJob = null
         }
     }
 

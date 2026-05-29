@@ -26,18 +26,20 @@ class QAsrEngine {
      * @return True if initialized successfully, false otherwise.
      */
     fun loadModel(modelDir: String, nThreads: Int): Boolean {
-        if (nativeHandle != 0L) {
-            Log.w(TAG, "Model already loaded. Freeing existing handle first.")
-            free()
+        synchronized(this) {
+            if (nativeHandle != 0L) {
+                Log.w(TAG, "Model already loaded. Freeing existing handle first.")
+                free()
+            }
+            nativeHandle = nativeLoadModel(modelDir, nThreads)
+            val success = nativeHandle != 0L
+            if (success) {
+                Log.i(TAG, "Successfully loaded model from $modelDir. Handle: $nativeHandle")
+            } else {
+                Log.e(TAG, "Failed to load model from $modelDir")
+            }
+            return success
         }
-        nativeHandle = nativeLoadModel(modelDir, nThreads)
-        val success = nativeHandle != 0L
-        if (success) {
-            Log.i(TAG, "Successfully loaded model from $modelDir. Handle: $nativeHandle")
-        } else {
-            Log.e(TAG, "Failed to load model from $modelDir")
-        }
-        return success
     }
 
     /**
@@ -47,15 +49,18 @@ class QAsrEngine {
      * @return Transcribed Cantonese text, or null if transcription failed.
      */
     fun transcribePcmDirect(directBuffer: ByteBuffer, sizeInSamples: Int): String? {
-        if (nativeHandle == 0L) {
-            Log.e(TAG, "Cannot transcribe: model is not loaded")
-            return null
+        synchronized(this) {
+            val handle = nativeHandle
+            if (handle == 0L) {
+                Log.e(TAG, "Cannot transcribe: model is not loaded")
+                return null
+            }
+            if (!directBuffer.isDirect) {
+                Log.e(TAG, "Cannot transcribe: buffer is not a direct ByteBuffer")
+                return null
+            }
+            return nativeTranscribePcmDirect(handle, directBuffer, sizeInSamples)
         }
-        if (!directBuffer.isDirect) {
-            Log.e(TAG, "Cannot transcribe: buffer is not a direct ByteBuffer")
-            return null
-        }
-        return nativeTranscribePcmDirect(nativeHandle, directBuffer, sizeInSamples)
     }
 
     /**
@@ -63,10 +68,12 @@ class QAsrEngine {
      * @param language Target language string (e.g. "zh" or "yue" or "en").
      */
     fun setLanguage(language: String) {
-        if (nativeHandle != 0L) {
-            nativeSetLanguage(nativeHandle, language)
-        } else {
-            Log.e(TAG, "Cannot set language: model is not loaded")
+        synchronized(this) {
+            if (nativeHandle != 0L) {
+                nativeSetLanguage(nativeHandle, language)
+            } else {
+                Log.e(TAG, "Cannot set language: model is not loaded")
+            }
         }
     }
 
@@ -75,10 +82,12 @@ class QAsrEngine {
      * @param prompt Guided context prompt string.
      */
     fun setPrompt(prompt: String) {
-        if (nativeHandle != 0L) {
-            nativeSetPrompt(nativeHandle, prompt)
-        } else {
-            Log.e(TAG, "Cannot set prompt: model is not loaded")
+        synchronized(this) {
+            if (nativeHandle != 0L) {
+                nativeSetPrompt(nativeHandle, prompt)
+            } else {
+                Log.e(TAG, "Cannot set prompt: model is not loaded")
+            }
         }
     }
 
@@ -87,10 +96,12 @@ class QAsrEngine {
      * @param sec Duration of segment in seconds.
      */
     fun setSegmentSec(sec: Float) {
-        if (nativeHandle != 0L) {
-            nativeSetSegmentSec(nativeHandle, sec)
-        } else {
-            Log.e(TAG, "Cannot set segment seconds: model is not loaded")
+        synchronized(this) {
+            if (nativeHandle != 0L) {
+                nativeSetSegmentSec(nativeHandle, sec)
+            } else {
+                Log.e(TAG, "Cannot set segment seconds: model is not loaded")
+            }
         }
     }
 
