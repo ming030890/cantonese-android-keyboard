@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">粤语语音输入法</string>
+    <string name="keyboard_name">粤语语音输入法</string>
+    <string name="subtype_name">粤语语音输入（设备内）</string>
+
+    <!-- Setup Main Screen Strings -->
+    <string name="app_header_title">广东话语音输入键盘</string>
+    <string name="app_header_subtitle">极速・设备内语音输入</string>
+
+    <string name="setup_step_completed">已就绪</string>
+
+    <string name="setup_step_1_title">允许使用麦克风</string>
+    <string name="setup_step_1_desc">语音输入需要使用麦克风。</string>
+    <string name="setup_step_1_action">允许</string>
+
+    <string name="setup_step_2_title">在系统中开启键盘</string>
+    <string name="setup_step_2_desc">请前往系统设置，打开“粤语语音输入法”的开关。</string>
+    <string name="setup_step_2_action">开启</string>
+
+    <string name="setup_step_3_title">设为默认键盘</string>
+    <string name="setup_step_3_desc">点按切换，将“粤语语音输入法”设为默认输入法。</string>
+    <string name="setup_step_3_action">切换</string>
+
+    <!-- Model Status Strings -->
+    <string name="model_status_title">语音识别模型</string>
+    <string name="model_status_ready">已就绪，可在设备内进行语音输入。</string>
+    <string name="model_status_preparing">准备下载…</string>
+    <string name="model_status_downloading">下载中… %1$d%%</string>
+    <string name="model_status_installing">安装中…</string>
+    <string name="model_status_failed">下载失败，点按重试。</string>
+
+    <!-- Try-it-out Strings -->
+    <string name="sandbox_title">试一试</string>
+    <string name="sandbox_desc">点按下方输入框唤出键盘，再按住蓝色麦克风按钮说粤语试一试：</string>
+    <string name="sandbox_placeholder">在这里试试语音输入吧…（例如说：“今日天气几好呀”）</string>
+    <string name="sandbox_clear">清除</string>
+
+    <!-- Keyboard Screen IME Strings -->
+    <string name="keyboard_status_idle">点按开始说话</string>
+    <string name="keyboard_status_loading_model">正在载入语音模型…</string>
+    <string name="keyboard_status_recording">正在聆听… 点按停止</string>
+    <string name="keyboard_status_transcribing">识别中…</string>
+    <string name="keyboard_status_error_setup">点按前往设置</string>
+    <string name="keyboard_key_space">空格</string>
+    <string name="keyboard_key_enter">换行</string>
+
+    <!-- Input Method Service Error Strings -->
+    <string name="error_external_storage_unavailable">无法访问设备存储空间。</string>
+    <string name="error_model_not_found">语音模型仍在下载中，请稍后再试。</string>
+    <string name="error_failed_initialize_asr">无法启动语音引擎。</string>
+    <string name="error_recording_permission_required">需要麦克风权限，请打开设置。</string>
+    <string name="error_audio_format_failed">麦克风设置失败。</string>
+    <string name="error_audio_permission_missing">缺少麦克风权限。</string>
+    <string name="error_microphone_init_failed">无法启动麦克风。</string>
+    <string name="error_failed_access_microphone">无法访问麦克风。</string>
+</resources>
