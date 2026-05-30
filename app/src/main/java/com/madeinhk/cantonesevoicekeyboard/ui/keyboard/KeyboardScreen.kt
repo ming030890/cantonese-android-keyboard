@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.*
@@ -227,23 +228,14 @@ fun KeyboardStatusLabel(
             )
         }
         KeyboardUiState.LoadingModel -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(14.dp),
-                    color = primaryColor,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.keyboard_status_loading_model),
-                    color = primaryColor,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+            // The spinner already lives inside the mic button, so the label is text-only
+            // to avoid showing two progress indicators at once.
+            Text(
+                text = stringResource(R.string.keyboard_status_loading_model),
+                color = primaryColor,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
         KeyboardUiState.Recording -> {
             Column(
@@ -262,23 +254,14 @@ fun KeyboardStatusLabel(
             }
         }
         KeyboardUiState.Transcribing -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(14.dp),
-                    color = TranscribeYellow,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.keyboard_status_transcribing),
-                    color = TranscribeYellow,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+            // The spinner already lives inside the mic button, so the label is text-only
+            // to avoid showing two progress indicators at once.
+            Text(
+                text = stringResource(R.string.keyboard_status_transcribing),
+                color = TranscribeYellow,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
         is KeyboardUiState.Error -> {
             Column(
@@ -366,20 +349,20 @@ fun RecordTriggerButton(
     }
 
     Box(contentAlignment = Alignment.Center) {
-        // Glowing Background Ring
-        if (state is KeyboardUiState.Recording) {
-            Box(
-                modifier = Modifier
-                    .size(68.dp * pulseScale)
-                    .clip(CircleShape)
-                    .background(buttonColor.copy(alpha = 0.25f * pulseAlpha))
-            )
-        }
-
-        // Inner Action Circle Button
+        // Inner Action Circle Button. The recording glow is painted via drawBehind so it can
+        // bleed past the 56.dp button without enlarging the layout footprint — that keeps the
+        // status label below it from being pushed down into the bottom key row.
         Box(
             modifier = Modifier
                 .size(56.dp)
+                .drawBehind {
+                    if (state is KeyboardUiState.Recording) {
+                        drawCircle(
+                            color = buttonColor.copy(alpha = 0.25f * pulseAlpha),
+                            radius = 34.dp.toPx() * pulseScale
+                        )
+                    }
+                }
                 .scale(pressScale)
                 .shadow(
                     elevation = if (state is KeyboardUiState.Recording) 8.dp else 4.dp,
