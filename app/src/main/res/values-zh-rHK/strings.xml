@@ -36,9 +36,9 @@
     <string name="sandbox_clear">清空內容</string>
 
     <!-- Keyboard Screen IME Strings -->
-    <string name="keyboard_status_idle">粵語語音輸入 (廣東話)</string>
-    <string name="keyboard_status_loading_model">正在載入語音模組...</string>
-    <string name="keyboard_status_recording">正在聆聽... 廣東話 dictation</string>
+    <string name="keyboard_status_idle">㩒一下開始講嘢</string>
+    <string name="keyboard_status_loading_model">正在載入語音模組…</string>
+    <string name="keyboard_status_recording">聆聽緊… 㩒一下停止</string>
     <string name="keyboard_status_transcribing">正在進行語音識別...</string>
     <string name="keyboard_status_error_setup">點擊開啟設定 app 進行配置</string>
     <string name="keyboard_key_space">空格</string>

@@ -9,12 +9,9 @@ import android.inputmethodservice.InputMethodService
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.os.Build
-import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputConnection
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
@@ -126,7 +123,6 @@ class CantoneseInputMethodService : InputMethodService(),
                         onDeleteSurroundingText = { deleteSurroundingText() },
                         onSendSpace = { sendSpace() },
                         onSendEnter = { sendEnter() },
-                        onSwitchKeyboard = { switchKeyboard() },
                         onOpenSettings = { openSettingsApp() }
                     )
                 }
@@ -558,18 +554,6 @@ class CantoneseInputMethodService : InputMethodService(),
                 connection.performEditorAction(actionId)
             } else {
                 connection.commitText("\n", 1)
-            }
-        }
-    }
-
-    private fun switchKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val binder: IBinder? = window?.window?.attributes?.token
-        if (binder != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                switchToNextInputMethod(false)
-            } else {
-                imm.switchToNextInputMethod(binder, false)
             }
         }
     }

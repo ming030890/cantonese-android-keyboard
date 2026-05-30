@@ -36,9 +36,9 @@
     <string name="sandbox_clear">Clear Content</string>
 
     <!-- Keyboard Screen IME Strings -->
-    <string name="keyboard_status_idle">Cantonese Voice Input (HK)</string>
-    <string name="keyboard_status_loading_model">Loading speech model...</string>
-    <string name="keyboard_status_recording">Listening... Cantonese dictation</string>
+    <string name="keyboard_status_idle">Tap to speak</string>
+    <string name="keyboard_status_loading_model">Loading model…</string>
+    <string name="keyboard_status_recording">Listening… tap to stop</string>
     <string name="keyboard_status_transcribing">Performing speech recognition...</string>
     <string name="keyboard_status_error_setup">Tap to open settings for configuration</string>
     <string name="keyboard_key_space">Space</string>

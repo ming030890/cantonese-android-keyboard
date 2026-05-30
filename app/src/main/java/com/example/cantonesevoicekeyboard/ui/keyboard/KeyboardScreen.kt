@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +23,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -46,7 +46,6 @@ fun KeyboardScreen(
     onDeleteSurroundingText: () -> Unit,
     onSendSpace: () -> Unit,
     onSendEnter: () -> Unit,
-    onSwitchKeyboard: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
     val state by uiState.collectAsState()
@@ -55,10 +54,15 @@ fun KeyboardScreen(
     val primaryColor = MaterialTheme.colorScheme.primary
     val backgroundColor = MaterialTheme.colorScheme.background
     val surfaceColor = MaterialTheme.colorScheme.surface
-    val outlineColor = MaterialTheme.colorScheme.outline
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
-    val errorColor = MaterialTheme.colorScheme.error
+    val haptics = LocalHapticFeedback.current
     var isDeleting by remember { mutableStateOf(false) }
+    // Visual depress for the delete key, which uses a raw pointer gesture (no clickable).
+    val deleteScale by animateFloatAsState(
+        targetValue = if (isDeleting) 0.92f else 1f,
+        animationSpec = tween(80, easing = FastOutSlowInEasing),
+        label = "deletePressScale"
+    )
 
     LaunchedEffect(isDeleting) {
         if (isDeleting) {
@@ -93,114 +97,33 @@ fun KeyboardScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Header / Status Area
-            Box(
+            // Central voice control: the mic and its state-driven label read as one
+            // cohesive cluster, vertically centered so there's no floating dead space.
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                when (val current = state) {
-                    KeyboardUiState.Idle -> {
-                        Text(
-                            text = stringResource(R.string.keyboard_status_idle),
-                            color = textVariantColor,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            letterSpacing = 0.5.sp
-                        )
-                    }
-                    KeyboardUiState.LoadingModel -> {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = primaryColor,
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.keyboard_status_loading_model),
-                                color = primaryColor,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal
-                            )
-                        }
-                    }
-                    KeyboardUiState.Recording -> {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.keyboard_status_recording),
-                                color = errorColor,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                letterSpacing = 0.5.sp
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            VoiceWaveform(volume = volume)
-                        }
-                    }
-                    KeyboardUiState.Transcribing -> {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = TranscribeYellow,
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.keyboard_status_transcribing),
-                                color = TranscribeYellow,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal
-                            )
-                        }
-                    }
-                    is KeyboardUiState.Error -> {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = current.message,
-                                color = errorColor,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Normal,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = stringResource(R.string.keyboard_status_error_setup),
-                                color = SystemBlue,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.clickable { onOpenSettings() }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Central Recording Control (Tap to Speak)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.5f),
-                contentAlignment = Alignment.Center
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 RecordTriggerButton(
                     state = state,
                     onClick = onToggleRecording
                 )
+                Spacer(modifier = Modifier.height(14.dp))
+                // Fixed-height label slot keeps the mic from jumping as the status changes.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 44.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    KeyboardStatusLabel(
+                        state = state,
+                        volume = volume,
+                        onOpenSettings = onOpenSettings
+                    )
+                }
             }
 
             // Bottom Functional Keys Row (Space, Delete, Enter, Switch)
@@ -211,12 +134,13 @@ fun KeyboardScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Switch Keyboard Key
+                // Settings Key (the system nav-bar already provides an IME-switch globe,
+                // so we surface app settings here instead of a redundant second globe).
                 KeyboardUtilityKey(
                     modifier = Modifier.weight(1f),
-                    onClick = onSwitchKeyboard
+                    onClick = onOpenSettings
                 ) {
-                    GlobeIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -224,14 +148,14 @@ fun KeyboardScreen(
                 // Space Key
                 KeyboardUtilityKey(
                     modifier = Modifier.weight(2.5f),
-                    onClick = onSendSpace,
-                    backgroundColor = outlineColor // Lighter key cap using outline color role
+                    onClick = onSendSpace
                 ) {
                     Text(
                         text = stringResource(R.string.keyboard_key_space),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
+                        color = textVariantColor,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        letterSpacing = 1.sp
                     )
                 }
 
@@ -241,9 +165,11 @@ fun KeyboardScreen(
                 KeyboardUtilityKey(
                     modifier = Modifier
                         .weight(1.2f)
+                        .scale(deleteScale)
                         .pointerInput(onDeleteSurroundingText) {
                             detectTapGestures(
                                 onPress = {
+                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     onDeleteSurroundingText()
                                     isDeleting = true
                                     try {
@@ -261,20 +187,120 @@ fun KeyboardScreen(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Enter Key
+                // Enter Key — filled accent so the primary commit action stands out.
                 KeyboardUtilityKey(
                     modifier = Modifier.weight(1.3f),
                     onClick = onSendEnter,
-                    backgroundColor = primaryColor.copy(alpha = 0.15f),
-                    borderColor = primaryColor.copy(alpha = 0.4f)
+                    backgroundColor = primaryColor,
+                    borderColor = primaryColor
                 ) {
                     Text(
                         text = stringResource(R.string.keyboard_key_enter),
-                        color = primaryColor,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun KeyboardStatusLabel(
+    state: KeyboardUiState,
+    volume: Float,
+    onOpenSettings: () -> Unit
+) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val errorColor = MaterialTheme.colorScheme.error
+
+    when (val current = state) {
+        KeyboardUiState.Idle -> {
+            Text(
+                text = stringResource(R.string.keyboard_status_idle),
+                color = textVariantColor,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 0.3.sp
+            )
+        }
+        KeyboardUiState.LoadingModel -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(14.dp),
+                    color = primaryColor,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.keyboard_status_loading_model),
+                    color = primaryColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+        KeyboardUiState.Recording -> {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                VoiceWaveform(volume = volume)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.keyboard_status_recording),
+                    color = errorColor,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 0.3.sp
+                )
+            }
+        }
+        KeyboardUiState.Transcribing -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(14.dp),
+                    color = TranscribeYellow,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.keyboard_status_transcribing),
+                    color = TranscribeYellow,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+        is KeyboardUiState.Error -> {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = current.message,
+                    color = errorColor,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.keyboard_status_error_setup),
+                    color = SystemBlue,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.clickable { onOpenSettings() }
+                )
             }
         }
     }
@@ -311,6 +337,16 @@ fun RecordTriggerButton(
     val primaryColor = MaterialTheme.colorScheme.primary
     val outlineColor = MaterialTheme.colorScheme.outline
     val errorColor = MaterialTheme.colorScheme.error
+    val haptics = LocalHapticFeedback.current
+
+    // Press feedback: a subtle depress on touch-down for the main trigger.
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.9f else 1f,
+        animationSpec = tween(80, easing = FastOutSlowInEasing),
+        label = "recordPressScale"
+    )
 
     // Button colors dynamically based on status
     val buttonColor = when (state) {
@@ -344,6 +380,7 @@ fun RecordTriggerButton(
         Box(
             modifier = Modifier
                 .size(56.dp)
+                .scale(pressScale)
                 .shadow(
                     elevation = if (state is KeyboardUiState.Recording) 8.dp else 4.dp,
                     shape = CircleShape,
@@ -360,10 +397,12 @@ fun RecordTriggerButton(
                     )
                 )
                 .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick
-                ),
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onClick()
+                },
             contentAlignment = Alignment.Center
         ) {
             if (state is KeyboardUiState.Transcribing || state is KeyboardUiState.LoadingModel) {
@@ -438,8 +477,27 @@ fun KeyboardUtilityKey(
     // background in both themes (white-on-white in light / dark-on-dark in dark).
     val finalBorderColor = if (borderColor == Color.Unspecified) MaterialTheme.colorScheme.outline else borderColor
     val keyShape = RoundedCornerShape(8.dp)
+    val haptics = LocalHapticFeedback.current
+
+    // Track press state so the key visibly depresses (scale + brightness) on touch.
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.92f else 1f,
+        animationSpec = tween(80, easing = FastOutSlowInEasing),
+        label = "keyPressScale"
+    )
+    // Brighten the key cap while held for an extra visual cue.
+    val highlightColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+
     val keyModifier = if (onClick != null) {
-        Modifier.clickable(onClick = onClick)
+        Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        }
     } else {
         Modifier
     }
@@ -447,8 +505,16 @@ fun KeyboardUtilityKey(
     Box(
         modifier = modifier
             .fillMaxHeight()
+            .scale(pressScale)
+            // Subtle elevation gives each cap a tactile, raised feel; it flattens on press.
+            .shadow(
+                elevation = if (isPressed) 0.dp else 2.dp,
+                shape = keyShape,
+                clip = false
+            )
             .clip(keyShape)
             .background(finalBgColor)
+            .then(if (isPressed) Modifier.background(highlightColor) else Modifier)
             .border(1.dp, finalBorderColor, keyShape)
             .then(keyModifier)
             .padding(vertical = 8.dp),
@@ -565,50 +631,46 @@ fun BackspaceIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
 }
 
 @Composable
-fun GlobeIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
+fun SettingsIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
     Canvas(modifier = modifier) {
         val w = size.width
         val h = size.height
         val center = Offset(w / 2f, h / 2f)
-        val radius = w * 0.36f
+        val outerR = w * 0.40f   // tip of the gear teeth
+        val ringR = w * 0.30f    // gear body ring
+        val innerR = w * 0.13f   // center hub hole
+        val toothLen = outerR - ringR
+        val strokePx = 2.dp.toPx()
 
-        // Outer circle
+        // Eight radial teeth around the gear body.
+        val teeth = 8
+        for (i in 0 until teeth) {
+            val angle = (Math.PI * 2 / teeth) * i
+            val dx = kotlin.math.cos(angle).toFloat()
+            val dy = kotlin.math.sin(angle).toFloat()
+            drawLine(
+                color = color,
+                start = Offset(center.x + dx * ringR, center.y + dy * ringR),
+                end = Offset(center.x + dx * (ringR + toothLen), center.y + dy * (ringR + toothLen)),
+                strokeWidth = strokePx * 1.6f,
+                cap = StrokeCap.Round
+            )
+        }
+
+        // Gear body ring
         drawCircle(
             color = color,
-            radius = radius,
+            radius = ringR,
             center = center,
-            style = Stroke(width = 2.dp.toPx())
+            style = Stroke(width = strokePx)
         )
 
-        // Equator
-        drawLine(
+        // Center hub
+        drawCircle(
             color = color,
-            start = Offset(center.x - radius, center.y),
-            end = Offset(center.x + radius, center.y),
-            strokeWidth = 2.dp.toPx()
-        )
-
-        // Prime meridian
-        drawLine(
-            color = color,
-            start = Offset(center.x, center.y - radius),
-            end = Offset(center.x, center.y + radius),
-            strokeWidth = 2.dp.toPx()
-        )
-
-        // Horizontal lines top & bottom (latitude lines)
-        val latOffset = radius * 0.5f
-        drawLine(
-            color = color,
-            start = Offset(center.x - radius * 0.86f, center.y - latOffset),
-            end = Offset(center.x + radius * 0.86f, center.y - latOffset),
-            strokeWidth = 1.5.dp.toPx()
-        )
-        drawLine(
-            color = color,
-            start = Offset(center.x - radius * 0.86f, center.y + latOffset),
-            end = Offset(center.x + radius * 0.86f, center.y + latOffset),
-            strokeWidth = 1.5.dp.toPx()
+            radius = innerR,
+            center = center,
+            style = Stroke(width = strokePx)
         )
     }
 }
