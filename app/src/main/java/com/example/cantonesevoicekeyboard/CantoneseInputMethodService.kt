@@ -55,10 +55,6 @@ class CantoneseInputMethodService : InputMethodService(),
     companion object {
         private const val TAG = "CantoneseIME"
         private const val SAMPLE_RATE = 16000
-        private const val MAX_RECORD_SECONDS = 30
-        private const val MAX_SAMPLES = SAMPLE_RATE * MAX_RECORD_SECONDS
-        private const val FLOAT_SIZE = 4
-        private const val DIRECT_BUFFER_SIZE = MAX_SAMPLES * FLOAT_SIZE
     }
 
     // Lifecycle, ViewModel, SavedState bridges for Compose support
@@ -87,9 +83,6 @@ class CantoneseInputMethodService : InputMethodService(),
     @Volatile
     private var isInputViewVisible = false
 
-    private lateinit var directAudioBuffer: ByteBuffer
-    private var totalSamplesRecorded = 0
-
     // UI States
     private val _uiState = MutableStateFlow<KeyboardUiState>(KeyboardUiState.Idle)
     val uiState = _uiState.asStateFlow()
@@ -107,9 +100,6 @@ class CantoneseInputMethodService : InputMethodService(),
         super.onCreate()
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-
-        // Pre-allocate Direct ByteBuffer for zero-copy samples sharing with native side
-        directAudioBuffer = ByteBuffer.allocateDirect(DIRECT_BUFFER_SIZE).order(ByteOrder.nativeOrder())
     }
 
     override fun onCreateInputView(): View {
@@ -171,7 +161,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     val loaded = qAsrEngine.loadModel(modelDir.absolutePath, 1)
                     if (loaded) {
                         qAsrEngine.setLanguage("yue")
-                        qAsrEngine.setPrompt("音频是粤语，可能夹杂英语")
+                        qAsrEngine.setPrompt("")
                         qAsrEngine.setSegmentSec(0.0f)
                     }
                     loaded
@@ -265,6 +255,10 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun startRecordingInternal() {
         if (isRecording) return
+        if (!isModelLoaded) {
+            Log.w(TAG, "Cannot start recording: ASR model is not loaded")
+            return
+        }
 
         val minBufferSize = AudioRecord.getMinBufferSize(
             SAMPLE_RATE,
@@ -311,36 +305,66 @@ class CantoneseInputMethodService : InputMethodService(),
         isRecording = true
         activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
-        totalSamplesRecorded = 0
+        val session = inputViewSession
+
+        val listener = object : QAsrEngine.VadListener {
+            override fun onTranscript(segmentId: Long, text: String, isFinal: Boolean) {
+                serviceScope.launch(Dispatchers.Main.immediate) {
+                    if (isInputViewVisible && session == inputViewSession && text.isNotBlank()) {
+                        currentInputConnection?.commitText(text, 1)
+                    }
+                }
+            }
+        }
+
+        val vadStarted = qAsrEngine.startVadSession(listener)
+        if (!vadStarted) {
+            Log.e(TAG, "Failed to start native VAD session.")
+            isRecording = false
+            try {
+                audioRecord.stop()
+            } catch (e: Exception) {
+                Log.w(TAG, "Error stopping AudioRecord after VAD start failure", e)
+            }
+            audioRecord.release()
+            activeAudioRecord = null
+            _uiState.value = KeyboardUiState.Idle
+            return
+        }
 
         audioRecordJob = serviceScope.launch(Dispatchers.IO) {
-            val shortBuffer = ShortArray(1024)
-            val floatBuffer = directAudioBuffer.asFloatBuffer()
-            floatBuffer.clear()
+            val directPcm16Buffer = ByteBuffer
+                .allocateDirect(2048)
+                .order(ByteOrder.nativeOrder())
 
             Log.i(TAG, "Recording started and mic is live...")
 
-            while (isRecording && totalSamplesRecorded < MAX_SAMPLES) {
-                val readShorts = audioRecord.read(shortBuffer, 0, shortBuffer.size)
-                if (readShorts > 0) {
+            while (isRecording) {
+                directPcm16Buffer.clear()
+                val bytesRead = audioRecord.read(
+                    directPcm16Buffer,
+                    directPcm16Buffer.capacity(),
+                    AudioRecord.READ_BLOCKING
+                )
+                if (bytesRead > 0) {
+                    val samplesRead = bytesRead / 2
                     var sumSquare = 0.0
-                    floatBuffer.position(totalSamplesRecorded)
-                    for (i in 0 until readShorts) {
-                        if (totalSamplesRecorded < MAX_SAMPLES) {
-                            val sample = shortBuffer[i]
-                            val floatSample = sample / 32768.0f
-                            floatBuffer.put(floatSample)
-                            totalSamplesRecorded++
-                            sumSquare += floatSample * floatSample
-                        }
+                    val volumeBuffer = directPcm16Buffer.duplicate().order(ByteOrder.nativeOrder())
+                    volumeBuffer.position(0)
+                    for (i in 0 until samplesRead) {
+                        val sample = volumeBuffer.getShort()
+                        val floatSample = sample / 32768.0f
+                        sumSquare += floatSample * floatSample
                     }
+                    directPcm16Buffer.position(0)
+                    qAsrEngine.pushPcm16Chunk(directPcm16Buffer, bytesRead)
 
                     // Calculate real-time RMS for waveform visuals
-                    val rms = if (readShorts > 0) Math.sqrt(sumSquare / readShorts) else 0.0
+                    val rms = if (samplesRead > 0) Math.sqrt(sumSquare / samplesRead) else 0.0
                     val normalizedVolume = (rms * 3.0).toFloat().coerceIn(0f, 1f) // boost visually
                     _volumeLevel.value = normalizedVolume
-                } else if (readShorts < 0) {
-                    Log.e(TAG, "Error reading audio data: $readShorts")
+                } else if (bytesRead < 0) {
+                    Log.e(TAG, "Error reading audio data: $bytesRead")
                     break
                 }
             }
@@ -355,7 +379,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     activeAudioRecord = null
                 }
             }
-            Log.i(TAG, "Recording finished. Recorded samples: $totalSamplesRecorded")
+            Log.i(TAG, "Recording finished.")
         }
     }
 
@@ -374,6 +398,9 @@ class CantoneseInputMethodService : InputMethodService(),
             _uiState.value = KeyboardUiState.Idle
             serviceScope.launch(Dispatchers.IO) {
                 recorderJob?.join()
+                engineMutex.withLock {
+                    qAsrEngine.stopVadSession(finalize = false)
+                }
                 if (audioRecordJob === recorderJob) {
                     audioRecordJob = null
                 }
@@ -382,32 +409,17 @@ class CantoneseInputMethodService : InputMethodService(),
         }
 
         _uiState.value = KeyboardUiState.Transcribing
-        val session = inputViewSession
 
         transcriptionJob = serviceScope.launch(Dispatchers.Default) {
             recorderJob?.join()
             if (audioRecordJob === recorderJob) {
                 audioRecordJob = null
             }
-
-            val samplesRecorded = totalSamplesRecorded
-            if (samplesRecorded <= 0) {
-                withContext(Dispatchers.Main) {
-                    _uiState.value = KeyboardUiState.Idle
-                }
-                return@launch
+            engineMutex.withLock {
+                qAsrEngine.stopVadSession(finalize = true)
             }
-
-            Log.i(TAG, "Starting transcription of $samplesRecorded samples...")
-            val result = engineMutex.withLock {
-                qAsrEngine.transcribePcmDirect(directAudioBuffer, samplesRecorded)
-            }
-            Log.i(TAG, "Transcription complete. Result: $result")
 
             withContext(Dispatchers.Main) {
-                if (isInputViewVisible && session == inputViewSession && !result.isNullOrEmpty()) {
-                    currentInputConnection?.commitText(result, 1)
-                }
                 _uiState.value = KeyboardUiState.Idle
             }
             transcriptionJob = null

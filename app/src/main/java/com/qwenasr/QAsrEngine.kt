@@ -4,6 +4,10 @@ import android.util.Log
 import java.nio.ByteBuffer
 
 class QAsrEngine {
+    interface VadListener {
+        fun onTranscript(segmentId: Long, text: String, isFinal: Boolean)
+    }
+
     companion object {
         private const val TAG = "QAsrEngine"
 
@@ -18,6 +22,7 @@ class QAsrEngine {
     }
 
     private var nativeHandle: Long = 0
+    private var vadSessionHandle: Long = 0
 
     /**
      * Initializes the Qwen ASR model from a directory.
@@ -60,6 +65,46 @@ class QAsrEngine {
                 return null
             }
             return nativeTranscribePcmDirect(handle, directBuffer, sizeInSamples)
+        }
+    }
+
+    fun startVadSession(listener: VadListener): Boolean {
+        synchronized(this) {
+            val handle = nativeHandle
+            if (handle == 0L) {
+                Log.e(TAG, "Cannot start VAD session: model is not loaded")
+                return false
+            }
+            if (vadSessionHandle != 0L) {
+                stopVadSession(finalize = false)
+            }
+            vadSessionHandle = nativeStartVadSession(handle, listener)
+            return vadSessionHandle != 0L
+        }
+    }
+
+    fun pushPcm16Chunk(directBuffer: ByteBuffer, byteCount: Int): Int {
+        if (!directBuffer.isDirect) {
+            Log.e(TAG, "Cannot push audio: buffer is not a direct ByteBuffer")
+            return -1
+        }
+        synchronized(this) {
+            val session = vadSessionHandle
+            if (session == 0L) {
+                return 0
+            }
+            return nativePushPcm16(session, directBuffer, byteCount)
+        }
+    }
+
+    fun stopVadSession(finalize: Boolean) {
+        val session = synchronized(this) {
+            val current = vadSessionHandle
+            vadSessionHandle = 0L
+            current
+        }
+        if (session != 0L) {
+            nativeStopVadSession(session, finalize)
         }
     }
 
@@ -110,6 +155,7 @@ class QAsrEngine {
      */
     fun free() {
         synchronized(this) {
+            stopVadSession(finalize = false)
             val handle = nativeHandle
             if (handle != 0L) {
                 nativeHandle = 0L
@@ -122,6 +168,9 @@ class QAsrEngine {
     // Native external methods
     private external fun nativeLoadModel(modelDir: String, nThreads: Int): Long
     private external fun nativeTranscribePcmDirect(handle: Long, buffer: ByteBuffer, size: Int): String?
+    private external fun nativeStartVadSession(handle: Long, listener: VadListener): Long
+    private external fun nativePushPcm16(sessionHandle: Long, buffer: ByteBuffer, byteCount: Int): Int
+    private external fun nativeStopVadSession(sessionHandle: Long, finalize: Boolean)
     private external fun nativeSetLanguage(handle: Long, language: String)
     private external fun nativeSetPrompt(handle: Long, prompt: String)
     private external fun nativeSetSegmentSec(handle: Long, sec: Float)
