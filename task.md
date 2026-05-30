@@ -21,7 +21,6 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 - [x] Implement `CantoneseInputMethodService.kt` extending `InputMethodService`.
 - [x] Implement visible-only memory optimization (loading in `onStartInputView` and freeing in `onFinishInputView` / `onWindowHidden`).
 - [x] Build the Jetpack Compose keyboard interface featuring the Tap-to-Speak button, sound wave animation, and editing keys.
-- [x] Implement fake streaming dictation with Android VAD and queued batch ASR.
 
 ## 4. Setup & Sandbox Companion Application
 - [x] Build the 3-step setup walkthrough inside `MainActivity.kt` using Jetpack Compose (Permissions, Activation, Picker).
@@ -31,4 +30,5 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 - [x] Create the comprehensive compilation, asset synchronization, building, and running shell script `deploy.sh` in the project root.
 - [x] Implement a full on-device instrumented End-to-End Test `QAsrEngineE2ETest` to verify transcription correctness and measure latency (Successfully verified: transcribed "Hello，你好嗎？已經坐低咗啦。" in 3.27s for 3.86s of audio!).
 - [ ] Configure the Compose Screenshot Testing plugin and write screenshot verification tests for key visual states (Idle, Recording, Transcribing).
+
 
