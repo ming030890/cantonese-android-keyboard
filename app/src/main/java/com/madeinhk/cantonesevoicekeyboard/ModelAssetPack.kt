@@ -1,7 +1,10 @@
-package com.example.cantonesevoicekeyboard
+package com.madeinhk.cantonesevoicekeyboard
 
 import android.content.Context
+import android.system.ErrnoException
+import android.system.Os
 import android.util.Log
+import com.google.android.play.core.assetpacks.AssetPackManager
 import com.google.android.play.core.assetpacks.AssetPackManagerFactory
 import com.google.android.play.core.assetpacks.AssetPackState
 import com.google.android.play.core.assetpacks.AssetPackStateUpdateListener
@@ -14,163 +17,210 @@ import java.io.File
 import kotlin.coroutines.resume
 
 /**
- * High-level download state of the model asset pack, suitable for driving UI.
+ * High-level download state of the model, suitable for driving UI.
+ *
+ * The model is split across two fast-follow Play Asset Delivery packs; this
+ * state aggregates both packs into a single progress signal so the UI can
+ * treat the model as one logical resource.
  */
 sealed interface ModelDownloadStatus {
-    /** No download started yet (e.g. just queried, fetch about to begin). */
     data object NotStarted : ModelDownloadStatus
-
-    /** Queued / waiting (pending, waiting for Wi-Fi, awaiting user confirmation). */
     data object Pending : ModelDownloadStatus
-
-    /** Actively downloading bytes from Play. */
     data class Downloading(val bytesDownloaded: Long, val totalBytes: Long) : ModelDownloadStatus {
-        /** Download completion in the range 0f..1f (0f if total size is unknown). */
         val fraction: Float =
             if (totalBytes > 0L) (bytesDownloaded.toFloat() / totalBytes.toFloat()).coerceIn(0f, 1f) else 0f
-
-        /** Whole-number percentage 0..100. */
         val percent: Int = (fraction * 100f).toInt()
     }
-
-    /** Downloaded; being unpacked/installed onto the file system. */
     data object Installing : ModelDownloadStatus
-
-    /** Pack is on disk and ready to use. */
     data object Ready : ModelDownloadStatus
-
-    /** Download failed or was cancelled. [errorCode] is the Play error code. */
     data class Failed(val errorCode: Int) : ModelDownloadStatus
 }
 
 /**
- * Resolves the Qwen ASR model directory, which ships as a fast-follow
- * Play Asset Delivery pack ([PACK_NAME]).
+ * Resolves the Qwen ASR model directory. The model ships as two sharded
+ * fast-follow Play Asset Delivery packs ([PACK_A], [PACK_B]) so each stays
+ * under Play's 512 MiB per-pack ceiling.
  *
- * Fast-follow packs download automatically right after the app is installed
- * from Play, so by the time the keyboard is first used the pack is usually
- * already on disk. If it is not yet available, [resolveModelDir] requests a
- * fetch and suspends until it completes.
+ * Files in each pack are mmap'd directly by the native loader from their
+ * Play-managed locations; we never copy them. To present both packs as one
+ * logical model directory (as the native `MultiSafetensors::open` expects),
+ * we symlink every file from each pack's `qwen-asr-int8dec/` into a single
+ * staging directory in internal storage. Symlinks consume only inodes — zero
+ * byte duplication.
  *
- * For local testing, install the app with `bundletool ... --local-testing`
- * (see `deploy.sh`); that path makes the pack resolvable exactly as it would
- * be in production, with no sideloading required.
+ * The staging step is idempotent and fast (~four `symlink` syscalls), so it
+ * re-runs on every resolve to absorb pack-update path changes.
  */
 object ModelAssetPack {
-    const val PACK_NAME = "model_pack"
+    const val PACK_A = "model_pack_a"
+    const val PACK_B = "model_pack_b"
     const val MODEL_DIR_NAME = "qwen-asr-int8dec"
+    private val PACKS = listOf(PACK_A, PACK_B)
     private const val TAG = "ModelAssetPack"
 
-    /** True if the pack is already downloaded and its files are on disk. */
-    fun isModelAvailable(context: Context): Boolean = locateModelDir(context) != null
+    /** True if both packs are already downloaded and the staged dir can be built. */
+    fun isModelAvailable(context: Context): Boolean = stageModelDir(context) != null
 
     /**
-     * Emits live [ModelDownloadStatus] updates for the model pack, suitable for
-     * showing download progress in the UI.
-     *
-     * On collection it seeds the current state, ensures a fetch is running (so a
-     * fast-follow pack that hasn't arrived yet starts downloading), and then
-     * streams progress until the pack is [ModelDownloadStatus.Ready] or fails.
-     * Unregisters its listener automatically when collection stops.
+     * Emits live aggregated [ModelDownloadStatus] for the model. Combines the
+     * worst-status of the two packs (any failure -> Failed, any pending ->
+     * Pending, otherwise sums of download progress) and emits Ready only once
+     * both packs are extracted on disk.
      */
     fun downloadStatusFlow(context: Context): Flow<ModelDownloadStatus> = callbackFlow {
         val appContext = context.applicationContext
         val manager = AssetPackManagerFactory.getInstance(appContext)
 
-        // Fast path: already extracted on disk.
-        if (locateModelDir(appContext) != null) {
+        if (stageModelDir(appContext) != null) {
             trySend(ModelDownloadStatus.Ready)
             close()
             return@callbackFlow
         }
 
+        val latest = HashMap<String, AssetPackState>()
+
+        fun emitCombined() {
+            val combined = combine(appContext, latest)
+            trySend(combined)
+        }
+
         val listener = AssetPackStateUpdateListener { state ->
-            if (state.name() == PACK_NAME) {
-                trySend(state.toDownloadStatus())
+            if (state.name() in PACKS) {
+                latest[state.name()] = state
+                emitCombined()
             }
         }
         manager.registerListener(listener)
 
-        // Seed the current state, then make sure a fetch is in flight so progress
-        // events actually start flowing.
-        manager.getPackStates(listOf(PACK_NAME))
+        manager.getPackStates(PACKS)
             .addOnSuccessListener { states ->
-                states.packStates()[PACK_NAME]?.let { trySend(it.toDownloadStatus()) }
-                manager.fetch(listOf(PACK_NAME))
+                PACKS.forEach { p -> states.packStates()[p]?.let { latest[p] = it } }
+                emitCombined()
+                manager.fetch(PACKS)
             }
             .addOnFailureListener {
                 Log.w(TAG, "getPackStates failed; requesting fetch anyway", it)
-                manager.fetch(listOf(PACK_NAME))
+                manager.fetch(PACKS)
             }
 
         awaitClose { manager.unregisterListener(listener) }
     }
 
-    private fun AssetPackState.toDownloadStatus(): ModelDownloadStatus = when (status()) {
-        AssetPackStatus.COMPLETED -> ModelDownloadStatus.Ready
-        AssetPackStatus.DOWNLOADING ->
-            ModelDownloadStatus.Downloading(bytesDownloaded(), totalBytesToDownload())
-        AssetPackStatus.TRANSFERRING -> ModelDownloadStatus.Installing
-        AssetPackStatus.PENDING,
-        AssetPackStatus.WAITING_FOR_WIFI,
-        AssetPackStatus.REQUIRES_USER_CONFIRMATION -> ModelDownloadStatus.Pending
-        AssetPackStatus.FAILED,
-        AssetPackStatus.CANCELED -> ModelDownloadStatus.Failed(errorCode())
-        else -> ModelDownloadStatus.NotStarted
-    }
-
-    private fun locateModelDir(context: Context): File? {
-        val manager = AssetPackManagerFactory.getInstance(context.applicationContext)
-        val assetsPath = manager.getPackLocation(PACK_NAME)?.assetsPath() ?: return null
-        val dir = File(assetsPath, MODEL_DIR_NAME)
-        return dir.takeIf { it.exists() && it.isDirectory }
-    }
-
     /**
-     * Returns the model directory, fetching the asset pack first if necessary.
-     * Suspends until the pack finishes downloading. Returns `null` if the pack
-     * could not be made available (e.g. download failed/cancelled).
+     * Returns the staged model directory, fetching both asset packs first if
+     * necessary. Suspends until both packs finish downloading. Returns `null`
+     * if either pack could not be made available.
      */
     suspend fun resolveModelDir(context: Context): File? {
-        locateModelDir(context)?.let { return it }
+        stageModelDir(context)?.let { return it }
 
         val manager = AssetPackManagerFactory.getInstance(context.applicationContext)
-        return suspendCancellableCoroutine { cont ->
+        val ready = awaitBothPacks(manager)
+        if (!ready) return null
+        return stageModelDir(context)
+    }
+
+    private suspend fun awaitBothPacks(manager: AssetPackManager): Boolean =
+        suspendCancellableCoroutine { cont ->
+            val completed = HashSet<String>()
             val listener = object : AssetPackStateUpdateListener {
                 override fun onStateUpdate(state: AssetPackState) {
-                    if (state.name() != PACK_NAME || cont.isCompleted) return
+                    if (state.name() !in PACKS || cont.isCompleted) return
                     when (state.status()) {
                         AssetPackStatus.COMPLETED -> {
-                            manager.unregisterListener(this)
-                            cont.resume(locateModelDir(context))
+                            completed.add(state.name())
+                            if (completed.containsAll(PACKS)) {
+                                manager.unregisterListener(this)
+                                cont.resume(true)
+                            }
                         }
                         AssetPackStatus.FAILED, AssetPackStatus.CANCELED -> {
-                            Log.e(
-                                TAG,
-                                "Asset pack '$PACK_NAME' download ended: status=${state.status()}, errorCode=${state.errorCode()}"
-                            )
+                            Log.e(TAG, "Pack '${state.name()}' ended: status=${state.status()}, errorCode=${state.errorCode()}")
                             manager.unregisterListener(this)
-                            cont.resume(null)
+                            cont.resume(false)
                         }
-                        else -> {
-                            Log.i(
-                                TAG,
-                                "Asset pack '$PACK_NAME' status=${state.status()} " +
-                                    "(${state.bytesDownloaded()}/${state.totalBytesToDownload()} bytes)"
-                            )
-                        }
+                        else -> Log.i(
+                            TAG,
+                            "Pack '${state.name()}' status=${state.status()} " +
+                                "(${state.bytesDownloaded()}/${state.totalBytesToDownload()} bytes)"
+                        )
                     }
                 }
             }
             manager.registerListener(listener)
             cont.invokeOnCancellation { manager.unregisterListener(listener) }
-            manager.fetch(listOf(PACK_NAME)).addOnFailureListener { e ->
+            manager.fetch(PACKS).addOnFailureListener { e ->
                 if (!cont.isCompleted) {
-                    Log.e(TAG, "Failed to start asset pack '$PACK_NAME' fetch", e)
+                    Log.e(TAG, "Failed to start asset pack fetch", e)
                     manager.unregisterListener(listener)
-                    cont.resume(null)
+                    cont.resume(false)
                 }
             }
         }
+
+    /**
+     * If both packs are extracted on disk, builds (or refreshes) a single
+     * staging dir in internal storage containing symlinks to every file in
+     * each pack's `qwen-asr-int8dec/` directory, and returns it.
+     *
+     * Returns null if either pack is not yet available.
+     */
+    private fun stageModelDir(context: Context): File? {
+        val appContext = context.applicationContext
+        val manager = AssetPackManagerFactory.getInstance(appContext)
+
+        val packDirs = PACKS.map { pack ->
+            val assetsPath = manager.getPackLocation(pack)?.assetsPath() ?: return null
+            val dir = File(assetsPath, MODEL_DIR_NAME)
+            if (!dir.exists() || !dir.isDirectory) return null
+            dir
+        }
+
+        val staged = File(appContext.filesDir, MODEL_DIR_NAME)
+        if (!staged.exists()) staged.mkdirs()
+
+        // Rebuild symlinks every time: cheap, and absorbs pack-update path
+        // changes when Play swaps in a new pack version.
+        for (pack in packDirs) {
+            val files = pack.listFiles() ?: continue
+            for (src in files) {
+                if (!src.isFile) continue
+                val link = File(staged, src.name)
+                try {
+                    if (link.exists()) link.delete()
+                    Os.symlink(src.absolutePath, link.absolutePath)
+                } catch (e: ErrnoException) {
+                    Log.e(TAG, "symlink ${src.name} failed", e)
+                    return null
+                }
+            }
+        }
+        return staged
+    }
+
+    private fun combine(context: Context, latest: Map<String, AssetPackState>): ModelDownloadStatus {
+        if (stageModelDir(context) != null) return ModelDownloadStatus.Ready
+        if (latest.size < PACKS.size) return ModelDownloadStatus.NotStarted
+
+        latest.values.firstOrNull {
+            it.status() == AssetPackStatus.FAILED || it.status() == AssetPackStatus.CANCELED
+        }?.let { return ModelDownloadStatus.Failed(it.errorCode()) }
+
+        if (latest.values.any { it.status() == AssetPackStatus.TRANSFERRING }) {
+            return ModelDownloadStatus.Installing
+        }
+        if (latest.values.any {
+                it.status() == AssetPackStatus.PENDING ||
+                    it.status() == AssetPackStatus.WAITING_FOR_WIFI ||
+                    it.status() == AssetPackStatus.REQUIRES_USER_CONFIRMATION
+            }) {
+            return ModelDownloadStatus.Pending
+        }
+        if (latest.values.all { it.status() == AssetPackStatus.DOWNLOADING || it.status() == AssetPackStatus.COMPLETED }) {
+            val downloaded = latest.values.sumOf { it.bytesDownloaded() }
+            val total = latest.values.sumOf { it.totalBytesToDownload() }
+            return ModelDownloadStatus.Downloading(downloaded, total)
+        }
+        return ModelDownloadStatus.NotStarted
     }
 }

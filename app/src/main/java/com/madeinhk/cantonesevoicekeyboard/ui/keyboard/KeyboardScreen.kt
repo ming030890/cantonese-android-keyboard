@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard.ui.keyboard
+package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -30,10 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cantonesevoicekeyboard.KeyboardUiState
-import com.example.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
+import com.madeinhk.cantonesevoicekeyboard.R
 import androidx.compose.ui.res.stringResource
-import com.example.cantonesevoicekeyboard.theme.*
+import com.madeinhk.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.sin

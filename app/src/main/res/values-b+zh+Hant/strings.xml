@@ -1,56 +1,56 @@
 <resources>
     <string name="app_name">粵語語音輸入法</string>
     <string name="keyboard_name">粵語語音輸入法</string>
-    <string name="subtype_name">粵語語音輸入 (本地)</string>
+    <string name="subtype_name">粵語語音輸入（裝置內）</string>
 
     <!-- Setup Main Screen Strings -->
     <string name="app_header_title">廣東話語音輸入鍵盤</string>
-    <string name="app_header_subtitle">極速本地離線語音識別</string>
+    <string name="app_header_subtitle">極速・裝置內語音輸入</string>
 
     <string name="setup_step_completed">已就緒</string>
 
-    <string name="setup_step_1_title">啟用麥克風權限</string>
-    <string name="setup_step_1_desc">進行語音輸入需要錄音權限，請授權麥克風。</string>
-    <string name="setup_step_1_action">授權</string>
+    <string name="setup_step_1_title">允許使用麥克風</string>
+    <string name="setup_step_1_desc">語音輸入需要使用麥克風。</string>
+    <string name="setup_step_1_action">允許</string>
 
-    <string name="setup_step_2_title">在系統中啟用鍵盤</string>
-    <string name="setup_step_2_desc">請前往系統設定，開啟「粵語語音輸入法」開關。</string>
-    <string name="setup_step_2_action">啟用</string>
+    <string name="setup_step_2_title">在系統開啟鍵盤</string>
+    <string name="setup_step_2_desc">請去系統設定，開啟「粵語語音輸入法」嘅開關。</string>
+    <string name="setup_step_2_action">開啟</string>
 
-    <string name="setup_step_3_title">設定為預設輸入法</string>
-    <string name="setup_step_3_desc">點擊切換，並將「粵語語音輸入法」設定為您的默認鍵盤。</string>
+    <string name="setup_step_3_title">設為預設鍵盤</string>
+    <string name="setup_step_3_desc">㩒一下切換，將「粵語語音輸入法」設為預設鍵盤。</string>
     <string name="setup_step_3_action">切換</string>
 
     <!-- Model Status Strings -->
-    <string name="model_status_title">Qwen ASR 語音模型</string>
-    <string name="model_status_ready">語音模型已就緒，可進行本地高精度識別。</string>
-    <string name="model_status_preparing">正在準備下載語音模型…</string>
-    <string name="model_status_downloading">正在下載語音模型… %1$d%%</string>
-    <string name="model_status_installing">正在安裝語音模型…</string>
-    <string name="model_status_failed">語音模型下載失敗，點擊重試。</string>
+    <string name="model_status_title">語音識別模型</string>
+    <string name="model_status_ready">已就緒，可喺裝置內進行語音輸入。</string>
+    <string name="model_status_preparing">準備下載…</string>
+    <string name="model_status_downloading">下載中… %1$d%%</string>
+    <string name="model_status_installing">安裝中…</string>
+    <string name="model_status_failed">下載失敗，㩒一下再試。</string>
 
-    <!-- Sandbox Strings -->
-    <string name="sandbox_title">粵語語音輸入測試沙盒 (Sandbox)</string>
-    <string name="sandbox_desc">點擊下方輸入框以喚起鍵盤，長按藍色的語音按鈕並說粵語進行測試：</string>
-    <string name="sandbox_placeholder">喺度試下語音輸入啦... (例如說：「今日天氣幾好呀」)</string>
-    <string name="sandbox_clear">清空內容</string>
+    <!-- Try-it-out Strings -->
+    <string name="sandbox_title">試吓用</string>
+    <string name="sandbox_desc">㩒下面個輸入框叫出鍵盤，再按住藍色嘅咪高峰掣講粵語試吓：</string>
+    <string name="sandbox_placeholder">喺度試下語音輸入啦…（例如講：「今日天氣幾好呀」）</string>
+    <string name="sandbox_clear">清除</string>
 
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">㩒一下開始講嘢</string>
-    <string name="keyboard_status_loading_model">正在載入語音模組…</string>
+    <string name="keyboard_status_loading_model">載入緊語音模型…</string>
     <string name="keyboard_status_recording">聆聽緊… 㩒一下停止</string>
-    <string name="keyboard_status_transcribing">正在進行語音識別...</string>
-    <string name="keyboard_status_error_setup">點擊開啟設定 app 進行配置</string>
+    <string name="keyboard_status_transcribing">識別緊…</string>
+    <string name="keyboard_status_error_setup">㩒一下去設定</string>
     <string name="keyboard_key_space">空格</string>
     <string name="keyboard_key_enter">換行</string>
 
     <!-- Input Method Service Error Strings -->
-    <string name="error_external_storage_unavailable">外部儲存空間不可用。</string>
-    <string name="error_model_not_found">語音模型仍在下載中，請稍候再試。</string>
-    <string name="error_failed_initialize_asr">語音引擎初始化失敗。</string>
-    <string name="error_recording_permission_required">需要錄音權限以進行語音輸入，請開啟設定。</string>
-    <string name="error_audio_format_failed">音訊格式設定失敗。</string>
-    <string name="error_audio_permission_missing">缺少錄音權限。</string>
-    <string name="error_microphone_init_failed">麥克風初始化失敗。</string>
+    <string name="error_external_storage_unavailable">無法存取裝置儲存空間。</string>
+    <string name="error_model_not_found">語音模型仲下載緊，請稍後再試。</string>
+    <string name="error_failed_initialize_asr">無法啟動語音引擎。</string>
+    <string name="error_recording_permission_required">需要麥克風權限，請開啟設定。</string>
+    <string name="error_audio_format_failed">麥克風設定失敗。</string>
+    <string name="error_audio_permission_missing">缺少麥克風權限。</string>
+    <string name="error_microphone_init_failed">無法啟動麥克風。</string>
     <string name="error_failed_access_microphone">無法存取麥克風。</string>
 </resources>

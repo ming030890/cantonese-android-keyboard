@@ -1,15 +1,13 @@
 plugins {
-    // Applied without a version: the asset-pack plugin is already on the
-    // build classpath via the Android Gradle Plugin.
     id("com.android.asset-pack")
 }
 
-// Play Asset Delivery pack that carries the Qwen ASR model files.
-// "fast-follow" means the pack downloads automatically right after the app is
-// installed from Play, without blocking the install itself. The app accesses
-// the extracted files on disk via AssetPackManager.getPackLocation(...).
+// Shard 1 of the Qwen ASR model + tokenizer files. The full model is split
+// into two fast-follow asset packs (a, b) so each stays under Play's 512 MiB
+// per-pack limit. The native loader transparently reads sharded safetensors
+// (model-XXXXX-of-YYYYY.safetensors) via MultiSafetensors::open.
 assetPack {
-    packName.set("model_pack")
+    packName.set("model_pack_a")
     dynamicDelivery {
         deliveryType.set("fast-follow")
     }

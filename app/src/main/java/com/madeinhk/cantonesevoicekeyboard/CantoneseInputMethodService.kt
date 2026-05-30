@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard
+package com.madeinhk.cantonesevoicekeyboard
 
 import android.Manifest
 import android.content.Context
@@ -27,9 +27,9 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.example.cantonesevoicekeyboard.R
-import com.example.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
-import com.example.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
+import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
 import com.qwenasr.QAsrEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
@@ -186,7 +186,7 @@ class CantoneseInputMethodService : InputMethodService(),
                 // suspends until the pack is downloaded if it is not already present.
                 val modelDir = ModelAssetPack.resolveModelDir(this@CantoneseInputMethodService)
                 if (modelDir == null) {
-                    Log.w(TAG, "Model asset pack '${ModelAssetPack.PACK_NAME}' unavailable")
+                    Log.w(TAG, "Model asset packs unavailable")
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_model_not_found))
                     return@launch
                 }
@@ -405,13 +405,10 @@ class CantoneseInputMethodService : InputMethodService(),
             }
         }
 
-        val externalDir = getExternalFilesDir(null)
-        val saveAudioDir = if (externalDir != null) {
-            val dir = File(externalDir, "saved_audio")
-            if (!dir.exists()) {
-                dir.mkdirs()
+        val saveAudioDir = if (BuildConfig.DEBUG) {
+            getExternalFilesDir(null)?.let { externalDir ->
+                File(externalDir, "saved_audio").apply { mkdirs() }.absolutePath
             }
-            dir.absolutePath
         } else {
             null
         }

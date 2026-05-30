@@ -1,14 +1,34 @@
+import java.util.Properties
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
 }
 
+// Signing credentials are loaded from keystore.properties (gitignored) or
+// environment variables. Release builds are signed only when all four values
+// are present; otherwise the release variant falls back to unsigned so local
+// debug builds still succeed.
+val keystoreProps = Properties().apply {
+    val file = rootProject.file("keystore.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+fun cred(key: String): String? =
+    keystoreProps.getProperty(key) ?: System.getenv(key)
+
+val ksFile = cred("KEYSTORE_FILE")
+val ksPassword = cred("KEYSTORE_PASSWORD")
+val ksAlias = cred("KEY_ALIAS")
+val ksKeyPassword = cred("KEY_PASSWORD")
+val hasReleaseSigning = ksFile != null && ksPassword != null &&
+    ksAlias != null && ksKeyPassword != null
+
 android {
-    namespace = "com.example.cantonesevoicekeyboard"
+    namespace = "com.madeinhk.cantonesevoicekeyboard"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.example.cantonesevoicekeyboard"
+        applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
         versionCode = 1
@@ -16,14 +36,31 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // The Qwen ASR model is delivered as a fast-follow Play Asset Delivery pack
-    // rather than bundled in the APK or sideloaded.
-    assetPacks += listOf(":model_pack")
+    // The Qwen ASR model is delivered as TWO fast-follow Play Asset Delivery
+    // packs so each stays under Play's 512 MiB per-pack ceiling. Shard 1 +
+    // tokenizer files live in :model_pack_a; shard 2 lives in :model_pack_b.
+    // See scripts/reshard_model.py for the build-time split.
+    assetPacks += listOf(":model_pack_a", ":model_pack_b")
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(ksFile!!)
+                storePassword = ksPassword
+                keyAlias = ksAlias
+                keyPassword = ksKeyPassword
+            }
+        }
+    }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {
@@ -33,7 +70,7 @@ android {
     buildFeatures {
       compose = true
       aidl = false
-      buildConfig = false
+      buildConfig = true
       shaders = false
     }
 

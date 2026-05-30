@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard.ui.main
+package com.madeinhk.cantonesevoicekeyboard.ui.main
 
 import android.Manifest
 import android.content.Context
@@ -41,11 +41,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.compose.ui.res.stringResource
-import com.example.cantonesevoicekeyboard.ModelAssetPack
-import com.example.cantonesevoicekeyboard.ModelDownloadStatus
-import com.example.cantonesevoicekeyboard.R
-import com.example.cantonesevoicekeyboard.data.DefaultDataRepository
-import com.example.cantonesevoicekeyboard.theme.*
+import com.madeinhk.cantonesevoicekeyboard.ModelAssetPack
+import com.madeinhk.cantonesevoicekeyboard.ModelDownloadStatus
+import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
+import com.madeinhk.cantonesevoicekeyboard.theme.*
 
 @Composable
 fun MainScreen(

@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard.ui.main
+package com.madeinhk.cantonesevoicekeyboard.ui.main
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-/** UI tests for [com.example.cantonesevoicekeyboard.ui.main.MainScreen]. */
+/** UI tests for [com.madeinhk.cantonesevoicekeyboard.ui.main.MainScreen]. */
 class MainScreenTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()

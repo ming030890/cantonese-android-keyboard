@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard.theme
+package com.madeinhk.cantonesevoicekeyboard.theme
 
 import androidx.compose.ui.graphics.Color
 

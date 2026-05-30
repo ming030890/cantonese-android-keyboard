@@ -1,56 +1,56 @@
 <resources>
     <string name="app_name">Cantonese Voice Keyboard</string>
     <string name="keyboard_name">Cantonese Voice Keyboard</string>
-    <string name="subtype_name">Cantonese Voice Input (local)</string>
+    <string name="subtype_name">Cantonese voice input (on-device)</string>
 
     <!-- Setup Main Screen Strings -->
     <string name="app_header_title">Cantonese Voice Keyboard</string>
-    <string name="app_header_subtitle">Ultra-fast Local Offline Speech Recognition</string>
+    <string name="app_header_subtitle">Fast, on-device Cantonese voice typing</string>
 
     <string name="setup_step_completed">Ready</string>
 
-    <string name="setup_step_1_title">Enable Microphone Permission</string>
-    <string name="setup_step_1_desc">Audio recording permission is required for voice input. Please authorize the microphone.</string>
-    <string name="setup_step_1_action">Grant</string>
+    <string name="setup_step_1_title">Allow microphone access</string>
+    <string name="setup_step_1_desc">Voice typing needs access to your microphone.</string>
+    <string name="setup_step_1_action">Allow</string>
 
-    <string name="setup_step_2_title">Enable Keyboard in System</string>
-    <string name="setup_step_2_desc">Go to system settings and turn on the "Cantonese Voice Keyboard" switch.</string>
-    <string name="setup_step_2_action">Enable</string>
+    <string name="setup_step_2_title">Turn on the keyboard</string>
+    <string name="setup_step_2_desc">In system settings, switch on "Cantonese Voice Keyboard".</string>
+    <string name="setup_step_2_action">Turn on</string>
 
-    <string name="setup_step_3_title">Set as Default Input Method</string>
-    <string name="setup_step_3_desc">Tap to switch and set "Cantonese Voice Keyboard" as your default keyboard.</string>
+    <string name="setup_step_3_title">Set as your default keyboard</string>
+    <string name="setup_step_3_desc">Tap to pick "Cantonese Voice Keyboard" as your default input method.</string>
     <string name="setup_step_3_action">Switch</string>
 
     <!-- Model Status Strings -->
-    <string name="model_status_title">Qwen ASR Speech Model</string>
-    <string name="model_status_ready">Speech model is ready for high-precision local offline recognition.</string>
-    <string name="model_status_preparing">Preparing speech model download…</string>
-    <string name="model_status_downloading">Downloading speech model… %1$d%%</string>
-    <string name="model_status_installing">Installing speech model…</string>
-    <string name="model_status_failed">Model download failed. Tap to retry.</string>
+    <string name="model_status_title">Speech recognition model</string>
+    <string name="model_status_ready">Ready. Voice typing runs fully on your device.</string>
+    <string name="model_status_preparing">Preparing download…</string>
+    <string name="model_status_downloading">Downloading… %1$d%%</string>
+    <string name="model_status_installing">Installing…</string>
+    <string name="model_status_failed">Download failed. Tap to retry.</string>
 
-    <!-- Sandbox Strings -->
-    <string name="sandbox_title">Cantonese Voice Input Sandbox</string>
-    <string name="sandbox_desc">Tap the input field below to show the keyboard, hold down the blue voice button and speak Cantonese to test:</string>
-    <string name="sandbox_placeholder">Try voice typing here... (e.g. say "Today's weather is so nice")</string>
-    <string name="sandbox_clear">Clear Content</string>
+    <!-- Try-it-out Strings -->
+    <string name="sandbox_title">Try it out</string>
+    <string name="sandbox_desc">Tap the box below, then hold the blue mic button and speak Cantonese:</string>
+    <string name="sandbox_placeholder">Try voice typing here… (e.g. say "Today's weather is so nice")</string>
+    <string name="sandbox_clear">Clear</string>
 
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">Tap to speak</string>
     <string name="keyboard_status_loading_model">Loading model…</string>
     <string name="keyboard_status_recording">Listening… tap to stop</string>
-    <string name="keyboard_status_transcribing">Performing speech recognition...</string>
-    <string name="keyboard_status_error_setup">Tap to open settings for configuration</string>
+    <string name="keyboard_status_transcribing">Transcribing…</string>
+    <string name="keyboard_status_error_setup">Tap to open settings</string>
     <string name="keyboard_key_space">Space</string>
     <string name="keyboard_key_enter">Enter</string>
 
     <!-- Input Method Service Error Strings -->
-    <string name="error_external_storage_unavailable">External storage not available.</string>
+    <string name="error_external_storage_unavailable">Can\'t access device storage.</string>
     <string name="error_model_not_found">Speech model is still downloading. Please try again in a moment.</string>
-    <string name="error_failed_initialize_asr">Failed to initialize ASR Engine.</string>
-    <string name="error_recording_permission_required">Recording permission required. Open settings.</string>
-    <string name="error_audio_format_failed">Audio format setup failed.</string>
-    <string name="error_audio_permission_missing">Audio recording permission missing.</string>
-    <string name="error_microphone_init_failed">Microphone initialization failed.</string>
-    <string name="error_failed_access_microphone">Failed to access microphone.</string>
+    <string name="error_failed_initialize_asr">Couldn\'t start the speech engine.</string>
+    <string name="error_recording_permission_required">Microphone permission needed. Open settings.</string>
+    <string name="error_audio_format_failed">Couldn\'t set up the microphone.</string>
+    <string name="error_audio_permission_missing">Microphone permission missing.</string>
+    <string name="error_microphone_init_failed">Couldn\'t start the microphone.</string>
+    <string name="error_failed_access_microphone">Can\'t access the microphone.</string>
 </resources>

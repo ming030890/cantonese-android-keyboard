@@ -35,7 +35,7 @@ DEVICE_ID=$(echo "$DEVICE_LIST" | awk '{print $1}' | head -n 1)
 echo -e "${COLOR_SUCCESS}Target Device detected: $DEVICE_ID${COLOR_RESET}"
 
 # 3. Define paths
-REMOTE_AUDIO_DIR="/sdcard/Android/data/com.example.cantonesevoicekeyboard/files/saved_audio"
+REMOTE_AUDIO_DIR="/sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/saved_audio"
 LOCAL_OUT_DIR="pulled_audio"
 
 # 4. Check remote directory and list wav files

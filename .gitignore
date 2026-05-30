@@ -47,6 +47,12 @@ Thumbs.db
 *.jks
 *.keystore
 *.pk8
+keystore.properties
+
+# Captured audio segments (debug builds only — never commit)
+*.wav
+
+
 *.pem
 
 # Crashlytics / Google Services

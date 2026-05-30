@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard
+package com.madeinhk.cantonesevoicekeyboard
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
+import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,9 +1,9 @@
-package com.example.cantonesevoicekeyboard.ui.main
+package com.madeinhk.cantonesevoicekeyboard.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cantonesevoicekeyboard.data.DataRepository
-import com.example.cantonesevoicekeyboard.ui.main.MainScreenUiState.Success
+import com.madeinhk.cantonesevoicekeyboard.data.DataRepository
+import com.madeinhk.cantonesevoicekeyboard.ui.main.MainScreenUiState.Success
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch

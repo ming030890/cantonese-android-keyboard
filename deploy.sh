@@ -18,44 +18,67 @@ echo -e "${COLOR_INFO}==========================================================
 # Configuration
 # ---------------------------------------------------------------------------
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PACKAGE="com.example.cantonesevoicekeyboard"
+PACKAGE="com.madeinhk.cantonesevoicekeyboard"
 
-# Where the raw model lives on the build machine (staged into the asset pack).
+# Where the raw model lives on the build machine. scripts/reshard_model.py
+# splits its model.safetensors into two ≤480 MiB shards across the two packs.
 SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-int8dec"
-# The asset pack module's assets dir. Files placed here are delivered to the
-# device by Play Asset Delivery (fast-follow), and locally by bundletool's
-# --local-testing mode.
-ASSET_PACK_MODEL_DIR="$PROJECT_DIR/model_pack/src/main/assets/qwen-asr-int8dec"
+# Two asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
+# shard 2 in pack B. Files placed here are delivered to the device by Play
+# Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
+PACK_A_ASSETS="$PROJECT_DIR/model_pack_a/src/main/assets/qwen-asr-int8dec"
+PACK_B_ASSETS="$PROJECT_DIR/model_pack_b/src/main/assets/qwen-asr-int8dec"
+RESHARD_SCRIPT="$PROJECT_DIR/scripts/reshard_model.py"
 
 # Pinned bundletool; auto-downloaded into .tools/ on first use.
 BUNDLETOOL_VERSION="1.18.1"
 TOOLS_DIR="$PROJECT_DIR/.tools"
 BUNDLETOOL_JAR="$TOOLS_DIR/bundletool-all-${BUNDLETOOL_VERSION}.jar"
 
-AAB_PATH="$PROJECT_DIR/app/build/outputs/bundle/debug/app-debug.aab"
-APKS_PATH="$PROJECT_DIR/build/app-debug.apks"
+# --release builds a Play-uploadable AAB (signed if keystore.properties is set)
+# and skips the on-device install. Default is the on-device debug flow.
+RELEASE=false
+for arg in "$@"; do
+    if [ "$arg" == "--release" ] || [ "$arg" == "-r" ]; then
+        RELEASE=true
+    fi
+done
+
+if [ "$RELEASE" = "true" ]; then
+    AAB_PATH="$PROJECT_DIR/app/build/outputs/bundle/release/app-release.aab"
+    APKS_PATH="$PROJECT_DIR/build/app-release.apks"
+else
+    AAB_PATH="$PROJECT_DIR/app/build/outputs/bundle/debug/app-debug.aab"
+    APKS_PATH="$PROJECT_DIR/build/app-debug.apks"
+fi
 
 # ---------------------------------------------------------------------------
 # 1. Locate ADB and verify device connection
 # ---------------------------------------------------------------------------
-echo -e "${COLOR_INFO}[Step 1/6] Locating ADB and verifying device connection...${COLOR_RESET}"
-ADB="/Users/tony/Library/Android/sdk/platform-tools/adb"
-if [ ! -f "$ADB" ]; then
-    if command -v adb &> /dev/null; then
-        ADB="adb"
-    else
-        echo -e "${COLOR_ERROR}Error: ADB not found at '$ADB' or in system PATH.${COLOR_RESET}"
+if [ "$RELEASE" = "true" ]; then
+    echo -e "${COLOR_INFO}[Step 1/6] Release mode: skipping device check (AAB is for Play upload).${COLOR_RESET}"
+    DEVICE_ID=""
+    ADB=""
+else
+    echo -e "${COLOR_INFO}[Step 1/6] Locating ADB and verifying device connection...${COLOR_RESET}"
+    ADB="/Users/tony/Library/Android/sdk/platform-tools/adb"
+    if [ ! -f "$ADB" ]; then
+        if command -v adb &> /dev/null; then
+            ADB="adb"
+        else
+            echo -e "${COLOR_ERROR}Error: ADB not found at '$ADB' or in system PATH.${COLOR_RESET}"
+            exit 1
+        fi
+    fi
+
+    DEVICE_LIST=$("$ADB" devices | grep -v "List of devices" | grep "device" || true)
+    if [ -z "$DEVICE_LIST" ]; then
+        echo -e "${COLOR_ERROR}Error: No Android device or emulator is connected via ADB.${COLOR_RESET}"
         exit 1
     fi
+    DEVICE_ID=$(echo "$DEVICE_LIST" | awk '{print $1}' | head -n 1)
+    echo -e "${COLOR_SUCCESS}Connected device detected: $DEVICE_ID${COLOR_RESET}"
 fi
-
-DEVICE_LIST=$("$ADB" devices | grep -v "List of devices" | grep "device" || true)
-if [ -z "$DEVICE_LIST" ]; then
-    echo -e "${COLOR_ERROR}Error: No Android device or emulator is connected via ADB.${COLOR_RESET}"
-    exit 1
-fi
-DEVICE_ID=$(echo "$DEVICE_LIST" | awk '{print $1}' | head -n 1)
-echo -e "${COLOR_SUCCESS}Connected device detected: $DEVICE_ID${COLOR_RESET}"
 
 # ---------------------------------------------------------------------------
 # 2. Compile JNI Library (Optional, pass --compile / -c to force)
@@ -103,17 +126,26 @@ fi
 # ---------------------------------------------------------------------------
 # 3. Stage the ASR model into the Play Asset Delivery pack
 # ---------------------------------------------------------------------------
-echo -e "${COLOR_INFO}[Step 3/6] Staging Qwen ASR model into the asset pack...${COLOR_RESET}"
-if [ -d "$ASSET_PACK_MODEL_DIR" ] && [ -n "$(ls -A "$ASSET_PACK_MODEL_DIR" 2>/dev/null)" ]; then
-    echo -e "${COLOR_SUCCESS}Model already staged at model_pack/src/main/assets/qwen-asr-int8dec. Skipping copy.${COLOR_RESET}"
+echo -e "${COLOR_INFO}[Step 3/6] Staging Qwen ASR model shards into both asset packs...${COLOR_RESET}"
+SHARD_A="$PACK_A_ASSETS/model-00001-of-00002.safetensors"
+SHARD_B="$PACK_B_ASSETS/model-00002-of-00002.safetensors"
+if [ -f "$SHARD_A" ] && [ -f "$SHARD_B" ]; then
+    echo -e "${COLOR_SUCCESS}Shards already staged. Skipping reshard.${COLOR_RESET}"
 elif [ -d "$SOURCE_MODEL_DIR" ]; then
-    echo -e "${COLOR_INFO}Copying model from $SOURCE_MODEL_DIR into the asset pack (~1.3 GB, one-time)...${COLOR_RESET}"
-    mkdir -p "$ASSET_PACK_MODEL_DIR"
-    cp -R "$SOURCE_MODEL_DIR/." "$ASSET_PACK_MODEL_DIR/"
-    echo -e "${COLOR_SUCCESS}Model staged into asset pack.${COLOR_RESET}"
+    if ! command -v python3 &> /dev/null; then
+        echo -e "${COLOR_ERROR}Error: python3 required to reshard the model.${COLOR_RESET}"
+        exit 1
+    fi
+    echo -e "${COLOR_INFO}Running reshard_model.py (one-time; needs python3 with safetensors+torch installed)...${COLOR_RESET}"
+    python3 "$RESHARD_SCRIPT" \
+        --source "$SOURCE_MODEL_DIR" \
+        --pack-a "$PACK_A_ASSETS" \
+        --pack-b "$PACK_B_ASSETS"
+    echo -e "${COLOR_SUCCESS}Shards staged into both asset packs.${COLOR_RESET}"
 else
-    echo -e "${COLOR_ERROR}Error: Model not staged and source '$SOURCE_MODEL_DIR' not found.${COLOR_RESET}"
-    echo -e "${COLOR_ERROR}Place the model under '$ASSET_PACK_MODEL_DIR' or at '$SOURCE_MODEL_DIR'.${COLOR_RESET}"
+    echo -e "${COLOR_ERROR}Error: Shards not staged and source '$SOURCE_MODEL_DIR' not found.${COLOR_RESET}"
+    echo -e "${COLOR_ERROR}Either place shards under '$PACK_A_ASSETS' and '$PACK_B_ASSETS',${COLOR_RESET}"
+    echo -e "${COLOR_ERROR}or place the source model at '$SOURCE_MODEL_DIR' so the script can shard it.${COLOR_RESET}"
     exit 1
 fi
 
@@ -138,12 +170,26 @@ fi
 # ---------------------------------------------------------------------------
 # 5. Build the App Bundle (.aab) including the asset pack
 # ---------------------------------------------------------------------------
-echo -e "${COLOR_INFO}[Step 5/6] Building debug App Bundle (.aab)...${COLOR_RESET}"
 cd "$PROJECT_DIR"
-./gradlew :app:bundleDebug
+if [ "$RELEASE" = "true" ]; then
+    echo -e "${COLOR_INFO}[Step 5/6] Building RELEASE App Bundle (.aab) for Play upload...${COLOR_RESET}"
+    ./gradlew :app:bundleRelease
+else
+    echo -e "${COLOR_INFO}[Step 5/6] Building debug App Bundle (.aab)...${COLOR_RESET}"
+    ./gradlew :app:bundleDebug
+fi
 if [ ! -f "$AAB_PATH" ]; then
     echo -e "${COLOR_ERROR}Error: Expected bundle not found at $AAB_PATH${COLOR_RESET}"
     exit 1
+fi
+
+if [ "$RELEASE" = "true" ]; then
+    echo -e "${COLOR_SUCCESS}================================================================${COLOR_RESET}"
+    echo -e "${COLOR_SUCCESS}Release AAB built:${COLOR_RESET}"
+    echo -e "${COLOR_SUCCESS}  $AAB_PATH${COLOR_RESET}"
+    echo -e "${COLOR_SUCCESS}Upload it to Play Console. Skipping on-device install.${COLOR_RESET}"
+    echo -e "${COLOR_SUCCESS}================================================================${COLOR_RESET}"
+    exit 0
 fi
 
 # ---------------------------------------------------------------------------
@@ -175,31 +221,38 @@ md5_of() {
 }
 
 LOCAL_TESTING_DIR="/sdcard/Android/data/$PACKAGE/files/local_testing"
-DEVICE_PACK="$LOCAL_TESTING_DIR/model_pack-master.apk"
-PACK_ENTRY=$(unzip -Z1 "$APKS_PATH" 2>/dev/null | grep -E 'model_pack.*\.apk$' | head -n1)
 
-NEED_FULL_INSTALL=true
-if [ -n "$PACK_ENTRY" ]; then
+# Freshness check across both packs: skip the full install only when every
+# pack's master split on-device matches what we just built.
+NEED_FULL_INSTALL=false
+for PACK in model_pack_a model_pack_b; do
+    PACK_ENTRY=$(unzip -Z1 "$APKS_PATH" 2>/dev/null | grep -E "${PACK}.*\.apk$" | head -n1)
+    DEVICE_PACK="$LOCAL_TESTING_DIR/${PACK}-master.apk"
+    if [ -z "$PACK_ENTRY" ]; then
+        NEED_FULL_INSTALL=true
+        break
+    fi
     LOCAL_PACK_MD5=$(unzip -p "$APKS_PATH" "$PACK_ENTRY" | md5_of)
     DEVICE_PACK_MD5=$("$ADB" -s "$DEVICE_ID" shell "md5sum '$DEVICE_PACK' 2>/dev/null" | awk '{print $1}')
-    if [ -n "$DEVICE_PACK_MD5" ] && [ "$LOCAL_PACK_MD5" == "$DEVICE_PACK_MD5" ]; then
-        NEED_FULL_INSTALL=false
+    if [ -z "$DEVICE_PACK_MD5" ] || [ "$LOCAL_PACK_MD5" != "$DEVICE_PACK_MD5" ]; then
+        NEED_FULL_INSTALL=true
+        break
     fi
-fi
+done
 
 if [ "$NEED_FULL_INSTALL" = "true" ]; then
-    echo -e "${COLOR_WARNING}Asset pack changed or missing on device — full install (pushes the model pack)...${COLOR_RESET}"
+    echo -e "${COLOR_WARNING}Asset pack changed or missing on device — full install (pushes the model packs)...${COLOR_RESET}"
     java -jar "$BUNDLETOOL_JAR" install-apks \
         --apks="$APKS_PATH" \
         --adb="$ADB" \
         --device-id="$DEVICE_ID"
 else
-    echo -e "${COLOR_SUCCESS}Asset pack unchanged on device — fast install (app splits only, keeping the pack).${COLOR_RESET}"
+    echo -e "${COLOR_SUCCESS}Asset packs unchanged on device — fast install (app splits only, keeping the packs).${COLOR_RESET}"
     APP_SPLITS_DIR="$PROJECT_DIR/build/app-splits"
     rm -rf "$APP_SPLITS_DIR"
     mkdir -p "$APP_SPLITS_DIR"
-    # Extract only the app splits (everything except the asset pack) and reinstall them.
-    unzip -Z1 "$APKS_PATH" | grep -E '\.apk$' | grep -v 'model_pack' | while read -r entry; do
+    # Extract only the app splits (everything except the asset packs) and reinstall them.
+    unzip -Z1 "$APKS_PATH" | grep -E '\.apk$' | grep -Ev 'model_pack_a|model_pack_b' | while read -r entry; do
         unzip -o -j -q "$APKS_PATH" "$entry" -d "$APP_SPLITS_DIR"
     done
     "$ADB" -s "$DEVICE_ID" install-multiple -r -d "$APP_SPLITS_DIR"/*.apk

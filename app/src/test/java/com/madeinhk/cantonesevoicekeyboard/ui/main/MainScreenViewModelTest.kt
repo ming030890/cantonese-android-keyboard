@@ -1,6 +1,6 @@
-package com.example.cantonesevoicekeyboard.ui.main
+package com.madeinhk.cantonesevoicekeyboard.ui.main
 
-import com.example.cantonesevoicekeyboard.data.DataRepository
+import com.madeinhk.cantonesevoicekeyboard.data.DataRepository
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

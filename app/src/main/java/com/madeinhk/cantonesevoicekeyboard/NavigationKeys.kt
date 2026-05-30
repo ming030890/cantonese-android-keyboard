@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard
+package com.madeinhk.cantonesevoicekeyboard
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable

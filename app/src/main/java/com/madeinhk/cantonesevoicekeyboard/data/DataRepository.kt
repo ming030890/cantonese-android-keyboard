@@ -1,4 +1,4 @@
-package com.example.cantonesevoicekeyboard.data
+package com.madeinhk.cantonesevoicekeyboard.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
