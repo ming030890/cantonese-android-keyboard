@@ -31,3 +31,4 @@ plugins {
 
 rootProject.name = "Cantonese Voice Keyboard"
 include(":app")
+include(":model_pack")

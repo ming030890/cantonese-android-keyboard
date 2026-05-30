@@ -5,6 +5,9 @@ build/
 build.log
 .gradle-tasks/
 
+# Local tooling cache (e.g. bundletool, downloaded by deploy.sh)
+.tools/
+
 # Android Studio / IntelliJ IDEA
 .idea/
 *.iml

@@ -13,6 +13,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -40,10 +41,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.compose.ui.res.stringResource
+import com.example.cantonesevoicekeyboard.ModelAssetPack
+import com.example.cantonesevoicekeyboard.ModelDownloadStatus
 import com.example.cantonesevoicekeyboard.R
 import com.example.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.example.cantonesevoicekeyboard.theme.*
-import java.io.File
 
 @Composable
 fun MainScreen(
@@ -57,24 +59,23 @@ fun MainScreen(
   var permissionGranted by remember { mutableStateOf(false) }
   var keyboardEnabled by remember { mutableStateOf(false) }
   var keyboardSelected by remember { mutableStateOf(false) }
-  var modelSynced by remember { mutableStateOf(false) }
+  var modelStatus by remember { mutableStateOf<ModelDownloadStatus>(ModelDownloadStatus.NotStarted) }
+  var retryKey by remember { mutableIntStateOf(0) }
+
+  // Observe the model asset-pack download live (progress, install, ready, failure).
+  // retryKey re-launches the collection so the user can retry after a failure.
+  LaunchedEffect(retryKey) {
+    ModelAssetPack.downloadStatusFlow(context).collect { modelStatus = it }
+  }
 
   fun refreshStatus() {
     permissionGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-    
+
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     keyboardEnabled = imm.enabledInputMethodList.any { it.packageName == context.packageName }
-    
+
     val currentIme = Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
     keyboardSelected = currentIme?.contains(context.packageName) == true
-    
-    val externalDir = context.getExternalFilesDir(null)
-    modelSynced = if (externalDir != null) {
-      val modelDir = File(externalDir, "qwen-asr-int8dec")
-      modelDir.exists() && modelDir.isDirectory && (modelDir.list()?.isNotEmpty() == true)
-    } else {
-      false
-    }
   }
 
   // Refresh status when window gains focus (e.g. returning from system dialog overlays like the IME picker)
@@ -107,18 +108,44 @@ fun MainScreen(
     }
   )
 
-  // Layout Container
+  MainScreenContent(
+    permissionGranted = permissionGranted,
+    keyboardEnabled = keyboardEnabled,
+    keyboardSelected = keyboardSelected,
+    modelStatus = modelStatus,
+    onGrantPermission = { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
+    onEnableKeyboard = { context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) },
+    onPickKeyboard = {
+      val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+      imm.showInputMethodPicker()
+    },
+    onModelRetry = { retryKey++ },
+    modifier = modifier
+  )
+}
+
+/**
+ * Stateless layout for the setup screen. Holds no Android dependencies, so it
+ * renders cleanly in @Preview / screenshot tests across light and dark themes.
+ */
+@Composable
+fun MainScreenContent(
+  permissionGranted: Boolean,
+  keyboardEnabled: Boolean,
+  keyboardSelected: Boolean,
+  modelStatus: ModelDownloadStatus,
+  onGrantPermission: () -> Unit,
+  onEnableKeyboard: () -> Unit,
+  onPickKeyboard: () -> Unit,
+  onModelRetry: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  // Backdrop gradient comes from the theme (decided once per light/dark there),
+  // so this screen never has to infer the theme itself.
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(
-        brush = Brush.verticalGradient(
-          colors = listOf(
-            DarkMidnight, // Deep indigo midnight
-            CarbonBlack  // Dark carbon black
-          )
-        )
-      )
+      .background(brush = BrandTheme.colors.backgroundGradient)
   ) {
     Column(
       modifier = modifier
@@ -135,9 +162,7 @@ fun MainScreen(
         description = stringResource(id = R.string.setup_step_1_desc),
         isCompleted = permissionGranted,
         actionText = stringResource(id = R.string.setup_step_1_action),
-        onActionClick = {
-          permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-        }
+        onActionClick = onGrantPermission
       )
 
       SetupStepCard(
@@ -146,9 +171,7 @@ fun MainScreen(
         description = stringResource(id = R.string.setup_step_2_desc),
         isCompleted = keyboardEnabled,
         actionText = stringResource(id = R.string.setup_step_2_action),
-        onActionClick = {
-          context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
-        }
+        onActionClick = onEnableKeyboard
       )
 
       SetupStepCard(
@@ -157,16 +180,13 @@ fun MainScreen(
         description = stringResource(id = R.string.setup_step_3_desc),
         isCompleted = keyboardSelected,
         actionText = stringResource(id = R.string.setup_step_3_action),
-        onActionClick = {
-          val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-          imm.showInputMethodPicker()
-        }
+        onActionClick = onPickKeyboard
       )
 
       Spacer(modifier = Modifier.height(6.dp))
 
       // Model Sync Status
-      ModelStatusCard(isSynced = modelSynced)
+      ModelStatusCard(status = modelStatus, onRetry = onModelRetry)
 
       Spacer(modifier = Modifier.height(12.dp))
 
@@ -187,7 +207,7 @@ fun AppHeader(modifier: Modifier = Modifier) {
     MicLogo(modifier = Modifier.padding(top = 16.dp, bottom = 12.dp))
     Text(
       text = stringResource(id = R.string.app_header_title),
-      color = Color.White,
+      color = MaterialTheme.colorScheme.onBackground,
       fontSize = 22.sp,
       fontWeight = FontWeight.Black,
       letterSpacing = 1.sp
@@ -380,7 +400,7 @@ fun SetupStepCard(
         Column {
           Text(
             text = title,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold
           )
@@ -424,23 +444,41 @@ fun SetupStepCard(
 
 @Composable
 fun ModelStatusCard(
-  isSynced: Boolean,
-  modifier: Modifier = Modifier
+  status: ModelDownloadStatus,
+  modifier: Modifier = Modifier,
+  onRetry: () -> Unit = {}
 ) {
   val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+  val primaryColor = MaterialTheme.colorScheme.primary
+
+  val isReady = status is ModelDownloadStatus.Ready
+  val isError = status is ModelDownloadStatus.Failed
+  val accent = when {
+    isReady -> SuccessGreen
+    isError -> AlertAmber
+    else -> primaryColor
+  }
+
+  val subtitle = when (status) {
+    is ModelDownloadStatus.Ready -> stringResource(id = R.string.model_status_ready)
+    is ModelDownloadStatus.Downloading ->
+      stringResource(id = R.string.model_status_downloading, status.percent)
+    is ModelDownloadStatus.Installing -> stringResource(id = R.string.model_status_installing)
+    is ModelDownloadStatus.Pending -> stringResource(id = R.string.model_status_preparing)
+    is ModelDownloadStatus.NotStarted -> stringResource(id = R.string.model_status_preparing)
+    is ModelDownloadStatus.Failed -> stringResource(id = R.string.model_status_failed)
+  }
 
   Card(
     modifier = modifier
       .fillMaxWidth()
-      .padding(vertical = 6.dp),
+      .padding(vertical = 6.dp)
+      .then(if (isError) Modifier.clickable { onRetry() } else Modifier),
     shape = RoundedCornerShape(16.dp),
     colors = CardDefaults.cardColors(
       containerColor = MaterialTheme.colorScheme.surface
     ),
-    border = BorderStroke(
-      width = 1.dp,
-      color = if (isSynced) SuccessGreen.copy(alpha = 0.3f) else AlertAmber.copy(alpha = 0.3f)
-    )
+    border = BorderStroke(width = 1.dp, color = accent.copy(alpha = 0.3f))
   ) {
     Row(
       modifier = Modifier
@@ -452,41 +490,65 @@ fun ModelStatusCard(
         modifier = Modifier
           .size(36.dp)
           .clip(CircleShape)
-          .background(
-            if (isSynced) SuccessGreen.copy(alpha = 0.15f)
-            else AlertAmber.copy(alpha = 0.15f)
-          )
-          .border(
-            width = 1.5.dp,
-            color = if (isSynced) SuccessGreen else AlertAmber,
-            shape = CircleShape
-          ),
+          .background(accent.copy(alpha = 0.15f))
+          .border(width = 1.5.dp, color = accent, shape = CircleShape),
         contentAlignment = Alignment.Center
       ) {
-        if (isSynced) {
-          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        } else {
-          Text("⚠", color = AlertAmber, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        when (status) {
+          is ModelDownloadStatus.Ready ->
+            Text("✓", color = accent, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+          is ModelDownloadStatus.Failed ->
+            Text("⚠", color = accent, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+          is ModelDownloadStatus.Downloading ->
+            CircularProgressIndicator(
+              progress = { status.fraction },
+              modifier = Modifier.size(20.dp),
+              strokeWidth = 2.dp,
+              color = accent
+            )
+          else ->
+            CircularProgressIndicator(
+              modifier = Modifier.size(20.dp),
+              strokeWidth = 2.dp,
+              color = accent
+            )
         }
       }
-      
+
       Spacer(modifier = Modifier.width(16.dp))
-      
+
       Column(modifier = Modifier.weight(1f)) {
         Text(
           text = stringResource(id = R.string.model_status_title),
-          color = Color.White,
+          color = MaterialTheme.colorScheme.onSurface,
           fontSize = 16.sp,
           fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-          text = if (isSynced) stringResource(id = R.string.model_status_ready)
-                 else stringResource(id = R.string.model_status_missing),
+          text = subtitle,
           color = textVariantColor,
           fontSize = 12.sp,
           fontWeight = FontWeight.Normal
         )
+        if (status is ModelDownloadStatus.Downloading) {
+          Spacer(modifier = Modifier.height(8.dp))
+          LinearProgressIndicator(
+            progress = { status.fraction },
+            modifier = Modifier
+              .fillMaxWidth()
+              .clip(RoundedCornerShape(4.dp)),
+            color = accent
+          )
+        } else if (status is ModelDownloadStatus.Pending || status is ModelDownloadStatus.Installing) {
+          Spacer(modifier = Modifier.height(8.dp))
+          LinearProgressIndicator(
+            modifier = Modifier
+              .fillMaxWidth()
+              .clip(RoundedCornerShape(4.dp)),
+            color = accent
+          )
+        }
       }
     }
   }
@@ -518,7 +580,7 @@ fun TestSandboxCard(
     ) {
       Text(
         text = stringResource(id = R.string.sandbox_title),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.onSurface,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold
       )
@@ -545,12 +607,16 @@ fun TestSandboxCard(
             fontSize = 14.sp
           )
         },
-        textStyle = TextStyle(color = Color.White, fontSize = 15.sp),
+        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp),
         colors = OutlinedTextFieldDefaults.colors(
+          focusedTextColor = MaterialTheme.colorScheme.onSurface,
+          unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
           focusedBorderColor = primaryColor,
           unfocusedBorderColor = outlineColor,
-          focusedContainerColor = CarbonBlack.copy(alpha = 0.5f),
-          unfocusedContainerColor = CarbonBlack.copy(alpha = 0.5f)
+          // Subtle adaptive fill: a faint tint of the content color reads correctly
+          // on both the light and dark card surfaces.
+          focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
+          unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
         ),
         shape = RoundedCornerShape(12.dp)
       )

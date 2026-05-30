@@ -25,4 +25,14 @@ val TranscribeYellow = Color(0xFFFFD600)  // Active transcription transcribing s
 val SystemBlue = Color(0xFF0A84FF)        // Link/Navigation reference blue
 val IconGray = Color(0xFFD1D1D6)          // Standard key icon monochrome gray
 
+// Light theme tokens (deep teal accent reads well against light surfaces)
+val LightPrimaryTeal = Color(0xFF00788A)    // Readable accent on white
+val LightBackground = Color(0xFFF7F7FB)     // Soft near-white screen backdrop
+val LightSurface = Color(0xFFFFFFFF)        // Clean white card surface
+val LightBorder = Color(0xFFD9D9E3)         // Subtle light card borders
+val LightOnSurface = Color(0xFF14141C)      // Primary text on light surfaces
+val LightTextGray = Color(0xFF5A5A6A)       // Secondary text on light surfaces
+val LightGradientTop = Color(0xFFF7F7FB)    // Screen gradient top (light)
+val LightGradientBottom = Color(0xFFE9E9F1) // Screen gradient bottom (light)
+
 

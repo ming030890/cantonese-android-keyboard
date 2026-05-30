@@ -24,7 +24,10 @@
     <!-- Model Status Strings -->
     <string name="model_status_title">Qwen ASR 語音模型</string>
     <string name="model_status_ready">語音模型已就緒，可進行本地高精度識別。</string>
-    <string name="model_status_missing">尚未檢測到語音模型！請連接電腦並執行 `deploy.sh` 進行同步。</string>
+    <string name="model_status_preparing">正在準備下載語音模型…</string>
+    <string name="model_status_downloading">正在下載語音模型… %1$d%%</string>
+    <string name="model_status_installing">正在安裝語音模型…</string>
+    <string name="model_status_failed">語音模型下載失敗，點擊重試。</string>
 
     <!-- Sandbox Strings -->
     <string name="sandbox_title">粵語語音輸入測試沙盒 (Sandbox)</string>
@@ -43,7 +46,7 @@
 
     <!-- Input Method Service Error Strings -->
     <string name="error_external_storage_unavailable">外部儲存空間不可用。</string>
-    <string name="error_model_not_found">找不到語音模型！請執行 deploy.sh 進行同步。</string>
+    <string name="error_model_not_found">語音模型仍在下載中，請稍候再試。</string>
     <string name="error_failed_initialize_asr">語音引擎初始化失敗。</string>
     <string name="error_recording_permission_required">需要錄音權限以進行語音輸入，請開啟設定。</string>
     <string name="error_audio_format_failed">音訊格式設定失敗。</string>

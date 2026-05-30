@@ -3,6 +3,7 @@ package com.example.cantonesevoicekeyboard.ui.keyboard
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,11 +17,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -79,7 +84,9 @@ fun KeyboardScreen(
                 )
             )
             .navigationBarsPadding()
-            .padding(12.dp)
+            // Extra bottom inset so the key row clears the system nav bar / IME-switch globe.
+            // navigationBarsPadding() is often ~0 in the IME window, so this fixed gap carries it.
+            .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 40.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -209,7 +216,7 @@ fun KeyboardScreen(
                     modifier = Modifier.weight(1f),
                     onClick = onSwitchKeyboard
                 ) {
-                    GlobeIcon(modifier = Modifier.size(20.dp), color = IconGray)
+                    GlobeIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -222,7 +229,7 @@ fun KeyboardScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.keyboard_key_space),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -249,7 +256,7 @@ fun KeyboardScreen(
                         },
                     onClick = null
                 ) {
-                    BackspaceIcon(modifier = Modifier.size(20.dp), color = IconGray)
+                    BackspaceIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -317,7 +324,9 @@ fun RecordTriggerButton(
     val iconColor = when (state) {
         KeyboardUiState.Recording -> Color.White
         is KeyboardUiState.Error -> errorColor
-        else -> Color.Black
+        // Pick black/white for legibility against whatever the button fill is,
+        // so the mic/spinner stays readable in both light and dark themes.
+        else -> if (buttonColor.luminance() > 0.5f) Color.Black else Color.White
     }
 
     Box(contentAlignment = Alignment.Center) {
@@ -425,6 +434,10 @@ fun KeyboardUtilityKey(
     content: @Composable BoxScope.() -> Unit
 ) {
     val finalBgColor = if (backgroundColor == Color.Unspecified) MaterialTheme.colorScheme.surface else backgroundColor
+    // Default to a subtle outline so key-caps stay delineated from the keyboard
+    // background in both themes (white-on-white in light / dark-on-dark in dark).
+    val finalBorderColor = if (borderColor == Color.Unspecified) MaterialTheme.colorScheme.outline else borderColor
+    val keyShape = RoundedCornerShape(8.dp)
     val keyModifier = if (onClick != null) {
         Modifier.clickable(onClick = onClick)
     } else {
@@ -434,8 +447,9 @@ fun KeyboardUtilityKey(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(keyShape)
             .background(finalBgColor)
+            .border(1.dp, finalBorderColor, keyShape)
             .then(keyModifier)
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center,

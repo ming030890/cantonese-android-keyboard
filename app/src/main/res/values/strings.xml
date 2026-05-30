@@ -24,7 +24,10 @@
     <!-- Model Status Strings -->
     <string name="model_status_title">Qwen ASR Speech Model</string>
     <string name="model_status_ready">Speech model is ready for high-precision local offline recognition.</string>
-    <string name="model_status_missing">Speech model not detected! Please connect your computer and run `deploy.sh` to sync.</string>
+    <string name="model_status_preparing">Preparing speech model download…</string>
+    <string name="model_status_downloading">Downloading speech model… %1$d%%</string>
+    <string name="model_status_installing">Installing speech model…</string>
+    <string name="model_status_failed">Model download failed. Tap to retry.</string>
 
     <!-- Sandbox Strings -->
     <string name="sandbox_title">Cantonese Voice Input Sandbox</string>
@@ -43,7 +46,7 @@
 
     <!-- Input Method Service Error Strings -->
     <string name="error_external_storage_unavailable">External storage not available.</string>
-    <string name="error_model_not_found">Model files not found! Sync model using deploy.sh.</string>
+    <string name="error_model_not_found">Speech model is still downloading. Please try again in a moment.</string>
     <string name="error_failed_initialize_asr">Failed to initialize ASR Engine.</string>
     <string name="error_recording_permission_required">Recording permission required. Open settings.</string>
     <string name="error_audio_format_failed">Audio format setup failed.</string>

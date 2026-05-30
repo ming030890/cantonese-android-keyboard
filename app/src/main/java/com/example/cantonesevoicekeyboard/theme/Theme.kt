@@ -8,8 +8,42 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+
+/**
+ * Brand design values that aren't part of Material's standard [androidx.compose.material3.ColorScheme]
+ * (e.g. the screen's gradient backdrop). Decided once in [CantoneseVoiceKeyboardTheme]
+ * alongside the color scheme and read via [BrandTheme.colors], so screens never
+ * have to infer light/dark themselves.
+ */
+@Immutable
+data class BrandColors(
+    val backgroundGradient: Brush
+)
+
+private val DarkBrandColors = BrandColors(
+    backgroundGradient = Brush.verticalGradient(listOf(DarkMidnight, CarbonBlack))
+)
+
+private val LightBrandColors = BrandColors(
+    backgroundGradient = Brush.verticalGradient(listOf(LightGradientTop, LightGradientBottom))
+)
+
+private val LocalBrandColors = staticCompositionLocalOf { DarkBrandColors }
+
+/** Accessor for brand design values provided by [CantoneseVoiceKeyboardTheme]. */
+object BrandTheme {
+    val colors: BrandColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBrandColors.current
+}
 
 private val DarkColorScheme = darkColorScheme(
     primary = NeonCyan,
@@ -25,26 +59,25 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme =
   lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = LightPrimaryTeal,
+    background = LightBackground,
+    surface = LightSurface,
+    outline = LightBorder,
+    error = ClearRed,
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    onBackground = LightOnSurface,
+    onSurface = LightOnSurface,
+    onSurfaceVariant = LightTextGray
   )
 
 @Composable
 fun CantoneseVoiceKeyboardTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
-  // Dynamic color is available on Android 12+
-  dynamicColor: Boolean = true,
+  // Default to the hand-tuned brand palettes rather than wallpaper-based dynamic
+  // color: the screens use a fixed gradient backdrop, and dynamic dark schemes
+  // render card surfaces dark-on-dark against it. Keeping this off also makes
+  // screenshot tests deterministic.
+  dynamicColor: Boolean = false,
   content: @Composable () -> Unit,
 ) {
   val colorScheme =
@@ -57,5 +90,9 @@ fun CantoneseVoiceKeyboardTheme(
       else -> LightColorScheme
     }
 
-  MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+  val brandColors = if (darkTheme) DarkBrandColors else LightBrandColors
+
+  CompositionLocalProvider(LocalBrandColors provides brandColors) {
+    MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+  }
 }

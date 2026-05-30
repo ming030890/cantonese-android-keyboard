@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.inputmethodservice.InputMethodService
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -17,6 +18,7 @@ import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputConnection
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -109,6 +111,7 @@ class CantoneseInputMethodService : InputMethodService(),
             decorView.setViewTreeViewModelStoreOwner(this)
             decorView.setViewTreeSavedStateRegistryOwner(this)
         }
+        applyNavigationBarAppearance()
 
         val composeView = ComposeView(this).apply {
             setViewTreeLifecycleOwner(this@CantoneseInputMethodService)
@@ -145,8 +148,22 @@ class CantoneseInputMethodService : InputMethodService(),
         super.onStartInputView(info, restarting)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
+        // Re-apply in case the system day/night mode changed while hidden.
+        applyNavigationBarAppearance()
         val session = ++inputViewSession
         ensureModelLoadingStarted(session)
+    }
+
+    /**
+     * Matches the navigation-bar icon tint to the keyboard's theme so the system
+     * IME-switch ("globe") button and gesture handle stay visible: dark icons on
+     * the light-theme keyboard, light icons on the dark-theme keyboard.
+     */
+    private fun applyNavigationBarAppearance() {
+        val w = window?.window ?: return
+        val isNight = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+            Configuration.UI_MODE_NIGHT_YES
+        WindowInsetsControllerCompat(w, w.decorView).isAppearanceLightNavigationBars = !isNight
     }
 
     private fun ensureModelLoadingStarted(session: Long = inputViewSession) {
@@ -169,19 +186,15 @@ class CantoneseInputMethodService : InputMethodService(),
 
         val loadingJob = serviceScope.launch(Dispatchers.Default) {
             try {
-                val externalDir = getExternalFilesDir(null)
-                if (externalDir == null) {
-                    _uiState.value = KeyboardUiState.Error(getString(R.string.error_external_storage_unavailable))
-                    return@launch
-                }
-                
-                val modelDir = File(externalDir, "qwen-asr-int8dec")
-                if (!modelDir.exists()) {
-                    Log.w(TAG, "Model directory not found at: ${modelDir.absolutePath}")
+                // The model ships as a fast-follow Play Asset Delivery pack. This
+                // suspends until the pack is downloaded if it is not already present.
+                val modelDir = ModelAssetPack.resolveModelDir(this@CantoneseInputMethodService)
+                if (modelDir == null) {
+                    Log.w(TAG, "Model asset pack '${ModelAssetPack.PACK_NAME}' unavailable")
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_model_not_found))
                     return@launch
                 }
-                
+
                 Log.i(TAG, "Loading model from: ${modelDir.absolutePath}")
                 val success = engineMutex.withLock {
                     val loaded = qAsrEngine.loadModel(modelDir.absolutePath, 1)

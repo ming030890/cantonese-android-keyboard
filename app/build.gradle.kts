@@ -16,6 +16,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // The Qwen ASR model is delivered as a fast-follow Play Asset Delivery pack
+    // rather than bundled in the APK or sideloaded.
+    assetPacks += listOf(":model_pack")
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -48,6 +52,9 @@ dependencies {
   val composeBom = platform(libs.androidx.compose.bom)
   implementation(composeBom)
   androidTestImplementation(composeBom)
+
+  // Play Asset Delivery (model download / location resolution)
+  implementation(libs.play.asset.delivery)
 
   // Core Android dependencies
   implementation(libs.androidx.core.ktx)
