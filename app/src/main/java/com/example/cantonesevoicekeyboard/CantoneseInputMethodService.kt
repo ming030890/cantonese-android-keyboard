@@ -33,6 +33,7 @@ import com.example.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 import com.example.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
 import com.qwenasr.QAsrEngine
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -131,20 +132,46 @@ class CantoneseInputMethodService : InputMethodService(),
         return composeView
     }
 
+    override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        super.onStartInput(info, restarting)
+        inputViewSession++
+        if (!restarting) {
+            stopRecordingInternal(discard = true)
+            _volumeLevel.value = 0f
+        }
+    }
+
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
         val session = ++inputViewSession
-        
-        // Dynamically load the model asynchronously when keyboard opens
-        if (!isModelLoaded && modelLoadingJob == null) {
+        ensureModelLoadingStarted(session)
+    }
+
+    private fun ensureModelLoadingStarted(session: Long = inputViewSession) {
+        if (!isInputViewVisible) {
+            _uiState.value = KeyboardUiState.Idle
+            return
+        }
+        if (isModelLoaded) {
+            _uiState.value = KeyboardUiState.Idle
+            return
+        }
+
+        val existingJob = modelLoadingJob
+        if (existingJob?.isActive == true) {
             _uiState.value = KeyboardUiState.LoadingModel
-            modelLoadingJob = serviceScope.launch(Dispatchers.Default) {
+            return
+        }
+        modelLoadingJob = null
+        _uiState.value = KeyboardUiState.LoadingModel
+
+        val loadingJob = serviceScope.launch(Dispatchers.Default) {
+            try {
                 val externalDir = getExternalFilesDir(null)
                 if (externalDir == null) {
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_external_storage_unavailable))
-                    modelLoadingJob = null
                     return@launch
                 }
                 
@@ -152,7 +179,6 @@ class CantoneseInputMethodService : InputMethodService(),
                 if (!modelDir.exists()) {
                     Log.w(TAG, "Model directory not found at: ${modelDir.absolutePath}")
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_model_not_found))
-                    modelLoadingJob = null
                     return@launch
                 }
                 
@@ -167,7 +193,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     loaded
                 }
                 if (success) {
-                    if (isInputViewVisible && session == inputViewSession) {
+                    if (isInputViewVisible) {
                         isModelLoaded = true
                         _uiState.value = KeyboardUiState.Idle
                         Log.i(TAG, "Model loaded successfully!")
@@ -177,37 +203,74 @@ class CantoneseInputMethodService : InputMethodService(),
                             qAsrEngine.free()
                         }
                         isModelLoaded = false
+                        _uiState.value = KeyboardUiState.Idle
                     }
                 } else {
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
                     Log.e(TAG, "Failed to load model!")
                 }
+            } catch (e: CancellationException) {
+                if (session == inputViewSession && isInputViewVisible && !isModelLoaded) {
+                    _uiState.value = KeyboardUiState.Idle
+                }
+                throw e
+            } catch (t: Throwable) {
+                Log.e(TAG, "Unexpected error while loading ASR model", t)
+                if (isInputViewVisible) {
+                    _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
+                }
+            }
+        }
+        modelLoadingJob = loadingJob
+        loadingJob.invokeOnCompletion {
+            if (modelLoadingJob === loadingJob) {
                 modelLoadingJob = null
             }
         }
     }
 
+    override fun onFinishInput() {
+        super.onFinishInput()
+        inputViewSession++
+        finishInputSession(releaseModel = false)
+    }
+
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        }
         isInputViewVisible = false
+        finishInputSession(releaseModel = true)
+    }
+
+    private fun finishInputSession(releaseModel: Boolean) {
         val finishingSession = inputViewSession
 
         // Cancel active recording or loading jobs if active
         stopRecordingInternal(discard = true)
-        modelLoadingJob?.cancel()
-        modelLoadingJob = null
+        if (releaseModel) {
+            modelLoadingJob?.cancel()
+            modelLoadingJob = null
+        }
 
         // Reclaim RAM optimization: free model allocations when keyboard is hidden
         serviceScope.launch(Dispatchers.Default) {
             audioRecordJob?.join()
             transcriptionJob?.join()
-            if (!isInputViewVisible && finishingSession == inputViewSession) {
+            if (releaseModel && !isInputViewVisible && finishingSession == inputViewSession) {
                 Log.i(TAG, "Freeing model to reclaim RAM...")
                 engineMutex.withLock {
                     qAsrEngine.free()
                 }
                 isModelLoaded = false
+                _uiState.value = KeyboardUiState.Idle
+            } else if (!releaseModel && finishingSession == inputViewSession) {
+                engineMutex.withLock {
+                    if (isModelLoaded) {
+                        qAsrEngine.setPrompt("")
+                    }
+                }
                 _uiState.value = KeyboardUiState.Idle
             }
         }
@@ -215,6 +278,12 @@ class CantoneseInputMethodService : InputMethodService(),
 
     override fun onWindowHidden() {
         super.onWindowHidden()
+        inputViewSession++
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        }
+        isInputViewVisible = false
+        finishInputSession(releaseModel = true)
     }
 
     override fun onDestroy() {
@@ -306,11 +375,21 @@ class CantoneseInputMethodService : InputMethodService(),
         activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
         val session = inputViewSession
+        val committedSegmentIds = mutableSetOf<Long>()
+        var lastCommittedTranscript = ""
 
         val listener = object : QAsrEngine.VadListener {
             override fun onTranscript(segmentId: Long, text: String, isFinal: Boolean) {
                 serviceScope.launch(Dispatchers.Main.immediate) {
-                    if (isInputViewVisible && session == inputViewSession && text.isNotBlank()) {
+                    val normalizedText = normalizeTranscriptForDedup(text)
+                    if (
+                        isInputViewVisible &&
+                        session == inputViewSession &&
+                        normalizedText.isNotEmpty() &&
+                        committedSegmentIds.add(segmentId) &&
+                        normalizedText != lastCommittedTranscript
+                    ) {
+                        lastCommittedTranscript = normalizedText
                         currentInputConnection?.commitText(text, 1)
                     }
                 }
@@ -425,6 +504,9 @@ class CantoneseInputMethodService : InputMethodService(),
             transcriptionJob = null
         }
     }
+
+    private fun normalizeTranscriptForDedup(text: String): String =
+        text.trim().replace(Regex("\\s+"), " ")
 
     private fun deleteSurroundingText() {
         currentInputConnection?.deleteSelectionOrPreviousCharacter()
