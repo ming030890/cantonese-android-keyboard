@@ -396,7 +396,18 @@ class CantoneseInputMethodService : InputMethodService(),
             }
         }
 
-        val vadStarted = qAsrEngine.startVadSession(listener)
+        val externalDir = getExternalFilesDir(null)
+        val saveAudioDir = if (externalDir != null) {
+            val dir = File(externalDir, "saved_audio")
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            dir.absolutePath
+        } else {
+            null
+        }
+
+        val vadStarted = qAsrEngine.startVadSession(listener, saveAudioDir)
         if (!vadStarted) {
             Log.e(TAG, "Failed to start native VAD session.")
             isRecording = false

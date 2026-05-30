@@ -234,3 +234,21 @@ We will implement Compose Screenshot Testing in accordance with Android Studio s
    * **Update Reference Images**: Run `./gradlew updateDebugScreenshotTest` to generate reference baseline images.
    * **Verify Correctness**: Run `./gradlew validateDebugScreenshotTest` to capture current layout outputs and perform high-precision pixel-by-pixel comparisons against baselines.
 
+---
+
+## 6. Save Post-VAD Audio Feature
+
+To improve model quality, we will save the audio files processed by the ASR model in the app's directory. Specifically, we will save the actual audio segments after Voice Activity Detection (VAD) has run, ensuring only active speech segments sent to the ASR model are archived.
+
+### Proposed Changes
+
+#### Rust JNI Bridge
+- Add `write_wav_file(path: &str, samples: &[i16], sample_rate: u32) -> std::io::Result<()>` to output standard 16-bit mono WAV files.
+- Modify `nativeStartVadSession` to accept `save_audio_dir: JString` (nullable).
+- In `start_asr_worker`, get the session timestamp and write each `AsrTask` segment's samples to `save_audio_dir` as `{timestamp}_seg{id}.wav`.
+
+#### Kotlin wrapper & IME Service
+- Update `QAsrEngine.kt` to pass the `saveAudioDir` path to native VAD.
+- Update `CantoneseInputMethodService.kt` to resolve and create the `saved_audio` directory under `getExternalFilesDir(null)` and pass its path to the VAD session.
+
+

@@ -68,7 +68,7 @@ class QAsrEngine {
         }
     }
 
-    fun startVadSession(listener: VadListener): Boolean {
+    fun startVadSession(listener: VadListener, saveAudioDir: String? = null): Boolean {
         synchronized(this) {
             val handle = nativeHandle
             if (handle == 0L) {
@@ -78,7 +78,7 @@ class QAsrEngine {
             if (vadSessionHandle != 0L) {
                 stopVadSession(finalize = false)
             }
-            vadSessionHandle = nativeStartVadSession(handle, listener)
+            vadSessionHandle = nativeStartVadSession(handle, listener, saveAudioDir)
             return vadSessionHandle != 0L
         }
     }
@@ -174,7 +174,7 @@ class QAsrEngine {
     // Native external methods
     private external fun nativeLoadModel(modelDir: String, nThreads: Int): Long
     private external fun nativeTranscribePcmDirect(handle: Long, buffer: ByteBuffer, size: Int): String?
-    private external fun nativeStartVadSession(handle: Long, listener: VadListener): Long
+    private external fun nativeStartVadSession(handle: Long, listener: VadListener, saveAudioDir: String?): Long
     private external fun nativePushPcm16(sessionHandle: Long, buffer: ByteBuffer, byteCount: Int): Int
     private external fun nativeStopVadSession(sessionHandle: Long, finalize: Boolean)
     private external fun nativeSetLanguage(handle: Long, language: String): Boolean

@@ -31,4 +31,11 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 - [x] Implement a full on-device instrumented End-to-End Test `QAsrEngineE2ETest` to verify transcription correctness and measure latency (Successfully verified: transcribed "Hello，你好嗎？已經坐低咗啦。" in 3.27s for 3.86s of audio!).
 - [ ] Configure the Compose Screenshot Testing plugin and write screenshot verification tests for key visual states (Idle, Recording, Transcribing).
 
+## 6. Save Post-VAD Audio Feature
+- [x] Implement audio saving in Rust JNI (`jni_api.rs`) by writing raw PCM16 samples to WAV format inside the worker thread.
+- [x] Update Kotlin wrapper (`QAsrEngine.kt`) to support passing a directory path to the VAD session.
+- [x] Update IME service (`CantoneseInputMethodService.kt`) to resolve/create the `saved_audio` directory and trigger saving post-VAD audio.
+- [x] Verify compilation, deployment, and correctness (saving post-VAD segments into the app directory).
+
+
 
