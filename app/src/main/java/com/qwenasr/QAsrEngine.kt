@@ -110,14 +110,20 @@ class QAsrEngine {
 
     /**
      * Set transcription language.
-     * @param language Target language string (e.g. "zh" or "yue" or "en").
+     * @param language Target language string (e.g. "Cantonese", "Chinese", "English").
+     * @return True if the language was accepted, false otherwise.
      */
-    fun setLanguage(language: String) {
+    fun setLanguage(language: String): Boolean {
         synchronized(this) {
             if (nativeHandle != 0L) {
-                nativeSetLanguage(nativeHandle, language)
+                val success = nativeSetLanguage(nativeHandle, language)
+                if (!success) {
+                    Log.e(TAG, "Invalid ASR language: $language")
+                }
+                return success
             } else {
                 Log.e(TAG, "Cannot set language: model is not loaded")
+                return false
             }
         }
     }
@@ -171,7 +177,7 @@ class QAsrEngine {
     private external fun nativeStartVadSession(handle: Long, listener: VadListener): Long
     private external fun nativePushPcm16(sessionHandle: Long, buffer: ByteBuffer, byteCount: Int): Int
     private external fun nativeStopVadSession(sessionHandle: Long, finalize: Boolean)
-    private external fun nativeSetLanguage(handle: Long, language: String)
+    private external fun nativeSetLanguage(handle: Long, language: String): Boolean
     private external fun nativeSetPrompt(handle: Long, prompt: String)
     private external fun nativeSetSegmentSec(handle: Long, sec: Float)
     private external fun nativeFree(handle: Long)

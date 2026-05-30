@@ -101,8 +101,8 @@ class QAsrEngine {
     /**
      * Set ASR configurations.
      */
-    fun setLanguage(language: String) {
-        if (nativeHandle != 0L) nativeSetLanguage(nativeHandle, language)
+    fun setLanguage(language: String): Boolean {
+        return nativeHandle != 0L && nativeSetLanguage(nativeHandle, language)
     }
 
     fun setSegmentSec(sec: Float) {
@@ -121,7 +121,7 @@ class QAsrEngine {
 
     private external fun nativeLoadModel(modelDir: String, nThreads: Int): Long
     private external fun nativeTranscribePcmDirect(handle: Long, buffer: ByteBuffer, size: Int): String?
-    private external fun nativeSetLanguage(handle: Long, language: String)
+    private external fun nativeSetLanguage(handle: Long, language: String): Boolean
     private external fun nativeSetSegmentSec(handle: Long, sec: Float)
     private external fun nativeFree(handle: Long)
 }
@@ -233,5 +233,4 @@ We will implement Compose Screenshot Testing in accordance with Android Studio s
 3. **Execution Commands**:
    * **Update Reference Images**: Run `./gradlew updateDebugScreenshotTest` to generate reference baseline images.
    * **Verify Correctness**: Run `./gradlew validateDebugScreenshotTest` to capture current layout outputs and perform high-precision pixel-by-pixel comparisons against baselines.
-
 

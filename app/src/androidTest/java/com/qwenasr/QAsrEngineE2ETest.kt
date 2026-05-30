@@ -58,7 +58,7 @@ class QAsrEngineE2ETest {
 
         try {
             // 4. Configure engine
-            engine.setLanguage("yue")
+            assertTrue("Failed to set Cantonese ASR language", engine.setLanguage("Cantonese"))
             engine.setPrompt("音频是粤语，可能夹杂英语")
             engine.setSegmentSec(0f) // disable segmenting for whole-file benchmark
 

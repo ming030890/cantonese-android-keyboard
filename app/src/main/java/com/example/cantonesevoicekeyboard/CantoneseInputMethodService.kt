@@ -186,7 +186,7 @@ class CantoneseInputMethodService : InputMethodService(),
                 val success = engineMutex.withLock {
                     val loaded = qAsrEngine.loadModel(modelDir.absolutePath, 1)
                     if (loaded) {
-                        qAsrEngine.setLanguage("yue")
+                        qAsrEngine.setLanguage("Cantonese")
                         qAsrEngine.setPrompt("")
                         qAsrEngine.setSegmentSec(0.0f)
                     }
