@@ -129,6 +129,26 @@ class QAsrEngine {
     }
 
     /**
+     * Set Chinese output variant conversion.
+     * @param variant BCP-47 style variant such as "zh-HK", "zh-Hant", or "" to disable.
+     * @return True if the variant was accepted, false otherwise.
+     */
+    fun setChineseVariant(variant: String): Boolean {
+        synchronized(this) {
+            if (nativeHandle != 0L) {
+                val success = nativeSetChineseVariant(nativeHandle, variant)
+                if (!success) {
+                    Log.e(TAG, "Invalid Chinese variant: $variant")
+                }
+                return success
+            } else {
+                Log.e(TAG, "Cannot set Chinese variant: model is not loaded")
+                return false
+            }
+        }
+    }
+
+    /**
      * Set transcription prompt to guide context/style.
      * @param prompt Guided context prompt string.
      */
@@ -178,6 +198,7 @@ class QAsrEngine {
     private external fun nativePushPcm16(sessionHandle: Long, buffer: ByteBuffer, byteCount: Int): Int
     private external fun nativeStopVadSession(sessionHandle: Long, finalize: Boolean)
     private external fun nativeSetLanguage(handle: Long, language: String): Boolean
+    private external fun nativeSetChineseVariant(handle: Long, variant: String): Boolean
     private external fun nativeSetPrompt(handle: Long, prompt: String)
     private external fun nativeSetSegmentSec(handle: Long, sec: Float)
     private external fun nativeFree(handle: Long)

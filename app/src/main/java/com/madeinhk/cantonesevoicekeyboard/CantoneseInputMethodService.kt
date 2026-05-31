@@ -196,6 +196,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     val loaded = qAsrEngine.loadModel(modelDir.absolutePath, 1)
                     if (loaded) {
                         qAsrEngine.setLanguage("Cantonese")
+                        qAsrEngine.setChineseVariant("zh-HK")
                         qAsrEngine.setPrompt("")
                         qAsrEngine.setSegmentSec(0.0f)
                     }
