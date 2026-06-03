@@ -52,6 +52,8 @@ keystore.properties
 # Captured audio segments (debug builds only — never commit)
 *.wav
 
+# Generated dataset outputs
+/dataset/hong_kong_proper_nouns/out/
 
 *.pem
 
@@ -62,3 +64,5 @@ google-services.json
 *~
 *.swp
 *.bak
+__pycache__/
+*.pyc
