@@ -1,5 +1,6 @@
 package com.qwenasr
 
+import android.os.SystemClock
 import android.util.Log
 import java.nio.ByteBuffer
 
@@ -12,11 +13,19 @@ class QAsrEngine {
         private const val TAG = "QAsrEngine"
 
         init {
+            val startedAt = SystemClock.elapsedRealtime()
             try {
                 System.loadLibrary("qwen_asr")
-                Log.i(TAG, "Successfully loaded qwen_asr native library")
+                Log.i(
+                    TAG,
+                    "Successfully loaded qwen_asr native library in ${SystemClock.elapsedRealtime() - startedAt}ms"
+                )
             } catch (e: UnsatisfiedLinkError) {
-                Log.e(TAG, "Failed to load qwen_asr native library", e)
+                Log.e(
+                    TAG,
+                    "Failed to load qwen_asr native library after ${SystemClock.elapsedRealtime() - startedAt}ms",
+                    e
+                )
             }
         }
     }

@@ -9,9 +9,11 @@ import android.inputmethodservice.InputMethodService
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
@@ -55,6 +57,8 @@ class CantoneseInputMethodService : InputMethodService(),
     companion object {
         private const val TAG = "CantoneseIME"
         private const val SAMPLE_RATE = 16000
+        private const val PROMPT_TEXT_BEFORE_CURSOR_CHARS = 160
+        private const val PROMPT_TEXT_AFTER_CURSOR_CHARS = 80
     }
 
     // Lifecycle, ViewModel, SavedState bridges for Compose support
@@ -72,7 +76,8 @@ class CantoneseInputMethodService : InputMethodService(),
         get() = savedStateRegistryController.savedStateRegistry
 
     // ASR Engine & Audio State
-    private val qAsrEngine = QAsrEngine()
+    @Volatile
+    private var qAsrEngine: QAsrEngine? = null
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(serviceJob + Dispatchers.Main.immediate)
     private val engineMutex = Mutex()
@@ -97,12 +102,15 @@ class CantoneseInputMethodService : InputMethodService(),
     private var isRecording = false
 
     override fun onCreate() {
+        val startedAt = SystemClock.elapsedRealtime()
         super.onCreate()
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        Log.i(TAG, "onCreate completed in ${SystemClock.elapsedRealtime() - startedAt}ms")
     }
 
     override fun onCreateInputView(): View {
+        val startedAt = SystemClock.elapsedRealtime()
         window?.window?.decorView?.let { decorView ->
             decorView.setViewTreeLifecycleOwner(this)
             decorView.setViewTreeViewModelStoreOwner(this)
@@ -128,6 +136,7 @@ class CantoneseInputMethodService : InputMethodService(),
                 }
             }
         }
+        Log.i(TAG, "onCreateInputView completed in ${SystemClock.elapsedRealtime() - startedAt}ms")
         return composeView
     }
 
@@ -141,6 +150,7 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
+        val startedAt = SystemClock.elapsedRealtime()
         super.onStartInputView(info, restarting)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
@@ -148,6 +158,7 @@ class CantoneseInputMethodService : InputMethodService(),
         applyNavigationBarAppearance()
         val session = ++inputViewSession
         ensureModelLoadingStarted(session)
+        Log.i(TAG, "onStartInputView completed in ${SystemClock.elapsedRealtime() - startedAt}ms")
     }
 
     /**
@@ -181,10 +192,16 @@ class CantoneseInputMethodService : InputMethodService(),
         _uiState.value = KeyboardUiState.LoadingModel
 
         val loadingJob = serviceScope.launch(Dispatchers.Default) {
+            val loadStartedAt = SystemClock.elapsedRealtime()
             try {
                 // The model ships as a fast-follow Play Asset Delivery pack. This
                 // suspends until the pack is downloaded if it is not already present.
+                val resolveStartedAt = SystemClock.elapsedRealtime()
                 val modelDir = ModelAssetPack.resolveModelDir(this@CantoneseInputMethodService)
+                Log.i(
+                    TAG,
+                    "Model directory resolve completed in ${SystemClock.elapsedRealtime() - resolveStartedAt}ms"
+                )
                 if (modelDir == null) {
                     Log.w(TAG, "Model asset packs unavailable")
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_model_not_found))
@@ -193,12 +210,18 @@ class CantoneseInputMethodService : InputMethodService(),
 
                 Log.i(TAG, "Loading model from: ${modelDir.absolutePath}")
                 val success = engineMutex.withLock {
-                    val loaded = qAsrEngine.loadModel(modelDir.absolutePath, 1)
+                    val engine = getOrCreateAsrEngine()
+                    val nativeLoadStartedAt = SystemClock.elapsedRealtime()
+                    val loaded = engine.loadModel(modelDir.absolutePath, 1)
+                    Log.i(
+                        TAG,
+                        "Native model load completed in ${SystemClock.elapsedRealtime() - nativeLoadStartedAt}ms"
+                    )
                     if (loaded) {
-                        qAsrEngine.setLanguage("Cantonese")
-                        qAsrEngine.setChineseVariant("zh-HK")
-                        qAsrEngine.setPrompt("")
-                        qAsrEngine.setSegmentSec(0.0f)
+                        engine.setLanguage("Cantonese")
+                        engine.setChineseVariant("zh-HK")
+                        engine.setPrompt("")
+                        engine.setSegmentSec(0.0f)
                     }
                     loaded
                 }
@@ -210,7 +233,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     } else {
                         Log.i(TAG, "Model loaded after keyboard hidden; freeing immediately.")
                         engineMutex.withLock {
-                            qAsrEngine.free()
+                            qAsrEngine?.free()
                         }
                         isModelLoaded = false
                         _uiState.value = KeyboardUiState.Idle
@@ -229,6 +252,8 @@ class CantoneseInputMethodService : InputMethodService(),
                 if (isInputViewVisible) {
                     _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
                 }
+            } finally {
+                Log.i(TAG, "ASR load job completed in ${SystemClock.elapsedRealtime() - loadStartedAt}ms")
             }
         }
         modelLoadingJob = loadingJob
@@ -271,14 +296,14 @@ class CantoneseInputMethodService : InputMethodService(),
             if (releaseModel && !isInputViewVisible && finishingSession == inputViewSession) {
                 Log.i(TAG, "Freeing model to reclaim RAM...")
                 engineMutex.withLock {
-                    qAsrEngine.free()
+                    qAsrEngine?.free()
                 }
                 isModelLoaded = false
                 _uiState.value = KeyboardUiState.Idle
             } else if (!releaseModel && finishingSession == inputViewSession) {
                 engineMutex.withLock {
                     if (isModelLoaded) {
-                        qAsrEngine.setPrompt("")
+                        qAsrEngine?.setPrompt("")
                     }
                 }
                 _uiState.value = KeyboardUiState.Idle
@@ -307,10 +332,19 @@ class CantoneseInputMethodService : InputMethodService(),
         serviceScope.launch(Dispatchers.Default) {
             listOfNotNull(audioRecordJob, transcriptionJob, modelLoadingJob).joinAll()
             engineMutex.withLock {
-                qAsrEngine.free()
+                qAsrEngine?.free()
             }
             isModelLoaded = false
             serviceJob.cancel()
+        }
+    }
+
+    private fun getOrCreateAsrEngine(): QAsrEngine {
+        qAsrEngine?.let { return it }
+        val startedAt = SystemClock.elapsedRealtime()
+        return QAsrEngine().also {
+            qAsrEngine = it
+            Log.i(TAG, "QAsrEngine created in ${SystemClock.elapsedRealtime() - startedAt}ms")
         }
     }
 
@@ -338,6 +372,13 @@ class CantoneseInputMethodService : InputMethodService(),
             Log.w(TAG, "Cannot start recording: ASR model is not loaded")
             return
         }
+        val engine = qAsrEngine ?: run {
+            Log.e(TAG, "Cannot start recording: ASR engine is unavailable")
+            _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
+            return
+        }
+        val cursorPrompt = buildCursorContextPrompt(currentInputConnection)
+        engine.setPrompt(cursorPrompt)
 
         val minBufferSize = AudioRecord.getMinBufferSize(
             SAMPLE_RATE,
@@ -425,7 +466,7 @@ class CantoneseInputMethodService : InputMethodService(),
             null
         }
 
-        val vadStarted = qAsrEngine.startVadSession(listener, saveAudioDir)
+        val vadStarted = engine.startVadSession(listener, saveAudioDir)
         if (!vadStarted) {
             Log.e(TAG, "Failed to start native VAD session.")
             isRecording = false
@@ -465,7 +506,7 @@ class CantoneseInputMethodService : InputMethodService(),
                         sumSquare += floatSample * floatSample
                     }
                     directPcm16Buffer.position(0)
-                    qAsrEngine.pushPcm16Chunk(directPcm16Buffer, bytesRead)
+                    engine.pushPcm16Chunk(directPcm16Buffer, bytesRead)
 
                     // Calculate real-time RMS for waveform visuals
                     val rms = if (samplesRead > 0) Math.sqrt(sumSquare / samplesRead) else 0.0
@@ -507,7 +548,7 @@ class CantoneseInputMethodService : InputMethodService(),
             serviceScope.launch(Dispatchers.IO) {
                 recorderJob?.join()
                 engineMutex.withLock {
-                    qAsrEngine.stopVadSession(finalize = false)
+                    qAsrEngine?.stopVadSession(finalize = false)
                 }
                 if (audioRecordJob === recorderJob) {
                     audioRecordJob = null
@@ -524,7 +565,7 @@ class CantoneseInputMethodService : InputMethodService(),
                 audioRecordJob = null
             }
             engineMutex.withLock {
-                qAsrEngine.stopVadSession(finalize = true)
+                qAsrEngine?.stopVadSession(finalize = true)
             }
 
             withContext(Dispatchers.Main) {
@@ -536,6 +577,59 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun normalizeTranscriptForDedup(text: String): String =
         text.trim().replace(Regex("\\s+"), " ")
+
+    private fun buildCursorContextPrompt(connection: InputConnection?): String {
+        if (connection == null) return ""
+
+        runCatching {
+            connection.getExtractedText(ExtractedTextRequest(), 0)
+        }.getOrNull()?.let { extractedText ->
+            val text = extractedText.text?.toString().orEmpty()
+            val selectionStart = extractedText.selectionStart
+            val selectionEnd = extractedText.selectionEnd
+            if (text.isNotEmpty() && selectionStart >= 0 && selectionEnd >= 0) {
+                val contextStart = minOf(selectionStart, selectionEnd).coerceIn(0, text.length)
+                val contextEnd = maxOf(selectionStart, selectionEnd).coerceIn(0, text.length)
+                return buildPromptFromContext(
+                    before = text.substring(0, contextStart),
+                    after = text.substring(contextEnd)
+                )
+            }
+        }
+
+        val before = runCatching {
+            connection.getTextBeforeCursor(PROMPT_TEXT_BEFORE_CURSOR_CHARS, 0)
+        }.getOrNull()
+            ?.toString()
+            .orEmpty()
+
+        val after = runCatching {
+            connection.getTextAfterCursor(PROMPT_TEXT_AFTER_CURSOR_CHARS, 0)
+        }.getOrNull()
+            ?.toString()
+            .orEmpty()
+
+        return buildPromptFromContext(before, after)
+    }
+
+    private fun buildPromptFromContext(before: String, after: String): String {
+        val normalizedBefore = before
+            .normalizePromptWhitespace()
+            .takeLast(PROMPT_TEXT_BEFORE_CURSOR_CHARS)
+        val normalizedAfter = after
+            .normalizePromptWhitespace()
+            .take(PROMPT_TEXT_AFTER_CURSOR_CHARS)
+
+        return when {
+            normalizedBefore.isEmpty() && normalizedAfter.isEmpty() -> ""
+            normalizedAfter.isEmpty() -> "前文：$normalizedBefore"
+            normalizedBefore.isEmpty() -> "後文：$normalizedAfter"
+            else -> "前文：$normalizedBefore\n後文：$normalizedAfter"
+        }
+    }
+
+    private fun String.normalizePromptWhitespace(): String =
+        replace(Regex("\\s+"), " ").trim()
 
     private fun deleteSurroundingText() {
         currentInputConnection?.deleteSelectionOrPreviousCharacter()
