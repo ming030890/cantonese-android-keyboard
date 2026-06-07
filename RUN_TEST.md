@@ -17,9 +17,9 @@ Since Android applications run inside restricted sandboxes and the model folder 
 2. **Push the Model Assets**:
    Create the download directory on the device and push the INT8 quantized model folder:
    ```bash
-   adb shell "mkdir -p /sdcard/Download/qwen-asr-int8dec"
+   adb shell "mkdir -p /sdcard/Download/qwen-asr-m4-lmhead-int8"
    # Push files (decoder-int8-cache.v1.bin, merges.txt, model.safetensors, vocab.json)
-   adb push QwenASR/bench/android-assets/model/. /sdcard/Download/qwen-asr-int8dec/
+   adb push QwenASR/bench/android-assets/model/. /sdcard/Download/qwen-asr-m4-lmhead-int8/
    ```
 
 3. **Push the Test Audio**:
@@ -31,7 +31,7 @@ Since Android applications run inside restricted sandboxes and the model folder 
 4. **Change File Permissions**:
    Make sure all files are globally readable on the shared storage:
    ```bash
-   adb shell "chmod -R 777 /sdcard/Download/qwen-asr-int8dec"
+   adb shell "chmod -R 777 /sdcard/Download/qwen-asr-m4-lmhead-int8"
    adb shell "chmod 777 /sdcard/Download/yue.wav"
    ```
 
@@ -89,7 +89,7 @@ adb logcat -d -s QAsrEngineE2ETest QAsrEngine
 I QAsrEngineE2ETest: Starting QAsrEngine E2E Integration Test
 I QAsrEngine: Successfully loaded qwen_asr native library
 I QAsrEngineE2ETest: Engine instance created, loading model...
-I QAsrEngine: Successfully loaded model from /sdcard/Download/qwen-asr-int8dec. Handle: 496989881776
+I QAsrEngine: Successfully loaded model from /sdcard/Download/qwen-asr-m4-lmhead-int8. Handle: 496989881776
 I QAsrEngineE2ETest: Parsing WAV file: /sdcard/Download/yue.wav
 I QAsrEngineE2ETest: First 20 audio samples: 0.611603 0.619324 0.650665 0.658386 0.000397 0.000000 0.760132 0.800476 0.392273 0.399841 ...
 I QAsrEngineE2ETest: Audio loaded: 61742 samples (duration: 3.858875s)

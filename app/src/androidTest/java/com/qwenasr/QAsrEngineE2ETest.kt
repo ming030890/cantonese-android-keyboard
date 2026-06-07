@@ -37,7 +37,7 @@ class QAsrEngineE2ETest {
     fun testASRModelLoadAndTranscription() {
         Log.i(TAG, "Starting QAsrEngine E2E Integration Test")
         
-        val modelDir = "/sdcard/Download/qwen-asr-int8dec"
+        val modelDir = "/sdcard/Download/qwen-asr-m4-lmhead-int8"
         val audioFile = "/sdcard/Download/yue.wav"
 
         // 1. Check if model and audio files exist on the device

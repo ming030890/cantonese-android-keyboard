@@ -44,7 +44,7 @@ sealed interface ModelDownloadStatus {
  * Files in each pack are mmap'd directly by the native loader from their
  * Play-managed locations; we never copy them. To present both packs as one
  * logical model directory (as the native `MultiSafetensors::open` expects),
- * we symlink every file from each pack's `qwen-asr-int8dec/` into a single
+ * we symlink every file from each pack's `qwen-asr-m4-lmhead-int8/` into a single
  * staging directory in internal storage. Symlinks consume only inodes — zero
  * byte duplication.
  *
@@ -54,7 +54,7 @@ sealed interface ModelDownloadStatus {
 object ModelAssetPack {
     const val PACK_A = "model_pack_a"
     const val PACK_B = "model_pack_b"
-    const val MODEL_DIR_NAME = "qwen-asr-int8dec"
+    const val MODEL_DIR_NAME = "qwen-asr-m4-lmhead-int8"
     private val PACKS = listOf(PACK_A, PACK_B)
     private const val TAG = "ModelAssetPack"
 
@@ -161,7 +161,7 @@ object ModelAssetPack {
     /**
      * If both packs are extracted on disk, builds (or refreshes) a single
      * staging dir in internal storage containing symlinks to every file in
-     * each pack's `qwen-asr-int8dec/` directory, and returns it.
+     * each pack's `qwen-asr-m4-lmhead-int8/` directory, and returns it.
      *
      * Returns null if either pack is not yet available.
      */

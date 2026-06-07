@@ -22,12 +22,12 @@ PACKAGE="com.madeinhk.cantonesevoicekeyboard"
 
 # Where the raw model lives on the build machine. scripts/reshard_model.py
 # splits its model.safetensors into two ≤480 MiB shards across the two packs.
-SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-int8dec"
+SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8"
 # Two asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shard 2 in pack B. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
-PACK_A_ASSETS="$PROJECT_DIR/model_pack_a/src/main/assets/qwen-asr-int8dec"
-PACK_B_ASSETS="$PROJECT_DIR/model_pack_b/src/main/assets/qwen-asr-int8dec"
+PACK_A_ASSETS="$PROJECT_DIR/model_pack_a/src/main/assets/qwen-asr-m4-lmhead-int8"
+PACK_B_ASSETS="$PROJECT_DIR/model_pack_b/src/main/assets/qwen-asr-m4-lmhead-int8"
 RESHARD_SCRIPT="$PROJECT_DIR/scripts/reshard_model.py"
 
 # Pinned bundletool; auto-downloaded into .tools/ on first use.

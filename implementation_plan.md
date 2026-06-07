@@ -47,9 +47,9 @@ We will integrate the absolute best benchmark baseline from the `android_experim
 2. **Zero-Copy JNI Buffer Access**:
    To avoid buffer copying between the JVM heap and Rust native memory, we will pass audio data using **Direct ByteBuffers** (`java.nio.ByteBuffer.allocateDirect()`). On the Rust side in `jni_api.rs`, we will access this direct pointer using `GetDirectBufferAddress(env, buffer)` rather than standard `GetFloatArrayElements`.
 3. **Model Assets Delivery**:
-   We will push the pre-quantized Cantonese ASR model directory (`qwen-asr-int8dec`) directly to the application's external files directory:
+   We will push the pre-quantized Cantonese ASR model directory (`qwen-asr-m4-lmhead-int8`) directly to the application's external files directory:
    ```bash
-   adb push /Volumes/SSD/qwen-asr-int8dec /sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/qwen-asr-int8dec
+   adb push /Volumes/SSD/qwen-asr-m4-lmhead-int8 /sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/qwen-asr-m4-lmhead-int8
    ```
    The keyboard service will access the model directly via `context.getExternalFilesDir(null)`.
 
@@ -196,10 +196,10 @@ We will create a robust shell script `deploy.sh` in the root of the project to c
 #### [NEW] [deploy.sh](file:///Users/tony/Documents/keyboard/cantonese-voice-keyboard/deploy.sh)
 The script will perform the following actions:
 1. **Compile Rust JNI Library**: Runs `cargo ndk` with baseline features (`blas`, `android`) and target options (`+dotprod`) statically linked with OpenBLAS inside the `QwenASR` crate workspace, outputting the generated `libqwen_asr.so` to `/app/src/main/jniLibs/arm64-v8a/`.
-2. **Push Model via ADB**: Automatically verifies/creates the destination path on the connected device and syncs the pre-quantized Cantonese model (`qwen-asr-int8dec`):
+2. **Push Model via ADB**: Automatically verifies/creates the destination path on the connected device and syncs the pre-quantized Cantonese model (`qwen-asr-m4-lmhead-int8`):
    ```bash
    adb shell "mkdir -p /sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files"
-   adb push /Volumes/SSD/qwen-asr-int8dec /sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/
+   adb push /Volumes/SSD/qwen-asr-m4-lmhead-int8 /sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/
    ```
 3. **Build & Install APK**: Compiles the Gradle project and installs the debug app:
    ```bash
@@ -213,7 +213,7 @@ The script will perform the following actions:
 ### Real End-to-End Instrumented Test
 We will implement an on-device instrumented test (`QAsrEngineE2ETest`) that runs on a physical target or high-performance arm64 emulator without mocking:
 
-1. **No-Mock Engine Load**: The test loads the actual native `libqwen_asr.so` and instantiates `QAsrEngine` pointing to the full, non-mocked Cantonese model located at `/sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/qwen-asr-int8dec/`.
+1. **No-Mock Engine Load**: The test loads the actual native `libqwen_asr.so` and instantiates `QAsrEngine` pointing to the full, non-mocked Cantonese model located at `/sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/qwen-asr-m4-lmhead-int8/`.
 2. **Accuracy Verification**: The test feeds a real 16kHz float PCM wave buffer (loaded from assets) containing a Cantonese utterance (e.g. `"Hello，你好吗？已经坐低咗啦。"`). It asserts that the resulting transcription exactly matches the expected text.
 3. **Performance & Latency Benchmark**:
    - The test measures total time elapsed during the `transcribePcmDirect` call.

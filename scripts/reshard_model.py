@@ -15,9 +15,9 @@ since the loader expects them next to the model.
 Usage:
     pip install safetensors torch
     python3 scripts/reshard_model.py \\
-        --source /Volumes/SSD/qwen-asr-int8dec \\
-        --pack-a model_pack_a/src/main/assets/qwen-asr-int8dec \\
-        --pack-b model_pack_b/src/main/assets/qwen-asr-int8dec
+        --source /Volumes/SSD/qwen-asr-m4-lmhead-int8 \\
+        --pack-a model_pack_a/src/main/assets/qwen-asr-m4-lmhead-int8 \\
+        --pack-b model_pack_b/src/main/assets/qwen-asr-m4-lmhead-int8
 
 Re-run is idempotent: if the output shards already exist with matching
 total size, it skips work.
