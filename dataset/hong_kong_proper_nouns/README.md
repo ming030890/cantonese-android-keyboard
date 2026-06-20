@@ -10,6 +10,11 @@ resulting duplicates retain the higher-ranked entity. They also drop a leading
 `香港` when the keyword remaining after station normalization is longer than
 four characters.
 
+The built-in equal-weight anchors include a small set of established local
+restaurant names. Titles from two through eight characters are not penalized by
+the spoken-title signal, and the default final export cutoff is the 88th
+percentile.
+
 ## Files
 
 - `scrape_hk_proper_nouns.py` fetches article titles from a Hugging Face Cantonese Wikipedia dataset by default. It can also fetch category members from Wikipedia / Cantonese Wikipedia and structured entities from Wikidata.

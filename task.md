@@ -45,3 +45,6 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 
 ## 9. Proper-Name Export Normalization and Dataset Index
 - [x] Export entity-only rows, strip long-keyword `香港` prefixes, and document all dataset workflows in `dataset/README.md`.
+
+## 10. Proper-Name Recall Tuning
+- [x] Remove the short-title ranking penalty, lower the default export cutoff, add equal-weight restaurant anchors, and regenerate the entity list.

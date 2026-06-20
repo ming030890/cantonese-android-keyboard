@@ -39,7 +39,10 @@ def spoken_title_score(title: str) -> float:
     if not compact:
         return 0.0
     score = 100.0
-    score -= min(45.0, abs(length - 5) * 3.0)
+    # Short names are common among people, buildings, brands, and restaurants.
+    # Only penalize titles after the normal spoken-name range.
+    if length > 8:
+        score -= min(45.0, (length - 8) * 3.0)
     score -= min(20.0, sum(char.isdigit() for char in compact) * 5.0)
     if any(word in title for word in ("列表", "一覽", "歷史", "文化", "事件", "概念", "理論")):
         score -= 30.0

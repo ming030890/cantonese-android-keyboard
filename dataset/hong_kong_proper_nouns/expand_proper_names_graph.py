@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--graph-dir", default="dataset/wiki_yue_graph")
     parser.add_argument("--out", default="dataset/proper_names_graph.jsonl")
     parser.add_argument("--iterations", type=int, default=3)
-    parser.add_argument("--min-percentile", type=float, default=0.95)
+    parser.add_argument("--min-percentile", type=float, default=0.88)
     parser.add_argument("--promote-percentile", type=float, default=0.98)
     parser.add_argument("--top-n", type=int)
     parser.add_argument("--seed-jsonl", action="append", default=[])
