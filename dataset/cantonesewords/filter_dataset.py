@@ -30,7 +30,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--apply",
         action="store_true",
-        help="Rewrite the manifest and delete rejected WAVs; otherwise only report.",
+        help="Rewrite the manifest and soft-delete rejected rows; otherwise only report.",
     )
     args = parser.parse_args()
     if args.min_chars < 1:
@@ -45,11 +45,20 @@ def is_cjk_character(character: str) -> bool:
     return any(start <= codepoint <= end for start, end in CJK_RANGES)
 
 
+def is_supported_character(character: str) -> bool:
+    return is_cjk_character(character) or (
+        character.isascii()
+        and (character.isalpha() or character.isdigit() or character == " ")
+    )
+
+
 def rejection_reason(text: str, min_chars: int, max_chars: int) -> str | None:
     if not text:
         return "empty"
-    if not all(is_cjk_character(character) for character in text):
-        return "contains_non_cjk"
+    if not any(is_cjk_character(character) for character in text):
+        return "no_cjk"
+    if not all(is_supported_character(character) for character in text):
+        return "contains_unsupported_character"
     if len(text) < min_chars:
         return "too_short"
     if len(text) > max_chars:
@@ -78,14 +87,6 @@ def write_jsonl_atomic(path: Path, rows: list[dict[str, Any]]) -> None:
     os.replace(temporary_path, path)
 
 
-def checked_audio_path(dataset_dir: Path, relative_path: str) -> Path:
-    audio_dir = (dataset_dir / "audio").resolve()
-    audio_path = (dataset_dir / relative_path).resolve()
-    if audio_path.parent != audio_dir or audio_path.suffix.lower() != ".wav":
-        raise ValueError(f"unsafe audio_filepath: {relative_path!r}")
-    return audio_path
-
-
 def filter_rows(
     rows: list[dict[str, Any]], min_chars: int, max_chars: int
 ) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
@@ -111,7 +112,18 @@ def filter_rows(
 def apply_filter(dataset_dir: Path, min_chars: int, max_chars: int, apply: bool) -> int:
     dataset_dir = dataset_dir.expanduser().resolve()
     manifest_path = dataset_dir / "manifest.jsonl"
-    rows = read_jsonl(manifest_path)
+    removed_path = dataset_dir / "removed.jsonl"
+    manifest_rows = read_jsonl(manifest_path)
+    prior_removed = read_jsonl(removed_path) if removed_path.exists() else []
+    combined: dict[str, dict[str, str]] = {}
+    for row in manifest_rows + prior_removed:
+        if "audio_filepath" not in row or "text" not in row:
+            raise ValueError("all manifest and removed rows require audio_filepath and text")
+        combined[str(row["audio_filepath"])] = {
+            "audio_filepath": str(row["audio_filepath"]),
+            "text": str(row["text"]),
+        }
+    rows = list(combined.values())
     kept, removed = filter_rows(rows, min_chars, max_chars)
     counts = Counter(row["reason"] for row in removed)
 
@@ -119,22 +131,12 @@ def apply_filter(dataset_dir: Path, min_chars: int, max_chars: int, apply: bool)
     for reason, count in sorted(counts.items()):
         print(f"  {reason}: {count}")
     if not apply:
-        print("Dry run only; pass --apply to rewrite the manifest and delete rejected WAVs.")
+        print("Dry run only; pass --apply to rewrite the manifest using soft deletion.")
         return 0
 
-    for row in removed:
-        checked_audio_path(dataset_dir, row["audio_filepath"]).unlink(missing_ok=True)
-
-    removed_path = dataset_dir / "removed.jsonl"
-    prior_removed = read_jsonl(removed_path) if removed_path.exists() else []
-    combined: dict[str, dict[str, Any]] = {
-        str(row.get("audio_filepath")): row for row in prior_removed
-    }
-    combined.update({row["audio_filepath"]: row for row in removed})
-
     write_jsonl_atomic(manifest_path, kept)
-    write_jsonl_atomic(removed_path, list(combined.values()))
-    print(f"Updated {manifest_path} and deleted {len(removed)} rejected WAVs.")
+    write_jsonl_atomic(removed_path, removed)
+    print(f"Updated {manifest_path}; {len(removed)} rows are soft-deleted and WAVs are unchanged.")
     return 0
 
 

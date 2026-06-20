@@ -41,7 +41,7 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 - [x] Add a resumable words.hk key-to-audio dataset generator using zh-HK-HiuMaanNeural with validated mono 16 kHz WAV output and a two-field manifest.
 
 ## 8. Cantonese Words ASR Text Filter
-- [x] Add and apply a reversible-audit ASR text filter that removes non-CJK, single-character, and overly long entries plus their WAV files.
+- [x] Add and apply a soft-delete ASR text filter that excludes entries without Chinese, unsupported punctuation/symbols, single-character text, and overly long entries while retaining mixed-script Cantonese and every WAV file.
 
 ## 8. Hong Kong Proper-Name Graph Dataset
 - [x] Implement the deterministic text-only Cantonese Wikipedia graph extractor and ranked proper-name export on SSD.

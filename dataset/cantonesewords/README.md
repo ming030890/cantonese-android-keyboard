@@ -63,9 +63,10 @@ seconds, a 16000 Hz sample rate, and one channel. Failed rows are written to
 
 ## Filter text for ASR training
 
-`filter_dataset.py` defaults to retaining only text made entirely of 2–12 CJK
-characters. This rejects isolated characters, Latin or numeric entries,
-code-switching, punctuation/templates, and unusually long dictionary sayings.
+`filter_dataset.py` defaults to retaining 2–12-character text containing Chinese.
+Chinese–Latin/digit code-switching is supported, including spaces between script
+runs. This rejects isolated characters, entries without Chinese, punctuation or
+template notation, unsupported symbols, and unusually long dictionary sayings.
 Run it without `--apply` to preview counts, then apply it to the SSD dataset:
 
 ```sh
@@ -73,5 +74,5 @@ python filter_dataset.py --dataset /Volumes/SSD/cantonesewords
 python filter_dataset.py --dataset /Volumes/SSD/cantonesewords --apply
 ```
 
-Applying the filter rewrites `manifest.jsonl`, deletes rejected WAV files, and
-records every rejected row and reason in `removed.jsonl`.
+Applying the filter rewrites `manifest.jsonl` and records every rejected row and
+reason in `removed.jsonl`. This is a soft delete: WAV files are never deleted.
