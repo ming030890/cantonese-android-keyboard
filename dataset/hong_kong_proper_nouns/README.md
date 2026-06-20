@@ -5,8 +5,10 @@ This folder contains tooling for building a Hong Kong proper-noun lexicon for Ca
 The graph extractor keeps generated data under `/Volumes/SSD/hk-proper-nouns`.
 Relative `dataset/...` output arguments are created there and exposed through
 local symlinks. It emits text only and never generates audio.
-Final keywords drop a terminal `站`; any resulting duplicates retain the
-higher-scoring row.
+Final rows contain only `{"text":"..."}`. Keywords drop a terminal `站`; any
+resulting duplicates retain the higher-ranked entity. They also drop a leading
+`香港` when the keyword remaining after station normalization is longer than
+four characters.
 
 ## Files
 

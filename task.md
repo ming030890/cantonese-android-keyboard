@@ -42,3 +42,6 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 
 ## 8. Hong Kong Proper-Name Graph Dataset
 - [x] Implement the deterministic text-only Cantonese Wikipedia graph extractor and ranked proper-name export on SSD.
+
+## 9. Proper-Name Export Normalization and Dataset Index
+- [x] Export entity-only rows, strip long-keyword `香港` prefixes, and document all dataset workflows in `dataset/README.md`.
