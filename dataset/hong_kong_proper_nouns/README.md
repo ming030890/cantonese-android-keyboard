@@ -5,10 +5,10 @@ This folder contains tooling for building a Hong Kong proper-noun lexicon for Ca
 The graph extractor keeps generated data under `/Volumes/SSD/hk-proper-nouns`.
 Relative `dataset/...` output arguments are created there and exposed through
 local symlinks. It emits text only and never generates audio.
-Final rows contain only `{"text":"..."}`. Keywords drop a terminal `站`; any
-resulting duplicates retain the higher-ranked entity. They also drop a leading
-`香港` when the keyword remaining after station normalization is longer than
-four characters.
+Final rows contain only `{"text":"..."}`. A terminal `站` is removed only when
+the same eligible entity without `站` also exists; resulting duplicates retain
+the higher-ranked entity. Keywords also drop a leading `香港` when the keyword
+remaining after station normalization is longer than four characters.
 
 The built-in equal-weight anchors include a small set of established local
 restaurant names. Titles from two through eight characters are not penalized by

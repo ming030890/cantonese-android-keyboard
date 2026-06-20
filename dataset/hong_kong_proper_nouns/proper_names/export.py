@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 from typing import Iterable
 
-def normalize_export_text(text: str) -> str:
-    if len(text) > 1 and text.endswith("站"):
+def normalize_export_text(text: str, known_texts: set[str]) -> str:
+    if len(text) > 1 and text.endswith("站") and text[:-1] in known_texts:
         text = text[:-1]
     if len(text) > 4 and text.startswith("香港"):
         text = text[2:]
@@ -15,9 +15,11 @@ def normalize_export_text(text: str) -> str:
 
 
 def entity_rows_from_scored(rows: Iterable[dict], top_n: int | None = None) -> list[dict]:
+    rows = list(rows)
+    known_texts = {row["text"] for row in rows}
     by_text: dict[str, dict] = {}
     for row in rows:
-        text = normalize_export_text(row["text"])
+        text = normalize_export_text(row["text"], known_texts)
         scored = {"text": text, "score": float(row["score"])}
         previous = by_text.get(text)
         if previous is None or scored["score"] > previous["score"]:

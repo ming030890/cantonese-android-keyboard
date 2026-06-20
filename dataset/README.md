@@ -31,8 +31,9 @@ are:
 - `wiki_yue_graph/`: nodes, edges, article regions, communities, seed
   promotions, and score diagnostics.
 - `proper_names_graph.jsonl`: the final entity list, with one `{"text":"..."}`
-  row per entity. Terminal `站` is removed; leading `香港` is removed when the
-  normalized keyword is longer than four characters.
+  row per entity. Terminal `站` is removed only when the corresponding entity
+  without `站` also exists; leading `香港` is removed when the normalized
+  keyword is longer than four characters.
 
 See
 [`hong_kong_proper_nouns/README.md`](hong_kong_proper_nouns/README.md) for the
