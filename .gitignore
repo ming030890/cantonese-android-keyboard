@@ -54,6 +54,9 @@ keystore.properties
 
 # Generated dataset outputs
 /dataset/hong_kong_proper_nouns/out/
+/dataset/wiki_yue_graph*
+/dataset/proper_names_graph*.jsonl
+/dataset/seeds_mtr.jsonl
 
 *.pem
 

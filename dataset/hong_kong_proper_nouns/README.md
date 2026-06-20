@@ -2,14 +2,47 @@
 
 This folder contains tooling for building a Hong Kong proper-noun lexicon for Cantonese ASR / keyboard biasing. It targets names that are easy for a recognizer to miss: places, districts, MTR stations, public bodies, brands, companies, schools, celebrities, politicians, artists, athletes, and other Hong Kong-specific entities.
 
+The graph extractor keeps generated data under `/Volumes/SSD/hk-proper-nouns`.
+Relative `dataset/...` output arguments are created there and exposed through
+local symlinks. It emits text only and never generates audio.
+Final keywords drop a terminal `站`; any resulting duplicates retain the
+higher-scoring row.
+
 ## Files
 
 - `scrape_hk_proper_nouns.py` fetches article titles from a Hugging Face Cantonese Wikipedia dataset by default. It can also fetch category members from Wikipedia / Cantonese Wikipedia and structured entities from Wikidata.
 - `seed_terms.tsv` contains a small hand-curated starter list for common Hong Kong terms.
 - `mobile_terms.tsv` contains high-value mobile voice-input terms: apps, transport, residential estates, malls, hospitals, schools, government services, finance, food/shop brands, media, and events.
+- `collect_mtr_station_seeds.py` creates equal-weight MTR station anchors.
+- `build_wiki_yue_graph.py` builds the deterministic title mention graph.
+- `expand_proper_names_graph.py` runs iterative equal-anchor ranking and exports candidates.
+- `proper_names/` contains the reusable graph extraction package.
+- `requirements.txt` lists required and optional graph dependencies.
 - `out/` is generated output and is intentionally ignored by git.
 
 ## Usage
+
+Install graph dependencies and run the sample pipeline from the project root:
+
+```sh
+python -m pip install -r dataset/hong_kong_proper_nouns/requirements.txt
+python dataset/hong_kong_proper_nouns/collect_mtr_station_seeds.py \
+  --out dataset/seeds_mtr.jsonl
+python dataset/hong_kong_proper_nouns/build_wiki_yue_graph.py \
+  --limit 5000 --out-dir dataset/wiki_yue_graph_sample
+python dataset/hong_kong_proper_nouns/expand_proper_names_graph.py \
+  --graph-dir dataset/wiki_yue_graph_sample \
+  --seed-jsonl dataset/seeds_mtr.jsonl \
+  --iterations 2 --min-percentile 0.90 --promote-percentile 0.97 \
+  --out dataset/proper_names_graph_sample.jsonl
+```
+
+Omit `--limit` and use `dataset/wiki_yue_graph` plus
+`dataset/proper_names_graph.jsonl` for the full export. The builder automatically
+uses the local SSD Parquet file when it exists, otherwise it streams the named
+Hugging Face dataset.
+
+The older flat-title scraper remains available:
 
 Run from the project root:
 
