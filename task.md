@@ -57,6 +57,3 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 
 ## 12. Canonical Dataset Workspace
 - [x] Merge dataset tooling into `/Users/tony/Documents/keyboard/dataset` and document subfolders plus canonical SSD paths in its `AGENTS.md`.
-
-## 13. Local Model Asset Ignore Rule
-- [x] Ignore large local Qwen ASR asset copies staged beneath model-pack modules.
