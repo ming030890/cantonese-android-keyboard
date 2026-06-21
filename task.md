@@ -47,10 +47,13 @@ This checklist tracks our step-by-step implementation progress. We will tackle t
 - [x] Implement the deterministic text-only Cantonese Wikipedia graph extractor and ranked proper-name export on SSD.
 
 ## 9. Proper-Name Export Normalization and Dataset Index
-- [x] Export entity-only rows, strip long-keyword `香港` prefixes, and document all dataset workflows in `dataset/README.md`.
+- [x] Export entity-only rows, strip long-keyword `香港` prefixes, and document all dataset workflows in `/Users/tony/Documents/keyboard/dataset/README.md`.
 
 ## 10. Proper-Name Recall Tuning
 - [x] Remove the short-title ranking penalty, lower the default export cutoff, add equal-weight restaurant anchors, and regenerate the entity list.
 
 ## 11. Conditional Station Suffix Normalization
 - [x] Remove terminal `站` only when the corresponding suffix-free entity is also eligible, then regenerate the entity list.
+
+## 12. Canonical Dataset Workspace
+- [x] Merge dataset tooling into `/Users/tony/Documents/keyboard/dataset` and document subfolders plus canonical SSD paths in its `AGENTS.md`.

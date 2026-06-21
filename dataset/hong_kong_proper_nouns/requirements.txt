@@ -1,9 +1,0 @@
-datasets
-pyahocorasick
-numpy
-tqdm
-networkx
-
-# Optional (preferred community detection and faster PageRank)
-python-louvain
-scipy
