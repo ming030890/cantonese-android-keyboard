@@ -58,6 +58,9 @@ keystore.properties
 /dataset/proper_names_graph*.jsonl
 /dataset/seeds_mtr.jsonl
 
+# Local model-pack assets (large deployment copies)
+/model_pack_*/src/main/assets/qwen-asr-*/
+
 *.pem
 
 # Crashlytics / Google Services
