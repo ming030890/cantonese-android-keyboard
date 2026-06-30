@@ -24,8 +24,10 @@ total size, it skips work.
 """
 
 import argparse
+import json
 import os
 import shutil
+import struct
 import sys
 from pathlib import Path
 
@@ -69,6 +71,102 @@ def bin_pack(tensors, limit):
     return [s for s, _ in shards]
 
 
+def bin_pack_raw(tensors, limit):
+    """
+    Dependency-free version of bin_pack for raw safetensors entries.
+    tensors maps name -> (meta, raw_bytes).
+    """
+    items = sorted(
+        tensors.items(),
+        key=lambda kv: len(kv[1][1]),
+        reverse=True,
+    )
+    shards: list[tuple[dict, int]] = []
+    for name, (meta, raw) in items:
+        sz = len(raw)
+        if sz > limit:
+            raise RuntimeError(
+                f"Tensor '{name}' is {sz / 1024 / 1024:.1f} MiB, larger than "
+                f"per-shard limit {limit / 1024 / 1024:.0f} MiB. "
+                "Increase SHARD_LIMIT_BYTES or split into more packs."
+            )
+        placed = False
+        for idx, (shard, current) in enumerate(shards):
+            if current + sz <= limit:
+                shard[name] = (meta, raw)
+                shards[idx] = (shard, current + sz)
+                placed = True
+                break
+        if not placed:
+            shards.append(({name: (meta, raw)}, sz))
+    return [s for s, _ in shards]
+
+
+def load_safetensors_raw(path: Path):
+    with path.open("rb") as f:
+        header_size = struct.unpack("<Q", f.read(8))[0]
+        header = json.loads(f.read(header_size).decode("utf-8"))
+        data_start = 8 + header_size
+        tensors = {}
+        for name, meta in header.items():
+            if name == "__metadata__":
+                continue
+            start, end = meta["data_offsets"]
+            f.seek(data_start + start)
+            raw = f.read(end - start)
+            tensors[name] = (meta, raw)
+    return tensors
+
+
+def save_safetensors_raw(tensors, path: Path):
+    header = {}
+    offset = 0
+    for name, (meta, raw) in tensors.items():
+        next_offset = offset + len(raw)
+        header[name] = {
+            "dtype": meta["dtype"],
+            "shape": meta["shape"],
+            "data_offsets": [offset, next_offset],
+        }
+        offset = next_offset
+
+    header_json = json.dumps(header, separators=(",", ":")).encode("utf-8")
+    with path.open("wb") as f:
+        f.write(struct.pack("<Q", len(header_json)))
+        f.write(header_json)
+        for _, raw in tensors.values():
+            f.write(raw)
+
+
+def reshard_raw(src_model: Path, pack_a: Path, pack_b: Path, limit: int):
+    print(f"loading {src_model} without safetensors/torch ...")
+    tensors = load_safetensors_raw(src_model)
+    total = sum(len(raw) for _, raw in tensors.values())
+    print(f"  {len(tensors)} tensors, {total / 1024 / 1024:.1f} MiB total")
+
+    shards = bin_pack_raw(tensors, limit)
+    if len(shards) != 2:
+        sys.exit(
+            f"error: bin-pack produced {len(shards)} shards, expected 2. "
+            f"Adjust --limit-mib ({limit // 1024 // 1024} MiB)."
+        )
+
+    pack_a.mkdir(parents=True, exist_ok=True)
+    pack_b.mkdir(parents=True, exist_ok=True)
+    shards.sort(key=lambda s: -sum(len(raw) for _, raw in s.values()))
+
+    shard1_path = pack_a / "model-00001-of-00002.safetensors"
+    shard2_path = pack_b / "model-00002-of-00002.safetensors"
+
+    print(f"writing {shard1_path} ({len(shards[0])} tensors)...")
+    save_safetensors_raw(shards[0], shard1_path)
+    print(f"  -> {shard1_path.stat().st_size / 1024 / 1024:.1f} MiB")
+
+    print(f"writing {shard2_path} ({len(shards[1])} tensors)...")
+    save_safetensors_raw(shards[1], shard2_path)
+    print(f"  -> {shard2_path.stat().st_size / 1024 / 1024:.1f} MiB")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--source", required=True, help="Directory containing the original model.safetensors + tokenizer files")
@@ -106,11 +204,11 @@ def main():
         from safetensors.torch import save_file
         import torch  # noqa: F401  (safetensors.torch needs torch present)
     except ImportError as e:
-        sys.exit(
-            f"error: {e}\n"
-            "Install dependencies first:\n"
-            "    pip install safetensors torch --index-url https://download.pytorch.org/whl/cpu"
-        )
+        print(f"warning: {e}; falling back to raw safetensors sharding")
+        reshard_raw(src_model, pack_a, pack_b, limit)
+        _copy_tokenizer(source, pack_a)
+        print("done.")
+        return
 
     print(f"loading {src_model} ...")
     tensors = {}

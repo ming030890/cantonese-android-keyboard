@@ -1,3 +1,4 @@
 # Model shards are staged here at build time by deploy.sh (which invokes
 # scripts/reshard_model.py). They must never be committed.
 /qwen-asr-int8dec/
+/qwen-asr-m4-lmhead-int8/

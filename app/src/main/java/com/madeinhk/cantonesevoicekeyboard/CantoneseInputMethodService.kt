@@ -219,7 +219,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     )
                     if (loaded) {
                         engine.setLanguage("Cantonese")
-                        engine.setChineseVariant("zh-HK")
+                        engine.setChineseVariant("")
                         engine.setPrompt("")
                         engine.setSegmentSec(0.0f)
                     }

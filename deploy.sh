@@ -22,7 +22,7 @@ PACKAGE="com.madeinhk.cantonesevoicekeyboard"
 
 # Where the raw model lives on the build machine. scripts/reshard_model.py
 # splits its model.safetensors into two ≤480 MiB shards across the two packs.
-SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8"
+SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8-v16-manual-code-switching-cp4000"
 # Two asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shard 2 in pack B. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
@@ -129,19 +129,20 @@ fi
 echo -e "${COLOR_INFO}[Step 3/6] Staging Qwen ASR model shards into both asset packs...${COLOR_RESET}"
 SHARD_A="$PACK_A_ASSETS/model-00001-of-00002.safetensors"
 SHARD_B="$PACK_B_ASSETS/model-00002-of-00002.safetensors"
-if [ -f "$SHARD_A" ] && [ -f "$SHARD_B" ]; then
-    echo -e "${COLOR_SUCCESS}Shards already staged. Skipping reshard.${COLOR_RESET}"
-elif [ -d "$SOURCE_MODEL_DIR" ]; then
+if [ -d "$SOURCE_MODEL_DIR" ]; then
     if ! command -v python3 &> /dev/null; then
         echo -e "${COLOR_ERROR}Error: python3 required to reshard the model.${COLOR_RESET}"
         exit 1
     fi
-    echo -e "${COLOR_INFO}Running reshard_model.py (one-time; needs python3 with safetensors+torch installed)...${COLOR_RESET}"
+    echo -e "${COLOR_INFO}Running reshard_model.py from $SOURCE_MODEL_DIR...${COLOR_RESET}"
     python3 "$RESHARD_SCRIPT" \
         --source "$SOURCE_MODEL_DIR" \
         --pack-a "$PACK_A_ASSETS" \
-        --pack-b "$PACK_B_ASSETS"
+        --pack-b "$PACK_B_ASSETS" \
+        --force
     echo -e "${COLOR_SUCCESS}Shards staged into both asset packs.${COLOR_RESET}"
+elif [ -f "$SHARD_A" ] && [ -f "$SHARD_B" ]; then
+    echo -e "${COLOR_SUCCESS}Shards already staged. Skipping reshard.${COLOR_RESET}"
 else
     echo -e "${COLOR_ERROR}Error: Shards not staged and source '$SOURCE_MODEL_DIR' not found.${COLOR_RESET}"
     echo -e "${COLOR_ERROR}Either place shards under '$PACK_A_ASSETS' and '$PACK_B_ASSETS',${COLOR_RESET}"
