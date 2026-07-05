@@ -142,6 +142,7 @@ private fun KeyboardScreenScreenshotContent(
             volumeLevel = MutableStateFlow(volume),
             keyboardAction = MutableStateFlow(action),
             keyboardInputMode = MutableStateFlow(inputMode),
+            inlineSuggestionViews = MutableStateFlow(emptyList()),
             onToggleRecording = {},
             onDeleteSurroundingText = {},
             onCommitText = {},

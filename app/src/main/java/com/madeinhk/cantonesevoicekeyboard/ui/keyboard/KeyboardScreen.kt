@@ -1,5 +1,6 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
+import android.view.View
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -28,15 +29,15 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
-import androidx.compose.ui.res.stringResource
 import com.madeinhk.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +49,7 @@ fun KeyboardScreen(
     volumeLevel: StateFlow<Float>,
     keyboardAction: StateFlow<KeyboardAction>,
     keyboardInputMode: StateFlow<KeyboardInputMode>,
+    inlineSuggestionViews: StateFlow<List<View>>,
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
@@ -61,6 +63,7 @@ fun KeyboardScreen(
     val volume by volumeLevel.collectAsState()
     val action by keyboardAction.collectAsState()
     val inputMode by keyboardInputMode.collectAsState()
+    val inlineSuggestions by inlineSuggestionViews.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val backgroundColor = MaterialTheme.colorScheme.background
@@ -111,6 +114,11 @@ fun KeyboardScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            InlineSuggestionStrip(
+                suggestions = inlineSuggestions,
+                modifier = Modifier.fillMaxWidth()
+            )
+
             when (activePanel) {
                 KeyboardPanel.Emoji -> {
                     EmojiPickerPanel(
@@ -274,6 +282,37 @@ fun KeyboardScreen(
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InlineSuggestionStrip(
+    suggestions: List<View>,
+    modifier: Modifier = Modifier
+) {
+    if (suggestions.isEmpty()) {
+        return
+    }
+
+    Row(
+        modifier = modifier
+            .height(44.dp)
+            .padding(bottom = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        suggestions.forEach { suggestionView ->
+            key(suggestionView) {
+                AndroidView(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(8.dp)),
+                    factory = { suggestionView },
+                    update = {}
+                )
             }
         }
     }

@@ -9,13 +9,21 @@ import android.inputmethodservice.InputMethodService
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.os.Bundle
 import android.os.SystemClock
 import android.text.InputType
 import android.util.Log
+import android.util.Size
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InlineSuggestion
+import android.view.inputmethod.InlineSuggestionsRequest
+import android.view.inputmethod.InlineSuggestionsResponse
+import android.widget.inline.InlineContentView
+import android.widget.inline.InlinePresentationSpec
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -61,6 +69,9 @@ class CantoneseInputMethodService : InputMethodService(),
         private const val SAMPLE_RATE = 16000
         private const val PROMPT_TEXT_BEFORE_CURSOR_CHARS = 160
         private const val PROMPT_TEXT_AFTER_CURSOR_CHARS = 80
+        private const val INLINE_SUGGESTION_MIN_WIDTH_DP = 72
+        private const val INLINE_SUGGESTION_HEIGHT_DP = 40
+        private const val INLINE_SUGGESTION_MAX_COUNT = 3
     }
 
     // Lifecycle, ViewModel, SavedState bridges for Compose support
@@ -103,6 +114,10 @@ class CantoneseInputMethodService : InputMethodService(),
     private val _keyboardInputMode = MutableStateFlow(KeyboardInputMode.Voice)
     val keyboardInputMode = _keyboardInputMode.asStateFlow()
 
+    private val _inlineSuggestionViews = MutableStateFlow<List<View>>(emptyList())
+    val inlineSuggestionViews = _inlineSuggestionViews.asStateFlow()
+    private var inlineSuggestionsGeneration = 0L
+
     private var audioRecordJob: Job? = null
     @Volatile
     private var activeAudioRecord: AudioRecord? = null
@@ -137,6 +152,7 @@ class CantoneseInputMethodService : InputMethodService(),
                         volumeLevel = volumeLevel,
                         keyboardAction = keyboardAction,
                         keyboardInputMode = keyboardInputMode,
+                        inlineSuggestionViews = inlineSuggestionViews,
                         onToggleRecording = { toggleRecording() },
                         onDeleteSurroundingText = { deleteSurroundingText() },
                         onCommitText = { text -> commitText(text) },
@@ -157,6 +173,7 @@ class CantoneseInputMethodService : InputMethodService(),
         _keyboardAction.value = keyboardActionFor(info)
         _keyboardInputMode.value = keyboardInputModeFor(info)
         inputViewSession++
+        clearInlineSuggestions()
         if (!restarting) {
             stopRecordingInternal(discard = true)
             _volumeLevel.value = 0f
@@ -168,6 +185,7 @@ class CantoneseInputMethodService : InputMethodService(),
         super.onStartInputView(info, restarting)
         _keyboardAction.value = keyboardActionFor(info)
         _keyboardInputMode.value = keyboardInputModeFor(info)
+        clearInlineSuggestions()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
         // Re-apply in case the system day/night mode changed while hidden.
@@ -283,11 +301,13 @@ class CantoneseInputMethodService : InputMethodService(),
     override fun onFinishInput() {
         super.onFinishInput()
         inputViewSession++
+        clearInlineSuggestions()
         finishInputSession(releaseModel = false)
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
+        clearInlineSuggestions()
         if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
@@ -327,9 +347,35 @@ class CantoneseInputMethodService : InputMethodService(),
         }
     }
 
+    override fun onUpdateSelection(
+        oldSelStart: Int,
+        oldSelEnd: Int,
+        newSelStart: Int,
+        newSelEnd: Int,
+        candidatesStart: Int,
+        candidatesEnd: Int
+    ) {
+        super.onUpdateSelection(
+            oldSelStart,
+            oldSelEnd,
+            newSelStart,
+            newSelEnd,
+            candidatesStart,
+            candidatesEnd
+        )
+        if (
+            oldSelStart != newSelStart ||
+            oldSelEnd != newSelEnd ||
+            candidatesStart != candidatesEnd
+        ) {
+            clearInlineSuggestions()
+        }
+    }
+
     override fun onWindowHidden() {
         super.onWindowHidden()
         inputViewSession++
+        clearInlineSuggestions()
         if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
@@ -342,6 +388,7 @@ class CantoneseInputMethodService : InputMethodService(),
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         store.clear()
         isInputViewVisible = false
+        clearInlineSuggestions()
         stopRecordingInternal(discard = true)
         
         // Final safety cleanup
@@ -354,6 +401,68 @@ class CantoneseInputMethodService : InputMethodService(),
             serviceJob.cancel()
         }
     }
+
+    override fun onCreateInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest {
+        clearInlineSuggestions()
+        val spec = InlinePresentationSpec.Builder(
+            Size(dpToPx(INLINE_SUGGESTION_MIN_WIDTH_DP), dpToPx(INLINE_SUGGESTION_HEIGHT_DP)),
+            Size(getMaxWidth().coerceAtLeast(dpToPx(INLINE_SUGGESTION_MIN_WIDTH_DP)), dpToPx(INLINE_SUGGESTION_HEIGHT_DP))
+        )
+            .setStyle(uiExtras)
+            .build()
+
+        return InlineSuggestionsRequest.Builder(listOf(spec))
+            .setMaxSuggestionCount(INLINE_SUGGESTION_MAX_COUNT)
+            .build()
+    }
+
+    override fun onInlineSuggestionsResponse(response: InlineSuggestionsResponse): Boolean {
+        val suggestions = response.inlineSuggestions
+        if (suggestions.isEmpty()) {
+            clearInlineSuggestions()
+            return true
+        }
+
+        val generation = inlineSuggestionsGeneration
+        val inflatedViews = arrayOfNulls<View>(suggestions.size)
+        val size = Size(
+            getMaxWidth().coerceAtLeast(dpToPx(INLINE_SUGGESTION_MIN_WIDTH_DP)),
+            dpToPx(INLINE_SUGGESTION_HEIGHT_DP)
+        )
+        suggestions.forEachIndexed { index, suggestion ->
+            inflateInlineSuggestion(suggestion, size) { view ->
+                if (generation != inlineSuggestionsGeneration || !isInputViewVisible) {
+                    return@inflateInlineSuggestion
+                }
+                (view.parent as? ViewGroup)?.removeView(view)
+                inflatedViews[index] = view
+                _inlineSuggestionViews.value = inflatedViews.filterNotNull()
+            }
+        }
+        return true
+    }
+
+    private fun inflateInlineSuggestion(
+        suggestion: InlineSuggestion,
+        size: Size,
+        onInflated: (InlineContentView) -> Unit
+    ) {
+        try {
+            suggestion.inflate(this, size, mainExecutor, onInflated)
+        } catch (t: Throwable) {
+            Log.w(TAG, "Unable to inflate inline suggestion", t)
+        }
+    }
+
+    private fun clearInlineSuggestions() {
+        inlineSuggestionsGeneration++
+        if (_inlineSuggestionViews.value.isNotEmpty()) {
+            _inlineSuggestionViews.value = emptyList()
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int =
+        (dp * resources.displayMetrics.density).toInt().coerceAtLeast(1)
 
     private fun getOrCreateAsrEngine(): QAsrEngine {
         qAsrEngine?.let { return it }
@@ -649,6 +758,7 @@ class CantoneseInputMethodService : InputMethodService(),
         replace(Regex("\\s+"), " ").trim()
 
     private fun deleteSurroundingText() {
+        clearInlineSuggestions()
         currentInputConnection?.deleteSelectionOrPreviousCharacter()
     }
 
@@ -662,14 +772,17 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     private fun sendSpace() {
+        clearInlineSuggestions()
         currentInputConnection?.commitText(" ", 1)
     }
 
     private fun commitText(text: String) {
+        clearInlineSuggestions()
         currentInputConnection?.commitText(text, 1)
     }
 
     private fun sendEnter() {
+        clearInlineSuggestions()
         val connection = currentInputConnection
         if (connection != null) {
             val editorInfo = currentInputEditorInfo
@@ -727,6 +840,7 @@ class CantoneseInputMethodService : InputMethodService(),
     )
 
     private fun sendEmoji(emoji: String) {
+        clearInlineSuggestions()
         currentInputConnection?.commitText(emoji, 1)
     }
 
