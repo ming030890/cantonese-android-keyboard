@@ -64,21 +64,57 @@ fun KeyboardScreenErrorScreenshot() {
     )
 }
 
+@PreviewTest
+@Preview(
+    name = "Keyboard search action",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = 270
+)
+@Composable
+fun KeyboardScreenSearchActionScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        action = KeyboardAction.Search
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard emoji panel",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = 270
+)
+@Composable
+fun KeyboardScreenEmojiPanelScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        initialEmojiPanel = true
+    )
+}
+
 @Composable
 private fun KeyboardScreenScreenshotContent(
     state: KeyboardUiState,
-    volume: Float = 0f
+    volume: Float = 0f,
+    action: KeyboardAction = KeyboardAction.Enter,
+    initialEmojiPanel: Boolean = false
 ) {
     CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
         KeyboardScreen(
             uiState = MutableStateFlow(state),
             volumeLevel = MutableStateFlow(volume),
+            keyboardAction = MutableStateFlow(action),
             onToggleRecording = {},
             onDeleteSurroundingText = {},
             onSendSpace = {},
             onSendEnter = {},
             onOpenSettings = {},
-            onEmojiPicked = {}
+            onEmojiPicked = {},
+            initialEmojiPanel = initialEmojiPanel
         )
     }
 }

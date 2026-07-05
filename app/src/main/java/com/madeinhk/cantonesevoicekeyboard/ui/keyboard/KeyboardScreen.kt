@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,15 +46,18 @@ import kotlin.math.sin
 fun KeyboardScreen(
     uiState: StateFlow<KeyboardUiState>,
     volumeLevel: StateFlow<Float>,
+    keyboardAction: StateFlow<KeyboardAction>,
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onSendSpace: () -> Unit,
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
-    onEmojiPicked: (String) -> Unit
+    onEmojiPicked: (String) -> Unit,
+    initialEmojiPanel: Boolean = false
 ) {
     val state by uiState.collectAsState()
     val volume by volumeLevel.collectAsState()
+    val action by keyboardAction.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val backgroundColor = MaterialTheme.colorScheme.background
@@ -61,7 +65,9 @@ fun KeyboardScreen(
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
     val haptics = LocalHapticFeedback.current
     var isDeleting by remember { mutableStateOf(false) }
-    var activePanel by remember { mutableStateOf(KeyboardPanel.Voice) }
+    var activePanel by remember {
+        mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else KeyboardPanel.Voice)
+    }
     // Visual depress for the delete key, which uses a raw pointer gesture (no clickable).
     val deleteScale by animateFloatAsState(
         targetValue = if (isDeleting) 0.92f else 1f,
@@ -156,7 +162,12 @@ fun KeyboardScreen(
                     }
                 ) {
                     if (activePanel == KeyboardPanel.Emoji) {
-                        KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                        Text(
+                            text = "中",
+                            color = textVariantColor,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     } else {
                         SmileIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                     }
@@ -222,11 +233,10 @@ fun KeyboardScreen(
                     backgroundColor = primaryColor,
                     borderColor = primaryColor
                 ) {
-                    Text(
-                        text = stringResource(R.string.keyboard_key_enter),
+                    KeyboardActionIcon(
+                        action = action,
+                        modifier = Modifier.size(22.dp),
                         color = MaterialTheme.colorScheme.onPrimary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -239,11 +249,26 @@ private enum class KeyboardPanel {
     Emoji
 }
 
+enum class KeyboardAction {
+    Enter,
+    Go,
+    Search,
+    Send,
+    Next,
+    Previous,
+    Done
+}
+
 @Composable
 fun EmojiPickerPanel(
     modifier: Modifier = Modifier,
     onEmojiPicked: (String) -> Unit
 ) {
+    if (LocalInspectionMode.current) {
+        EmojiPreviewGrid(modifier = modifier)
+        return
+    }
+
     AndroidView(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -258,6 +283,40 @@ fun EmojiPickerPanel(
             picker.setOnEmojiPickedListener { item -> onEmojiPicked(item.emoji) }
         }
     )
+}
+
+@Composable
+private fun EmojiPreviewGrid(modifier: Modifier = Modifier) {
+    val emojis = listOf(
+        "😀", "😂", "😍", "🥳", "😎", "😭", "😡", "👍",
+        "🙏", "👏", "💪", "🔥", "✨", "❤️", "🎉", "✅",
+        "🍜", "☕", "🚇", "🏠", "📍", "💬", "🔎", "⭐"
+    )
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        emojis.chunked(8).forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                row.forEach { emoji ->
+                    Text(
+                        text = emoji,
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.width(34.dp)
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -720,6 +779,142 @@ fun KeyboardIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
                     topLeft = Offset(startX + column * w * 0.14f, startY + row * h * 0.14f),
                     size = Size(keyW, keyH),
                     cornerRadius = keyRadius
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun KeyboardActionIcon(
+    action: KeyboardAction,
+    modifier: Modifier = Modifier,
+    color: Color = Color.White
+) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val strokePx = 2.4.dp.toPx()
+
+        when (action) {
+            KeyboardAction.Search -> {
+                drawCircle(
+                    color = color,
+                    radius = w * 0.25f,
+                    center = Offset(w * 0.42f, h * 0.42f),
+                    style = Stroke(width = strokePx)
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.60f, h * 0.60f),
+                    end = Offset(w * 0.82f, h * 0.82f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+            }
+            KeyboardAction.Send -> {
+                val path = Path().apply {
+                    moveTo(w * 0.14f, h * 0.18f)
+                    lineTo(w * 0.88f, h * 0.50f)
+                    lineTo(w * 0.14f, h * 0.82f)
+                    lineTo(w * 0.26f, h * 0.55f)
+                    lineTo(w * 0.52f, h * 0.50f)
+                    lineTo(w * 0.26f, h * 0.45f)
+                    close()
+                }
+                drawPath(path = path, color = color)
+            }
+            KeyboardAction.Done -> {
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.18f, h * 0.54f),
+                    end = Offset(w * 0.40f, h * 0.74f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.40f, h * 0.74f),
+                    end = Offset(w * 0.84f, h * 0.26f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+            }
+            KeyboardAction.Go,
+            KeyboardAction.Next -> {
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.18f, h * 0.50f),
+                    end = Offset(w * 0.78f, h * 0.50f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.58f, h * 0.30f),
+                    end = Offset(w * 0.78f, h * 0.50f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.58f, h * 0.70f),
+                    end = Offset(w * 0.78f, h * 0.50f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+            }
+            KeyboardAction.Previous -> {
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.22f, h * 0.50f),
+                    end = Offset(w * 0.82f, h * 0.50f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.42f, h * 0.30f),
+                    end = Offset(w * 0.22f, h * 0.50f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.42f, h * 0.70f),
+                    end = Offset(w * 0.22f, h * 0.50f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+            }
+            KeyboardAction.Enter -> {
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.78f, h * 0.22f),
+                    end = Offset(w * 0.78f, h * 0.58f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.78f, h * 0.58f),
+                    end = Offset(w * 0.24f, h * 0.58f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.42f, h * 0.38f),
+                    end = Offset(w * 0.24f, h * 0.58f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(w * 0.42f, h * 0.78f),
+                    end = Offset(w * 0.24f, h * 0.58f),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
                 )
             }
         }

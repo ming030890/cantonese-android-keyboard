@@ -31,6 +31,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardAction
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
 import com.qwenasr.QAsrEngine
 import kotlinx.coroutines.CoroutineScope
@@ -94,6 +95,9 @@ class CantoneseInputMethodService : InputMethodService(),
     private val _volumeLevel = MutableStateFlow(0f)
     val volumeLevel = _volumeLevel.asStateFlow()
 
+    private val _keyboardAction = MutableStateFlow(KeyboardAction.Enter)
+    val keyboardAction = _keyboardAction.asStateFlow()
+
     private var audioRecordJob: Job? = null
     @Volatile
     private var activeAudioRecord: AudioRecord? = null
@@ -126,6 +130,7 @@ class CantoneseInputMethodService : InputMethodService(),
                     KeyboardScreen(
                         uiState = uiState,
                         volumeLevel = volumeLevel,
+                        keyboardAction = keyboardAction,
                         onToggleRecording = { toggleRecording() },
                         onDeleteSurroundingText = { deleteSurroundingText() },
                         onSendSpace = { sendSpace() },
@@ -142,6 +147,7 @@ class CantoneseInputMethodService : InputMethodService(),
 
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
         super.onStartInput(info, restarting)
+        _keyboardAction.value = keyboardActionFor(info)
         inputViewSession++
         if (!restarting) {
             stopRecordingInternal(discard = true)
@@ -152,6 +158,7 @@ class CantoneseInputMethodService : InputMethodService(),
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         val startedAt = SystemClock.elapsedRealtime()
         super.onStartInputView(info, restarting)
+        _keyboardAction.value = keyboardActionFor(info)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
         // Re-apply in case the system day/night mode changed while hidden.
@@ -654,12 +661,34 @@ class CantoneseInputMethodService : InputMethodService(),
         if (connection != null) {
             val editorInfo = currentInputEditorInfo
             val actionId = editorInfo?.actionId ?: 0
+            val imeAction = editorInfo.standardImeAction()
             if (actionId != 0) {
                 connection.performEditorAction(actionId)
+            } else if (imeAction != EditorInfo.IME_ACTION_NONE) {
+                connection.performEditorAction(imeAction)
             } else {
                 connection.commitText("\n", 1)
             }
         }
+    }
+
+    private fun keyboardActionFor(editorInfo: EditorInfo?): KeyboardAction =
+        when (editorInfo.standardImeAction()) {
+            EditorInfo.IME_ACTION_GO -> KeyboardAction.Go
+            EditorInfo.IME_ACTION_SEARCH -> KeyboardAction.Search
+            EditorInfo.IME_ACTION_SEND -> KeyboardAction.Send
+            EditorInfo.IME_ACTION_NEXT -> KeyboardAction.Next
+            EditorInfo.IME_ACTION_PREVIOUS -> KeyboardAction.Previous
+            EditorInfo.IME_ACTION_DONE -> KeyboardAction.Done
+            else -> KeyboardAction.Enter
+        }
+
+    private fun EditorInfo?.standardImeAction(): Int {
+        if (this == null) return EditorInfo.IME_ACTION_NONE
+        if ((imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0) {
+            return EditorInfo.IME_ACTION_NONE
+        }
+        return imeOptions and EditorInfo.IME_MASK_ACTION
     }
 
     private fun sendEmoji(emoji: String) {
