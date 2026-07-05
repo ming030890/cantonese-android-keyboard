@@ -136,7 +136,7 @@ private fun KeyboardScreenScreenshotContent(
     inputMode: KeyboardInputMode = KeyboardInputMode.Voice,
     initialEmojiPanel: Boolean = false
 ) {
-    CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
+    CantoneseVoiceKeyboardTheme(darkTheme = false, dynamicColor = false) {
         KeyboardScreen(
             uiState = MutableStateFlow(state),
             volumeLevel = MutableStateFlow(volume),

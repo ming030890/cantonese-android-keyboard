@@ -35,4 +35,7 @@ val LightTextGray = Color(0xFF5A5A6A)       // Secondary text on light surfaces
 val LightGradientTop = Color(0xFFF7F7FB)    // Screen gradient top (light)
 val LightGradientBottom = Color(0xFFE9E9F1) // Screen gradient bottom (light)
 
-
+// Gboard-inspired key palette for alternate keyboard panels in light theme.
+val KeyboardKeySurface = Color(0xFFF8FAF7)
+val KeyboardModifierKeySurface = Color(0xFFD8E8D6)
+val KeyboardKeyOnSurface = Color(0xFF202820)

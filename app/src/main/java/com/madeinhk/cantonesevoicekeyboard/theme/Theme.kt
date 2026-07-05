@@ -24,15 +24,24 @@ import androidx.compose.ui.platform.LocalContext
  */
 @Immutable
 data class BrandColors(
-    val backgroundGradient: Brush
+    val backgroundGradient: Brush,
+    val keyboardKeySurface: Color,
+    val keyboardModifierKeySurface: Color,
+    val keyboardKeyOnSurface: Color
 )
 
 private val DarkBrandColors = BrandColors(
-    backgroundGradient = Brush.verticalGradient(listOf(DarkMidnight, CarbonBlack))
+    backgroundGradient = Brush.verticalGradient(listOf(DarkMidnight, CarbonBlack)),
+    keyboardKeySurface = CardGray,
+    keyboardModifierKeySurface = BorderGray,
+    keyboardKeyOnSurface = Color.White
 )
 
 private val LightBrandColors = BrandColors(
-    backgroundGradient = Brush.verticalGradient(listOf(LightGradientTop, LightGradientBottom))
+    backgroundGradient = Brush.verticalGradient(listOf(LightGradientTop, LightGradientBottom)),
+    keyboardKeySurface = KeyboardKeySurface,
+    keyboardModifierKeySurface = KeyboardModifierKeySurface,
+    keyboardKeyOnSurface = KeyboardKeyOnSurface
 )
 
 private val LocalBrandColors = staticCompositionLocalOf { DarkBrandColors }

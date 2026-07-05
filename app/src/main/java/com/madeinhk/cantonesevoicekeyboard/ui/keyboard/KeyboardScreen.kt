@@ -387,6 +387,7 @@ fun AlphaNumPanel(
     onDeleteSurroundingText: () -> Unit
 ) {
     var isUppercase by remember { mutableStateOf(true) }
+    val keyboardColors = BrandTheme.colors
 
     Column(
         modifier = modifier.padding(vertical = 4.dp),
@@ -411,11 +412,11 @@ fun AlphaNumPanel(
             GboardKey(
                 modifier = Modifier.weight(1.35f),
                 onClick = { isUppercase = !isUppercase },
-                backgroundColor = GboardSpecialKey
+                backgroundColor = keyboardColors.keyboardModifierKeySurface
             ) {
                 ShiftIcon(
                     modifier = Modifier.size(21.dp),
-                    color = GboardKeyText,
+                    color = keyboardColors.keyboardKeyOnSurface,
                     filled = isUppercase
                 )
             }
@@ -430,9 +431,9 @@ fun AlphaNumPanel(
             GboardKey(
                 modifier = Modifier.weight(1.35f),
                 onClick = onDeleteSurroundingText,
-                backgroundColor = GboardSpecialKey
+                backgroundColor = keyboardColors.keyboardModifierKeySurface
             ) {
-                BackspaceIcon(modifier = Modifier.size(22.dp), color = GboardKeyText)
+                BackspaceIcon(modifier = Modifier.size(22.dp), color = keyboardColors.keyboardKeyOnSurface)
             }
         }
     }
@@ -511,6 +512,7 @@ private fun AlphaNumBottomRow(
     onBackToVoice: () -> Unit
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
+    val keyboardColors = BrandTheme.colors
 
     Row(
         modifier = Modifier
@@ -522,23 +524,33 @@ private fun AlphaNumBottomRow(
         GboardKey(
             modifier = Modifier.weight(1.15f),
             onClick = onBackToVoice,
-            backgroundColor = GboardSpecialKey,
+            backgroundColor = keyboardColors.keyboardModifierKeySurface,
             shape = CircleShape
         ) {
-            Text(text = "中", color = GboardKeyText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = "中",
+                color = keyboardColors.keyboardKeyOnSurface,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
         GboardKey(
             modifier = Modifier.weight(0.9f),
             onClick = { onCommitText(",") },
-            backgroundColor = GboardSpecialKey
+            backgroundColor = keyboardColors.keyboardModifierKeySurface
         ) {
-            Text(text = ",", color = GboardKeyText, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = ",",
+                color = keyboardColors.keyboardKeyOnSurface,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
         GboardKey(
             modifier = Modifier.weight(0.9f),
             onClick = onOpenEmoji
         ) {
-            SmileIcon(modifier = Modifier.size(22.dp), color = GboardKeyText)
+            SmileIcon(modifier = Modifier.size(22.dp), color = keyboardColors.keyboardKeyOnSurface)
         }
         GboardKey(
             modifier = Modifier.weight(3.6f),
@@ -546,7 +558,7 @@ private fun AlphaNumBottomRow(
         ) {
             Text(
                 text = stringResource(R.string.keyboard_key_space),
-                color = GboardKeyText,
+                color = keyboardColors.keyboardKeyOnSurface,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -554,9 +566,14 @@ private fun AlphaNumBottomRow(
         GboardKey(
             modifier = Modifier.weight(0.9f),
             onClick = { onCommitText(".") },
-            backgroundColor = GboardSpecialKey
+            backgroundColor = keyboardColors.keyboardModifierKeySurface
         ) {
-            Text(text = ".", color = GboardKeyText, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = ".",
+                color = keyboardColors.keyboardKeyOnSurface,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
         GboardKey(
             modifier = Modifier.weight(1.25f),
@@ -573,18 +590,20 @@ private fun AlphaNumBottomRow(
     }
 }
 
-private val GboardKeyColor = Color(0xFFF8FAF7)
-private val GboardSpecialKey = Color(0xFFD8E8D6)
-private val GboardKeyText = Color(0xFF202820)
-
 @Composable
 private fun GboardKey(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    backgroundColor: Color = GboardKeyColor,
+    backgroundColor: Color = Color.Unspecified,
     shape: Shape = RoundedCornerShape(9.dp),
     content: @Composable BoxScope.() -> Unit
 ) {
+    val resolvedBackgroundColor =
+        if (backgroundColor == Color.Unspecified) {
+            BrandTheme.colors.keyboardKeySurface
+        } else {
+            backgroundColor
+        }
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val pressScale by animateFloatAsState(
@@ -599,7 +618,7 @@ private fun GboardKey(
             .scale(pressScale)
             .shadow(elevation = if (isPressed) 0.dp else 1.dp, shape = shape)
             .clip(shape)
-            .background(backgroundColor)
+            .background(resolvedBackgroundColor)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -617,13 +636,15 @@ private fun CharacterKey(
     commitValue: String = label.lowercase(),
     onCommitText: (String) -> Unit
 ) {
+    val keyboardColors = BrandTheme.colors
+
     GboardKey(
         modifier = modifier,
         onClick = { onCommitText(commitValue) }
     ) {
         Text(
             text = label,
-            color = GboardKeyText,
+            color = keyboardColors.keyboardKeyOnSurface,
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold
         )
