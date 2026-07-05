@@ -19,7 +19,7 @@ import kotlin.coroutines.resume
 /**
  * High-level download state of the model, suitable for driving UI.
  *
- * The model is split across two on-demand Play Asset Delivery packs; this
+ * The model is split across two fast-follow Play Asset Delivery packs; this
  * state aggregates both packs into a single progress signal so the UI can
  * treat the model as one logical resource.
  */
@@ -38,7 +38,7 @@ sealed interface ModelDownloadStatus {
 
 /**
  * Resolves the Qwen ASR model directory. The model ships as two sharded
- * on-demand Play Asset Delivery packs ([PACK_A], [PACK_B]) so each stays
+ * fast-follow Play Asset Delivery packs ([PACK_A], [PACK_B]) so each stays
  * under Play's 512 MiB per-pack ceiling.
  *
  * Files in each pack are mmap'd directly by the native loader from their

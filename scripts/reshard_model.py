@@ -225,7 +225,7 @@ def main():
     source_manifest = build_source_manifest(source, limit)
 
     # Idempotency check: preserve existing shard bytes for code-only releases.
-    # A forced rewrite makes Play treat the on-demand asset packs as changed,
+    # A forced rewrite makes Play treat the fast-follow asset packs as changed,
     # causing already-installed users to receive a huge asset-pack update.
     if not args.force and shard1_path.exists() and shard2_path.exists():
         existing_manifest = read_manifest(manifest_path)

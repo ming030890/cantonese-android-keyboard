@@ -34,12 +34,12 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 7
+        versionCode = 8
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // The Qwen ASR model is delivered as TWO on-demand Play Asset Delivery
+    // The Qwen ASR model is delivered as TWO fast-follow Play Asset Delivery
     // packs so each stays under Play's 512 MiB per-pack ceiling. Shard 1 +
     // tokenizer files live in :model_pack_a; shard 2 lives in :model_pack_b.
     // See scripts/reshard_model.py for the build-time split.
