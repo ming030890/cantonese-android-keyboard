@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -141,7 +142,8 @@ fun KeyboardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        onCommitText = onCommitText
+                        onCommitText = onCommitText,
+                        onDeleteSurroundingText = onDeleteSurroundingText
                     )
                 }
                 KeyboardPanel.Voice -> {
@@ -176,111 +178,122 @@ fun KeyboardScreen(
                 }
             }
 
-            // Bottom Functional Keys Row (Space, Delete, Enter, Switch)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                KeyboardUtilityKey(
-                    modifier = Modifier.weight(0.75f),
-                    onClick = {
-                        activePanel = if (activePanel == KeyboardPanel.Voice) {
-                            KeyboardPanel.Emoji
+            if (activePanel == KeyboardPanel.AlphaNum) {
+                AlphaNumBottomRow(
+                    action = action,
+                    onCommitText = onCommitText,
+                    onSendSpace = onSendSpace,
+                    onSendEnter = onSendEnter,
+                    onOpenEmoji = { activePanel = KeyboardPanel.Emoji },
+                    onBackToVoice = { activePanel = KeyboardPanel.Voice }
+                )
+            } else {
+                // Bottom Functional Keys Row (Space, Delete, Enter, Switch)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    KeyboardUtilityKey(
+                        modifier = Modifier.weight(0.75f),
+                        onClick = {
+                            activePanel = if (activePanel == KeyboardPanel.Voice) {
+                                KeyboardPanel.Emoji
+                            } else {
+                                KeyboardPanel.Voice
+                            }
+                        }
+                    ) {
+                        if (activePanel == KeyboardPanel.Voice) {
+                            SmileIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                         } else {
-                            KeyboardPanel.Voice
+                            Text(
+                                text = "中",
+                                color = textVariantColor,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
-                ) {
-                    if (activePanel == KeyboardPanel.Voice) {
-                        SmileIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
-                    } else {
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    KeyboardUtilityKey(
+                        modifier = Modifier.weight(0.75f),
+                        onClick = {
+                            if (activePanel == KeyboardPanel.Voice) {
+                                activePanel = KeyboardPanel.AlphaNum
+                            } else {
+                                onOpenSettings()
+                            }
+                        }
+                    ) {
+                        if (activePanel == KeyboardPanel.Voice) {
+                            KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                        } else {
+                            SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    // Space Key
+                    KeyboardUtilityKey(
+                        modifier = Modifier.weight(2.1f),
+                        onClick = onSendSpace
+                    ) {
                         Text(
-                            text = "中",
+                            text = stringResource(R.string.keyboard_key_space),
                             color = textVariantColor,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = 1.sp
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
 
-                KeyboardUtilityKey(
-                    modifier = Modifier.weight(0.75f),
-                    onClick = {
-                        if (activePanel == KeyboardPanel.Voice) {
-                            activePanel = KeyboardPanel.AlphaNum
-                        } else {
-                            onOpenSettings()
-                        }
-                    }
-                ) {
-                    if (activePanel == KeyboardPanel.Voice) {
-                        KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
-                    } else {
-                        SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                // Space Key
-                KeyboardUtilityKey(
-                    modifier = Modifier.weight(2.1f),
-                    onClick = onSendSpace
-                ) {
-                    Text(
-                        text = stringResource(R.string.keyboard_key_space),
-                        color = textVariantColor,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 1.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                // Delete Key
-                KeyboardUtilityKey(
-                    modifier = Modifier
-                        .weight(1f)
-                        .scale(deleteScale)
-                        .pointerInput(onDeleteSurroundingText) {
-                            detectTapGestures(
-                                onPress = {
-                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onDeleteSurroundingText()
-                                    isDeleting = true
-                                    try {
-                                        tryAwaitRelease()
-                                    } finally {
-                                        isDeleting = false
+                    // Delete Key
+                    KeyboardUtilityKey(
+                        modifier = Modifier
+                            .weight(1f)
+                            .scale(deleteScale)
+                            .pointerInput(onDeleteSurroundingText) {
+                                detectTapGestures(
+                                    onPress = {
+                                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        onDeleteSurroundingText()
+                                        isDeleting = true
+                                        try {
+                                            tryAwaitRelease()
+                                        } finally {
+                                            isDeleting = false
+                                        }
                                     }
-                                }
-                            )
-                        },
-                    onClick = null
-                ) {
-                    BackspaceIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
-                }
+                                )
+                            },
+                        onClick = null
+                    ) {
+                        BackspaceIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    }
 
-                Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
 
-                // Enter Key — filled accent so the primary commit action stands out.
-                KeyboardUtilityKey(
-                    modifier = Modifier.weight(1.1f),
-                    onClick = onSendEnter,
-                    backgroundColor = primaryColor,
-                    borderColor = primaryColor
-                ) {
-                    KeyboardActionIcon(
-                        action = action,
-                        modifier = Modifier.size(22.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
+                    // Enter Key - filled accent so the primary commit action stands out.
+                    KeyboardUtilityKey(
+                        modifier = Modifier.weight(1.1f),
+                        onClick = onSendEnter,
+                        backgroundColor = primaryColor,
+                        borderColor = primaryColor
+                    ) {
+                        KeyboardActionIcon(
+                            action = action,
+                            modifier = Modifier.size(22.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                        )
+                    }
                 }
             }
         }
@@ -370,20 +383,59 @@ fun NumberPanel(
 @Composable
 fun AlphaNumPanel(
     modifier: Modifier = Modifier,
-    onCommitText: (String) -> Unit
+    onCommitText: (String) -> Unit,
+    onDeleteSurroundingText: () -> Unit
 ) {
-    val rows = listOf(
-        listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"),
-        listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
-        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
-        listOf("z", "x", "c", "v", "b", "n", "m")
-    )
+    var isUppercase by remember { mutableStateOf(true) }
 
-    KeyGridPanel(
-        modifier = modifier,
-        rows = rows,
-        onCommitText = onCommitText
-    )
+    Column(
+        modifier = modifier.padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        KeyRow(labels = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"), onCommitText = onCommitText)
+        KeyRow(labels = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"), uppercase = isUppercase, onCommitText = onCommitText)
+        KeyRow(
+            labels = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
+            uppercase = isUppercase,
+            leadingWeight = 0.5f,
+            trailingWeight = 0.5f,
+            onCommitText = onCommitText
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(38.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GboardKey(
+                modifier = Modifier.weight(1.35f),
+                onClick = { isUppercase = !isUppercase },
+                backgroundColor = GboardSpecialKey
+            ) {
+                ShiftIcon(
+                    modifier = Modifier.size(21.dp),
+                    color = GboardKeyText,
+                    filled = isUppercase
+                )
+            }
+            listOf("z", "x", "c", "v", "b", "n", "m").forEach { key ->
+                CharacterKey(
+                    modifier = Modifier.weight(1f),
+                    label = if (isUppercase) key.uppercase() else key,
+                    commitValue = if (isUppercase) key.uppercase() else key,
+                    onCommitText = onCommitText
+                )
+            }
+            GboardKey(
+                modifier = Modifier.weight(1.35f),
+                onClick = onDeleteSurroundingText,
+                backgroundColor = GboardSpecialKey
+            ) {
+                BackspaceIcon(modifier = Modifier.size(22.dp), color = GboardKeyText)
+            }
+        }
+    }
 }
 
 @Composable
@@ -408,7 +460,8 @@ private fun KeyGridPanel(
                     CharacterKey(
                         modifier = Modifier.weight(1f),
                         label = key.uppercase(),
-                        onClick = { onCommitText(key) }
+                        commitValue = key,
+                        onCommitText = onCommitText
                     )
                 }
             }
@@ -417,19 +470,161 @@ private fun KeyGridPanel(
 }
 
 @Composable
+private fun KeyRow(
+    labels: List<String>,
+    uppercase: Boolean = false,
+    leadingWeight: Float = 0f,
+    trailingWeight: Float = 0f,
+    onCommitText: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(38.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (leadingWeight > 0f) {
+            Spacer(modifier = Modifier.weight(leadingWeight))
+        }
+        labels.forEach { key ->
+            CharacterKey(
+                modifier = Modifier.weight(1f),
+                label = if (uppercase) key.uppercase() else key.uppercase(),
+                commitValue = if (uppercase) key.uppercase() else key,
+                onCommitText = onCommitText
+            )
+        }
+        if (trailingWeight > 0f) {
+            Spacer(modifier = Modifier.weight(trailingWeight))
+        }
+    }
+}
+
+@Composable
+private fun AlphaNumBottomRow(
+    action: KeyboardAction,
+    onCommitText: (String) -> Unit,
+    onSendSpace: () -> Unit,
+    onSendEnter: () -> Unit,
+    onOpenEmoji: () -> Unit,
+    onBackToVoice: () -> Unit
+) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GboardKey(
+            modifier = Modifier.weight(1.15f),
+            onClick = onBackToVoice,
+            backgroundColor = GboardSpecialKey,
+            shape = CircleShape
+        ) {
+            Text(text = "中", color = GboardKeyText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+        GboardKey(
+            modifier = Modifier.weight(0.9f),
+            onClick = { onCommitText(",") },
+            backgroundColor = GboardSpecialKey
+        ) {
+            Text(text = ",", color = GboardKeyText, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+        }
+        GboardKey(
+            modifier = Modifier.weight(0.9f),
+            onClick = onOpenEmoji
+        ) {
+            SmileIcon(modifier = Modifier.size(22.dp), color = GboardKeyText)
+        }
+        GboardKey(
+            modifier = Modifier.weight(3.6f),
+            onClick = onSendSpace
+        ) {
+            Text(
+                text = stringResource(R.string.keyboard_key_space),
+                color = GboardKeyText,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        GboardKey(
+            modifier = Modifier.weight(0.9f),
+            onClick = { onCommitText(".") },
+            backgroundColor = GboardSpecialKey
+        ) {
+            Text(text = ".", color = GboardKeyText, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+        }
+        GboardKey(
+            modifier = Modifier.weight(1.25f),
+            onClick = onSendEnter,
+            backgroundColor = primaryColor,
+            shape = CircleShape
+        ) {
+            KeyboardActionIcon(
+                action = action,
+                modifier = Modifier.size(22.dp),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
+}
+
+private val GboardKeyColor = Color(0xFFF8FAF7)
+private val GboardSpecialKey = Color(0xFFD8E8D6)
+private val GboardKeyText = Color(0xFF202820)
+
+@Composable
+private fun GboardKey(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    backgroundColor: Color = GboardKeyColor,
+    shape: Shape = RoundedCornerShape(9.dp),
+    content: @Composable BoxScope.() -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.94f else 1f,
+        animationSpec = tween(80, easing = FastOutSlowInEasing),
+        label = "gboardKeyPressScale"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .scale(pressScale)
+            .shadow(elevation = if (isPressed) 0.dp else 1.dp, shape = shape)
+            .clip(shape)
+            .background(backgroundColor)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center,
+        content = content
+    )
+}
+
+@Composable
 private fun CharacterKey(
     modifier: Modifier = Modifier,
     label: String,
-    onClick: () -> Unit
+    commitValue: String = label.lowercase(),
+    onCommitText: (String) -> Unit
 ) {
-    KeyboardUtilityKey(
+    GboardKey(
         modifier = modifier,
-        onClick = onClick
+        onClick = { onCommitText(commitValue) }
     ) {
         Text(
             text = label,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 17.sp,
+            color = GboardKeyText,
+            fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold
         )
     }
@@ -897,6 +1092,30 @@ fun BackspaceIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
             end = Offset(w * 0.52f, h * 0.6f),
             strokeWidth = 2.dp.toPx(),
             cap = StrokeCap.Round
+        )
+    }
+}
+
+@Composable
+fun ShiftIcon(modifier: Modifier = Modifier, color: Color = Color.White, filled: Boolean = false) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val path = Path().apply {
+            moveTo(w * 0.50f, h * 0.14f)
+            lineTo(w * 0.18f, h * 0.46f)
+            lineTo(w * 0.34f, h * 0.46f)
+            lineTo(w * 0.34f, h * 0.82f)
+            lineTo(w * 0.66f, h * 0.82f)
+            lineTo(w * 0.66f, h * 0.46f)
+            lineTo(w * 0.82f, h * 0.46f)
+            close()
+        }
+
+        drawPath(
+            path = path,
+            color = color,
+            style = if (filled) Fill else Stroke(width = 2.2.dp.toPx(), join = StrokeJoin.Round)
         )
     }
 }
