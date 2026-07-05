@@ -34,3 +34,30 @@ val Typography =
     )
     */
   )
+
+val KeyboardKeyTextStyle =
+  TextStyle(
+    fontFamily = FontFamily.Default,
+    fontWeight = FontWeight.Normal,
+    fontSize = 22.sp,
+    lineHeight = 24.sp,
+    letterSpacing = 0.sp,
+  )
+
+val KeyboardUtilityKeyTextStyle =
+  TextStyle(
+    fontFamily = FontFamily.Default,
+    fontWeight = FontWeight.Normal,
+    fontSize = 22.sp,
+    lineHeight = 24.sp,
+    letterSpacing = 0.sp,
+  )
+
+val KeyboardSpaceKeyTextStyle =
+  TextStyle(
+    fontFamily = FontFamily.Default,
+    fontWeight = FontWeight.Normal,
+    fontSize = 16.sp,
+    lineHeight = 20.sp,
+    letterSpacing = 0.sp,
+  )

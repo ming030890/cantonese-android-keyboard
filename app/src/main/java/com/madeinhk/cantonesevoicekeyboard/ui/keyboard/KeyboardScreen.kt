@@ -513,6 +513,7 @@ private fun AlphaNumBottomRow(
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val keyboardColors = BrandTheme.colors
+    val keyboardTypography = BrandTheme.typography
 
     Row(
         modifier = Modifier
@@ -530,8 +531,7 @@ private fun AlphaNumBottomRow(
             Text(
                 text = "中",
                 color = keyboardColors.keyboardKeyOnSurface,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                style = keyboardTypography.keyboardUtilityKey
             )
         }
         GboardKey(
@@ -542,8 +542,7 @@ private fun AlphaNumBottomRow(
             Text(
                 text = ",",
                 color = keyboardColors.keyboardKeyOnSurface,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
+                style = keyboardTypography.keyboardUtilityKey
             )
         }
         GboardKey(
@@ -559,8 +558,7 @@ private fun AlphaNumBottomRow(
             Text(
                 text = stringResource(R.string.keyboard_key_space),
                 color = keyboardColors.keyboardKeyOnSurface,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium
+                style = keyboardTypography.keyboardSpaceKey
             )
         }
         GboardKey(
@@ -571,8 +569,7 @@ private fun AlphaNumBottomRow(
             Text(
                 text = ".",
                 color = keyboardColors.keyboardKeyOnSurface,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
+                style = keyboardTypography.keyboardUtilityKey
             )
         }
         GboardKey(
@@ -637,6 +634,7 @@ private fun CharacterKey(
     onCommitText: (String) -> Unit
 ) {
     val keyboardColors = BrandTheme.colors
+    val keyboardTypography = BrandTheme.typography
 
     GboardKey(
         modifier = modifier,
@@ -645,8 +643,7 @@ private fun CharacterKey(
         Text(
             text = label,
             color = keyboardColors.keyboardKeyOnSurface,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold
+            style = keyboardTypography.keyboardKey
         )
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 
 /**
  * Brand design values that aren't part of Material's standard [androidx.compose.material3.ColorScheme]
@@ -28,6 +29,19 @@ data class BrandColors(
     val keyboardKeySurface: Color,
     val keyboardModifierKeySurface: Color,
     val keyboardKeyOnSurface: Color
+)
+
+@Immutable
+data class BrandTypography(
+    val keyboardKey: TextStyle,
+    val keyboardUtilityKey: TextStyle,
+    val keyboardSpaceKey: TextStyle
+)
+
+private val DefaultBrandTypography = BrandTypography(
+    keyboardKey = KeyboardKeyTextStyle,
+    keyboardUtilityKey = KeyboardUtilityKeyTextStyle,
+    keyboardSpaceKey = KeyboardSpaceKeyTextStyle
 )
 
 private val DarkBrandColors = BrandColors(
@@ -45,6 +59,7 @@ private val LightBrandColors = BrandColors(
 )
 
 private val LocalBrandColors = staticCompositionLocalOf { DarkBrandColors }
+private val LocalBrandTypography = staticCompositionLocalOf { DefaultBrandTypography }
 
 /** Accessor for brand design values provided by [CantoneseVoiceKeyboardTheme]. */
 object BrandTheme {
@@ -52,6 +67,11 @@ object BrandTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalBrandColors.current
+
+    val typography: BrandTypography
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBrandTypography.current
 }
 
 private val DarkColorScheme = darkColorScheme(
@@ -101,7 +121,10 @@ fun CantoneseVoiceKeyboardTheme(
 
   val brandColors = if (darkTheme) DarkBrandColors else LightBrandColors
 
-  CompositionLocalProvider(LocalBrandColors provides brandColors) {
+  CompositionLocalProvider(
+    LocalBrandColors provides brandColors,
+    LocalBrandTypography provides DefaultBrandTypography
+  ) {
     MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
   }
 }
