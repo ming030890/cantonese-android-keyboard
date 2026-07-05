@@ -70,6 +70,7 @@ fun KeyboardScreen(
     val backgroundColor = MaterialTheme.colorScheme.background
     val surfaceColor = MaterialTheme.colorScheme.surface
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val keyboardTypography = BrandTheme.typography
     val haptics = LocalHapticFeedback.current
     var isDeleting by remember { mutableStateOf(false) }
     var activePanel by remember(inputMode, initialEmojiPanel) {
@@ -212,8 +213,7 @@ fun KeyboardScreen(
                             Text(
                                 text = "中",
                                 color = textVariantColor,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
+                                style = keyboardTypography.keyboardUtilityKey
                             )
                         }
                     }
@@ -247,9 +247,7 @@ fun KeyboardScreen(
                         Text(
                             text = stringResource(R.string.keyboard_key_space),
                             color = textVariantColor,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            letterSpacing = 1.sp
+                            style = keyboardTypography.keyboardSpaceKey
                         )
                     }
 
