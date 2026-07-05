@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.emoji2.emojipicker.EmojiPickerView
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
@@ -44,6 +45,18 @@ import com.madeinhk.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.sin
+
+private val DefaultKeyboardHeight = 320.dp
+private val AlphaKeyboardHeight = 344.dp
+private val SymbolKeyboardHeight = 400.dp
+private val TextToolbarHeight = 40.dp
+private val TextToolbarBackgroundHeight = 48.dp
+private val AlphaCharacterRowHeight = 52.dp
+private val AlphaBottomRowHeight = 58.dp
+private val AlphaRowSpacing = 8.dp
+private val AlphaBottomRowSpacing = 4.dp
+private val KeyboardHorizontalPadding = 12.dp
+private val KeyboardBottomPadding = 40.dp
 
 @Composable
 fun KeyboardScreen(
@@ -75,9 +88,28 @@ fun KeyboardScreen(
     val keyboardTypography = BrandTheme.typography
     val haptics = LocalHapticFeedback.current
     var isDeleting by remember { mutableStateOf(false) }
+    var symbolVariant by remember(inputMode) {
+        mutableStateOf(
+            if (inputMode == KeyboardInputMode.Number) {
+                SymbolVariant.English
+            } else {
+                SymbolVariant.Chinese
+            }
+        )
+    }
     var activePanel by remember(inputMode, initialEmojiPanel) {
         mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
     }
+    val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum
+    val isTextPanel = activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
+    val keyboardHeight = when (activePanel) {
+        KeyboardPanel.AlphaNum -> AlphaKeyboardHeight
+        KeyboardPanel.Number -> SymbolKeyboardHeight
+        else -> DefaultKeyboardHeight
+    }
+    val keyboardTopPadding = if (isTextPanel) 4.dp else 12.dp
+    val keyboardVerticalArrangement =
+        if (isTextPanel) Arrangement.spacedBy(AlphaBottomRowSpacing) else Arrangement.SpaceBetween
     // Visual depress for the delete key, which uses a raw pointer gesture (no clickable).
     val deleteScale by animateFloatAsState(
         targetValue = if (isDeleting) 0.92f else 1f,
@@ -99,7 +131,7 @@ fun KeyboardScreen(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(320.dp)
+            .height(keyboardHeight)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -111,17 +143,32 @@ fun KeyboardScreen(
             .navigationBarsPadding()
             // Extra bottom inset so the key row clears the system nav bar / IME-switch globe.
             // navigationBarsPadding() is often ~0 in the IME window, so this fixed gap carries it.
-            .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 40.dp)
+            .padding(
+                start = KeyboardHorizontalPadding,
+                end = KeyboardHorizontalPadding,
+                top = keyboardTopPadding,
+                bottom = KeyboardBottomPadding
+            )
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = keyboardVerticalArrangement
         ) {
             InlineSuggestionStrip(
                 suggestions = inlineSuggestions,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (isTextPanel) {
+                TextKeyboardToolbar(
+                    onBackToVoice = {
+                        activePanel = KeyboardPanel.Voice
+                        onKeyboardInputModeSelected(KeyboardInputMode.Voice)
+                    },
+                    onOpenSettings = onOpenSettings
+                )
+            }
 
             when (activePanel) {
                 KeyboardPanel.Emoji -> {
@@ -135,16 +182,16 @@ fun KeyboardScreen(
                 KeyboardPanel.Number -> {
                     NumberPanel(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        onCommitText = onCommitText
+                            .fillMaxWidth(),
+                        variant = symbolVariant,
+                        onCommitText = onCommitText,
+                        onDeleteSurroundingText = onDeleteSurroundingText
                     )
                 }
                 KeyboardPanel.AlphaNum -> {
                     AlphaNumPanel(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                            .fillMaxWidth(),
                         onCommitText = onCommitText,
                         onDeleteSurroundingText = onDeleteSurroundingText
                     )
@@ -181,16 +228,35 @@ fun KeyboardScreen(
                 }
             }
 
-            if (activePanel == KeyboardPanel.AlphaNum) {
+            if (isAlphaPanel) {
                 AlphaNumBottomRow(
                     action = action,
                     onCommitText = onCommitText,
                     onSendSpace = onSendSpace,
                     onSendEnter = onSendEnter,
                     onOpenEmoji = { activePanel = KeyboardPanel.Emoji },
-                    onBackToVoice = {
-                        activePanel = KeyboardPanel.Voice
-                        onKeyboardInputModeSelected(KeyboardInputMode.Voice)
+                    modeSwitchLabel = "?123",
+                    commaValue = ",",
+                    periodValue = ".",
+                    onModeSwitch = {
+                        symbolVariant = SymbolVariant.English
+                        activePanel = KeyboardPanel.Number
+                        onKeyboardInputModeSelected(KeyboardInputMode.Number)
+                    }
+                )
+            } else if (activePanel == KeyboardPanel.Number) {
+                AlphaNumBottomRow(
+                    action = action,
+                    onCommitText = onCommitText,
+                    onSendSpace = onSendSpace,
+                    onSendEnter = onSendEnter,
+                    onOpenEmoji = { activePanel = KeyboardPanel.Emoji },
+                    modeSwitchLabel = "ABC",
+                    commaValue = ",".toSymbolCommitValue(symbolVariant),
+                    periodValue = ".".toSymbolCommitValue(symbolVariant),
+                    onModeSwitch = {
+                        activePanel = KeyboardPanel.AlphaNum
+                        onKeyboardInputModeSelected(KeyboardInputMode.AlphaNum)
                     }
                 )
             } else {
@@ -205,23 +271,16 @@ fun KeyboardScreen(
                     KeyboardUtilityKey(
                         modifier = Modifier.weight(0.75f),
                         onClick = {
-                            activePanel = if (activePanel == KeyboardPanel.Voice) {
-                                KeyboardPanel.Emoji
-                            } else {
-                                onKeyboardInputModeSelected(KeyboardInputMode.Voice)
-                                KeyboardPanel.Voice
-                            }
+                            symbolVariant = SymbolVariant.Chinese
+                            activePanel = KeyboardPanel.Number
+                            onKeyboardInputModeSelected(KeyboardInputMode.Number)
                         }
                     ) {
-                        if (activePanel == KeyboardPanel.Voice) {
-                            SmileIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
-                        } else {
-                            Text(
-                                text = "中",
-                                color = textVariantColor,
-                                style = keyboardTypography.keyboardUtilityKey
-                            )
-                        }
+                        Text(
+                            text = "?123",
+                            color = textVariantColor,
+                            style = keyboardTypography.keyboardSpaceKey
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(6.dp))
@@ -336,11 +395,73 @@ private fun InlineSuggestionStrip(
     }
 }
 
+@Composable
+private fun TextKeyboardToolbar(
+    onBackToVoice: () -> Unit,
+    onOpenSettings: () -> Unit
+) {
+    val keyboardColors = BrandTheme.colors
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(TextToolbarBackgroundHeight)
+            .clip(RoundedCornerShape(18.dp))
+            .background(keyboardColors.keyboardModifierKeySurface.copy(alpha = 0.72f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .height(TextToolbarHeight),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.width(1.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(18.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ToolbarIconButton(onClick = onOpenSettings) {
+                    SettingsIcon(modifier = Modifier.size(24.dp), color = keyboardColors.keyboardKeyOnSurface)
+                }
+                ToolbarIconButton(onClick = onBackToVoice) {
+                    MicIcon(modifier = Modifier.size(24.dp), color = keyboardColors.keyboardKeyOnSurface)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToolbarIconButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    content: @Composable BoxScope.() -> Unit
+) {
+    KeyboardKey(
+        modifier = modifier.size(40.dp),
+        onClick = onClick,
+        backgroundColor = Color.Transparent,
+        shape = CircleShape,
+        restingElevation = 0.dp,
+        pressedScale = 0.9f,
+        borderColor = Color.Transparent,
+        content = content
+    )
+}
+
 private enum class KeyboardPanel {
     Voice,
     Emoji,
     Number,
     AlphaNum
+}
+
+private enum class SymbolVariant {
+    Chinese,
+    English
 }
 
 enum class KeyboardAction {
@@ -367,21 +488,35 @@ private fun KeyboardInputMode.toPanel(): KeyboardPanel =
     }
 
 @Composable
-fun NumberPanel(
+private fun NumberPanel(
     modifier: Modifier = Modifier,
-    onCommitText: (String) -> Unit
+    variant: SymbolVariant,
+    onCommitText: (String) -> Unit,
+    onDeleteSurroundingText: () -> Unit
 ) {
-    val rows = listOf(
-        listOf("1", "2", "3"),
-        listOf("4", "5", "6"),
-        listOf("7", "8", "9"),
-        listOf(".", "0", "-")
-    )
+    var showMoreSymbols by remember { mutableStateOf(false) }
+    val rows = if (showMoreSymbols) {
+        listOf(
+            listOf("[", "]", "{", "}", "#", "%", "^", "*", "+", "="),
+            listOf("_", "\\", "|", "~", "<", ">", "$", "€", "£", "¥"),
+            listOf(".", ",", "?", "!", "'", "\"", ":", ";")
+        )
+    } else {
+        listOf(
+            listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"),
+            listOf("@", "#", "£", "_", "&", "-", "+", "(", ")", "/"),
+            listOf("*", "\"", "'", ":", ";", "!", "?")
+        )
+    }
 
-    KeyGridPanel(
+    SymbolGridPanel(
         modifier = modifier,
         rows = rows,
-        onCommitText = onCommitText
+        variant = variant,
+        showMoreSymbols = showMoreSymbols,
+        onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols },
+        onCommitText = onCommitText,
+        onDeleteSurroundingText = onDeleteSurroundingText
     )
 }
 
@@ -395,10 +530,9 @@ fun AlphaNumPanel(
     val keyboardColors = BrandTheme.colors
 
     Column(
-        modifier = modifier.padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(AlphaRowSpacing)
     ) {
-        KeyRow(labels = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"), onCommitText = onCommitText)
         KeyRow(labels = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"), uppercase = isUppercase, onCommitText = onCommitText)
         KeyRow(
             labels = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
@@ -407,71 +541,151 @@ fun AlphaNumPanel(
             trailingWeight = 0.5f,
             onCommitText = onCommitText
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(38.dp),
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalAlignment = Alignment.CenterVertically
+        BottomLetterRow(
+            isUppercase = isUppercase,
+            onToggleUppercase = { isUppercase = !isUppercase },
+            onCommitText = onCommitText,
+            onDeleteSurroundingText = onDeleteSurroundingText
+        )
+    }
+}
+
+@Composable
+private fun BottomLetterRow(
+    isUppercase: Boolean,
+    onToggleUppercase: () -> Unit,
+    onCommitText: (String) -> Unit,
+    onDeleteSurroundingText: () -> Unit
+) {
+    val keyboardColors = BrandTheme.colors
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(AlphaCharacterRowHeight),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        KeyboardKey(
+            modifier = Modifier.weight(1.35f),
+            onClick = onToggleUppercase,
+            backgroundColor = keyboardColors.keyboardModifierKeySurface
         ) {
-            KeyboardKey(
-                modifier = Modifier.weight(1.35f),
-                onClick = { isUppercase = !isUppercase },
-                backgroundColor = keyboardColors.keyboardModifierKeySurface
-            ) {
-                ShiftIcon(
-                    modifier = Modifier.size(21.dp),
-                    color = keyboardColors.keyboardKeyOnSurface,
-                    filled = isUppercase
-                )
-            }
-            listOf("z", "x", "c", "v", "b", "n", "m").forEach { key ->
-                CharacterKey(
-                    modifier = Modifier.weight(1f),
-                    label = if (isUppercase) key.uppercase() else key,
-                    commitValue = if (isUppercase) key.uppercase() else key,
-                    onCommitText = onCommitText
-                )
-            }
-            KeyboardKey(
-                modifier = Modifier.weight(1.35f),
-                onClick = onDeleteSurroundingText,
-                backgroundColor = keyboardColors.keyboardModifierKeySurface
-            ) {
-                BackspaceIcon(modifier = Modifier.size(22.dp), color = keyboardColors.keyboardKeyOnSurface)
-            }
+            ShiftIcon(
+                modifier = Modifier.size(21.dp),
+                color = keyboardColors.keyboardKeyOnSurface,
+                filled = isUppercase
+            )
+        }
+        listOf("z", "x", "c", "v", "b", "n", "m").forEach { key ->
+            CharacterKey(
+                modifier = Modifier.weight(1f),
+                label = if (isUppercase) key.uppercase() else key,
+                commitValue = if (isUppercase) key.uppercase() else key,
+                showPressPopup = true,
+                onCommitText = onCommitText
+            )
+        }
+        KeyboardKey(
+            modifier = Modifier.weight(1.35f),
+            onClick = onDeleteSurroundingText,
+            backgroundColor = keyboardColors.keyboardModifierKeySurface
+        ) {
+            BackspaceIcon(modifier = Modifier.size(22.dp), color = keyboardColors.keyboardKeyOnSurface)
         }
     }
 }
 
 @Composable
-private fun KeyGridPanel(
+private fun SymbolGridPanel(
     modifier: Modifier = Modifier,
     rows: List<List<String>>,
-    onCommitText: (String) -> Unit
+    variant: SymbolVariant,
+    showMoreSymbols: Boolean,
+    onToggleMoreSymbols: () -> Unit,
+    onCommitText: (String) -> Unit,
+    onDeleteSurroundingText: () -> Unit
 ) {
+    val keyboardColors = BrandTheme.colors
+    val keyboardTypography = BrandTheme.typography
+
     Column(
-        modifier = modifier.padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(AlphaRowSpacing)
     ) {
-        rows.forEach { row ->
+        rows.forEachIndexed { index, row ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(34.dp),
+                    .height(AlphaCharacterRowHeight),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                if (index == 2) {
+                    KeyboardKey(
+                        modifier = Modifier.weight(1.35f),
+                        onClick = onToggleMoreSymbols,
+                        backgroundColor = keyboardColors.keyboardModifierKeySurface
+                    ) {
+                        Text(
+                            text = if (showMoreSymbols) "123" else "=<",
+                            color = keyboardColors.keyboardKeyOnSurface,
+                            style = keyboardTypography.keyboardSpaceKey
+                        )
+                    }
+                }
+
                 row.forEach { key ->
                     CharacterKey(
                         modifier = Modifier.weight(1f),
-                        label = key.uppercase(),
-                        commitValue = key,
+                        label = key.toSymbolCommitValue(variant),
+                        commitValue = key.toSymbolCommitValue(variant),
+                        showPressPopup = false,
                         onCommitText = onCommitText
                     )
                 }
+
+                if (index == 2) {
+                    KeyboardKey(
+                        modifier = Modifier.weight(1.35f),
+                        onClick = onDeleteSurroundingText,
+                        backgroundColor = keyboardColors.keyboardModifierKeySurface
+                    ) {
+                        BackspaceIcon(modifier = Modifier.size(22.dp), color = keyboardColors.keyboardKeyOnSurface)
+                    }
+                }
             }
         }
+    }
+}
+
+private fun String.toSymbolCommitValue(variant: SymbolVariant): String {
+    if (variant != SymbolVariant.Chinese) {
+        return this
+    }
+
+    return when (this) {
+        "," -> "，"
+        "." -> "。"
+        "?" -> "？"
+        "!" -> "！"
+        ":" -> "："
+        ";" -> "；"
+        "(" -> "（"
+        ")" -> "）"
+        "[" -> "【"
+        "]" -> "】"
+        "{" -> "「"
+        "}" -> "」"
+        "<" -> "《"
+        ">" -> "》"
+        "\"" -> "“"
+        "'" -> "‘"
+        "-" -> "－"
+        "_" -> "＿"
+        "/" -> "／"
+        "\\" -> "＼"
+        else -> this
     }
 }
 
@@ -481,12 +695,13 @@ private fun KeyRow(
     uppercase: Boolean = false,
     leadingWeight: Float = 0f,
     trailingWeight: Float = 0f,
+    showPressPopup: Boolean = true,
     onCommitText: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(38.dp),
+            .height(AlphaCharacterRowHeight),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -496,8 +711,9 @@ private fun KeyRow(
         labels.forEach { key ->
             CharacterKey(
                 modifier = Modifier.weight(1f),
-                label = if (uppercase) key.uppercase() else key.uppercase(),
+                label = if (uppercase) key.uppercase() else key,
                 commitValue = if (uppercase) key.uppercase() else key,
+                showPressPopup = showPressPopup,
                 onCommitText = onCommitText
             )
         }
@@ -514,7 +730,10 @@ private fun AlphaNumBottomRow(
     onSendSpace: () -> Unit,
     onSendEnter: () -> Unit,
     onOpenEmoji: () -> Unit,
-    onBackToVoice: () -> Unit
+    modeSwitchLabel: String,
+    commaValue: String,
+    periodValue: String,
+    onModeSwitch: () -> Unit
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val keyboardColors = BrandTheme.colors
@@ -523,29 +742,28 @@ private fun AlphaNumBottomRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .height(AlphaBottomRowHeight),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         KeyboardKey(
             modifier = Modifier.weight(1.15f),
-            onClick = onBackToVoice,
-            backgroundColor = keyboardColors.keyboardModifierKeySurface,
-            shape = CircleShape
+            onClick = onModeSwitch,
+            backgroundColor = keyboardColors.keyboardModifierKeySurface
         ) {
             Text(
-                text = "中",
+                text = modeSwitchLabel,
                 color = keyboardColors.keyboardKeyOnSurface,
-                style = keyboardTypography.keyboardUtilityKey
+                style = keyboardTypography.keyboardSpaceKey
             )
         }
         KeyboardKey(
             modifier = Modifier.weight(0.9f),
-            onClick = { onCommitText(",") },
+            onClick = { onCommitText(commaValue) },
             backgroundColor = keyboardColors.keyboardModifierKeySurface
         ) {
             Text(
-                text = ",",
+                text = commaValue,
                 color = keyboardColors.keyboardKeyOnSurface,
                 style = keyboardTypography.keyboardUtilityKey
             )
@@ -568,11 +786,11 @@ private fun AlphaNumBottomRow(
         }
         KeyboardKey(
             modifier = Modifier.weight(0.9f),
-            onClick = { onCommitText(".") },
+            onClick = { onCommitText(periodValue) },
             backgroundColor = keyboardColors.keyboardModifierKeySurface
         ) {
             Text(
-                text = ".",
+                text = periodValue,
                 color = keyboardColors.keyboardKeyOnSurface,
                 style = keyboardTypography.keyboardUtilityKey
             )
@@ -604,12 +822,13 @@ private fun BaseKeyboardKey(
     borderColor: Color = Color.Unspecified,
     verticalPadding: Dp = 0.dp,
     hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
+    interactionSource: MutableInteractionSource? = null,
     animationLabel: String,
     content: @Composable BoxScope.() -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
+    val keyInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
+    val isPressed by keyInteractionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) pressedScale else 1f,
         animationSpec = tween(80, easing = FastOutSlowInEasing),
@@ -617,7 +836,7 @@ private fun BaseKeyboardKey(
     )
     val clickModifier = if (onClick != null) {
         Modifier.clickable(
-            interactionSource = interactionSource,
+            interactionSource = keyInteractionSource,
             indication = null
         ) {
             hapticFeedbackType?.let(haptics::performHapticFeedback)
@@ -655,23 +874,31 @@ private fun KeyboardKey(
     borderColor: Color = Color.Unspecified,
     verticalPadding: Dp = 0.dp,
     hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
+    interactionSource: MutableInteractionSource? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
+    val keyboardColors = BrandTheme.colors
+
     BaseKeyboardKey(
         modifier = modifier,
         onClick = onClick,
         backgroundColor = if (backgroundColor == Color.Unspecified) {
-            BrandTheme.colors.keyboardKeySurface
+            keyboardColors.keyboardKeySurface
         } else {
             backgroundColor
         },
         shape = shape,
         pressedScale = pressedScale,
         restingElevation = restingElevation,
-        pressedOverlayColor = pressedOverlayColor,
+        pressedOverlayColor = if (pressedOverlayColor == Color.Unspecified) {
+            keyboardColors.keyboardKeyOnSurface.copy(alpha = 0.08f)
+        } else {
+            pressedOverlayColor
+        },
         borderColor = borderColor,
         verticalPadding = verticalPadding,
         hapticFeedbackType = hapticFeedbackType,
+        interactionSource = interactionSource,
         animationLabel = "keyboardKeyPressScale",
         content = content
     )
@@ -682,19 +909,72 @@ private fun CharacterKey(
     modifier: Modifier = Modifier,
     label: String,
     commitValue: String = label.lowercase(),
+    showPressPopup: Boolean = true,
     onCommitText: (String) -> Unit
 ) {
     val keyboardColors = BrandTheme.colors
     val keyboardTypography = BrandTheme.typography
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
 
-    KeyboardKey(
-        modifier = modifier,
-        onClick = { onCommitText(commitValue) }
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .zIndex(if (isPressed) 1f else 0f),
+        contentAlignment = Alignment.Center
+    ) {
+        KeyboardKey(
+            modifier = Modifier.matchParentSize(),
+            onClick = { onCommitText(commitValue) },
+            interactionSource = interactionSource
+        ) {
+            Text(
+                text = label,
+                color = keyboardColors.keyboardKeyOnSurface.copy(alpha = if (isPressed) 0.28f else 1f),
+                style = keyboardTypography.keyboardKey
+            )
+        }
+
+        if (isPressed && showPressPopup && label.length == 1) {
+            CharacterKeyPopup(
+                label = label,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = (-52).dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CharacterKeyPopup(
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    val keyboardColors = BrandTheme.colors
+    val popupShape = RoundedCornerShape(32.dp)
+
+    Box(
+        modifier = modifier
+            .size(width = 60.dp, height = 64.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = popupShape,
+                ambientColor = Color.Black.copy(alpha = 0.18f),
+                spotColor = Color.Black.copy(alpha = 0.22f)
+            )
+            .clip(popupShape)
+            .background(keyboardColors.keyboardKeySurface)
+            .border(1.dp, Color.Black.copy(alpha = 0.04f), popupShape),
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = label,
             color = keyboardColors.keyboardKeyOnSurface,
-            style = keyboardTypography.keyboardKey
+            fontSize = 34.sp,
+            lineHeight = 36.sp,
+            fontWeight = FontWeight.Normal,
+            textAlign = TextAlign.Center
         )
     }
 }
