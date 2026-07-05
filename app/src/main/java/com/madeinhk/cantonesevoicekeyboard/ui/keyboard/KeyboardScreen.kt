@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -390,7 +391,7 @@ fun AlphaNumPanel(
     onCommitText: (String) -> Unit,
     onDeleteSurroundingText: () -> Unit
 ) {
-    var isUppercase by remember { mutableStateOf(true) }
+    var isUppercase by remember { mutableStateOf(false) }
     val keyboardColors = BrandTheme.colors
 
     Column(
@@ -413,7 +414,7 @@ fun AlphaNumPanel(
             horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            GboardKey(
+            KeyboardKey(
                 modifier = Modifier.weight(1.35f),
                 onClick = { isUppercase = !isUppercase },
                 backgroundColor = keyboardColors.keyboardModifierKeySurface
@@ -432,7 +433,7 @@ fun AlphaNumPanel(
                     onCommitText = onCommitText
                 )
             }
-            GboardKey(
+            KeyboardKey(
                 modifier = Modifier.weight(1.35f),
                 onClick = onDeleteSurroundingText,
                 backgroundColor = keyboardColors.keyboardModifierKeySurface
@@ -526,7 +527,7 @@ private fun AlphaNumBottomRow(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        GboardKey(
+        KeyboardKey(
             modifier = Modifier.weight(1.15f),
             onClick = onBackToVoice,
             backgroundColor = keyboardColors.keyboardModifierKeySurface,
@@ -538,7 +539,7 @@ private fun AlphaNumBottomRow(
                 style = keyboardTypography.keyboardUtilityKey
             )
         }
-        GboardKey(
+        KeyboardKey(
             modifier = Modifier.weight(0.9f),
             onClick = { onCommitText(",") },
             backgroundColor = keyboardColors.keyboardModifierKeySurface
@@ -549,13 +550,13 @@ private fun AlphaNumBottomRow(
                 style = keyboardTypography.keyboardUtilityKey
             )
         }
-        GboardKey(
+        KeyboardKey(
             modifier = Modifier.weight(0.9f),
             onClick = onOpenEmoji
         ) {
             SmileIcon(modifier = Modifier.size(22.dp), color = keyboardColors.keyboardKeyOnSurface)
         }
-        GboardKey(
+        KeyboardKey(
             modifier = Modifier.weight(3.6f),
             onClick = onSendSpace
         ) {
@@ -565,7 +566,7 @@ private fun AlphaNumBottomRow(
                 style = keyboardTypography.keyboardSpaceKey
             )
         }
-        GboardKey(
+        KeyboardKey(
             modifier = Modifier.weight(0.9f),
             onClick = { onCommitText(".") },
             backgroundColor = keyboardColors.keyboardModifierKeySurface
@@ -576,7 +577,7 @@ private fun AlphaNumBottomRow(
                 style = keyboardTypography.keyboardUtilityKey
             )
         }
-        GboardKey(
+        KeyboardKey(
             modifier = Modifier.weight(1.25f),
             onClick = onSendEnter,
             backgroundColor = primaryColor,
@@ -592,40 +593,86 @@ private fun AlphaNumBottomRow(
 }
 
 @Composable
-private fun GboardKey(
+private fun BaseKeyboardKey(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    backgroundColor: Color = Color.Unspecified,
-    shape: Shape = RoundedCornerShape(9.dp),
+    onClick: (() -> Unit)?,
+    backgroundColor: Color,
+    shape: Shape,
+    pressedScale: Float,
+    restingElevation: Dp,
+    pressedOverlayColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
+    verticalPadding: Dp = 0.dp,
+    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
+    animationLabel: String,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val resolvedBackgroundColor =
-        if (backgroundColor == Color.Unspecified) {
-            BrandTheme.colors.keyboardKeySurface
-        } else {
-            backgroundColor
-        }
+    val haptics = LocalHapticFeedback.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val pressScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.94f else 1f,
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) pressedScale else 1f,
         animationSpec = tween(80, easing = FastOutSlowInEasing),
-        label = "gboardKeyPressScale"
+        label = animationLabel
     )
+    val clickModifier = if (onClick != null) {
+        Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) {
+            hapticFeedbackType?.let(haptics::performHapticFeedback)
+            onClick()
+        }
+    } else {
+        Modifier
+    }
 
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .scale(pressScale)
-            .shadow(elevation = if (isPressed) 0.dp else 1.dp, shape = shape)
+            .scale(scale)
+            .shadow(elevation = if (isPressed) 0.dp else restingElevation, shape = shape)
             .clip(shape)
-            .background(resolvedBackgroundColor)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            ),
+            .background(backgroundColor)
+            .then(if (isPressed && pressedOverlayColor != Color.Unspecified) Modifier.background(pressedOverlayColor) else Modifier)
+            .then(if (borderColor != Color.Unspecified) Modifier.border(1.dp, borderColor, shape) else Modifier)
+            .then(clickModifier)
+            .padding(vertical = verticalPadding),
         contentAlignment = Alignment.Center,
+        content = content
+    )
+}
+
+@Composable
+private fun KeyboardKey(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    backgroundColor: Color = Color.Unspecified,
+    shape: Shape = RoundedCornerShape(9.dp),
+    pressedScale: Float = 0.94f,
+    restingElevation: Dp = 1.dp,
+    pressedOverlayColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
+    verticalPadding: Dp = 0.dp,
+    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
+    content: @Composable BoxScope.() -> Unit
+) {
+    BaseKeyboardKey(
+        modifier = modifier,
+        onClick = onClick,
+        backgroundColor = if (backgroundColor == Color.Unspecified) {
+            BrandTheme.colors.keyboardKeySurface
+        } else {
+            backgroundColor
+        },
+        shape = shape,
+        pressedScale = pressedScale,
+        restingElevation = restingElevation,
+        pressedOverlayColor = pressedOverlayColor,
+        borderColor = borderColor,
+        verticalPadding = verticalPadding,
+        hapticFeedbackType = hapticFeedbackType,
+        animationLabel = "keyboardKeyPressScale",
         content = content
     )
 }
@@ -640,7 +687,7 @@ private fun CharacterKey(
     val keyboardColors = BrandTheme.colors
     val keyboardTypography = BrandTheme.typography
 
-    GboardKey(
+    KeyboardKey(
         modifier = modifier,
         onClick = { onCommitText(commitValue) }
     ) {
@@ -657,6 +704,8 @@ fun EmojiPickerPanel(
     modifier: Modifier = Modifier,
     onEmojiPicked: (String) -> Unit
 ) {
+    val haptics = LocalHapticFeedback.current
+
     if (LocalInspectionMode.current) {
         EmojiPreviewGrid(modifier = modifier)
         return
@@ -669,11 +718,17 @@ fun EmojiPickerPanel(
         factory = { context ->
             EmojiPickerView(context).apply {
                 emojiGridColumns = 8
-                setOnEmojiPickedListener { item -> onEmojiPicked(item.emoji) }
+                setOnEmojiPickedListener { item ->
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onEmojiPicked(item.emoji)
+                }
             }
         },
         update = { picker ->
-            picker.setOnEmojiPickedListener { item -> onEmojiPicked(item.emoji) }
+            picker.setOnEmojiPickedListener { item ->
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onEmojiPicked(item.emoji)
+            }
         }
     )
 }
@@ -957,6 +1012,12 @@ fun KeyboardUtilityKey(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
+    shape: Shape = RoundedCornerShape(8.dp),
+    pressedScale: Float = 0.92f,
+    restingElevation: Dp = 2.dp,
+    pressedOverlayColor: Color = Color.Unspecified,
+    verticalPadding: Dp = 8.dp,
+    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
     onClick: (() -> Unit)?,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -964,49 +1025,25 @@ fun KeyboardUtilityKey(
     // Default to a subtle outline so key-caps stay delineated from the keyboard
     // background in both themes (white-on-white in light / dark-on-dark in dark).
     val finalBorderColor = if (borderColor == Color.Unspecified) MaterialTheme.colorScheme.outline else borderColor
-    val keyShape = RoundedCornerShape(8.dp)
-    val haptics = LocalHapticFeedback.current
-
-    // Track press state so the key visibly depresses (scale + brightness) on touch.
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val pressScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.92f else 1f,
-        animationSpec = tween(80, easing = FastOutSlowInEasing),
-        label = "keyPressScale"
-    )
-    // Brighten the key cap while held for an extra visual cue.
-    val highlightColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-
-    val keyModifier = if (onClick != null) {
-        Modifier.clickable(
-            interactionSource = interactionSource,
-            indication = null
-        ) {
-            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            onClick()
+    val finalPressedOverlayColor =
+        if (pressedOverlayColor == Color.Unspecified) {
+            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        } else {
+            pressedOverlayColor
         }
-    } else {
-        Modifier
-    }
 
-    Box(
-        modifier = modifier
-            .fillMaxHeight()
-            .scale(pressScale)
-            // Subtle elevation gives each cap a tactile, raised feel; it flattens on press.
-            .shadow(
-                elevation = if (isPressed) 0.dp else 2.dp,
-                shape = keyShape,
-                clip = false
-            )
-            .clip(keyShape)
-            .background(finalBgColor)
-            .then(if (isPressed) Modifier.background(highlightColor) else Modifier)
-            .border(1.dp, finalBorderColor, keyShape)
-            .then(keyModifier)
-            .padding(vertical = 8.dp),
-        contentAlignment = Alignment.Center,
+    BaseKeyboardKey(
+        modifier = modifier,
+        onClick = onClick,
+        backgroundColor = finalBgColor,
+        shape = shape,
+        pressedScale = pressedScale,
+        restingElevation = restingElevation,
+        pressedOverlayColor = finalPressedOverlayColor,
+        borderColor = finalBorderColor,
+        verticalPadding = verticalPadding,
+        hapticFeedbackType = hapticFeedbackType,
+        animationLabel = "utilityKeyPressScale",
         content = content
     )
 }
