@@ -4,8 +4,19 @@
     android:supportsInlineSuggestions="true"
     android:supportsSwitchingToNextInputMethod="true">
     <subtype
-        android:label="@string/subtype_name"
+        android:label="@string/subtype_cantonese_hk"
         android:imeSubtypeMode="keyboard"
         android:imeSubtypeLocale="yue_HK"
-        android:imeSubtypeExtraValue="KeyboardLayoutType=cantonese" />
+        android:languageTag="yue-Hant-HK"
+        android:imeSubtypeExtraValue="KeyboardLayoutType=cantonese,AsciiCapable"
+        android:isAsciiCapable="true"
+        android:subtypeId="1001" />
+    <subtype
+        android:label="@string/subtype_english_hk"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeLocale="en_HK"
+        android:languageTag="en-HK"
+        android:imeSubtypeExtraValue="KeyboardLayoutType=qwerty,AsciiCapable"
+        android:isAsciiCapable="true"
+        android:subtypeId="1002" />
 </input-method>

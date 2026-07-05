@@ -2,6 +2,8 @@
     <string name="app_name">Cantonese Voice Keyboard</string>
     <string name="keyboard_name">Cantonese Voice Keyboard</string>
     <string name="subtype_name">Cantonese voice input (on-device)</string>
+    <string name="subtype_cantonese_hk">Cantonese (Hong Kong)</string>
+    <string name="subtype_english_hk">English (Hong Kong)</string>
 
     <!-- Setup Main Screen Strings -->
     <string name="app_header_title">Cantonese Voice Keyboard</string>

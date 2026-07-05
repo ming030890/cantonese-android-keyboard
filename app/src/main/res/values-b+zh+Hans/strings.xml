@@ -2,6 +2,8 @@
     <string name="app_name">粤语语音输入法</string>
     <string name="keyboard_name">粤语语音输入法</string>
     <string name="subtype_name">粤语语音输入（设备内）</string>
+    <string name="subtype_cantonese_hk">粤语（香港）</string>
+    <string name="subtype_english_hk">英文（香港）</string>
 
     <!-- Setup Main Screen Strings -->
     <string name="app_header_title">广东话语音输入键盘</string>

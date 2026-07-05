@@ -58,6 +58,7 @@ fun KeyboardScreen(
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
     onEmojiPicked: (String) -> Unit,
+    onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     initialEmojiPanel: Boolean = false
 ) {
     val state by uiState.collectAsState()
@@ -186,7 +187,10 @@ fun KeyboardScreen(
                     onSendSpace = onSendSpace,
                     onSendEnter = onSendEnter,
                     onOpenEmoji = { activePanel = KeyboardPanel.Emoji },
-                    onBackToVoice = { activePanel = KeyboardPanel.Voice }
+                    onBackToVoice = {
+                        activePanel = KeyboardPanel.Voice
+                        onKeyboardInputModeSelected(KeyboardInputMode.Voice)
+                    }
                 )
             } else {
                 // Bottom Functional Keys Row (Space, Delete, Enter, Switch)
@@ -203,6 +207,7 @@ fun KeyboardScreen(
                             activePanel = if (activePanel == KeyboardPanel.Voice) {
                                 KeyboardPanel.Emoji
                             } else {
+                                onKeyboardInputModeSelected(KeyboardInputMode.Voice)
                                 KeyboardPanel.Voice
                             }
                         }
@@ -224,6 +229,7 @@ fun KeyboardScreen(
                         modifier = Modifier.weight(0.75f),
                         onClick = {
                             if (activePanel == KeyboardPanel.Voice) {
+                                onKeyboardInputModeSelected(KeyboardInputMode.AlphaNum)
                                 activePanel = KeyboardPanel.AlphaNum
                             } else {
                                 onOpenSettings()
