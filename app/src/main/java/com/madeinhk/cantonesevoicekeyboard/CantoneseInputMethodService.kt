@@ -131,7 +131,8 @@ class CantoneseInputMethodService : InputMethodService(),
                         onDeleteSurroundingText = { deleteSurroundingText() },
                         onSendSpace = { sendSpace() },
                         onSendEnter = { sendEnter() },
-                        onOpenSettings = { openSettingsApp() }
+                        onOpenSettings = { openSettingsApp() },
+                        onEmojiPicked = { emoji -> sendEmoji(emoji) }
                     )
                 }
             }
@@ -659,6 +660,10 @@ class CantoneseInputMethodService : InputMethodService(),
                 connection.commitText("\n", 1)
             }
         }
+    }
+
+    private fun sendEmoji(emoji: String) {
+        currentInputConnection?.commitText(emoji, 1)
     }
 
     private fun openSettingsApp() {

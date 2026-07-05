@@ -77,7 +77,8 @@ private fun KeyboardScreenScreenshotContent(
             onDeleteSurroundingText = {},
             onSendSpace = {},
             onSendEnter = {},
-            onOpenSettings = {}
+            onOpenSettings = {},
+            onEmojiPicked = {}
         )
     }
 }

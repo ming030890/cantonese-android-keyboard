@@ -27,10 +27,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.emoji2.emojipicker.EmojiPickerView
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import androidx.compose.ui.res.stringResource
@@ -47,7 +49,8 @@ fun KeyboardScreen(
     onDeleteSurroundingText: () -> Unit,
     onSendSpace: () -> Unit,
     onSendEnter: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onEmojiPicked: (String) -> Unit
 ) {
     val state by uiState.collectAsState()
     val volume by volumeLevel.collectAsState()
@@ -58,6 +61,7 @@ fun KeyboardScreen(
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
     val haptics = LocalHapticFeedback.current
     var isDeleting by remember { mutableStateOf(false) }
+    var activePanel by remember { mutableStateOf(KeyboardPanel.Voice) }
     // Visual depress for the delete key, which uses a raw pointer gesture (no clickable).
     val deleteScale by animateFloatAsState(
         targetValue = if (isDeleting) 0.92f else 1f,
@@ -98,32 +102,41 @@ fun KeyboardScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Central voice control: the mic and its state-driven label read as one
-            // cohesive cluster, vertically centered so there's no floating dead space.
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                RecordTriggerButton(
-                    state = state,
-                    onClick = onToggleRecording
-                )
-                Spacer(modifier = Modifier.height(14.dp))
-                // Fixed-height label slot keeps the mic from jumping as the status changes.
-                Box(
+            if (activePanel == KeyboardPanel.Emoji) {
+                EmojiPickerPanel(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 44.dp),
-                    contentAlignment = Alignment.Center
+                        .weight(1f),
+                    onEmojiPicked = onEmojiPicked
+                )
+            } else {
+                // Central voice control: the mic and its state-driven label read as one
+                // cohesive cluster, vertically centered so there's no floating dead space.
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    KeyboardStatusLabel(
+                    RecordTriggerButton(
                         state = state,
-                        volume = volume,
-                        onOpenSettings = onOpenSettings
+                        onClick = onToggleRecording
                     )
+                    Spacer(modifier = Modifier.height(14.dp))
+                    // Fixed-height label slot keeps the mic from jumping as the status changes.
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 44.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        KeyboardStatusLabel(
+                            state = state,
+                            volume = volume,
+                            onOpenSettings = onOpenSettings
+                        )
+                    }
                 }
             }
 
@@ -135,20 +148,34 @@ fun KeyboardScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Settings Key (the system nav-bar already provides an IME-switch globe,
-                // so we surface app settings here instead of a redundant second globe).
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(0.9f),
+                    onClick = {
+                        activePanel =
+                            if (activePanel == KeyboardPanel.Emoji) KeyboardPanel.Voice else KeyboardPanel.Emoji
+                    }
+                ) {
+                    if (activePanel == KeyboardPanel.Emoji) {
+                        KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    } else {
+                        SmileIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                KeyboardUtilityKey(
+                    modifier = Modifier.weight(0.9f),
                     onClick = onOpenSettings
                 ) {
                     SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
 
                 // Space Key
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(2.5f),
+                    modifier = Modifier.weight(2.3f),
                     onClick = onSendSpace
                 ) {
                     Text(
@@ -160,12 +187,12 @@ fun KeyboardScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
 
                 // Delete Key
                 KeyboardUtilityKey(
                     modifier = Modifier
-                        .weight(1.2f)
+                        .weight(1.1f)
                         .scale(deleteScale)
                         .pointerInput(onDeleteSurroundingText) {
                             detectTapGestures(
@@ -186,11 +213,11 @@ fun KeyboardScreen(
                     BackspaceIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
 
                 // Enter Key — filled accent so the primary commit action stands out.
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(1.3f),
+                    modifier = Modifier.weight(1.2f),
                     onClick = onSendEnter,
                     backgroundColor = primaryColor,
                     borderColor = primaryColor
@@ -205,6 +232,32 @@ fun KeyboardScreen(
             }
         }
     }
+}
+
+private enum class KeyboardPanel {
+    Voice,
+    Emoji
+}
+
+@Composable
+fun EmojiPickerPanel(
+    modifier: Modifier = Modifier,
+    onEmojiPicked: (String) -> Unit
+) {
+    AndroidView(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surface),
+        factory = { context ->
+            EmojiPickerView(context).apply {
+                emojiGridColumns = 8
+                setOnEmojiPickedListener { item -> onEmojiPicked(item.emoji) }
+            }
+        },
+        update = { picker ->
+            picker.setOnEmojiPickedListener { item -> onEmojiPicked(item.emoji) }
+        }
+    )
 }
 
 @Composable
@@ -610,6 +663,66 @@ fun BackspaceIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
             strokeWidth = 2.dp.toPx(),
             cap = StrokeCap.Round
         )
+    }
+}
+
+@Composable
+fun SmileIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val center = Offset(w / 2f, h / 2f)
+        val strokePx = 2.dp.toPx()
+
+        drawCircle(
+            color = color,
+            radius = w * 0.38f,
+            center = center,
+            style = Stroke(width = strokePx)
+        )
+        drawCircle(color = color, radius = w * 0.045f, center = Offset(w * 0.38f, h * 0.42f))
+        drawCircle(color = color, radius = w * 0.045f, center = Offset(w * 0.62f, h * 0.42f))
+        drawArc(
+            color = color,
+            startAngle = 20f,
+            sweepAngle = 140f,
+            useCenter = false,
+            topLeft = Offset(w * 0.33f, h * 0.38f),
+            size = Size(w * 0.34f, h * 0.34f),
+            style = Stroke(width = strokePx, cap = StrokeCap.Round)
+        )
+    }
+}
+
+@Composable
+fun KeyboardIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val strokePx = 2.dp.toPx()
+        val keyRadius = CornerRadius(w * 0.05f, w * 0.05f)
+
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(w * 0.12f, h * 0.22f),
+            size = Size(w * 0.76f, h * 0.56f),
+            cornerRadius = CornerRadius(w * 0.08f, w * 0.08f),
+            style = Stroke(width = strokePx)
+        )
+        val keyW = w * 0.11f
+        val keyH = h * 0.10f
+        val startX = w * 0.23f
+        val startY = h * 0.36f
+        repeat(3) { row ->
+            repeat(4) { column ->
+                drawRoundRect(
+                    color = color,
+                    topLeft = Offset(startX + column * w * 0.14f, startY + row * h * 0.14f),
+                    size = Size(keyW, keyH),
+                    cornerRadius = keyRadius
+                )
+            }
+        }
     }
 }
 
