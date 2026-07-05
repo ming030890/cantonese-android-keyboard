@@ -579,32 +579,15 @@ class CantoneseInputMethodService : InputMethodService(),
         activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
         val session = inputViewSession
-        val committedSegmentIds = mutableSetOf<Long>()
-        var lastCommittedTranscript = ""
-        // Concatenation of everything committed this recording, used to drop the
-        // finalize "tail" segment when it only echoes speech we already committed.
-        // Tapping stop flushes the trailing segment with isFinal=true; if the user
-        // had already finished speaking, that tail is usually just noise that the
-        // native worker re-transcribes under the carried-over ASR prompt and
-        // hallucinates as a repeat of earlier text. A genuine mid-utterance tail
-        // carries new words, is not contained in the history, and still commits.
-        var committedTranscriptHistory = ""
 
         val listener = object : QAsrEngine.VadListener {
             override fun onTranscript(segmentId: Long, text: String, isFinal: Boolean) {
                 serviceScope.launch(Dispatchers.Main.immediate) {
-                    val normalizedText = normalizeTranscriptForDedup(text)
-                    val isDuplicate = normalizedText == lastCommittedTranscript ||
-                        (isFinal && normalizedText in committedTranscriptHistory)
                     if (
                         isInputViewVisible &&
                         session == inputViewSession &&
-                        normalizedText.isNotEmpty() &&
-                        committedSegmentIds.add(segmentId) &&
-                        !isDuplicate
+                        text.trim().isNotEmpty()
                     ) {
-                        lastCommittedTranscript = normalizedText
-                        committedTranscriptHistory += normalizedText
                         currentInputConnection?.commitText(text, 1)
                     }
                 }
@@ -728,9 +711,6 @@ class CantoneseInputMethodService : InputMethodService(),
             transcriptionJob = null
         }
     }
-
-    private fun normalizeTranscriptForDedup(text: String): String =
-        text.trim().replace(Regex("\\s+"), " ")
 
     private fun buildCursorContextPrompt(connection: InputConnection?): String {
         if (connection == null) return ""
