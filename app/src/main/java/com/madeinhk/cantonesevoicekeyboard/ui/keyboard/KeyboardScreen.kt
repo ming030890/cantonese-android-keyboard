@@ -47,16 +47,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.sin
 
 private val DefaultKeyboardHeight = 320.dp
-private val AlphaKeyboardHeight = 344.dp
-private val SymbolKeyboardHeight = 400.dp
-private val TextToolbarHeight = 40.dp
-private val TextToolbarBackgroundHeight = 48.dp
-private val AlphaCharacterRowHeight = 52.dp
-private val AlphaBottomRowHeight = 58.dp
+private val AlphaKeyboardHeight = 364.dp
+private val SymbolKeyboardHeight = 352.dp
+private val TextToolbarHeight = 44.dp
+private val TextToolbarBackgroundHeight = 52.dp
+private val AlphaCharacterRowHeight = 60.dp
+private val SymbolCharacterRowHeight = 64.dp
+private val AlphaBottomRowHeight = 64.dp
 private val AlphaRowSpacing = 8.dp
 private val AlphaBottomRowSpacing = 4.dp
 private val KeyboardHorizontalPadding = 12.dp
-private val KeyboardBottomPadding = 40.dp
+private val DefaultKeyboardBottomPadding = 40.dp
+private val TextKeyboardBottomPadding = 20.dp
 
 @Composable
 fun KeyboardScreen(
@@ -108,6 +110,8 @@ fun KeyboardScreen(
         else -> DefaultKeyboardHeight
     }
     val keyboardTopPadding = if (isTextPanel) 4.dp else 12.dp
+    val keyboardBottomPadding =
+        if (isTextPanel) TextKeyboardBottomPadding else DefaultKeyboardBottomPadding
     val keyboardVerticalArrangement =
         if (isTextPanel) Arrangement.spacedBy(AlphaBottomRowSpacing) else Arrangement.SpaceBetween
     // Visual depress for the delete key, which uses a raw pointer gesture (no clickable).
@@ -147,7 +151,7 @@ fun KeyboardScreen(
                 start = KeyboardHorizontalPadding,
                 end = KeyboardHorizontalPadding,
                 top = keyboardTopPadding,
-                bottom = KeyboardBottomPadding
+                bottom = keyboardBottomPadding
             )
     ) {
         Column(
@@ -327,7 +331,7 @@ fun KeyboardScreen(
                             .pointerInput(onDeleteSurroundingText) {
                                 detectTapGestures(
                                     onPress = {
-                                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                         onDeleteSurroundingText()
                                         isDeleting = true
                                         try {
@@ -617,7 +621,7 @@ private fun SymbolGridPanel(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(AlphaCharacterRowHeight),
+                    .height(SymbolCharacterRowHeight),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -821,7 +825,7 @@ private fun BaseKeyboardKey(
     pressedOverlayColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
     verticalPadding: Dp = 0.dp,
-    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
+    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.LongPress,
     interactionSource: MutableInteractionSource? = null,
     animationLabel: String,
     content: @Composable BoxScope.() -> Unit
@@ -873,7 +877,7 @@ private fun KeyboardKey(
     pressedOverlayColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
     verticalPadding: Dp = 0.dp,
-    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
+    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.LongPress,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -999,14 +1003,14 @@ fun EmojiPickerPanel(
             EmojiPickerView(context).apply {
                 emojiGridColumns = 8
                 setOnEmojiPickedListener { item ->
-                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     onEmojiPicked(item.emoji)
                 }
             }
         },
         update = { picker ->
             picker.setOnEmojiPickedListener { item ->
-                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                 onEmojiPicked(item.emoji)
             }
         }
@@ -1297,7 +1301,7 @@ fun KeyboardUtilityKey(
     restingElevation: Dp = 2.dp,
     pressedOverlayColor: Color = Color.Unspecified,
     verticalPadding: Dp = 8.dp,
-    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove,
+    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.LongPress,
     onClick: (() -> Unit)?,
     content: @Composable BoxScope.() -> Unit
 ) {

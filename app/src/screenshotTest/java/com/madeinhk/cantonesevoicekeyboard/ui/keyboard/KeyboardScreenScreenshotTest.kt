@@ -102,7 +102,7 @@ fun KeyboardScreenEmojiPanelScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 400
+    heightDp = 352
 )
 @Composable
 fun KeyboardScreenNumberPanelScreenshot() {
@@ -118,7 +118,7 @@ fun KeyboardScreenNumberPanelScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 344
+    heightDp = 364
 )
 @Composable
 fun KeyboardScreenAlphaNumPanelScreenshot() {
