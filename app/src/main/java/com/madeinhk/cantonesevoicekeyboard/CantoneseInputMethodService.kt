@@ -228,7 +228,7 @@ class CantoneseInputMethodService : InputMethodService(),
         val loadingJob = serviceScope.launch(Dispatchers.Default) {
             val loadStartedAt = SystemClock.elapsedRealtime()
             try {
-                // The model ships as a fast-follow Play Asset Delivery pack. This
+                // The model ships as on-demand Play Asset Delivery packs. This
                 // suspends until the pack is downloaded if it is not already present.
                 val resolveStartedAt = SystemClock.elapsedRealtime()
                 val modelDir = ModelAssetPack.resolveModelDir(this@CantoneseInputMethodService)

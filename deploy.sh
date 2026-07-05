@@ -25,7 +25,7 @@ PACKAGE="com.madeinhk.cantonesevoicekeyboard"
 SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8-v16-manual-code-switching-cp4000"
 # Two asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shard 2 in pack B. Files placed here are delivered to the device by Play
-# Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
+# Asset Delivery (on-demand), and locally by bundletool's --local-testing.
 PACK_A_ASSETS="$PROJECT_DIR/model_pack_a/src/main/assets/qwen-asr-m4-lmhead-int8"
 PACK_B_ASSETS="$PROJECT_DIR/model_pack_b/src/main/assets/qwen-asr-m4-lmhead-int8"
 RESHARD_SCRIPT="$PROJECT_DIR/scripts/reshard_model.py"
@@ -138,8 +138,7 @@ if [ -d "$SOURCE_MODEL_DIR" ]; then
     python3 "$RESHARD_SCRIPT" \
         --source "$SOURCE_MODEL_DIR" \
         --pack-a "$PACK_A_ASSETS" \
-        --pack-b "$PACK_B_ASSETS" \
-        --force
+        --pack-b "$PACK_B_ASSETS"
     echo -e "${COLOR_SUCCESS}Shards staged into both asset packs.${COLOR_RESET}"
 elif [ -f "$SHARD_A" ] && [ -f "$SHARD_B" ]; then
     echo -e "${COLOR_SUCCESS}Shards already staged. Skipping reshard.${COLOR_RESET}"
@@ -200,7 +199,7 @@ echo -e "${COLOR_INFO}[Step 6/6] Generating APK set and installing via bundletoo
 mkdir -p "$(dirname "$APKS_PATH")"
 rm -f "$APKS_PATH"
 
-# --local-testing embeds the fast-follow asset pack so install-apks pushes it to
+# --local-testing embeds the on-demand asset packs so install-apks pushes them to
 # device-local storage, where the Play Asset Delivery library resolves it exactly
 # as it would after a Play install. No adb push / sideloading required.
 java -jar "$BUNDLETOOL_JAR" build-apks \

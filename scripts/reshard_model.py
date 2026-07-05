@@ -24,6 +24,7 @@ total size, it skips work.
 """
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -36,6 +37,7 @@ from pathlib import Path
 SHARD_LIMIT_BYTES = 480 * 1024 * 1024
 
 TOKENIZER_FILES = ["vocab.json", "merges.txt"]
+RESHARD_MANIFEST = ".reshard_manifest.json"
 
 
 def bin_pack(tensors, limit):
@@ -138,6 +140,38 @@ def save_safetensors_raw(tensors, path: Path):
             f.write(raw)
 
 
+def sha256_file(path: Path):
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def build_source_manifest(source: Path, limit: int):
+    files = {"model.safetensors": sha256_file(source / "model.safetensors")}
+    for name in TOKENIZER_FILES:
+        path = source / name
+        if path.exists():
+            files[name] = sha256_file(path)
+    return {
+        "version": 1,
+        "limit_bytes": limit,
+        "files": files,
+    }
+
+
+def read_manifest(path: Path):
+    try:
+        return json.loads(path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
+def write_manifest(path: Path, manifest):
+    path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+
 def reshard_raw(src_model: Path, pack_a: Path, pack_b: Path, limit: int):
     print(f"loading {src_model} without safetensors/torch ...")
     tensors = load_safetensors_raw(src_model)
@@ -187,15 +221,29 @@ def main():
 
     shard1_path = pack_a / "model-00001-of-00002.safetensors"
     shard2_path = pack_b / "model-00002-of-00002.safetensors"
+    manifest_path = pack_a / RESHARD_MANIFEST
+    source_manifest = build_source_manifest(source, limit)
 
-    # Idempotency check: total bytes across shards should match source.
+    # Idempotency check: preserve existing shard bytes for code-only releases.
+    # A forced rewrite makes Play treat the on-demand asset packs as changed,
+    # causing already-installed users to receive a huge asset-pack update.
     if not args.force and shard1_path.exists() and shard2_path.exists():
+        existing_manifest = read_manifest(manifest_path)
+        if existing_manifest == source_manifest:
+            print("shards already match recorded source fingerprint. Use --force to rebuild.")
+            _copy_tokenizer(source, pack_a)
+            return
+
         src_size = src_model.stat().st_size
         out_size = shard1_path.stat().st_size + shard2_path.stat().st_size
-        # Each shard adds its own header, so out_size will be slightly larger;
-        # if it's within 2 MiB we treat it as up to date.
-        if 0 <= out_size - src_size < 2 * 1024 * 1024:
-            print(f"shards already present and consistent ({out_size / 1024 / 1024:.1f} MiB total). Use --force to rebuild.")
+        # The source and split shards each have their own safetensors headers,
+        # so the shard total can be slightly larger or smaller. If the delta is
+        # tiny, seed the manifest and treat the existing shard bytes as current.
+        if abs(out_size - src_size) < 2 * 1024 * 1024:
+            print(f"shards already present and size-consistent ({out_size / 1024 / 1024:.1f} MiB total).")
+            print(f"recording source fingerprint in {manifest_path}. Use --force to rebuild.")
+            pack_a.mkdir(parents=True, exist_ok=True)
+            write_manifest(manifest_path, source_manifest)
             _copy_tokenizer(source, pack_a)
             return
 
@@ -207,6 +255,7 @@ def main():
         print(f"warning: {e}; falling back to raw safetensors sharding")
         reshard_raw(src_model, pack_a, pack_b, limit)
         _copy_tokenizer(source, pack_a)
+        write_manifest(manifest_path, source_manifest)
         print("done.")
         return
 
@@ -241,6 +290,7 @@ def main():
     print(f"  -> {shard2_path.stat().st_size / 1024 / 1024:.1f} MiB")
 
     _copy_tokenizer(source, pack_a)
+    write_manifest(manifest_path, source_manifest)
 
     print("done.")
 
@@ -254,7 +304,7 @@ def _copy_tokenizer(source: Path, pack_a: Path):
             print(f"warning: {src} not found, skipping")
             continue
         dst = pack_a / name
-        if dst.exists() and dst.stat().st_size == src.stat().st_size:
+        if dst.exists() and dst.stat().st_size == src.stat().st_size and sha256_file(dst) == sha256_file(src):
             continue
         print(f"copying {name} -> {dst}")
         shutil.copy2(src, dst)
