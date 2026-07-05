@@ -4,6 +4,7 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.screenshot)
 }
 
 // Signing credentials are loaded from keystore.properties (gitignored) or
@@ -27,6 +28,8 @@ val hasReleaseSigning = ksFile != null && ksPassword != null &&
 android {
     namespace = "com.madeinhk.cantonesevoicekeyboard"
     compileSdk = 36
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+
     defaultConfig {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
@@ -89,6 +92,7 @@ dependencies {
   val composeBom = platform(libs.androidx.compose.bom)
   implementation(composeBom)
   androidTestImplementation(composeBom)
+  screenshotTestImplementation(composeBom)
 
   // Play Asset Delivery (model download / location resolution)
   implementation(libs.play.asset.delivery)
@@ -108,6 +112,8 @@ dependencies {
   implementation(libs.androidx.compose.material3)
   // Tooling
   debugImplementation(libs.androidx.compose.ui.tooling)
+  screenshotTestImplementation(libs.androidx.compose.ui.tooling)
+  screenshotTestImplementation(libs.screenshot.validation.api)
   // Instrumented tests
   androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
