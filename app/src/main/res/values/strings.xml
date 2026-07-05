@@ -35,6 +35,11 @@
     <string name="sandbox_placeholder">Try voice typing here… (e.g. say "Today's weather is so nice")</string>
     <string name="sandbox_clear">Clear</string>
 
+    <!-- Developer Options -->
+    <string name="developer_options_title">Developer options</string>
+    <string name="developer_store_audio_title">Store debug audio</string>
+    <string name="developer_store_audio_desc">Save recordings for debugging. Only the latest 100 are kept.</string>
+
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">Tap to speak</string>
     <string name="keyboard_status_loading_model">Loading model…</string>

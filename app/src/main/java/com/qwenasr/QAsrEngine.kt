@@ -77,7 +77,7 @@ class QAsrEngine {
         }
     }
 
-    fun startVadSession(listener: VadListener, saveAudioDir: String? = null): Boolean {
+    fun startVadSession(listener: VadListener): Boolean {
         synchronized(this) {
             val handle = nativeHandle
             if (handle == 0L) {
@@ -87,7 +87,7 @@ class QAsrEngine {
             if (vadSessionHandle != 0L) {
                 stopVadSession(finalize = false)
             }
-            vadSessionHandle = nativeStartVadSession(handle, listener, saveAudioDir)
+            vadSessionHandle = nativeStartVadSession(handle, listener, null)
             return vadSessionHandle != 0L
         }
     }

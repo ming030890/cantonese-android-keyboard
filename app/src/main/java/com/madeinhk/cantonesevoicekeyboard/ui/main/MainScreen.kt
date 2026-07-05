@@ -43,6 +43,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.compose.ui.res.stringResource
 import com.madeinhk.cantonesevoicekeyboard.ModelAssetPack
 import com.madeinhk.cantonesevoicekeyboard.ModelDownloadStatus
+import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.madeinhk.cantonesevoicekeyboard.theme.*
@@ -60,6 +61,7 @@ fun MainScreen(
   var keyboardEnabled by remember { mutableStateOf(false) }
   var keyboardSelected by remember { mutableStateOf(false) }
   var modelStatus by remember { mutableStateOf<ModelDownloadStatus>(ModelDownloadStatus.NotStarted) }
+  var storeDebugAudio by remember { mutableStateOf(DebugAudioSettings.isStoreDebugAudioEnabled(context)) }
   var retryKey by remember { mutableIntStateOf(0) }
 
   // Observe the model asset-pack download live (progress, install, ready, failure).
@@ -76,6 +78,7 @@ fun MainScreen(
 
     val currentIme = Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
     keyboardSelected = currentIme?.contains(context.packageName) == true
+    storeDebugAudio = DebugAudioSettings.isStoreDebugAudioEnabled(context)
   }
 
   // Refresh status when window gains focus (e.g. returning from system dialog overlays like the IME picker)
@@ -120,6 +123,11 @@ fun MainScreen(
       imm.showInputMethodPicker()
     },
     onModelRetry = { retryKey++ },
+    storeDebugAudio = storeDebugAudio,
+    onStoreDebugAudioChange = { enabled ->
+      DebugAudioSettings.setStoreDebugAudioEnabled(context, enabled)
+      storeDebugAudio = enabled
+    },
     modifier = modifier
   )
 }
@@ -138,6 +146,8 @@ fun MainScreenContent(
   onEnableKeyboard: () -> Unit,
   onPickKeyboard: () -> Unit,
   onModelRetry: () -> Unit,
+  storeDebugAudio: Boolean,
+  onStoreDebugAudioChange: (Boolean) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   // Backdrop gradient comes from the theme (decided once per light/dark there),
@@ -192,6 +202,11 @@ fun MainScreenContent(
 
       // Interactive Test Sandbox
       TestSandboxCard()
+
+      DeveloperOptionsCard(
+        storeDebugAudio = storeDebugAudio,
+        onStoreDebugAudioChange = onStoreDebugAudioChange
+      )
 
       Spacer(modifier = Modifier.height(24.dp))
     }
@@ -555,6 +570,64 @@ fun ModelStatusCard(
 }
 
 @Composable
+fun DeveloperOptionsCard(
+  storeDebugAudio: Boolean,
+  onStoreDebugAudioChange: (Boolean) -> Unit,
+  modifier: Modifier = Modifier
+) {
+  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+
+  Card(
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(vertical = 6.dp),
+    shape = RoundedCornerShape(16.dp),
+    colors = CardDefaults.cardColors(
+      containerColor = MaterialTheme.colorScheme.surface
+    ),
+    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+  ) {
+    Column(
+      modifier = Modifier.padding(16.dp)
+    ) {
+      Text(
+        text = stringResource(id = R.string.developer_options_title),
+        color = MaterialTheme.colorScheme.onSurface,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold
+      )
+      Spacer(modifier = Modifier.height(12.dp))
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+            text = stringResource(id = R.string.developer_store_audio_title),
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold
+          )
+          Spacer(modifier = Modifier.height(2.dp))
+          Text(
+            text = stringResource(id = R.string.developer_store_audio_desc),
+            color = textVariantColor,
+            fontSize = 12.sp,
+            lineHeight = 16.sp
+          )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Switch(
+          checked = storeDebugAudio,
+          onCheckedChange = onStoreDebugAudioChange
+        )
+      }
+    }
+  }
+}
+
+@Composable
 fun TestSandboxCard(
   modifier: Modifier = Modifier
 ) {
@@ -646,4 +719,3 @@ fun MainScreenPreview() {
     MainScreen(onItemClick = {})
   }
 }
-

@@ -9,6 +9,6 @@ plugins {
 assetPack {
     packName.set("model_pack_a")
     dynamicDelivery {
-        deliveryType.set("fast-follow")
+        deliveryType.set("on-demand")
     }
 }

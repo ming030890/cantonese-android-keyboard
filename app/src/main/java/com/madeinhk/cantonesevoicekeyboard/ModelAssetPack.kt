@@ -81,6 +81,7 @@ object ModelAssetPack {
 
         fun emitCombined() {
             val combined = combine(appContext, latest)
+            Log.i(TAG, "downloadStatusFlow combined=$combined latest=${latest.values.joinToString { describeState(it) }}")
             trySend(combined)
         }
 
@@ -95,6 +96,7 @@ object ModelAssetPack {
         manager.getPackStates(PACKS)
             .addOnSuccessListener { states ->
                 PACKS.forEach { p -> states.packStates()[p]?.let { latest[p] = it } }
+                Log.i(TAG, "getPackStates success: ${latest.values.joinToString { describeState(it) }}")
                 emitCombined()
                 manager.fetch(PACKS)
             }
@@ -112,12 +114,18 @@ object ModelAssetPack {
      * if either pack could not be made available.
      */
     suspend fun resolveModelDir(context: Context): File? {
-        stageModelDir(context)?.let { return it }
+        stageModelDir(context)?.let {
+            Log.i(TAG, "resolveModelDir: staged model already available at ${it.absolutePath}")
+            return it
+        }
 
         val manager = AssetPackManagerFactory.getInstance(context.applicationContext)
         val ready = awaitBothPacks(manager)
+        Log.i(TAG, "resolveModelDir: awaitBothPacks ready=$ready")
         if (!ready) return null
-        return stageModelDir(context)
+        return stageModelDir(context).also {
+            Log.i(TAG, "resolveModelDir: stage after fetch result=${it?.absolutePath}")
+        }
     }
 
     private suspend fun awaitBothPacks(manager: AssetPackManager): Boolean =
@@ -128,6 +136,7 @@ object ModelAssetPack {
                     if (state.name() !in PACKS || cont.isCompleted) return
                     when (state.status()) {
                         AssetPackStatus.COMPLETED -> {
+                            Log.i(TAG, "awaitBothPacks completed: ${describeState(state)}")
                             completed.add(state.name())
                             if (completed.containsAll(PACKS)) {
                                 manager.unregisterListener(this)
@@ -139,11 +148,7 @@ object ModelAssetPack {
                             manager.unregisterListener(this)
                             cont.resume(false)
                         }
-                        else -> Log.i(
-                            TAG,
-                            "Pack '${state.name()}' status=${state.status()} " +
-                                "(${state.bytesDownloaded()}/${state.totalBytesToDownload()} bytes)"
-                        )
+                        else -> Log.i(TAG, "awaitBothPacks update: ${describeState(state)}")
                     }
                 }
             }
@@ -170,14 +175,23 @@ object ModelAssetPack {
         val manager = AssetPackManagerFactory.getInstance(appContext)
 
         val packDirs = PACKS.map { pack ->
-            val assetsPath = manager.getPackLocation(pack)?.assetsPath() ?: return null
+            val location = manager.getPackLocation(pack)
+            val assetsPath = location?.assetsPath()
+            Log.i(TAG, "stageModelDir: pack=$pack location=${location != null} assetsPath=$assetsPath")
+            if (assetsPath == null) return null
             val dir = File(assetsPath, MODEL_DIR_NAME)
-            if (!dir.exists() || !dir.isDirectory) return null
+            if (!dir.exists() || !dir.isDirectory) {
+                Log.w(TAG, "stageModelDir: missing model dir for $pack: ${dir.absolutePath}")
+                return null
+            }
             dir
         }
 
         val staged = File(appContext.filesDir, MODEL_DIR_NAME)
-        if (!staged.exists()) staged.mkdirs()
+        if (!staged.exists() && !staged.mkdirs()) {
+            Log.e(TAG, "stageModelDir: failed to create staged dir ${staged.absolutePath}")
+            return null
+        }
 
         // Rebuild symlinks every time: cheap, and absorbs pack-update path
         // changes when Play swaps in a new pack version.
@@ -187,7 +201,11 @@ object ModelAssetPack {
                 if (!src.isFile) continue
                 val link = File(staged, src.name)
                 try {
-                    if (link.exists()) link.delete()
+                    // Always delete the link first. link.delete() successfully deletes
+                    // both real files and broken/valid symbolic links. We must delete it
+                    // unconditionally because link.exists() returns false for broken symlinks,
+                    // which would cause delete() to be skipped and Os.symlink to fail with EEXIST.
+                    link.delete()
                     Os.symlink(src.absolutePath, link.absolutePath)
                 } catch (e: ErrnoException) {
                     Log.e(TAG, "symlink ${src.name} failed", e)
@@ -197,6 +215,9 @@ object ModelAssetPack {
         }
         return staged
     }
+
+    private fun describeState(state: AssetPackState): String =
+        "${state.name()} status=${state.status()} bytes=${state.bytesDownloaded()}/${state.totalBytesToDownload()} error=${state.errorCode()}"
 
     private fun combine(context: Context, latest: Map<String, AssetPackState>): ModelDownloadStatus {
         if (stageModelDir(context) != null) return ModelDownloadStatus.Ready

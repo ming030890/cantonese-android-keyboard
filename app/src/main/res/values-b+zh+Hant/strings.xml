@@ -35,6 +35,11 @@
     <string name="sandbox_placeholder">喺度試下語音輸入啦…（例如講：「今日天氣幾好呀」）</string>
     <string name="sandbox_clear">清除</string>
 
+    <!-- Developer Options -->
+    <string name="developer_options_title">開發者選項</string>
+    <string name="developer_store_audio_title">儲存除錯音訊</string>
+    <string name="developer_store_audio_desc">儲存錄音作除錯用途，只保留最新 100 個。</string>
+
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">㩒一下開始講嘢</string>
     <string name="keyboard_status_loading_model">載入緊語音模型…</string>

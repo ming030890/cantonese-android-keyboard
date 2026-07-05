@@ -45,7 +45,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -459,15 +458,7 @@ class CantoneseInputMethodService : InputMethodService(),
             }
         }
 
-        val saveAudioDir = if (BuildConfig.DEBUG) {
-            getExternalFilesDir(null)?.let { externalDir ->
-                File(externalDir, "saved_audio").apply { mkdirs() }.absolutePath
-            }
-        } else {
-            null
-        }
-
-        val vadStarted = engine.startVadSession(listener, saveAudioDir)
+        val vadStarted = engine.startVadSession(listener)
         if (!vadStarted) {
             Log.e(TAG, "Failed to start native VAD session.")
             isRecording = false
@@ -486,37 +477,46 @@ class CantoneseInputMethodService : InputMethodService(),
             val directPcm16Buffer = ByteBuffer
                 .allocateDirect(2048)
                 .order(ByteOrder.nativeOrder())
+            val debugAudioStore = DebugAudioStore.createIfEnabled(this@CantoneseInputMethodService)
 
             Log.i(TAG, "Recording started and mic is live...")
 
-            while (isRecording) {
-                directPcm16Buffer.clear()
-                val bytesRead = audioRecord.read(
-                    directPcm16Buffer,
-                    directPcm16Buffer.capacity(),
-                    AudioRecord.READ_BLOCKING
-                )
-                if (bytesRead > 0) {
-                    val samplesRead = bytesRead / 2
-                    var sumSquare = 0.0
-                    val volumeBuffer = directPcm16Buffer.duplicate().order(ByteOrder.nativeOrder())
-                    volumeBuffer.position(0)
-                    for (i in 0 until samplesRead) {
-                        val sample = volumeBuffer.getShort()
-                        val floatSample = sample / 32768.0f
-                        sumSquare += floatSample * floatSample
-                    }
-                    directPcm16Buffer.position(0)
-                    engine.pushPcm16Chunk(directPcm16Buffer, bytesRead)
+            try {
+                while (isRecording) {
+                    directPcm16Buffer.clear()
+                    val bytesRead = audioRecord.read(
+                        directPcm16Buffer,
+                        directPcm16Buffer.capacity(),
+                        AudioRecord.READ_BLOCKING
+                    )
+                    if (bytesRead > 0) {
+                        val samplesRead = bytesRead / 2
+                        var sumSquare = 0.0
+                        val volumeBuffer = directPcm16Buffer.duplicate().order(ByteOrder.nativeOrder())
+                        volumeBuffer.position(0)
+                        for (i in 0 until samplesRead) {
+                            val sample = volumeBuffer.getShort()
+                            val floatSample = sample / 32768.0f
+                            sumSquare += floatSample * floatSample
+                        }
+                        directPcm16Buffer.position(0)
+                        debugAudioStore?.writePcm16(directPcm16Buffer, bytesRead)
+                        directPcm16Buffer.position(0)
+                        engine.pushPcm16Chunk(directPcm16Buffer, bytesRead)
 
-                    // Calculate real-time RMS for waveform visuals
-                    val rms = if (samplesRead > 0) Math.sqrt(sumSquare / samplesRead) else 0.0
-                    val normalizedVolume = (rms * 3.0).toFloat().coerceIn(0f, 1f) // boost visually
-                    _volumeLevel.value = normalizedVolume
-                } else if (bytesRead < 0) {
-                    Log.e(TAG, "Error reading audio data: $bytesRead")
-                    break
+                        // Calculate real-time RMS for waveform visuals
+                        val rms = if (samplesRead > 0) Math.sqrt(sumSquare / samplesRead) else 0.0
+                        val normalizedVolume = (rms * 3.0).toFloat().coerceIn(0f, 1f) // boost visually
+                        _volumeLevel.value = normalizedVolume
+                    } else if (bytesRead < 0) {
+                        Log.e(TAG, "Error reading audio data: $bytesRead")
+                        break
+                    }
                 }
+                debugAudioStore?.closeAndKeepLatest()
+            } catch (e: Exception) {
+                Log.w(TAG, "Error while recording audio", e)
+                debugAudioStore?.closeAndDelete()
             }
 
             try {

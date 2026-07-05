@@ -35,6 +35,11 @@
     <string name="sandbox_placeholder">在这里试试语音输入吧…（例如说：“今日天气几好呀”）</string>
     <string name="sandbox_clear">清除</string>
 
+    <!-- Developer Options -->
+    <string name="developer_options_title">开发者选项</string>
+    <string name="developer_store_audio_title">保存调试音频</string>
+    <string name="developer_store_audio_desc">保存录音用于调试，只保留最新 100 个。</string>
+
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">点按开始说话</string>
     <string name="keyboard_status_loading_model">正在载入语音模型…</string>
