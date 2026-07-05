@@ -92,7 +92,7 @@ fun KeyboardScreen(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(270.dp)
+            .height(320.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -334,10 +334,10 @@ fun AlphaNumPanel(
     onCommitText: (String) -> Unit
 ) {
     val rows = listOf(
+        listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"),
         listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
         listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
-        listOf("z", "x", "c", "v", "b", "n", "m"),
-        listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+        listOf("z", "x", "c", "v", "b", "n", "m")
     )
 
     KeyGridPanel(
