@@ -47,8 +47,10 @@ fun KeyboardScreen(
     uiState: StateFlow<KeyboardUiState>,
     volumeLevel: StateFlow<Float>,
     keyboardAction: StateFlow<KeyboardAction>,
+    keyboardInputMode: StateFlow<KeyboardInputMode>,
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
+    onCommitText: (String) -> Unit,
     onSendSpace: () -> Unit,
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -58,6 +60,7 @@ fun KeyboardScreen(
     val state by uiState.collectAsState()
     val volume by volumeLevel.collectAsState()
     val action by keyboardAction.collectAsState()
+    val inputMode by keyboardInputMode.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val backgroundColor = MaterialTheme.colorScheme.background
@@ -65,8 +68,8 @@ fun KeyboardScreen(
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
     val haptics = LocalHapticFeedback.current
     var isDeleting by remember { mutableStateOf(false) }
-    var activePanel by remember {
-        mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else KeyboardPanel.Voice)
+    var activePanel by remember(inputMode, initialEmojiPanel) {
+        mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
     }
     // Visual depress for the delete key, which uses a raw pointer gesture (no clickable).
     val deleteScale by animateFloatAsState(
@@ -108,40 +111,59 @@ fun KeyboardScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            if (activePanel == KeyboardPanel.Emoji) {
-                EmojiPickerPanel(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    onEmojiPicked = onEmojiPicked
-                )
-            } else {
-                // Central voice control: the mic and its state-driven label read as one
-                // cohesive cluster, vertically centered so there's no floating dead space.
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    RecordTriggerButton(
-                        state = state,
-                        onClick = onToggleRecording
-                    )
-                    Spacer(modifier = Modifier.height(14.dp))
-                    // Fixed-height label slot keeps the mic from jumping as the status changes.
-                    Box(
+            when (activePanel) {
+                KeyboardPanel.Emoji -> {
+                    EmojiPickerPanel(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 44.dp),
-                        contentAlignment = Alignment.Center
+                            .weight(1f),
+                        onEmojiPicked = onEmojiPicked
+                    )
+                }
+                KeyboardPanel.Number -> {
+                    NumberPanel(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        onCommitText = onCommitText
+                    )
+                }
+                KeyboardPanel.AlphaNum -> {
+                    AlphaNumPanel(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        onCommitText = onCommitText
+                    )
+                }
+                KeyboardPanel.Voice -> {
+                    // Central voice control: the mic and its state-driven label read as one
+                    // cohesive cluster, vertically centered so there's no floating dead space.
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        KeyboardStatusLabel(
+                        RecordTriggerButton(
                             state = state,
-                            volume = volume,
-                            onOpenSettings = onOpenSettings
+                            onClick = onToggleRecording
                         )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        // Fixed-height label slot keeps the mic from jumping as the status changes.
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 44.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            KeyboardStatusLabel(
+                                state = state,
+                                volume = volume,
+                                onOpenSettings = onOpenSettings
+                            )
+                        }
                     }
                 }
             }
@@ -155,38 +177,51 @@ fun KeyboardScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(0.9f),
+                    modifier = Modifier.weight(0.75f),
                     onClick = {
-                        activePanel =
-                            if (activePanel == KeyboardPanel.Emoji) KeyboardPanel.Voice else KeyboardPanel.Emoji
+                        activePanel = if (activePanel == KeyboardPanel.Voice) {
+                            KeyboardPanel.Emoji
+                        } else {
+                            KeyboardPanel.Voice
+                        }
                     }
                 ) {
-                    if (activePanel == KeyboardPanel.Emoji) {
+                    if (activePanel == KeyboardPanel.Voice) {
+                        SmileIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    } else {
                         Text(
                             text = "中",
                             color = textVariantColor,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
-                    } else {
-                        SmileIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                     }
                 }
 
                 Spacer(modifier = Modifier.width(6.dp))
 
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(0.9f),
-                    onClick = onOpenSettings
+                    modifier = Modifier.weight(0.75f),
+                    onClick = {
+                        if (activePanel == KeyboardPanel.Voice) {
+                            activePanel = KeyboardPanel.AlphaNum
+                        } else {
+                            onOpenSettings()
+                        }
+                    }
                 ) {
-                    SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    if (activePanel == KeyboardPanel.Voice) {
+                        KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    } else {
+                        SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(6.dp))
 
                 // Space Key
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(2.3f),
+                    modifier = Modifier.weight(2.1f),
                     onClick = onSendSpace
                 ) {
                     Text(
@@ -203,7 +238,7 @@ fun KeyboardScreen(
                 // Delete Key
                 KeyboardUtilityKey(
                     modifier = Modifier
-                        .weight(1.1f)
+                        .weight(1f)
                         .scale(deleteScale)
                         .pointerInput(onDeleteSurroundingText) {
                             detectTapGestures(
@@ -228,7 +263,7 @@ fun KeyboardScreen(
 
                 // Enter Key — filled accent so the primary commit action stands out.
                 KeyboardUtilityKey(
-                    modifier = Modifier.weight(1.2f),
+                    modifier = Modifier.weight(1.1f),
                     onClick = onSendEnter,
                     backgroundColor = primaryColor,
                     borderColor = primaryColor
@@ -246,7 +281,9 @@ fun KeyboardScreen(
 
 private enum class KeyboardPanel {
     Voice,
-    Emoji
+    Emoji,
+    Number,
+    AlphaNum
 }
 
 enum class KeyboardAction {
@@ -257,6 +294,106 @@ enum class KeyboardAction {
     Next,
     Previous,
     Done
+}
+
+enum class KeyboardInputMode {
+    Voice,
+    Number,
+    AlphaNum
+}
+
+private fun KeyboardInputMode.toPanel(): KeyboardPanel =
+    when (this) {
+        KeyboardInputMode.Voice -> KeyboardPanel.Voice
+        KeyboardInputMode.Number -> KeyboardPanel.Number
+        KeyboardInputMode.AlphaNum -> KeyboardPanel.AlphaNum
+    }
+
+@Composable
+fun NumberPanel(
+    modifier: Modifier = Modifier,
+    onCommitText: (String) -> Unit
+) {
+    val rows = listOf(
+        listOf("1", "2", "3"),
+        listOf("4", "5", "6"),
+        listOf("7", "8", "9"),
+        listOf(".", "0", "-")
+    )
+
+    KeyGridPanel(
+        modifier = modifier,
+        rows = rows,
+        onCommitText = onCommitText
+    )
+}
+
+@Composable
+fun AlphaNumPanel(
+    modifier: Modifier = Modifier,
+    onCommitText: (String) -> Unit
+) {
+    val rows = listOf(
+        listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
+        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
+        listOf("z", "x", "c", "v", "b", "n", "m"),
+        listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+    )
+
+    KeyGridPanel(
+        modifier = modifier,
+        rows = rows,
+        onCommitText = onCommitText
+    )
+}
+
+@Composable
+private fun KeyGridPanel(
+    modifier: Modifier = Modifier,
+    rows: List<List<String>>,
+    onCommitText: (String) -> Unit
+) {
+    Column(
+        modifier = modifier.padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        rows.forEach { row ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(34.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                row.forEach { key ->
+                    CharacterKey(
+                        modifier = Modifier.weight(1f),
+                        label = key.uppercase(),
+                        onClick = { onCommitText(key) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CharacterKey(
+    modifier: Modifier = Modifier,
+    label: String,
+    onClick: () -> Unit
+) {
+    KeyboardUtilityKey(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
 
 @Composable

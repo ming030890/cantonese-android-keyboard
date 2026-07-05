@@ -10,6 +10,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.SystemClock
+import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -32,6 +33,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardAction
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
 import com.qwenasr.QAsrEngine
 import kotlinx.coroutines.CoroutineScope
@@ -98,6 +100,9 @@ class CantoneseInputMethodService : InputMethodService(),
     private val _keyboardAction = MutableStateFlow(KeyboardAction.Enter)
     val keyboardAction = _keyboardAction.asStateFlow()
 
+    private val _keyboardInputMode = MutableStateFlow(KeyboardInputMode.Voice)
+    val keyboardInputMode = _keyboardInputMode.asStateFlow()
+
     private var audioRecordJob: Job? = null
     @Volatile
     private var activeAudioRecord: AudioRecord? = null
@@ -131,8 +136,10 @@ class CantoneseInputMethodService : InputMethodService(),
                         uiState = uiState,
                         volumeLevel = volumeLevel,
                         keyboardAction = keyboardAction,
+                        keyboardInputMode = keyboardInputMode,
                         onToggleRecording = { toggleRecording() },
                         onDeleteSurroundingText = { deleteSurroundingText() },
+                        onCommitText = { text -> commitText(text) },
                         onSendSpace = { sendSpace() },
                         onSendEnter = { sendEnter() },
                         onOpenSettings = { openSettingsApp() },
@@ -148,6 +155,7 @@ class CantoneseInputMethodService : InputMethodService(),
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
         super.onStartInput(info, restarting)
         _keyboardAction.value = keyboardActionFor(info)
+        _keyboardInputMode.value = keyboardInputModeFor(info)
         inputViewSession++
         if (!restarting) {
             stopRecordingInternal(discard = true)
@@ -159,6 +167,7 @@ class CantoneseInputMethodService : InputMethodService(),
         val startedAt = SystemClock.elapsedRealtime()
         super.onStartInputView(info, restarting)
         _keyboardAction.value = keyboardActionFor(info)
+        _keyboardInputMode.value = keyboardInputModeFor(info)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
         // Re-apply in case the system day/night mode changed while hidden.
@@ -656,6 +665,10 @@ class CantoneseInputMethodService : InputMethodService(),
         currentInputConnection?.commitText(" ", 1)
     }
 
+    private fun commitText(text: String) {
+        currentInputConnection?.commitText(text, 1)
+    }
+
     private fun sendEnter() {
         val connection = currentInputConnection
         if (connection != null) {
@@ -690,6 +703,28 @@ class CantoneseInputMethodService : InputMethodService(),
         }
         return imeOptions and EditorInfo.IME_MASK_ACTION
     }
+
+    private fun keyboardInputModeFor(editorInfo: EditorInfo?): KeyboardInputMode {
+        val inputType = editorInfo?.inputType ?: return KeyboardInputMode.Voice
+        val inputClass = inputType and InputType.TYPE_MASK_CLASS
+        val inputVariation = inputType and InputType.TYPE_MASK_VARIATION
+
+        return when {
+            inputVariation == InputType.TYPE_NUMBER_VARIATION_PASSWORD -> KeyboardInputMode.AlphaNum
+            inputClass == InputType.TYPE_CLASS_NUMBER ||
+                inputClass == InputType.TYPE_CLASS_PHONE ||
+                inputClass == InputType.TYPE_CLASS_DATETIME -> KeyboardInputMode.Number
+            inputClass == InputType.TYPE_CLASS_TEXT && inputVariation in passwordVariations ->
+                KeyboardInputMode.AlphaNum
+            else -> KeyboardInputMode.Voice
+        }
+    }
+
+    private val passwordVariations = setOf(
+        InputType.TYPE_TEXT_VARIATION_PASSWORD,
+        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+        InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+    )
 
     private fun sendEmoji(emoji: String) {
         currentInputConnection?.commitText(emoji, 1)

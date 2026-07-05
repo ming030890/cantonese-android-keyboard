@@ -96,11 +96,44 @@ fun KeyboardScreenEmojiPanelScreenshot() {
     )
 }
 
+@PreviewTest
+@Preview(
+    name = "Keyboard number panel",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = 270
+)
+@Composable
+fun KeyboardScreenNumberPanelScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Number
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard alphanum panel",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = 270
+)
+@Composable
+fun KeyboardScreenAlphaNumPanelScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.AlphaNum
+    )
+}
+
 @Composable
 private fun KeyboardScreenScreenshotContent(
     state: KeyboardUiState,
     volume: Float = 0f,
     action: KeyboardAction = KeyboardAction.Enter,
+    inputMode: KeyboardInputMode = KeyboardInputMode.Voice,
     initialEmojiPanel: Boolean = false
 ) {
     CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
@@ -108,8 +141,10 @@ private fun KeyboardScreenScreenshotContent(
             uiState = MutableStateFlow(state),
             volumeLevel = MutableStateFlow(volume),
             keyboardAction = MutableStateFlow(action),
+            keyboardInputMode = MutableStateFlow(inputMode),
             onToggleRecording = {},
             onDeleteSurroundingText = {},
+            onCommitText = {},
             onSendSpace = {},
             onSendEnter = {},
             onOpenSettings = {},
