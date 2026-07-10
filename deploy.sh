@@ -81,47 +81,36 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 2. Compile JNI Library (Optional, pass --compile / -c to force)
+# 2. Compile JNI Library
 # ---------------------------------------------------------------------------
-COMPILE=false
-for arg in "$@"; do
-    if [ "$arg" == "--compile" ] || [ "$arg" == "-c" ]; then
-        COMPILE=true
-    fi
-done
-
 SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libqwen_asr.so"
 
-if [ "$COMPILE" = "true" ] || [ ! -f "$SO_DEST" ]; then
-    echo -e "${COLOR_INFO}[Step 2/6] Compiling native libqwen_asr.so shared library...${COLOR_RESET}"
-    if [ ! -d "$PROJECT_DIR/../QwenASR" ]; then
-        echo -e "${COLOR_ERROR}Error: QwenASR workspace directory not found at '../QwenASR'.${COLOR_RESET}"
-        exit 1
-    fi
-
-    pushd "$PROJECT_DIR/../QwenASR" > /dev/null
-
-    echo -e "${COLOR_INFO}Building Rust crate 'qwen-asr' with native DOTPROD features and OpenBLAS...${COLOR_RESET}"
-
-    CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/Users/tony/Documents/keyboard/QwenASR/android-aarch64-clang \
-    CC_aarch64_linux_android=/Users/tony/Documents/keyboard/QwenASR/android-aarch64-clang \
-    AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar \
-    RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
-    RUSTFLAGS="-C target-feature=+dotprod" \
-    PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
-    OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
-    OPENBLAS_ANDROID_STATIC=1 \
-    cargo build --release --target aarch64-linux-android --features "blas android" -p qwen-asr
-
-    popd > /dev/null
-
-    echo -e "${COLOR_INFO}Copying compiled .so to keyboard project...${COLOR_RESET}"
-    mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
-    cp "$PROJECT_DIR/../QwenASR/target/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
-    echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
-else
-    echo -e "${COLOR_SUCCESS}[Step 2/6] Using existing libqwen_asr.so in jniLibs (Pass --compile to rebuild).${COLOR_RESET}"
+echo -e "${COLOR_INFO}[Step 2/6] Compiling native libqwen_asr.so shared library...${COLOR_RESET}"
+if [ ! -d "$PROJECT_DIR/../QwenASR" ]; then
+    echo -e "${COLOR_ERROR}Error: QwenASR workspace directory not found at '../QwenASR'.${COLOR_RESET}"
+    exit 1
 fi
+
+pushd "$PROJECT_DIR/../QwenASR" > /dev/null
+
+echo -e "${COLOR_INFO}Building Rust crate 'qwen-asr' with native DOTPROD features and OpenBLAS...${COLOR_RESET}"
+
+CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/Users/tony/Documents/keyboard/QwenASR/android-aarch64-clang \
+CC_aarch64_linux_android=/Users/tony/Documents/keyboard/QwenASR/android-aarch64-clang \
+AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar \
+RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
+RUSTFLAGS="-C target-feature=+dotprod" \
+PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
+OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
+OPENBLAS_ANDROID_STATIC=1 \
+cargo build --release --target aarch64-linux-android --features "blas android" -p qwen-asr
+
+popd > /dev/null
+
+echo -e "${COLOR_INFO}Copying compiled .so to keyboard project...${COLOR_RESET}"
+mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
+cp "$PROJECT_DIR/../QwenASR/target/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
+echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
 
 # ---------------------------------------------------------------------------
 # 3. Stage the ASR model into the Play Asset Delivery pack
