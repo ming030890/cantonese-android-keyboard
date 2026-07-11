@@ -553,17 +553,38 @@ class CantoneseInputMethodService : InputMethodService(),
         activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
         val session = inputViewSession
+        var composingTranscript = ""
 
         val listener = object : QAsrEngine.VadListener {
-            override fun onTranscript(segmentId: Long, text: String, isFinal: Boolean) {
+            override fun onTranscriptDelta(textDelta: String) {
                 serviceScope.launch(Dispatchers.Main.immediate) {
                     if (
                         isInputViewVisible &&
                         session == inputViewSession &&
-                        text.trim().isNotEmpty()
+                        textDelta.isNotEmpty()
                     ) {
-                        currentInputConnection?.commitText(text, 1)
+                        composingTranscript += textDelta
+                        currentInputConnection?.setComposingText(composingTranscript, 1)
                     }
+                }
+            }
+
+            override fun onTranscriptComplete() {
+                serviceScope.launch(Dispatchers.Main.immediate) {
+                    if (isInputViewVisible && session == inputViewSession) {
+                        currentInputConnection?.finishComposingText()
+                    }
+                    composingTranscript = ""
+                }
+            }
+
+            override fun onTranscriptError() {
+                serviceScope.launch(Dispatchers.Main.immediate) {
+                    if (isInputViewVisible && session == inputViewSession) {
+                        currentInputConnection?.setComposingText("", 1)
+                        currentInputConnection?.finishComposingText()
+                    }
+                    composingTranscript = ""
                 }
             }
         }
