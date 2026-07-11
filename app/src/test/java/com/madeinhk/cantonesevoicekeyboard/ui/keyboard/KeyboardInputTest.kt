@@ -14,6 +14,34 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class KeyboardInputTest {
     @Test
+    fun toolbarKeysAreRegisteredAgainAfterARecompositionClearsVisibleKeys() {
+        val registry = KeyboardKeyRegistry()
+        registry.beginLayout()
+        val initial = registerTextToolbarKeys(registry)
+        registry.updateSurfaceSize(width = 300, height = 100)
+        registry.updateVisualBounds(initial.settings, Rect(190f, 20f, 238f, 68f))
+        registry.updateVisualBounds(initial.voice, Rect(246f, 20f, 294f, 68f))
+
+        registry.beginLayout()
+        val recomposed = registerTextToolbarKeys(registry)
+        registry.updateSurfaceSize(width = 300, height = 100)
+
+        assertSame(initial.settings, recomposed.settings)
+        assertSame(initial.voice, recomposed.voice)
+        assertSame(recomposed.settings, registry.findKeyAt(220f, 40f))
+        assertSame(recomposed.voice, registry.findKeyAt(270f, 40f))
+    }
+
+    @Test
+    fun emojiPickerPassThroughOnlyAppliesInsideActivePickerBounds() {
+        val bounds = Rect(10f, 20f, 190f, 120f)
+
+        assertTrue(shouldPassToEmojiPicker(true, bounds, 50f, 60f))
+        assertFalse(shouldPassToEmojiPicker(false, bounds, 50f, 60f))
+        assertFalse(shouldPassToEmojiPicker(true, bounds, 50f, 140f))
+    }
+
+    @Test
     fun touchBounds_fillVisualSpacingAndKeyboardEdges() {
         val registry = KeyboardKeyRegistry()
         registry.beginLayout()

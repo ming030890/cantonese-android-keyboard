@@ -26,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 @Immutable
 data class BrandColors(
     val backgroundGradient: Brush,
+    val keyboardBackground: Brush,
     val keyboardKeySurface: Color,
     val keyboardModifierKeySurface: Color,
     val keyboardKeyOnSurface: Color
@@ -50,6 +51,7 @@ private val DefaultBrandTypography = BrandTypography(
 
 private val DarkBrandColors = BrandColors(
     backgroundGradient = Brush.verticalGradient(listOf(DarkMidnight, CarbonBlack)),
+    keyboardBackground = Brush.verticalGradient(listOf(CardGray, DarkMidnight)),
     keyboardKeySurface = CardGray,
     keyboardModifierKeySurface = BorderGray,
     keyboardKeyOnSurface = Color.White
@@ -57,6 +59,9 @@ private val DarkBrandColors = BrandColors(
 
 private val LightBrandColors = BrandColors(
     backgroundGradient = Brush.verticalGradient(listOf(LightGradientTop, LightGradientBottom)),
+    keyboardBackground = Brush.verticalGradient(
+        listOf(KeyboardBackgroundTop, KeyboardBackgroundBottom)
+    ),
     keyboardKeySurface = KeyboardKeySurface,
     keyboardModifierKeySurface = KeyboardModifierKeySurface,
     keyboardKeyOnSurface = KeyboardKeyOnSurface

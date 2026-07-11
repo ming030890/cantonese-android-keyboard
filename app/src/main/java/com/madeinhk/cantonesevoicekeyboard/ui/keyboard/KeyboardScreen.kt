@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -84,9 +85,8 @@ fun KeyboardScreen(
     val inlineSuggestions by inlineSuggestionViews.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
-    val backgroundColor = MaterialTheme.colorScheme.background
-    val surfaceColor = MaterialTheme.colorScheme.surface
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val keyboardColors = BrandTheme.colors
     val keyboardTypography = BrandTheme.typography
     var symbolVariant by remember(inputMode) {
         mutableStateOf(
@@ -102,8 +102,17 @@ fun KeyboardScreen(
     }
     var isUppercase by remember(activePanel) { mutableStateOf(false) }
     var showMoreSymbols by remember(activePanel) { mutableStateOf(false) }
+    var keyboardSurfaceOriginInRoot by remember { mutableStateOf(Offset.Zero) }
+    var emojiPickerBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
     val keyRegistry = remember { KeyboardKeyRegistry() }
     keyRegistry.beginLayout()
+    val toolbarKeys = if (
+        activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
+    ) {
+        registerTextToolbarKeys(keyRegistry)
+    } else {
+        null
+    }
     val inputReceiver = remember { KeyboardScreenInputReceiver() }
     val inputDispatcher = remember(inputReceiver) {
         CoroutineKeyboardInputDispatcher(inputReceiver)
@@ -166,17 +175,25 @@ fun KeyboardScreen(
         modifier = Modifier
             .fillMaxWidth()
             .height(keyboardHeight)
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        surfaceColor,     // Sleek deep charcoal
-                        backgroundColor   // Dark carbon black
-                    )
-                )
-            )
+            .background(brush = keyboardColors.keyboardBackground)
             .navigationBarsPadding()
-            .onGloballyPositioned(keyRegistry::updateSurfaceCoordinates)
-            .pointerInteropFilter { event -> touchController.onMotionEvent(event) }
+            .onGloballyPositioned { coordinates ->
+                keyboardSurfaceOriginInRoot = coordinates.boundsInRoot().topLeft
+                keyRegistry.updateSurfaceCoordinates(coordinates)
+            }
+            .pointerInteropFilter { event ->
+                if (shouldPassToEmojiPicker(
+                        emojiPanelActive = activePanel == KeyboardPanel.Emoji,
+                        emojiPickerBounds = emojiPickerBoundsInSurface,
+                        x = event.x,
+                        y = event.y
+                    )
+                ) {
+                    false
+                } else {
+                    touchController.onMotionEvent(event)
+                }
+            }
             .drawWithContent {
                 drawContent()
                 if (debugTouchBounds) {
@@ -211,7 +228,8 @@ fun KeyboardScreen(
 
             if (isTextPanel) {
                 TextKeyboardToolbar(
-                    keyRegistry = keyRegistry
+                    keyRegistry = keyRegistry,
+                    keys = checkNotNull(toolbarKeys)
                 )
             }
 
@@ -220,7 +238,16 @@ fun KeyboardScreen(
                     EmojiPickerPanel(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
+                            .weight(1f)
+                            .onGloballyPositioned { coordinates ->
+                                val bounds = coordinates.boundsInRoot()
+                                emojiPickerBoundsInSurface = Rect(
+                                    left = bounds.left - keyboardSurfaceOriginInRoot.x,
+                                    top = bounds.top - keyboardSurfaceOriginInRoot.y,
+                                    right = bounds.right - keyboardSurfaceOriginInRoot.x,
+                                    bottom = bounds.bottom - keyboardSurfaceOriginInRoot.y
+                                )
+                            },
                         onEmojiPicked = onEmojiPicked
                     )
                 }
@@ -469,7 +496,8 @@ private fun InlineSuggestionStrip(
 
 @Composable
 private fun TextKeyboardToolbar(
-    keyRegistry: KeyboardKeyRegistry
+    keyRegistry: KeyboardKeyRegistry,
+    keys: TextToolbarKeys
 ) {
     val keyboardColors = BrandTheme.colors
 
@@ -485,11 +513,7 @@ private fun TextKeyboardToolbar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ToolbarIconVisual(
-            key = keyRegistry.key(
-                id = "toolbar.settings",
-                data = KeyData("toolbar.settings", KeyboardKeyKind.Settings),
-                rowId = "toolbar"
-            ),
+            key = keys.settings,
             keyRegistry = keyRegistry
         ) {
             SettingsIcon(
@@ -498,11 +522,7 @@ private fun TextKeyboardToolbar(
             )
         }
         ToolbarIconVisual(
-            key = keyRegistry.key(
-                id = "toolbar.voice",
-                data = KeyData("toolbar.voice", KeyboardKeyKind.BackToVoice),
-                rowId = "toolbar"
-            ),
+            key = keys.voice,
             keyRegistry = keyRegistry
         ) {
             MicIcon(
@@ -512,6 +532,25 @@ private fun TextKeyboardToolbar(
         }
     }
 }
+
+internal data class TextToolbarKeys(
+    val settings: KeyModel,
+    val voice: KeyModel
+)
+
+internal fun registerTextToolbarKeys(keyRegistry: KeyboardKeyRegistry): TextToolbarKeys =
+    TextToolbarKeys(
+        settings = keyRegistry.key(
+            id = "toolbar.settings",
+            data = KeyData("toolbar.settings", KeyboardKeyKind.Settings),
+            rowId = "toolbar"
+        ),
+        voice = keyRegistry.key(
+            id = "toolbar.voice",
+            data = KeyData("toolbar.voice", KeyboardKeyKind.BackToVoice),
+            rowId = "toolbar"
+        )
+    )
 
 @Composable
 private fun ToolbarIconVisual(
@@ -539,6 +578,13 @@ private enum class KeyboardPanel {
     Number,
     AlphaNum
 }
+
+internal fun shouldPassToEmojiPicker(
+    emojiPanelActive: Boolean,
+    emojiPickerBounds: Rect,
+    x: Float,
+    y: Float
+): Boolean = emojiPanelActive && emojiPickerBounds.contains(Offset(x, y))
 
 private enum class SymbolVariant {
     Chinese,
