@@ -1,7 +1,6 @@
 package com.madeinhk.cantonesevoicekeyboard
 
 import android.Manifest
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -20,12 +19,9 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
-import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InlineSuggestion
 import android.view.inputmethod.InlineSuggestionsRequest
 import android.view.inputmethod.InlineSuggestionsResponse
-import android.view.inputmethod.InputMethodInfo
-import android.view.inputmethod.InputMethodSubtype
 import android.widget.inline.InlineContentView
 import android.widget.inline.InlinePresentationSpec
 import androidx.compose.ui.platform.ComposeView
@@ -76,10 +72,6 @@ class CantoneseInputMethodService : InputMethodService(),
         private const val INLINE_SUGGESTION_MIN_WIDTH_DP = 72
         private const val INLINE_SUGGESTION_HEIGHT_DP = 40
         private const val INLINE_SUGGESTION_MAX_COUNT = 3
-        private const val CANTONESE_HK_LANGUAGE_TAG = "yue-Hant-HK"
-        private const val CANTONESE_HK_LEGACY_LOCALE = "yue_HK"
-        private const val ENGLISH_HK_LANGUAGE_TAG = "en-HK"
-        private const val ENGLISH_HK_LEGACY_LOCALE = "en_HK"
     }
 
     // Lifecycle, ViewModel, SavedState bridges for Compose support
@@ -167,8 +159,7 @@ class CantoneseInputMethodService : InputMethodService(),
                         onSendSpace = { sendSpace() },
                         onSendEnter = { sendEnter() },
                         onOpenSettings = { openSettingsApp() },
-                        onEmojiPicked = { emoji -> sendEmoji(emoji) },
-                        onKeyboardInputModeSelected = { mode -> reportInputModeSubtype(mode) }
+                        onEmojiPicked = { emoji -> sendEmoji(emoji) }
                     )
                 }
             }
@@ -182,7 +173,6 @@ class CantoneseInputMethodService : InputMethodService(),
         _keyboardAction.value = keyboardActionFor(info)
         val inputMode = keyboardInputModeFor(info)
         _keyboardInputMode.value = inputMode
-        reportInputModeSubtype(inputMode)
         inputViewSession++
         clearInlineSuggestions()
         if (!restarting) {
@@ -197,7 +187,6 @@ class CantoneseInputMethodService : InputMethodService(),
         _keyboardAction.value = keyboardActionFor(info)
         val inputMode = keyboardInputModeFor(info)
         _keyboardInputMode.value = inputMode
-        reportInputModeSubtype(inputMode)
         clearInlineSuggestions()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
@@ -206,21 +195,6 @@ class CantoneseInputMethodService : InputMethodService(),
         val session = ++inputViewSession
         ensureModelLoadingStarted(session)
         Log.i(TAG, "onStartInputView completed in ${SystemClock.elapsedRealtime() - startedAt}ms")
-    }
-
-    override fun onCurrentInputMethodSubtypeChanged(newSubtype: InputMethodSubtype) {
-        super.onCurrentInputMethodSubtypeChanged(newSubtype)
-        val fieldInputMode = keyboardInputModeFor(currentInputEditorInfo)
-        if (fieldInputMode != KeyboardInputMode.Voice) {
-            _keyboardInputMode.value = fieldInputMode
-            return
-        }
-
-        _keyboardInputMode.value = when {
-            newSubtype.matchesLanguageTag(ENGLISH_HK_LANGUAGE_TAG, ENGLISH_HK_LEGACY_LOCALE) ->
-                KeyboardInputMode.AlphaNum
-            else -> KeyboardInputMode.Voice
-        }
     }
 
     /**
@@ -846,68 +820,6 @@ class CantoneseInputMethodService : InputMethodService(),
         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
         InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
     )
-
-    private fun reportInputModeSubtype(inputMode: KeyboardInputMode) {
-        val targetLanguage = when (inputMode) {
-            KeyboardInputMode.Voice -> ImeLanguage.CantoneseHongKong
-            KeyboardInputMode.AlphaNum -> ImeLanguage.EnglishHongKong
-            KeyboardInputMode.Number -> return
-        }
-        if (currentInputMethodSubtypeMatches(targetLanguage)) {
-            return
-        }
-        val inputMethodInfo = ownInputMethodInfo() ?: return
-        val subtype = inputMethodInfo.findSubtype(targetLanguage) ?: return
-
-        runCatching {
-            switchInputMethod(inputMethodInfo.id, subtype)
-        }.onFailure { error ->
-            Log.w(TAG, "Failed to switch IME subtype to $targetLanguage", error)
-        }
-    }
-
-    private fun currentInputMethodSubtypeMatches(language: ImeLanguage): Boolean {
-        val subtype = getSystemService(InputMethodManager::class.java)
-            .currentInputMethodSubtype
-            ?: return false
-        return subtype.matchesLanguage(language)
-    }
-
-    private fun ownInputMethodInfo(): InputMethodInfo? {
-        val serviceName = ComponentName(this, CantoneseInputMethodService::class.java).className
-        return getSystemService(InputMethodManager::class.java)
-            .inputMethodList
-            .firstOrNull { info ->
-                info.serviceInfo.packageName == packageName &&
-                    info.serviceInfo.name == serviceName
-            }
-    }
-
-    private fun InputMethodInfo.findSubtype(language: ImeLanguage): InputMethodSubtype? {
-        for (index in 0 until subtypeCount) {
-            val subtype = getSubtypeAt(index)
-            if (subtype.matchesLanguage(language)) {
-                return subtype
-            }
-        }
-        return null
-    }
-
-    private fun InputMethodSubtype.matchesLanguage(language: ImeLanguage): Boolean =
-        when (language) {
-            ImeLanguage.CantoneseHongKong ->
-                matchesLanguageTag(CANTONESE_HK_LANGUAGE_TAG, CANTONESE_HK_LEGACY_LOCALE)
-            ImeLanguage.EnglishHongKong ->
-                matchesLanguageTag(ENGLISH_HK_LANGUAGE_TAG, ENGLISH_HK_LEGACY_LOCALE)
-        }
-
-    private fun InputMethodSubtype.matchesLanguageTag(languageTag: String, legacyLocale: String): Boolean =
-        this.languageTag == languageTag || locale == legacyLocale
-
-    private enum class ImeLanguage {
-        CantoneseHongKong,
-        EnglishHongKong
-    }
 
     private fun sendEmoji(emoji: String) {
         clearInlineSuggestions()

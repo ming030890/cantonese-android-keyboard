@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardUiDefaults
 
 // Set of Material typography styles to start with
 val Typography =
@@ -39,8 +40,8 @@ val KeyboardKeyTextStyle =
   TextStyle(
     fontFamily = FontFamily.Default,
     fontWeight = FontWeight.Normal,
-    fontSize = 22.sp,
-    lineHeight = 24.sp,
+    fontSize = KeyboardUiDefaults.StandardKeyFontSize,
+    lineHeight = 30.sp,
     letterSpacing = 0.sp,
   )
 
@@ -48,8 +49,17 @@ val KeyboardUtilityKeyTextStyle =
   TextStyle(
     fontFamily = FontFamily.Default,
     fontWeight = FontWeight.Normal,
-    fontSize = 22.sp,
-    lineHeight = 24.sp,
+    fontSize = KeyboardUiDefaults.StandardKeyFontSize,
+    lineHeight = 30.sp,
+    letterSpacing = 0.sp,
+  )
+
+val KeyboardHintTextStyle =
+  TextStyle(
+    fontFamily = FontFamily.Monospace,
+    fontWeight = FontWeight.Normal,
+    fontSize = 12.sp,
+    lineHeight = 14.sp,
     letterSpacing = 0.sp,
   )
 
@@ -57,7 +67,16 @@ val KeyboardSpaceKeyTextStyle =
   TextStyle(
     fontFamily = FontFamily.Default,
     fontWeight = FontWeight.Normal,
-    fontSize = 16.sp,
+    fontSize = 12.sp,
+    lineHeight = 14.sp,
+    letterSpacing = 0.sp,
+  )
+
+val KeyboardModeSwitchKeyTextStyle =
+  TextStyle(
+    fontFamily = FontFamily.Default,
+    fontWeight = FontWeight.Normal,
+    fontSize = 18.sp,
     lineHeight = 20.sp,
     letterSpacing = 0.sp,
   )

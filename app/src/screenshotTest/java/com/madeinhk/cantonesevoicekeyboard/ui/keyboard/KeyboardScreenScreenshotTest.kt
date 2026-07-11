@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 320
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenIdleScreenshot() {
@@ -26,7 +26,7 @@ fun KeyboardScreenIdleScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 320
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenLoadingScreenshot() {
@@ -39,7 +39,7 @@ fun KeyboardScreenLoadingScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 320
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenRecordingScreenshot() {
@@ -55,7 +55,7 @@ fun KeyboardScreenRecordingScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 320
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenErrorScreenshot() {
@@ -70,7 +70,7 @@ fun KeyboardScreenErrorScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 320
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenSearchActionScreenshot() {
@@ -86,7 +86,7 @@ fun KeyboardScreenSearchActionScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 320
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenEmojiPanelScreenshot() {
@@ -102,7 +102,7 @@ fun KeyboardScreenEmojiPanelScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 352
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenNumberPanelScreenshot() {
@@ -118,7 +118,7 @@ fun KeyboardScreenNumberPanelScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = 364
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenAlphaNumPanelScreenshot() {

@@ -35,13 +35,17 @@ data class BrandColors(
 data class BrandTypography(
     val keyboardKey: TextStyle,
     val keyboardUtilityKey: TextStyle,
-    val keyboardSpaceKey: TextStyle
+    val keyboardHint: TextStyle,
+    val keyboardSpaceKey: TextStyle,
+    val keyboardModeSwitchKey: TextStyle
 )
 
 private val DefaultBrandTypography = BrandTypography(
     keyboardKey = KeyboardKeyTextStyle,
     keyboardUtilityKey = KeyboardUtilityKeyTextStyle,
-    keyboardSpaceKey = KeyboardSpaceKeyTextStyle
+    keyboardHint = KeyboardHintTextStyle,
+    keyboardSpaceKey = KeyboardSpaceKeyTextStyle,
+    keyboardModeSwitchKey = KeyboardModeSwitchKeyTextStyle
 )
 
 private val DarkBrandColors = BrandColors(
