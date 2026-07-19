@@ -51,7 +51,6 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.sin
 
 private val AlphaRowSpacing = 0.dp
@@ -69,7 +68,6 @@ fun KeyboardScreen(
     keyboardInputMode: StateFlow<KeyboardInputMode>,
     autofillSuggestionView: StateFlow<View?>,
     clipboardSuggestion: StateFlow<ClipboardSuggestion?>,
-    canFlagBadOutput: StateFlow<Boolean> = MutableStateFlow(false),
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
@@ -77,7 +75,6 @@ fun KeyboardScreen(
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
     onPasteClipboard: () -> Unit,
-    onFlagBadOutput: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     initialEmojiPanel: Boolean = false,
@@ -90,7 +87,6 @@ fun KeyboardScreen(
     val inputMode by keyboardInputMode.collectAsState()
     val autofillView by autofillSuggestionView.collectAsState()
     val clipboard by clipboardSuggestion.collectAsState()
-    val showBadOutputFlag by canFlagBadOutput.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -146,7 +142,6 @@ fun KeyboardScreen(
         inputReceiver.onToggleRecording = onToggleRecording
         inputReceiver.onOpenSettings = onOpenSettings
         inputReceiver.onPasteClipboard = onPasteClipboard
-        inputReceiver.onFlagBadOutput = onFlagBadOutput
         inputReceiver.onOpenEmoji = { activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
@@ -328,33 +323,6 @@ fun KeyboardScreen(
                                 volume = volume,
                                 onOpenSettings = onOpenSettings
                             )
-                        }
-                        if (showBadOutputFlag) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            KeyVisual(
-                                key = keyRegistry.key(
-                                    id = "voice.flag_bad",
-                                    data = KeyData(
-                                        "voice.flag_bad",
-                                        KeyboardKeyKind.FlagBadOutput,
-                                        text = "Flag bad output"
-                                    ),
-                                    rowId = "voice.flag_bad"
-                                ),
-                                keyRegistry = keyRegistry,
-                                modifier = Modifier.width(168.dp).height(36.dp),
-                                backgroundColor = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
-                                borderColor = MaterialTheme.colorScheme.error,
-                                shape = RoundedCornerShape(10.dp),
-                                pressedScale = 0.96f,
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.keyboard_flag_bad_output),
-                                    color = MaterialTheme.colorScheme.error,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
                         }
                     }
                 }
@@ -831,7 +799,6 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
     var onToggleRecording: () -> Unit = {}
     var onOpenSettings: () -> Unit = {}
     var onPasteClipboard: () -> Unit = {}
-    var onFlagBadOutput: () -> Unit = {}
     var onOpenEmoji: () -> Unit = {}
     var onBackToVoice: () -> Unit = {}
     var onToggleUppercase: () -> Unit = {}
@@ -855,7 +822,6 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
             KeyboardKeyKind.BackToVoice -> onBackToVoice()
             KeyboardKeyKind.Clipboard -> onPasteClipboard()
             KeyboardKeyKind.Record -> onToggleRecording()
-            KeyboardKeyKind.FlagBadOutput -> onFlagBadOutput()
             KeyboardKeyKind.Delete,
             KeyboardKeyKind.Utility -> Unit
         }

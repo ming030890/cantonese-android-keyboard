@@ -121,8 +121,6 @@ class CantoneseInputMethodService : InputMethodService(),
     val autofillSuggestionView = _autofillSuggestionView.asStateFlow()
     private val _clipboardSuggestion = MutableStateFlow<ClipboardSuggestion?>(null)
     val clipboardSuggestion = _clipboardSuggestion.asStateFlow()
-    private val _canFlagBadOutput = MutableStateFlow(false)
-    val canFlagBadOutput = _canFlagBadOutput.asStateFlow()
     private var autofillSuggestionGeneration = 0L
 
     private var clipboardManager: ClipboardManager? = null
@@ -142,7 +140,6 @@ class CantoneseInputMethodService : InputMethodService(),
     @Volatile
     private var activeDebugAudioStore: DebugAudioStore? = null
     private var activeDebugTranscript = StringBuffer()
-    private var lastCompletedDebugRecordingId: String? = null
 
     override fun onCreate() {
         val startedAt = SystemClock.elapsedRealtime()
@@ -174,7 +171,6 @@ class CantoneseInputMethodService : InputMethodService(),
                         keyboardInputMode = keyboardInputMode,
                         autofillSuggestionView = autofillSuggestionView,
                         clipboardSuggestion = clipboardSuggestion,
-                        canFlagBadOutput = canFlagBadOutput,
                         onToggleRecording = { toggleRecording() },
                         onDeleteSurroundingText = { deleteSurroundingText() },
                         onCommitText = { text -> commitText(text) },
@@ -182,7 +178,6 @@ class CantoneseInputMethodService : InputMethodService(),
                         onSendEnter = { sendEnter() },
                         onOpenSettings = { openSettingsApp() },
                         onPasteClipboard = { pasteClipboard() },
-                        onFlagBadOutput = { flagLastOutputAsBad() },
                         onEmojiPicked = { emoji -> sendEmoji(emoji) }
                     )
                 }
@@ -197,9 +192,6 @@ class CantoneseInputMethodService : InputMethodService(),
         _keyboardAction.value = keyboardActionFor(info)
         val inputMode = keyboardInputModeFor(info)
         _keyboardInputMode.value = inputMode
-        if (!DebugAudioSettings.isStoreDebugAudioEnabled(this)) {
-            _canFlagBadOutput.value = false
-        }
         inputViewSession++
         clearAutofillSuggestion()
         startClipboardObservation()
@@ -665,8 +657,6 @@ class CantoneseInputMethodService : InputMethodService(),
         isRecording = true
         activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
-        _canFlagBadOutput.value = false
-        lastCompletedDebugRecordingId = null
         val debugAudioStore = DebugAudioStore.createIfEnabled(this)
         activeDebugAudioStore = debugAudioStore
         activeDebugTranscript = StringBuffer()
@@ -827,10 +817,6 @@ class CantoneseInputMethodService : InputMethodService(),
             val completedStore = activeDebugAudioStore
             if (completedStore != null) {
                 runCatching { completedStore.finish(activeDebugTranscript.toString()) }
-                    .onSuccess {
-                        lastCompletedDebugRecordingId = completedStore.recordingId
-                        _canFlagBadOutput.value = true
-                    }
                     .onFailure { Log.w(TAG, "Failed to finalize debug recording", it) }
             }
             activeDebugAudioStore = null
@@ -839,15 +825,6 @@ class CantoneseInputMethodService : InputMethodService(),
                 _uiState.value = KeyboardUiState.Idle
             }
             transcriptionJob = null
-        }
-    }
-
-    private fun flagLastOutputAsBad() {
-        val recordingId = lastCompletedDebugRecordingId ?: return
-        serviceScope.launch(Dispatchers.IO) {
-            if (DebugAudioStore.markBad(this@CantoneseInputMethodService, recordingId)) {
-                _canFlagBadOutput.value = false
-            }
         }
     }
 

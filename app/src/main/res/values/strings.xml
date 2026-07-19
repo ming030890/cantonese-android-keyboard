@@ -107,7 +107,6 @@
     <string name="keyboard_status_error_setup">Tap to open settings</string>
     <string name="keyboard_key_space">Space</string>
     <string name="keyboard_key_enter">Enter</string>
-    <string name="keyboard_flag_bad_output">Flag bad output</string>
     <string name="keyboard_toolbar_settings">Settings</string>
     <string name="keyboard_toolbar_voice">Voice input</string>
     <string name="keyboard_toolbar_clipboard_preview">Paste %1$s</string>

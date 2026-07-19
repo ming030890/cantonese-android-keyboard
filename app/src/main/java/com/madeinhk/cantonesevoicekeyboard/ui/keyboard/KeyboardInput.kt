@@ -40,7 +40,6 @@ enum class KeyboardKeyKind {
     BackToVoice,
     Clipboard,
     Record,
-    FlagBadOutput,
     Utility
 }
 
