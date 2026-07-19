@@ -1,5 +1,6 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
+import android.view.MotionEvent
 import android.view.View
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -75,6 +76,7 @@ fun KeyboardScreen(
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
     onPasteClipboard: () -> Unit,
+    onAutofillTapped: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     initialEmojiPanel: Boolean = false,
@@ -197,18 +199,29 @@ fun KeyboardScreen(
                 keyRegistry.updateSurfaceCoordinates(coordinates)
             }
             .pointerInteropFilter { event ->
+                val passToAutofill = shouldPassToAutofillView(
+                    autofillViewPresent = autofillView != null,
+                    autofillBounds = autofillBoundsInSurface,
+                    x = event.x,
+                    y = event.y
+                )
+                if (shouldDismissAutofillOnTouch(
+                        autofillViewPresent = autofillView != null,
+                        autofillBounds = autofillBoundsInSurface,
+                        action = event.actionMasked,
+                        x = event.x,
+                        y = event.y
+                    )
+                ) {
+                    onAutofillTapped()
+                }
                 if (shouldPassToEmojiPicker(
                         emojiPanelActive = activePanel == KeyboardPanel.Emoji,
                         emojiPickerBounds = emojiPickerBoundsInSurface,
                         x = event.x,
                         y = event.y
                     )
-                    || shouldPassToAutofillView(
-                        autofillViewPresent = autofillView != null,
-                        autofillBounds = autofillBoundsInSurface,
-                        x = event.x,
-                        y = event.y
-                    )
+                    || passToAutofill
                 ) {
                     false
                 } else {
@@ -755,6 +768,15 @@ internal fun shouldPassToAutofillView(
     x: Float,
     y: Float,
 ): Boolean = autofillViewPresent && autofillBounds.contains(Offset(x, y))
+
+internal fun shouldDismissAutofillOnTouch(
+    autofillViewPresent: Boolean,
+    autofillBounds: Rect,
+    action: Int,
+    x: Float,
+    y: Float,
+): Boolean = action == MotionEvent.ACTION_DOWN &&
+    shouldPassToAutofillView(autofillViewPresent, autofillBounds, x, y)
 
 private enum class SymbolVariant {
     Chinese,

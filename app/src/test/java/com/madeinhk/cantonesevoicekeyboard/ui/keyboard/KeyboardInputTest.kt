@@ -2,6 +2,7 @@ package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import android.view.MotionEvent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -69,6 +70,15 @@ class KeyboardInputTest {
         assertTrue(shouldPassToAutofillView(true, bounds, 150f, 30f))
         assertFalse(shouldPassToAutofillView(true, bounds, 80f, 30f))
         assertFalse(shouldPassToAutofillView(false, bounds, 150f, 30f))
+    }
+
+    @Test
+    fun providerRenderedAutofillViewIsDismissedOnTouchDownInsideBounds() {
+        val bounds = Rect(100f, 10f, 290f, 58f)
+
+        assertTrue(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_DOWN, 150f, 30f))
+        assertFalse(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_UP, 150f, 30f))
+        assertFalse(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_DOWN, 80f, 30f))
     }
 
     @Test

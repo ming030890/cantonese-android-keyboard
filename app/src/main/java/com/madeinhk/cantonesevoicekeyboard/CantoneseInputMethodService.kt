@@ -178,6 +178,7 @@ class CantoneseInputMethodService : InputMethodService(),
                         onSendEnter = { sendEnter() },
                         onOpenSettings = { openSettingsApp() },
                         onPasteClipboard = { pasteClipboard() },
+                        onAutofillTapped = { clearAutofillSuggestion() },
                         onEmojiPicked = { emoji -> sendEmoji(emoji) }
                     )
                 }
@@ -537,6 +538,9 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     private fun pasteClipboard() {
+        // Hide the chip immediately. Re-reading below still validates and commits the
+        // current clipboard item, and the generation remains dismissed until it changes.
+        _clipboardSuggestion.value = null
         val manager = clipboardManager ?: return
         val clip = manager.primaryClip
         val description = clip?.description
