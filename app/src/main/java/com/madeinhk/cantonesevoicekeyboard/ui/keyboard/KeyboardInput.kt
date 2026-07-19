@@ -38,7 +38,9 @@ enum class KeyboardKeyKind {
     Emoji,
     Settings,
     BackToVoice,
+    Clipboard,
     Record,
+    FlagBadOutput,
     Utility
 }
 

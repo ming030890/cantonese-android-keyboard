@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import com.madeinhk.cantonesevoicekeyboard.ModelAssetPack
 import com.madeinhk.cantonesevoicekeyboard.ModelDownloadStatus
 import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
+import com.madeinhk.cantonesevoicekeyboard.DebugAudio
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.madeinhk.cantonesevoicekeyboard.theme.*
@@ -128,6 +129,7 @@ fun MainScreen(
       DebugAudioSettings.setStoreDebugAudioEnabled(context, enabled)
       storeDebugAudio = enabled
     },
+    onOpenDebugAudio = { onItemClick(DebugAudio) },
     modifier = modifier
   )
 }
@@ -148,6 +150,7 @@ fun MainScreenContent(
   onModelRetry: () -> Unit,
   storeDebugAudio: Boolean,
   onStoreDebugAudioChange: (Boolean) -> Unit,
+  onOpenDebugAudio: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
   // Backdrop gradient comes from the theme (decided once per light/dark there),
@@ -205,7 +208,8 @@ fun MainScreenContent(
 
       DeveloperOptionsCard(
         storeDebugAudio = storeDebugAudio,
-        onStoreDebugAudioChange = onStoreDebugAudioChange
+        onStoreDebugAudioChange = onStoreDebugAudioChange,
+        onOpenDebugAudio = onOpenDebugAudio
       )
 
       Spacer(modifier = Modifier.height(24.dp))
@@ -573,6 +577,7 @@ fun ModelStatusCard(
 fun DeveloperOptionsCard(
   storeDebugAudio: Boolean,
   onStoreDebugAudioChange: (Boolean) -> Unit,
+  onOpenDebugAudio: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
   val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -622,6 +627,14 @@ fun DeveloperOptionsCard(
           checked = storeDebugAudio,
           onCheckedChange = onStoreDebugAudioChange
         )
+      }
+      Spacer(modifier = Modifier.height(8.dp))
+      TextButton(
+        onClick = onOpenDebugAudio,
+        enabled = storeDebugAudio,
+        modifier = Modifier.align(Alignment.End)
+      ) {
+        Text(stringResource(R.string.developer_manage_audio))
       }
     }
   }

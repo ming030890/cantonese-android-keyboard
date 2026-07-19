@@ -39,8 +39,65 @@
 
     <!-- Developer Options -->
     <string name="developer_options_title">Developer options</string>
-    <string name="developer_store_audio_title">Store debug audio</string>
-    <string name="developer_store_audio_desc">Save recordings for debugging. Only the latest 100 are kept.</string>
+    <string name="developer_store_audio_title">Training data debug mode</string>
+    <string name="developer_store_audio_desc">Keep the latest 100 recordings, model output, and VAD metadata so bad results can be corrected and synced.</string>
+    <string name="developer_manage_audio">Manage saved recordings</string>
+
+    <!-- Debug audio collection -->
+    <string name="debug_audio_title">Training recordings</string>
+    <string name="debug_back">Back</string>
+    <string name="debug_choose_folder">Drive folder</string>
+    <string name="debug_folder_saved">Drive folder saved. Nothing was synced.</string>
+    <string name="debug_recording_count">%1$d of 100 recordings</string>
+    <string name="debug_annotated_ready_count">%1$d annotated and ready to sync</string>
+    <string name="debug_sync">Sync</string>
+    <string name="debug_syncing">Syncing…</string>
+    <string name="debug_sync_result">Uploaded and removed %1$d local recordings; failed %2$d</string>
+    <string name="debug_sync_failed">Couldn’t access the selected folder. Choose the Drive folder again.</string>
+    <string name="debug_no_recordings">No recordings yet. Use voice input while debug mode is enabled.</string>
+    <string name="debug_bad_badge">BAD</string>
+    <string name="debug_good_badge">GOOD</string>
+    <string name="debug_annotated_badge">ANNOTATED</string>
+    <string name="debug_unannotated_badge">NOT ANNOTATED</string>
+    <string name="debug_flagged_bad_badge">FLAGGED BAD</string>
+    <string name="debug_synced_badge">SYNCED</string>
+    <string name="debug_no_transcript">No model transcript</string>
+    <string name="debug_recording_details">%1$.1f s • %2$d VAD segments</string>
+    <string name="debug_correct_transcript">Correct transcript</string>
+    <string name="debug_transcript_label">Transcript</string>
+    <string name="debug_model_output_label">Model output</string>
+    <string name="debug_corrected_output_label">Correct transcript</string>
+    <string name="debug_model_no_speech">No model output (VAD or ASR returned empty)</string>
+    <string name="debug_model_pending">Running the model…</string>
+    <string name="debug_annotation_quality">Review result</string>
+    <string name="debug_mark_good">Good</string>
+    <string name="debug_mark_bad">Bad</string>
+    <string name="debug_bad_needs_correction">Bad output requires a corrected transcript. You can save now, but it will remain not annotated and will not sync.</string>
+    <string name="debug_save_annotation">Save annotation</string>
+    <string name="debug_cancel">Cancel</string>
+    <string name="debug_remove_recording">Remove</string>
+    <string name="debug_remove_confirm_title">Remove this recording?</string>
+    <string name="debug_remove_confirm_desc">This permanently deletes the local audio, transcripts, and VAD metadata.</string>
+    <string name="debug_remove">Remove</string>
+    <string name="debug_backfilling_model">Running current VAD + model for old recordings: %1$d/%2$d</string>
+    <string name="debug_backfill_result">Model backfill completed %1$d; failed %2$d</string>
+    <string name="debug_whole_input_title">Complete microphone input</string>
+    <string name="debug_whole_input_desc">Listen to everything captured before VAD. Compare this with the model segments below to find missing or incorrect VAD cuts.</string>
+    <string name="debug_play_whole_audio">Play complete input</string>
+    <string name="debug_stop_audio">Stop</string>
+    <string name="debug_quick_play">Play</string>
+    <string name="debug_quick_good">Good</string>
+    <string name="debug_bad_and_correct">Bad &amp; correct</string>
+    <string name="debug_edit_annotation">Edit</string>
+    <string name="debug_show_vad_details">Show VAD details</string>
+    <string name="debug_hide_vad_details">Hide VAD details</string>
+    <string name="debug_model_segments_title">Actual model input</string>
+    <string name="debug_model_segments_desc">Each blue range and playable file is the exact post-VAD audio passed to the speech model.</string>
+    <string name="debug_vad_summary">Selected %1$.2f of %2$.2f s • thresholds %3$.2f/%4$.2f • silence %5$d ms • padding %6$d ms • queue drops %7$d</string>
+    <string name="debug_no_vad_segments">VAD sent no audio to the model.</string>
+    <string name="debug_segment_title">Segment %1$d • %2$.2f–%3$.2f s</string>
+    <string name="debug_segment_vad_details">VAD score min/avg/max %1$.2f/%2$.2f/%3$.2f • ended by %4$s</string>
+    <string name="debug_play_segment">Play</string>
 
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">Tap to speak</string>
@@ -50,6 +107,11 @@
     <string name="keyboard_status_error_setup">Tap to open settings</string>
     <string name="keyboard_key_space">Space</string>
     <string name="keyboard_key_enter">Enter</string>
+    <string name="keyboard_flag_bad_output">Flag bad output</string>
+    <string name="keyboard_toolbar_settings">Settings</string>
+    <string name="keyboard_toolbar_voice">Voice input</string>
+    <string name="keyboard_toolbar_clipboard_preview">Paste %1$s</string>
+    <string name="keyboard_toolbar_paste">Paste</string>
 
     <!-- Input Method Service Error Strings -->
     <string name="error_external_storage_unavailable">Can\'t access device storage.</string>

@@ -28,8 +28,29 @@ class KeyboardInputTest {
 
         assertSame(initial.settings, recomposed.settings)
         assertSame(initial.voice, recomposed.voice)
+        assertSame(initial.clipboard, recomposed.clipboard)
         assertSame(recomposed.settings, registry.findKeyAt(220f, 40f))
         assertSame(recomposed.voice, registry.findKeyAt(270f, 40f))
+    }
+
+    @Test
+    fun clipboardToolbarKeyIsRegisteredAndHitAfterSecondaryActionChanges() {
+        val registry = KeyboardKeyRegistry()
+        registry.beginLayout()
+        val voice = registerTextToolbarKeys(registry, ToolbarSecondaryAction.Voice)
+        registry.updateSurfaceSize(width = 300, height = 100)
+        registry.updateVisualBounds(voice.settings, Rect(190f, 20f, 238f, 68f))
+        registry.updateVisualBounds(voice.voice, Rect(246f, 20f, 294f, 68f))
+
+        registry.beginLayout()
+        val clipboard = registerTextToolbarKeys(registry, ToolbarSecondaryAction.Clipboard)
+        registry.updateSurfaceSize(width = 300, height = 100)
+        registry.updateVisualBounds(clipboard.settings, Rect(190f, 20f, 238f, 68f))
+        registry.updateVisualBounds(clipboard.clipboard, Rect(246f, 20f, 294f, 68f))
+
+        assertEquals(false, clipboard.voice.enabled)
+        assertTrue(clipboard.clipboard.enabled)
+        assertSame(clipboard.clipboard, registry.findKeyAt(270f, 40f))
     }
 
     @Test
@@ -39,6 +60,15 @@ class KeyboardInputTest {
         assertTrue(shouldPassToEmojiPicker(true, bounds, 50f, 60f))
         assertFalse(shouldPassToEmojiPicker(false, bounds, 50f, 60f))
         assertFalse(shouldPassToEmojiPicker(true, bounds, 50f, 140f))
+    }
+
+    @Test
+    fun providerRenderedAutofillViewBypassesKeyboardTouchControllerOnlyInsideBounds() {
+        val bounds = Rect(100f, 10f, 290f, 58f)
+
+        assertTrue(shouldPassToAutofillView(true, bounds, 150f, 30f))
+        assertFalse(shouldPassToAutofillView(true, bounds, 80f, 30f))
+        assertFalse(shouldPassToAutofillView(false, bounds, 150f, 30f))
     }
 
     @Test

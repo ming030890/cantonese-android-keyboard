@@ -1,6 +1,9 @@
 package com.madeinhk.cantonesevoicekeyboard
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipDescription
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,7 +20,6 @@ import android.util.Size
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InlineSuggestion
 import android.view.inputmethod.InlineSuggestionsRequest
@@ -41,8 +43,12 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardAction
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.ClipboardItemSnapshot
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.ClipboardSnapshot
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.ClipboardSuggestion
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.clipboardSuggestionFor
 import com.qwenasr.QAsrEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
@@ -67,11 +73,8 @@ class CantoneseInputMethodService : InputMethodService(),
     companion object {
         private const val TAG = "CantoneseIME"
         private const val SAMPLE_RATE = 16000
-        private const val PROMPT_TEXT_BEFORE_CURSOR_CHARS = 160
-        private const val PROMPT_TEXT_AFTER_CURSOR_CHARS = 80
         private const val INLINE_SUGGESTION_MIN_WIDTH_DP = 72
-        private const val INLINE_SUGGESTION_HEIGHT_DP = 40
-        private const val INLINE_SUGGESTION_MAX_COUNT = 3
+        private const val INLINE_SUGGESTION_HEIGHT_DP = 48
     }
 
     // Lifecycle, ViewModel, SavedState bridges for Compose support
@@ -114,15 +117,32 @@ class CantoneseInputMethodService : InputMethodService(),
     private val _keyboardInputMode = MutableStateFlow(KeyboardInputMode.Voice)
     val keyboardInputMode = _keyboardInputMode.asStateFlow()
 
-    private val _inlineSuggestionViews = MutableStateFlow<List<View>>(emptyList())
-    val inlineSuggestionViews = _inlineSuggestionViews.asStateFlow()
-    private var inlineSuggestionsGeneration = 0L
+    private val _autofillSuggestionView = MutableStateFlow<View?>(null)
+    val autofillSuggestionView = _autofillSuggestionView.asStateFlow()
+    private val _clipboardSuggestion = MutableStateFlow<ClipboardSuggestion?>(null)
+    val clipboardSuggestion = _clipboardSuggestion.asStateFlow()
+    private val _canFlagBadOutput = MutableStateFlow(false)
+    val canFlagBadOutput = _canFlagBadOutput.asStateFlow()
+    private var autofillSuggestionGeneration = 0L
+
+    private var clipboardManager: ClipboardManager? = null
+    private var clipboardGeneration = 0L
+    private var dismissedClipboardGeneration: Long? = null
+    private var lastObservedClip: ClipData? = null
+    private var clipboardObservationActive = false
+    private val clipboardListener = ClipboardManager.OnPrimaryClipChangedListener {
+        refreshClipboardSuggestion(forceGeneration = true)
+    }
 
     private var audioRecordJob: Job? = null
     @Volatile
     private var activeAudioRecord: AudioRecord? = null
     @Volatile
     private var isRecording = false
+    @Volatile
+    private var activeDebugAudioStore: DebugAudioStore? = null
+    private var activeDebugTranscript = StringBuffer()
+    private var lastCompletedDebugRecordingId: String? = null
 
     override fun onCreate() {
         val startedAt = SystemClock.elapsedRealtime()
@@ -152,13 +172,17 @@ class CantoneseInputMethodService : InputMethodService(),
                         volumeLevel = volumeLevel,
                         keyboardAction = keyboardAction,
                         keyboardInputMode = keyboardInputMode,
-                        inlineSuggestionViews = inlineSuggestionViews,
+                        autofillSuggestionView = autofillSuggestionView,
+                        clipboardSuggestion = clipboardSuggestion,
+                        canFlagBadOutput = canFlagBadOutput,
                         onToggleRecording = { toggleRecording() },
                         onDeleteSurroundingText = { deleteSurroundingText() },
                         onCommitText = { text -> commitText(text) },
                         onSendSpace = { sendSpace() },
                         onSendEnter = { sendEnter() },
                         onOpenSettings = { openSettingsApp() },
+                        onPasteClipboard = { pasteClipboard() },
+                        onFlagBadOutput = { flagLastOutputAsBad() },
                         onEmojiPicked = { emoji -> sendEmoji(emoji) }
                     )
                 }
@@ -173,8 +197,12 @@ class CantoneseInputMethodService : InputMethodService(),
         _keyboardAction.value = keyboardActionFor(info)
         val inputMode = keyboardInputModeFor(info)
         _keyboardInputMode.value = inputMode
+        if (!DebugAudioSettings.isStoreDebugAudioEnabled(this)) {
+            _canFlagBadOutput.value = false
+        }
         inputViewSession++
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
+        startClipboardObservation()
         if (!restarting) {
             stopRecordingInternal(discard = true)
             _volumeLevel.value = 0f
@@ -187,7 +215,8 @@ class CantoneseInputMethodService : InputMethodService(),
         _keyboardAction.value = keyboardActionFor(info)
         val inputMode = keyboardInputModeFor(info)
         _keyboardInputMode.value = inputMode
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
+        startClipboardObservation()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         isInputViewVisible = true
         // Re-apply in case the system day/night mode changed while hidden.
@@ -303,13 +332,15 @@ class CantoneseInputMethodService : InputMethodService(),
     override fun onFinishInput() {
         super.onFinishInput()
         inputViewSession++
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
+        stopClipboardObservation()
         finishInputSession(releaseModel = false)
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
+        stopClipboardObservation()
         if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
@@ -370,14 +401,15 @@ class CantoneseInputMethodService : InputMethodService(),
             oldSelEnd != newSelEnd ||
             candidatesStart != candidatesEnd
         ) {
-            clearInlineSuggestions()
+            clearAutofillSuggestion()
         }
     }
 
     override fun onWindowHidden() {
         super.onWindowHidden()
         inputViewSession++
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
+        stopClipboardObservation()
         if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
@@ -390,7 +422,8 @@ class CantoneseInputMethodService : InputMethodService(),
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         store.clear()
         isInputViewVisible = false
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
+        stopClipboardObservation()
         stopRecordingInternal(discard = true)
         
         // Final safety cleanup
@@ -405,7 +438,7 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     override fun onCreateInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest {
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
         val spec = InlinePresentationSpec.Builder(
             Size(dpToPx(INLINE_SUGGESTION_MIN_WIDTH_DP), dpToPx(INLINE_SUGGESTION_HEIGHT_DP)),
             Size(getMaxWidth().coerceAtLeast(dpToPx(INLINE_SUGGESTION_MIN_WIDTH_DP)), dpToPx(INLINE_SUGGESTION_HEIGHT_DP))
@@ -414,32 +447,29 @@ class CantoneseInputMethodService : InputMethodService(),
             .build()
 
         return InlineSuggestionsRequest.Builder(listOf(spec))
-            .setMaxSuggestionCount(INLINE_SUGGESTION_MAX_COUNT)
+            .setMaxSuggestionCount(1)
             .build()
     }
 
     override fun onInlineSuggestionsResponse(response: InlineSuggestionsResponse): Boolean {
-        val suggestions = response.inlineSuggestions
-        if (suggestions.isEmpty()) {
-            clearInlineSuggestions()
+        val suggestion = response.inlineSuggestions.firstOrNull()
+        if (suggestion == null) {
+            clearAutofillSuggestion()
             return true
         }
 
-        val generation = inlineSuggestionsGeneration
-        val inflatedViews = arrayOfNulls<View>(suggestions.size)
+        val generation = ++autofillSuggestionGeneration
+        _autofillSuggestionView.value = null
         val size = Size(
             getMaxWidth().coerceAtLeast(dpToPx(INLINE_SUGGESTION_MIN_WIDTH_DP)),
             dpToPx(INLINE_SUGGESTION_HEIGHT_DP)
         )
-        suggestions.forEachIndexed { index, suggestion ->
-            inflateInlineSuggestion(suggestion, size) { view ->
-                if (generation != inlineSuggestionsGeneration || !isInputViewVisible) {
-                    return@inflateInlineSuggestion
-                }
-                (view.parent as? ViewGroup)?.removeView(view)
-                inflatedViews[index] = view
-                _inlineSuggestionViews.value = inflatedViews.filterNotNull()
+        inflateInlineSuggestion(suggestion, size) { view ->
+            if (generation != autofillSuggestionGeneration || !isInputViewVisible) {
+                return@inflateInlineSuggestion
             }
+            (view.parent as? ViewGroup)?.removeView(view)
+            _autofillSuggestionView.value = view
         }
         return true
     }
@@ -456,11 +486,95 @@ class CantoneseInputMethodService : InputMethodService(),
         }
     }
 
-    private fun clearInlineSuggestions() {
-        inlineSuggestionsGeneration++
-        if (_inlineSuggestionViews.value.isNotEmpty()) {
-            _inlineSuggestionViews.value = emptyList()
+    private fun clearAutofillSuggestion() {
+        autofillSuggestionGeneration++
+        _autofillSuggestionView.value = null
+    }
+
+    private fun startClipboardObservation() {
+        if (clipboardObservationActive) return
+        val manager = getSystemService(ClipboardManager::class.java) ?: return
+        clipboardManager = manager
+        manager.addPrimaryClipChangedListener(clipboardListener)
+        clipboardObservationActive = true
+        refreshClipboardSuggestion()
+    }
+
+    private fun stopClipboardObservation() {
+        if (!clipboardObservationActive) return
+        clipboardManager?.removePrimaryClipChangedListener(clipboardListener)
+        clipboardObservationActive = false
+        _clipboardSuggestion.value = null
+    }
+
+    private fun refreshClipboardSuggestion(forceGeneration: Boolean = false) {
+        if (!clipboardObservationActive) return
+        val clip = clipboardManager?.primaryClip
+        if (forceGeneration || clip !== lastObservedClip) {
+            clipboardGeneration++
+            lastObservedClip = clip
         }
+
+        val description = clip?.description
+        val isSensitive = description?.extras?.getBoolean(ClipDescription.EXTRA_IS_SENSITIVE, false) == true
+        val mimeTypes = if (description == null) {
+            emptySet()
+        } else {
+            (0 until description.mimeTypeCount).mapTo(mutableSetOf()) { description.getMimeType(it) }
+        }
+        val items = if (clip == null) {
+            emptyList()
+        } else {
+            (0 until clip.itemCount).map {
+                val item = clip.getItemAt(it)
+                ClipboardItemSnapshot(
+                    mimeTypes = mimeTypes,
+                    // Never inspect sensitive clipboard text before the user taps.
+                    text = if (isSensitive) null else item.text?.toString()
+                )
+            }
+        }
+        _clipboardSuggestion.value = clipboardSuggestionFor(
+            snapshot = ClipboardSnapshot(
+                token = clipboardGeneration,
+                items = items,
+                isSensitive = isSensitive
+            ),
+            dismissedToken = dismissedClipboardGeneration
+        )
+    }
+
+    private fun pasteClipboard() {
+        val manager = clipboardManager ?: return
+        val clip = manager.primaryClip
+        val description = clip?.description
+        if (
+            clip == null ||
+            description == null ||
+            description.mimeTypeCount != 1 ||
+            !description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
+        ) {
+            refreshClipboardSuggestion(forceGeneration = true)
+            return
+        }
+
+        if (clip !== lastObservedClip) {
+            refreshClipboardSuggestion()
+        }
+        val token = clipboardGeneration
+        val text = (0 until clip.itemCount)
+            .asSequence()
+            .mapNotNull { clip.getItemAt(it).coerceToText(this)?.toString() }
+            .firstOrNull { it.isNotEmpty() }
+
+        // Dismiss this clipboard generation even if the target disappeared or the item
+        // turned out to be empty after it was re-read.
+        dismissedClipboardGeneration = token
+        clearAutofillSuggestion()
+        if (text != null) {
+            currentInputConnection?.commitText(text, 1)
+        }
+        refreshClipboardSuggestion()
     }
 
     private fun dpToPx(dp: Int): Int =
@@ -504,8 +618,7 @@ class CantoneseInputMethodService : InputMethodService(),
             _uiState.value = KeyboardUiState.Error(getString(R.string.error_failed_initialize_asr))
             return
         }
-        val cursorPrompt = buildCursorContextPrompt(currentInputConnection)
-        engine.setPrompt(cursorPrompt)
+        engine.setPrompt("")
 
         val minBufferSize = AudioRecord.getMinBufferSize(
             SAMPLE_RATE,
@@ -552,11 +665,17 @@ class CantoneseInputMethodService : InputMethodService(),
         isRecording = true
         activeAudioRecord = audioRecord
         _uiState.value = KeyboardUiState.Recording
+        _canFlagBadOutput.value = false
+        lastCompletedDebugRecordingId = null
+        val debugAudioStore = DebugAudioStore.createIfEnabled(this)
+        activeDebugAudioStore = debugAudioStore
+        activeDebugTranscript = StringBuffer()
         val session = inputViewSession
         var composingTranscript = ""
 
         val listener = object : QAsrEngine.VadListener {
             override fun onTranscriptDelta(textDelta: String) {
+                activeDebugTranscript.append(textDelta)
                 serviceScope.launch(Dispatchers.Main.immediate) {
                     if (
                         isInputViewVisible &&
@@ -589,7 +708,7 @@ class CantoneseInputMethodService : InputMethodService(),
             }
         }
 
-        val vadStarted = engine.startVadSession(listener)
+        val vadStarted = engine.startVadSession(listener, debugAudioStore?.directory?.absolutePath)
         if (!vadStarted) {
             Log.e(TAG, "Failed to start native VAD session.")
             isRecording = false
@@ -600,6 +719,8 @@ class CantoneseInputMethodService : InputMethodService(),
             }
             audioRecord.release()
             activeAudioRecord = null
+            debugAudioStore?.closeAndDelete()
+            activeDebugAudioStore = null
             _uiState.value = KeyboardUiState.Idle
             return
         }
@@ -608,8 +729,6 @@ class CantoneseInputMethodService : InputMethodService(),
             val directPcm16Buffer = ByteBuffer
                 .allocateDirect(2048)
                 .order(ByteOrder.nativeOrder())
-            val debugAudioStore = DebugAudioStore.createIfEnabled(this@CantoneseInputMethodService)
-
             Log.i(TAG, "Recording started and mic is live...")
 
             try {
@@ -644,10 +763,13 @@ class CantoneseInputMethodService : InputMethodService(),
                         break
                     }
                 }
-                debugAudioStore?.closeAndKeepLatest()
+                debugAudioStore?.closeInput()
             } catch (e: Exception) {
                 Log.w(TAG, "Error while recording audio", e)
                 debugAudioStore?.closeAndDelete()
+                if (activeDebugAudioStore === debugAudioStore) {
+                    activeDebugAudioStore = null
+                }
             }
 
             try {
@@ -682,6 +804,8 @@ class CantoneseInputMethodService : InputMethodService(),
                 engineMutex.withLock {
                     qAsrEngine?.stopVadSession(finalize = false)
                 }
+                activeDebugAudioStore?.closeAndDelete()
+                activeDebugAudioStore = null
                 if (audioRecordJob === recorderJob) {
                     audioRecordJob = null
                 }
@@ -700,6 +824,17 @@ class CantoneseInputMethodService : InputMethodService(),
                 qAsrEngine?.stopVadSession(finalize = true)
             }
 
+            val completedStore = activeDebugAudioStore
+            if (completedStore != null) {
+                runCatching { completedStore.finish(activeDebugTranscript.toString()) }
+                    .onSuccess {
+                        lastCompletedDebugRecordingId = completedStore.recordingId
+                        _canFlagBadOutput.value = true
+                    }
+                    .onFailure { Log.w(TAG, "Failed to finalize debug recording", it) }
+            }
+            activeDebugAudioStore = null
+
             withContext(Dispatchers.Main) {
                 _uiState.value = KeyboardUiState.Idle
             }
@@ -707,61 +842,17 @@ class CantoneseInputMethodService : InputMethodService(),
         }
     }
 
-    private fun buildCursorContextPrompt(connection: InputConnection?): String {
-        if (connection == null) return ""
-
-        runCatching {
-            connection.getExtractedText(ExtractedTextRequest(), 0)
-        }.getOrNull()?.let { extractedText ->
-            val text = extractedText.text?.toString().orEmpty()
-            val selectionStart = extractedText.selectionStart
-            val selectionEnd = extractedText.selectionEnd
-            if (text.isNotEmpty() && selectionStart >= 0 && selectionEnd >= 0) {
-                val contextStart = minOf(selectionStart, selectionEnd).coerceIn(0, text.length)
-                val contextEnd = maxOf(selectionStart, selectionEnd).coerceIn(0, text.length)
-                return buildPromptFromContext(
-                    before = text.substring(0, contextStart),
-                    after = text.substring(contextEnd)
-                )
+    private fun flagLastOutputAsBad() {
+        val recordingId = lastCompletedDebugRecordingId ?: return
+        serviceScope.launch(Dispatchers.IO) {
+            if (DebugAudioStore.markBad(this@CantoneseInputMethodService, recordingId)) {
+                _canFlagBadOutput.value = false
             }
         }
-
-        val before = runCatching {
-            connection.getTextBeforeCursor(PROMPT_TEXT_BEFORE_CURSOR_CHARS, 0)
-        }.getOrNull()
-            ?.toString()
-            .orEmpty()
-
-        val after = runCatching {
-            connection.getTextAfterCursor(PROMPT_TEXT_AFTER_CURSOR_CHARS, 0)
-        }.getOrNull()
-            ?.toString()
-            .orEmpty()
-
-        return buildPromptFromContext(before, after)
     }
-
-    private fun buildPromptFromContext(before: String, after: String): String {
-        val normalizedBefore = before
-            .normalizePromptWhitespace()
-            .takeLast(PROMPT_TEXT_BEFORE_CURSOR_CHARS)
-        val normalizedAfter = after
-            .normalizePromptWhitespace()
-            .take(PROMPT_TEXT_AFTER_CURSOR_CHARS)
-
-        return when {
-            normalizedBefore.isEmpty() && normalizedAfter.isEmpty() -> ""
-            normalizedAfter.isEmpty() -> "前文：$normalizedBefore"
-            normalizedBefore.isEmpty() -> "後文：$normalizedAfter"
-            else -> "前文：$normalizedBefore\n後文：$normalizedAfter"
-        }
-    }
-
-    private fun String.normalizePromptWhitespace(): String =
-        replace(Regex("\\s+"), " ").trim()
 
     private fun deleteSurroundingText() {
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
         currentInputConnection?.deleteSelectionOrPreviousCharacter()
     }
 
@@ -775,17 +866,17 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     private fun sendSpace() {
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
         currentInputConnection?.commitText(" ", 1)
     }
 
     private fun commitText(text: String) {
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
         currentInputConnection?.commitText(text, 1)
     }
 
     private fun sendEnter() {
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
         val connection = currentInputConnection
         if (connection != null) {
             val editorInfo = currentInputEditorInfo
@@ -843,7 +934,7 @@ class CantoneseInputMethodService : InputMethodService(),
     )
 
     private fun sendEmoji(emoji: String) {
-        clearInlineSuggestions()
+        clearAutofillSuggestion()
         currentInputConnection?.commitText(emoji, 1)
     }
 

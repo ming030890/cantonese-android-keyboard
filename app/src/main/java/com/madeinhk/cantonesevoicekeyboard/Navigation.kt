@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.madeinhk.cantonesevoicekeyboard.ui.main.MainScreen
+import com.madeinhk.cantonesevoicekeyboard.ui.main.DebugAudioScreen
 
 @Composable
 fun MainNavigation() {
@@ -21,6 +22,12 @@ fun MainNavigation() {
       entryProvider {
         entry<Main> {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) }, modifier = Modifier.safeDrawingPadding().padding(16.dp))
+        }
+        entry<DebugAudio> {
+          DebugAudioScreen(
+            onBack = { backStack.removeLastOrNull() },
+            modifier = Modifier.safeDrawingPadding()
+          )
         }
       },
   )

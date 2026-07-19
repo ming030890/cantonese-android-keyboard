@@ -40,6 +40,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +51,7 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.sin
 
 private val AlphaRowSpacing = 0.dp
@@ -65,13 +67,17 @@ fun KeyboardScreen(
     volumeLevel: StateFlow<Float>,
     keyboardAction: StateFlow<KeyboardAction>,
     keyboardInputMode: StateFlow<KeyboardInputMode>,
-    inlineSuggestionViews: StateFlow<List<View>>,
+    autofillSuggestionView: StateFlow<View?>,
+    clipboardSuggestion: StateFlow<ClipboardSuggestion?>,
+    canFlagBadOutput: StateFlow<Boolean> = MutableStateFlow(false),
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
     onSendSpace: () -> Unit,
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
+    onPasteClipboard: () -> Unit,
+    onFlagBadOutput: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     initialEmojiPanel: Boolean = false,
@@ -82,7 +88,9 @@ fun KeyboardScreen(
     val volume by volumeLevel.collectAsState()
     val action by keyboardAction.collectAsState()
     val inputMode by keyboardInputMode.collectAsState()
-    val inlineSuggestions by inlineSuggestionViews.collectAsState()
+    val autofillView by autofillSuggestionView.collectAsState()
+    val clipboard by clipboardSuggestion.collectAsState()
+    val showBadOutputFlag by canFlagBadOutput.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -104,12 +112,17 @@ fun KeyboardScreen(
     var showMoreSymbols by remember(activePanel) { mutableStateOf(false) }
     var keyboardSurfaceOriginInRoot by remember { mutableStateOf(Offset.Zero) }
     var emojiPickerBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
+    var autofillBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
     val keyRegistry = remember { KeyboardKeyRegistry() }
     keyRegistry.beginLayout()
-    val toolbarKeys = if (
-        activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
-    ) {
-        registerTextToolbarKeys(keyRegistry)
+    val toolbarVisible = activePanel != KeyboardPanel.Emoji
+    val toolbarState = toolbarPresentation(
+        panel = activePanel.toInputMode(),
+        hasAutofill = autofillView != null,
+        hasClipboard = clipboard != null,
+    )
+    val toolbarKeys = if (toolbarVisible) {
+        registerTextToolbarKeys(keyRegistry, toolbarState.secondaryAction)
     } else {
         null
     }
@@ -132,6 +145,8 @@ fun KeyboardScreen(
         inputReceiver.onSendEnter = onSendEnter
         inputReceiver.onToggleRecording = onToggleRecording
         inputReceiver.onOpenSettings = onOpenSettings
+        inputReceiver.onPasteClipboard = onPasteClipboard
+        inputReceiver.onFlagBadOutput = onFlagBadOutput
         inputReceiver.onOpenEmoji = { activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
@@ -154,6 +169,11 @@ fun KeyboardScreen(
             onKeyboardInputModeSelected(KeyboardInputMode.Voice)
         }
         touchController.setHapticHandler { performKeyboardHaptic(hostView, keyboardHapticConfig) }
+    }
+    SideEffect {
+        if (autofillView == null) {
+            autofillBoundsInSurface = Rect.Zero
+        }
     }
     DisposableEffect(touchController) {
         onDispose { touchController.dispose() }
@@ -185,6 +205,12 @@ fun KeyboardScreen(
                 if (shouldPassToEmojiPicker(
                         emojiPanelActive = activePanel == KeyboardPanel.Emoji,
                         emojiPickerBounds = emojiPickerBoundsInSurface,
+                        x = event.x,
+                        y = event.y
+                    )
+                    || shouldPassToAutofillView(
+                        autofillViewPresent = autofillView != null,
+                        autofillBounds = autofillBoundsInSurface,
                         x = event.x,
                         y = event.y
                     )
@@ -221,15 +247,15 @@ fun KeyboardScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = keyboardVerticalArrangement
             ) {
-            InlineSuggestionStrip(
-                suggestions = inlineSuggestions,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            if (isTextPanel) {
-                TextKeyboardToolbar(
+            if (toolbarVisible) {
+                UnifiedKeyboardToolbar(
                     keyRegistry = keyRegistry,
-                    keys = checkNotNull(toolbarKeys)
+                    keys = checkNotNull(toolbarKeys),
+                    secondaryAction = toolbarState.secondaryAction,
+                    autofillView = autofillView,
+                    clipboard = clipboard,
+                    surfaceOriginInRoot = keyboardSurfaceOriginInRoot,
+                    onAutofillBoundsChanged = { autofillBoundsInSurface = it },
                 )
             }
 
@@ -302,6 +328,33 @@ fun KeyboardScreen(
                                 volume = volume,
                                 onOpenSettings = onOpenSettings
                             )
+                        }
+                        if (showBadOutputFlag) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            KeyVisual(
+                                key = keyRegistry.key(
+                                    id = "voice.flag_bad",
+                                    data = KeyData(
+                                        "voice.flag_bad",
+                                        KeyboardKeyKind.FlagBadOutput,
+                                        text = "Flag bad output"
+                                    ),
+                                    rowId = "voice.flag_bad"
+                                ),
+                                keyRegistry = keyRegistry,
+                                modifier = Modifier.width(168.dp).height(36.dp),
+                                backgroundColor = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
+                                borderColor = MaterialTheme.colorScheme.error,
+                                shape = RoundedCornerShape(10.dp),
+                                pressedScale = 0.96f,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.keyboard_flag_bad_output),
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
@@ -464,92 +517,199 @@ fun KeyboardScreen(
 }
 
 @Composable
-private fun InlineSuggestionStrip(
-    suggestions: List<View>,
-    modifier: Modifier = Modifier
-) {
-    if (suggestions.isEmpty()) {
-        return
-    }
-
-    Row(
-        modifier = modifier
-            .height(44.dp)
-            .padding(bottom = 6.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        suggestions.forEach { suggestionView ->
-            key(suggestionView) {
-                AndroidView(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(8.dp)),
-                    factory = { suggestionView },
-                    update = {}
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TextKeyboardToolbar(
+private fun UnifiedKeyboardToolbar(
     keyRegistry: KeyboardKeyRegistry,
-    keys: TextToolbarKeys
+    keys: TextToolbarKeys,
+    secondaryAction: ToolbarSecondaryAction?,
+    autofillView: View?,
+    clipboard: ClipboardSuggestion?,
+    surfaceOriginInRoot: Offset,
+    onAutofillBoundsChanged: (Rect) -> Unit,
 ) {
     val keyboardColors = BrandTheme.colors
+
+    if (secondaryAction == ToolbarSecondaryAction.Clipboard) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(KeyboardUiDefaults.ToolbarHeight)
+                .padding(horizontal = KeyboardUiDefaults.KeyboardHorizontalPadding),
+        ) {
+            ToolbarSettingsVisual(
+                key = keys.settings,
+                keyRegistry = keyRegistry,
+                modifier = Modifier.align(Alignment.CenterStart),
+            )
+            ClipboardToolbarChip(
+                key = keys.clipboard,
+                keyRegistry = keyRegistry,
+                clipboard = checkNotNull(clipboard),
+                keyboardColors = keyboardColors,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+        return
+    }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(KeyboardUiDefaults.ToolbarHeight)
             .padding(horizontal = KeyboardUiDefaults.KeyboardHorizontalPadding),
-        horizontalArrangement = Arrangement.spacedBy(
-            KeyboardUiDefaults.ToolbarIconSpacing,
-            alignment = Alignment.End
-        ),
+        horizontalArrangement = Arrangement.spacedBy(KeyboardUiDefaults.ToolbarIconSpacing),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ToolbarIconVisual(
-            key = keys.settings,
-            keyRegistry = keyRegistry
-        ) {
-            SettingsIcon(
-                modifier = Modifier.size(KeyboardUiDefaults.ToolbarSettingsIconSize),
-                color = keyboardColors.keyboardKeyOnSurface
-            )
+        if (secondaryAction == null) {
+            Spacer(modifier = Modifier.weight(1f))
         }
-        ToolbarIconVisual(
-            key = keys.voice,
-            keyRegistry = keyRegistry
-        ) {
-            MicIcon(
-                modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
-                color = keyboardColors.keyboardKeyOnSurface
-            )
+        ToolbarSettingsVisual(key = keys.settings, keyRegistry = keyRegistry)
+        when (secondaryAction) {
+            ToolbarSecondaryAction.Voice -> ToolbarIconVisual(
+                key = keys.voice,
+                keyRegistry = keyRegistry,
+                accessibilityDescription = stringResource(R.string.keyboard_toolbar_voice),
+            ) {
+                MicIcon(
+                    modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
+                    color = keyboardColors.keyboardKeyOnSurface
+                )
+            }
+            ToolbarSecondaryAction.Autofill -> {
+                val providerView = checkNotNull(autofillView)
+                if (LocalInspectionMode.current) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surface),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "Autofill suggestion",
+                            color = keyboardColors.keyboardKeyOnSurface,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                } else {
+                    AndroidView(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(8.dp))
+                            .onGloballyPositioned { coordinates ->
+                                val bounds = coordinates.boundsInRoot()
+                                onAutofillBoundsChanged(
+                                    Rect(
+                                        left = bounds.left - surfaceOriginInRoot.x,
+                                        top = bounds.top - surfaceOriginInRoot.y,
+                                        right = bounds.right - surfaceOriginInRoot.x,
+                                        bottom = bounds.bottom - surfaceOriginInRoot.y,
+                                    )
+                                )
+                            },
+                        factory = { providerView },
+                        update = {}
+                    )
+                }
+            }
+            null -> Unit
+            ToolbarSecondaryAction.Clipboard -> error("Clipboard is rendered above")
         }
+    }
+}
+
+@Composable
+private fun ToolbarSettingsVisual(
+    key: KeyModel,
+    keyRegistry: KeyboardKeyRegistry,
+    modifier: Modifier = Modifier,
+) {
+    ToolbarIconVisual(
+        modifier = modifier,
+        key = key,
+        keyRegistry = keyRegistry,
+        accessibilityDescription = stringResource(R.string.keyboard_toolbar_settings),
+    ) {
+        SettingsIcon(
+            modifier = Modifier.size(KeyboardUiDefaults.ToolbarSettingsIconSize),
+            color = BrandTheme.colors.keyboardKeyOnSurface,
+        )
+    }
+}
+
+@Composable
+private fun ClipboardToolbarChip(
+    key: KeyModel,
+    keyRegistry: KeyboardKeyRegistry,
+    clipboard: ClipboardSuggestion,
+    keyboardColors: BrandColors,
+    modifier: Modifier = Modifier,
+) {
+    val description = if (clipboard.isSensitive) {
+        stringResource(R.string.keyboard_toolbar_paste)
+    } else {
+        stringResource(
+            R.string.keyboard_toolbar_clipboard_preview,
+            clipboard.preview.orEmpty(),
+        )
+    }
+    ToolbarChipVisual(
+        key = key,
+        keyRegistry = keyRegistry,
+        accessibilityDescription = description,
+        modifier = modifier.width(104.dp),
+    ) {
+        ClipboardIcon(
+            modifier = Modifier.size(20.dp),
+            color = keyboardColors.keyboardKeyOnSurface,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = if (clipboard.isSensitive) {
+                stringResource(R.string.keyboard_toolbar_paste)
+            } else {
+                clipboard.preview.orEmpty()
+            },
+            color = keyboardColors.keyboardKeyOnSurface,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
 internal data class TextToolbarKeys(
     val settings: KeyModel,
-    val voice: KeyModel
+    val voice: KeyModel,
+    val clipboard: KeyModel,
 )
 
-internal fun registerTextToolbarKeys(keyRegistry: KeyboardKeyRegistry): TextToolbarKeys =
+internal fun registerTextToolbarKeys(
+    keyRegistry: KeyboardKeyRegistry,
+    secondaryAction: ToolbarSecondaryAction? = ToolbarSecondaryAction.Voice,
+): TextToolbarKeys =
     TextToolbarKeys(
         settings = keyRegistry.key(
             id = "toolbar.settings",
-            data = KeyData("toolbar.settings", KeyboardKeyKind.Settings),
-            rowId = "toolbar"
+            data = KeyData("toolbar.settings", KeyboardKeyKind.Settings, text = "Settings"),
+            rowId = "toolbar",
         ),
         voice = keyRegistry.key(
             id = "toolbar.voice",
-            data = KeyData("toolbar.voice", KeyboardKeyKind.BackToVoice),
-            rowId = "toolbar"
-        )
+            data = KeyData("toolbar.voice", KeyboardKeyKind.BackToVoice, text = "Voice input"),
+            rowId = "toolbar",
+            enabled = secondaryAction == ToolbarSecondaryAction.Voice,
+        ),
+        clipboard = keyRegistry.key(
+            id = "toolbar.clipboard",
+            data = KeyData("toolbar.clipboard", KeyboardKeyKind.Clipboard, text = "Paste"),
+            rowId = "toolbar",
+            enabled = secondaryAction == ToolbarSecondaryAction.Clipboard,
+        ),
     )
 
 @Composable
@@ -557,18 +717,53 @@ private fun ToolbarIconVisual(
     modifier: Modifier = Modifier,
     key: KeyModel,
     keyRegistry: KeyboardKeyRegistry,
+    accessibilityDescription: String,
     content: @Composable BoxScope.() -> Unit
 ) {
     KeyVisual(
-        modifier = modifier.size(KeyboardUiDefaults.ToolbarIconTouchSize),
+        modifier = modifier
+            .size(KeyboardUiDefaults.ToolbarIconTouchSize)
+            .semantics { contentDescription = accessibilityDescription },
         key = key,
         keyRegistry = keyRegistry,
+        accessibilityDescription = accessibilityDescription,
         backgroundColor = Color.Transparent,
         shape = CircleShape,
         restingElevation = 0.dp,
         pressedScale = 0.9f,
         borderColor = Color.Transparent,
         content = content
+    )
+}
+
+@Composable
+private fun ToolbarChipVisual(
+    modifier: Modifier,
+    key: KeyModel,
+    keyRegistry: KeyboardKeyRegistry,
+    accessibilityDescription: String,
+    content: @Composable RowScope.() -> Unit,
+) {
+    KeyVisual(
+        modifier = modifier
+            .height(44.dp)
+            .semantics { contentDescription = accessibilityDescription },
+        key = key,
+        keyRegistry = keyRegistry,
+        accessibilityDescription = accessibilityDescription,
+        backgroundColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(percent = 50),
+        restingElevation = 0.dp,
+        pressedScale = 0.98f,
+        content = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                content = content,
+            )
+        }
     )
 }
 
@@ -585,6 +780,13 @@ internal fun shouldPassToEmojiPicker(
     x: Float,
     y: Float
 ): Boolean = emojiPanelActive && emojiPickerBounds.contains(Offset(x, y))
+
+internal fun shouldPassToAutofillView(
+    autofillViewPresent: Boolean,
+    autofillBounds: Rect,
+    x: Float,
+    y: Float,
+): Boolean = autofillViewPresent && autofillBounds.contains(Offset(x, y))
 
 private enum class SymbolVariant {
     Chinese,
@@ -628,6 +830,8 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
     var onSendEnter: () -> Unit = {}
     var onToggleRecording: () -> Unit = {}
     var onOpenSettings: () -> Unit = {}
+    var onPasteClipboard: () -> Unit = {}
+    var onFlagBadOutput: () -> Unit = {}
     var onOpenEmoji: () -> Unit = {}
     var onBackToVoice: () -> Unit = {}
     var onToggleUppercase: () -> Unit = {}
@@ -649,7 +853,9 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
             KeyboardKeyKind.Emoji -> onOpenEmoji()
             KeyboardKeyKind.Settings -> onOpenSettings()
             KeyboardKeyKind.BackToVoice -> onBackToVoice()
+            KeyboardKeyKind.Clipboard -> onPasteClipboard()
             KeyboardKeyKind.Record -> onToggleRecording()
+            KeyboardKeyKind.FlagBadOutput -> onFlagBadOutput()
             KeyboardKeyKind.Delete,
             KeyboardKeyKind.Utility -> Unit
         }
@@ -1083,6 +1289,7 @@ private fun KeyVisual(
     borderColor: Color = Color.Unspecified,
     verticalPadding: Dp = 0.dp,
     utilityStyle: Boolean = false,
+    accessibilityDescription: String? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     val keyboardColors = BrandTheme.colors
@@ -1121,7 +1328,9 @@ private fun KeyVisual(
             modifier = Modifier
                 .width(visibleWidth)
                 .height(visibleHeight)
-                .semantics { contentDescription = key.currentData?.text ?: key.id }
+                .semantics {
+                    contentDescription = accessibilityDescription ?: key.currentData?.text ?: key.id
+                }
                 .onGloballyPositioned { coordinates -> keyRegistry.updateVisualBounds(key, coordinates) }
                 .scale(scale)
                 .shadow(elevation = if (isPressed) 0.dp else restingElevation, shape = shape)
@@ -1688,6 +1897,44 @@ fun KeyboardIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ClipboardIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val strokePx = 2.dp.toPx()
+
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(w * 0.22f, h * 0.18f),
+            size = Size(w * 0.60f, h * 0.70f),
+            cornerRadius = CornerRadius(w * 0.08f, w * 0.08f),
+            style = Stroke(width = strokePx)
+        )
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(w * 0.36f, h * 0.10f),
+            size = Size(w * 0.28f, h * 0.18f),
+            cornerRadius = CornerRadius(w * 0.05f, w * 0.05f),
+            style = Stroke(width = strokePx)
+        )
+        drawLine(
+            color = color,
+            start = Offset(w * 0.38f, h * 0.46f),
+            end = Offset(w * 0.66f, h * 0.46f),
+            strokeWidth = strokePx,
+            cap = StrokeCap.Round
+        )
+        drawLine(
+            color = color,
+            start = Offset(w * 0.38f, h * 0.62f),
+            end = Offset(w * 0.60f, h * 0.62f),
+            strokeWidth = strokePx,
+            cap = StrokeCap.Round
+        )
     }
 }
 
