@@ -35,4 +35,10 @@ class HandwritingBitmapTest {
 
         assertTrue(bitmap.pixels.any { (it.toInt() and 0xff) < 255 })
     }
+
+    @Test
+    fun displayAndInferenceUseTheSameStrokeWidthRule() {
+        assertEquals(7f, handwritingStrokeWidthPx(400f, 200f))
+        assertEquals(5f, handwritingStrokeWidthPx(100f, 100f))
+    }
 }

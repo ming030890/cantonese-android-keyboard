@@ -55,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -430,6 +431,7 @@ private fun HandwritingPreview(
             bitmap = bitmap,
             contentDescription = stringResource(R.string.debug_handwriting_model_input),
             contentScale = ContentScale.Fit,
+            filterQuality = FilterQuality.None,
             modifier = Modifier.fillMaxSize(),
         )
     }
