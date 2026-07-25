@@ -247,7 +247,7 @@ private fun HandwritingCard(
             bitmap?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
-                    contentDescription = stringResource(R.string.debug_handwriting_sample),
+                    contentDescription = stringResource(R.string.debug_handwriting_model_input),
                     modifier = Modifier.fillMaxWidth().heightIn(max = 180.dp),
                 )
             }
@@ -324,7 +324,7 @@ private fun HandwritingEditor(
                 bitmap?.let {
                     Image(
                         bitmap = it.asImageBitmap(),
-                        contentDescription = stringResource(R.string.debug_handwriting_sample),
+                        contentDescription = stringResource(R.string.debug_handwriting_model_input),
                         modifier = Modifier.fillMaxWidth().heightIn(max = 220.dp),
                     )
                 }

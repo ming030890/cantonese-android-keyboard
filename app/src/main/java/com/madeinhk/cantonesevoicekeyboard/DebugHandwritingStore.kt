@@ -60,7 +60,9 @@ object DebugHandwritingStore {
             val imageFile = File(directory, INPUT_IMAGE_FILE_NAME)
             val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             val colors = IntArray(pixels.size) { index ->
-                val value = pixels[index].toInt() and 0xff
+                // The model tensor stores ink intensity (black=255, background=0);
+                // invert it for a normal black-on-white debug image.
+                val value = 255 - (pixels[index].toInt() and 0xff)
                 Color.rgb(value, value, value)
             }
             bitmap.setPixels(colors, 0, width, 0, 0, width, height)

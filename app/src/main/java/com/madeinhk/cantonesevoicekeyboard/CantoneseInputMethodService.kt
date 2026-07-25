@@ -464,16 +464,23 @@ class CantoneseInputMethodService : InputMethodService(),
                 }
 
                 val recognizer = handwritingRecognizer
-                val debugRecordingId = DebugHandwritingStore.capture(
-                    this@CantoneseInputMethodService,
-                    request.pixels,
-                    request.width,
-                    request.height,
-                )
                 if (recognizer == null) {
                     _handwritingError.value = getString(R.string.error_handwriting_model_unavailable)
                     _handwritingCandidates.value = emptyList()
                 } else {
+                    val modelInputPixels = recognizer.modelInputPixels(
+                        request.pixels,
+                        request.width,
+                        request.height,
+                    ) ?: throw HandwritingRecognitionException(
+                        "Native handwriting preprocessing failed",
+                    )
+                    val debugRecordingId = DebugHandwritingStore.capture(
+                        this@CantoneseInputMethodService,
+                        modelInputPixels,
+                        48,
+                        48,
+                    )
                     try {
                         val candidates = recognizer.predict(
                             request.pixels,

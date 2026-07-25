@@ -88,6 +88,7 @@
     <string name="debug_handwriting_count">%1$d of 100 samples</string>
     <string name="debug_handwriting_no_samples">No handwriting samples yet. Use handwriting input while debug mode is enabled.</string>
     <string name="debug_handwriting_sample">Handwriting sample</string>
+    <string name="debug_handwriting_model_input">48 by 48 model input</string>
     <string name="debug_handwriting_candidates">Candidates</string>
     <string name="debug_handwriting_chosen">Chosen character</string>
     <string name="debug_handwriting_none_chosen">No candidate chosen</string>

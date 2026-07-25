@@ -11,6 +11,8 @@ data class HandwritingCandidate(
 class HandwritingRecognitionException(message: String) : RuntimeException(message)
 
 interface HandwritingRecognitionEngine : AutoCloseable {
+    fun modelInputPixels(pixels: ByteArray, width: Int, height: Int): ByteArray? = null
+
     fun predict(
         pixels: ByteArray,
         width: Int,
@@ -74,6 +76,32 @@ class HandwritingRecognizer private constructor(
             height: Int,
             topK: Int,
         ): Array<String>?
+
+        @JvmStatic
+        private external fun nativePreprocess(
+            handle: Long,
+            pixels: ByteArray,
+            width: Int,
+            height: Int,
+        ): ByteArray?
+    }
+
+    @Synchronized
+    override fun modelInputPixels(pixels: ByteArray, width: Int, height: Int): ByteArray {
+        val handle = nativeHandle
+        if (handle == 0L) {
+            throw HandwritingRecognitionException("The handwriting recognizer is closed")
+        }
+        if (
+            pixels.isEmpty() ||
+            width <= 0 ||
+            height <= 0 ||
+            pixels.size.toLong() != width.toLong() * height.toLong()
+        ) {
+            throw HandwritingRecognitionException("Invalid handwriting bitmap dimensions")
+        }
+        return nativePreprocess(handle, pixels, width, height)
+            ?: throw HandwritingRecognitionException("Native handwriting preprocessing failed")
     }
 
     @Synchronized
