@@ -485,10 +485,13 @@ class CantoneseInputMethodService : InputMethodService(),
                         "Native handwriting preprocessing failed",
                     )
                     val debugRecordingId = DebugHandwritingStore.capture(
-                        this@CantoneseInputMethodService,
-                        modelInputPixels,
-                        48,
-                        48,
+                        context = this@CantoneseInputMethodService,
+                        originalPixels = request.pixels,
+                        originalWidth = request.width,
+                        originalHeight = request.height,
+                        modelInputPixels = modelInputPixels,
+                        modelInputWidth = 48,
+                        modelInputHeight = 48,
                     )
                     try {
                         val candidates = recognizer.predict(
