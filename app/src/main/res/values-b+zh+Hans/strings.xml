@@ -41,6 +41,13 @@
     <string name="developer_options_title">开发者选项</string>
     <string name="developer_store_audio_title">保存调试音频</string>
     <string name="developer_store_audio_desc">保存录音用于调试，只保留最新 100 个。</string>
+    <string name="developer_store_handwriting_title">帮助改进手写输入</string>
+    <string name="developer_store_handwriting_desc">在此设备上保存最多 100 个最近的手写样本，以便检查识别错误并同步你选择的修正。</string>
+    <string name="developer_manage_handwriting">查看已保存样本</string>
+
+    <!-- Handwriting review -->
+    <string name="debug_handwriting_title">查看手写样本</string>
+    <string name="debug_handwriting_model_input">手写样本</string>
 
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">点按开始说话</string>

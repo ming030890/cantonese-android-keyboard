@@ -41,6 +41,13 @@
     <string name="developer_options_title">開發者選項</string>
     <string name="developer_store_audio_title">儲存除錯音訊</string>
     <string name="developer_store_audio_desc">儲存錄音作除錯用途，只保留最新 100 個。</string>
+    <string name="developer_store_handwriting_title">幫助改善手寫輸入</string>
+    <string name="developer_store_handwriting_desc">喺呢部裝置儲存最多 100 個最近嘅手寫樣本，等你檢查識別錯誤，同步你選擇嘅修正。</string>
+    <string name="developer_manage_handwriting">檢視已儲存樣本</string>
+
+    <!-- Handwriting review -->
+    <string name="debug_handwriting_title">檢視手寫樣本</string>
+    <string name="debug_handwriting_model_input">手寫樣本</string>
 
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">㩒一下開始講嘢</string>

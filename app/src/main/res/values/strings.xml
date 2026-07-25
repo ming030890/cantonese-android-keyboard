@@ -42,9 +42,9 @@
     <string name="developer_store_audio_title">Training data debug mode</string>
     <string name="developer_store_audio_desc">Keep the latest 100 recordings, model output, and VAD metadata so bad results can be corrected and synced.</string>
     <string name="developer_manage_audio">Manage saved recordings</string>
-    <string name="developer_store_handwriting_title">Handwriting data debug mode</string>
-    <string name="developer_store_handwriting_desc">Keep the latest 100 handwriting samples, candidates, and annotations so recognition errors can be corrected and synced.</string>
-    <string name="developer_manage_handwriting">Manage saved handwriting</string>
+    <string name="developer_store_handwriting_title">Help improve handwriting</string>
+    <string name="developer_store_handwriting_desc">Save up to 100 recent handwriting samples on this device so you can review recognition mistakes and sync the corrections you choose.</string>
+    <string name="developer_manage_handwriting">Review saved samples</string>
 
     <!-- Debug audio collection -->
     <string name="debug_audio_title">Training recordings</string>
@@ -84,11 +84,11 @@
     <string name="debug_remove">Remove</string>
     <string name="debug_backfilling_model">Running current VAD + model for old recordings: %1$d/%2$d</string>
     <string name="debug_backfill_result">Model backfill completed %1$d; failed %2$d</string>
-    <string name="debug_handwriting_title">Training handwriting</string>
+    <string name="debug_handwriting_title">Review handwriting</string>
     <string name="debug_handwriting_count">%1$d of 100 samples</string>
     <string name="debug_handwriting_no_samples">No handwriting samples yet. Use handwriting input while debug mode is enabled.</string>
     <string name="debug_handwriting_sample">Handwriting sample</string>
-    <string name="debug_handwriting_model_input">48 by 48 model input</string>
+    <string name="debug_handwriting_model_input">Handwriting sample</string>
     <string name="debug_handwriting_candidates">Candidates</string>
     <string name="debug_handwriting_chosen">Chosen character</string>
     <string name="debug_handwriting_none_chosen">No candidate chosen</string>
