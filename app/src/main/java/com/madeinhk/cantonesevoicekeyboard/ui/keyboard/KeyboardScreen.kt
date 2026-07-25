@@ -114,6 +114,7 @@ fun KeyboardScreen(
     val handwritingBusy by handwritingRecognizing.collectAsState()
     val handwritingFailure by handwritingError.collectAsState()
     val handwritingSessionId by handwritingSession.collectAsState()
+    var handwritingCandidateResetKey by remember { mutableIntStateOf(0) }
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -306,6 +307,7 @@ fun KeyboardScreen(
                     surfaceOriginInRoot = keyboardSurfaceOriginInRoot,
                     onAutofillBoundsChanged = { autofillBoundsInSurface = it },
                     onHandwritingCandidatesInteracted = onHandwritingCandidatesInteracted,
+                    handwritingCandidateResetKey = handwritingCandidateResetKey,
                 )
             }
 
@@ -354,7 +356,10 @@ fun KeyboardScreen(
                         sessionKey = handwritingSessionId,
                         voiceActive = state == KeyboardUiState.Recording ||
                             state == KeyboardUiState.Transcribing,
-                        onStrokeStarted = onHandwritingStrokeStarted,
+                        onStrokeStarted = {
+                            handwritingCandidateResetKey++
+                            onHandwritingStrokeStarted()
+                        },
                         onBoundsChanged = { bounds ->
                             handwritingBoundsInSurface = bounds.translate(
                                 -keyboardSurfaceOriginInRoot.x,
@@ -538,6 +543,7 @@ private fun UnifiedKeyboardToolbar(
     surfaceOriginInRoot: Offset,
     onAutofillBoundsChanged: (Rect) -> Unit,
     onHandwritingCandidatesInteracted: () -> Unit,
+    handwritingCandidateResetKey: Int,
 ) {
     val keyboardColors = BrandTheme.colors
     val candidatesVisible = showHandwritingCandidates && candidates.isNotEmpty()
@@ -621,6 +627,7 @@ private fun UnifiedKeyboardToolbar(
                         keys = keys.candidates,
                         keyRegistry = keyRegistry,
                         onInteracted = onHandwritingCandidatesInteracted,
+                        resetKey = handwritingCandidateResetKey,
                     )
                 }
                 secondaryAction == ToolbarSecondaryAction.Clipboard -> {
@@ -806,8 +813,12 @@ private fun HandwritingCandidateStrip(
     keys: List<KeyModel>,
     keyRegistry: KeyboardKeyRegistry,
     onInteracted: () -> Unit,
+    resetKey: Int,
 ) {
     val scrollState = rememberScrollState()
+    LaunchedEffect(resetKey) {
+        scrollState.scrollTo(0)
+    }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
