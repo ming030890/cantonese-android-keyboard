@@ -50,10 +50,10 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardScreen
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.clipboardSuggestionFor
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
-import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingDebouncer
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingInferenceIdleDelayMillis
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognitionEngine
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognitionException
+import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognitionQueue
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognizer
 import com.qwenasr.QAsrEngine
 import kotlinx.coroutines.CoroutineScope
@@ -86,7 +86,9 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     private data class HandwritingRequest(
-        val generation: Long,
+        val sessionGeneration: Long,
+        val characterId: Long,
+        val requestVersion: Long,
         val pixels: ByteArray,
         val width: Int,
         val height: Int,
@@ -118,15 +120,17 @@ class CantoneseInputMethodService : InputMethodService(),
     private var modelLoadingJob: Job? = null
     private var transcriptionJob: Job? = null
     private var handwritingLoadingJob: Job? = null
-    private var handwritingRecognitionJob: Job? = null
     @Volatile
     private var activeDebugHandwritingRecordingId: String? = null
-    private val handwritingDebouncer = HandwritingDebouncer<HandwritingRequest>(
+    private val handwritingRecognitionQueue = HandwritingRecognitionQueue<HandwritingRequest>(
         scope = serviceScope,
         idleDelayMillis = HandwritingInferenceIdleDelayMillis,
-        onIdle = ::recognizeHandwritingAfterIdle,
+        process = { _, request -> recognizeQueuedHandwriting(request) },
     )
     private var handwritingGeneration = 0L
+    private var handwritingCharacterId = 0L
+    private var handwritingRequestVersion = 0L
+    private val latestHandwritingRequestVersions = mutableMapOf<Long, Long>()
     private var activeHandwritingComposition: String? = null
     private var inputViewSession = 0L
     @Volatile
@@ -253,9 +257,8 @@ class CantoneseInputMethodService : InputMethodService(),
         val inputMode = keyboardInputModeFor(info)
         _keyboardInputMode.value = inputMode
         advanceInputViewSession()
-        handwritingGeneration++
-        handwritingDebouncer.cancel()
-        handwritingRecognitionJob?.cancel()
+        cancelAllHandwritingRecognition()
+        handwritingCharacterId = 0L
         _handwritingCandidates.value = emptyList()
         _handwritingRecognizing.value = false
         _handwritingError.value = null
@@ -415,11 +418,20 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun recognizeHandwriting(pixels: ByteArray, width: Int, height: Int) {
         if (!isInputViewVisible || pixels.isEmpty()) return
-        val generation = ++handwritingGeneration
+        val requestVersion = ++handwritingRequestVersion
+        latestHandwritingRequestVersions[handwritingCharacterId] = requestVersion
         _handwritingError.value = null
         _handwritingRecognizing.value = true
-        handwritingRecognitionJob = handwritingDebouncer.submit(
-            HandwritingRequest(generation, pixels, width, height),
+        handwritingRecognitionQueue.submit(
+            characterId = handwritingCharacterId,
+            request = HandwritingRequest(
+                sessionGeneration = handwritingGeneration,
+                characterId = handwritingCharacterId,
+                requestVersion = requestVersion,
+                pixels = pixels,
+                width = width,
+                height = height,
+            ),
         )
     }
 
@@ -427,15 +439,22 @@ class CantoneseInputMethodService : InputMethodService(),
         if (!isInputViewVisible) return
         stopVoiceInputForHandwriting()
         if (startsNewCharacter) {
-            acceptActiveHandwritingComposition()
+            if (
+                activeHandwritingComposition != null ||
+                _handwritingCandidates.value.isNotEmpty()
+            ) {
+                acceptActiveHandwritingComposition()
+            }
+            handwritingCharacterId++
+            _handwritingCandidates.value = emptyList()
+            _handwritingRecognizing.value = false
+            _handwritingError.value = null
+            activeHandwritingComposition = null
+            activeDebugHandwritingRecordingId = null
+        } else {
+            invalidateHandwritingCharacterRequest(handwritingCharacterId)
+            _handwritingRecognizing.value = false
         }
-        // A new touch means the previous ACTION_UP was not actually the last
-        // interaction. Cancel its idle inference; ACTION_UP will submit a fresh
-        // bitmap containing all strokes for the current character.
-        handwritingGeneration++
-        handwritingDebouncer.cancel()
-        handwritingRecognitionJob?.cancel()
-        _handwritingRecognizing.value = false
     }
 
     private fun stopVoiceInputForHandwriting() {
@@ -464,94 +483,129 @@ class CantoneseInputMethodService : InputMethodService(),
         }
     }
 
-    private suspend fun recognizeHandwritingAfterIdle(request: HandwritingRequest) {
-        withContext(Dispatchers.Default) {
-            try {
-                handwritingLoadingJob?.join()
-                if (!isInputViewVisible || request.generation != handwritingGeneration) {
-                    return@withContext
-                }
+    private suspend fun recognizeQueuedHandwriting(request: HandwritingRequest) {
+        try {
+            handwritingLoadingJob?.join()
+            if (!isLatestHandwritingRequest(request) || !isInputViewVisible) return
 
-                val recognizer = handwritingRecognizer
-                if (recognizer == null) {
+            val recognizer = handwritingRecognizer
+            if (recognizer == null) {
+                if (request.characterId == handwritingCharacterId) {
                     _handwritingError.value = getString(R.string.error_handwriting_model_unavailable)
                     _handwritingCandidates.value = emptyList()
-                } else {
-                    val modelInputPixels = recognizer.modelInputPixels(
-                        request.pixels,
-                        request.width,
-                        request.height,
-                    ) ?: throw HandwritingRecognitionException(
-                        "Native handwriting preprocessing failed",
-                    )
-                    val debugRecordingId = DebugHandwritingStore.capture(
-                        context = this@CantoneseInputMethodService,
-                        originalPixels = request.pixels,
-                        originalWidth = request.width,
-                        originalHeight = request.height,
-                        modelInputPixels = modelInputPixels,
-                        modelInputWidth = 48,
-                        modelInputHeight = 48,
-                    )
-                    try {
-                        val candidates = recognizer.predict(
-                            request.pixels,
-                            request.width,
-                            request.height,
-                            HANDWRITING_TOP_K,
-                        )
-                        debugRecordingId?.let { recordingId ->
-                            DebugHandwritingStore.saveInferenceResult(
-                                this@CantoneseInputMethodService,
-                                recordingId,
-                                candidates.map { candidate ->
-                                    DebugHandwritingCandidate(candidate.text, candidate.rank)
-                                },
-                            )
-                        }
-                        if (
-                            request.generation == handwritingGeneration &&
-                            isInputViewVisible
-                        ) {
-                            withContext(Dispatchers.Main.immediate) {
-                                activeDebugHandwritingRecordingId = debugRecordingId
-                                _handwritingCandidates.value = candidates
-                                val topCandidate = candidates.firstOrNull()?.text
-                                if (topCandidate != null) {
-                                    activeHandwritingComposition = topCandidate
-                                    currentInputConnection?.setComposingText(topCandidate, 1)
-                                } else {
-                                    discardActiveHandwritingComposition()
-                                }
-                            }
-                        } else {
-                            withContext(Dispatchers.Main.immediate) {
-                                activeDebugHandwritingRecordingId = null
-                            }
-                        }
-                    } catch (error: HandwritingRecognitionException) {
-                        Log.e(TAG, "Handwriting inference failed", error)
-                        _handwritingError.value = getString(
-                            R.string.error_handwriting_recognition_failed,
-                        )
-                        _handwritingCandidates.value = emptyList()
-                    }
                 }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Throwable) {
-                Log.e(TAG, "Unexpected handwriting recognition error", error)
-                if (isInputViewVisible && request.generation == handwritingGeneration) {
-                    _handwritingError.value = getString(
-                        R.string.error_handwriting_recognition_failed,
-                    )
-                    _handwritingCandidates.value = emptyList()
-                }
-            } finally {
-                if (request.generation == handwritingGeneration) {
-                    _handwritingRecognizing.value = false
-                }
+                return
             }
+
+            val result = withContext(Dispatchers.Default) {
+                val modelInputPixels = recognizer.modelInputPixels(
+                    request.pixels,
+                    request.width,
+                    request.height,
+                ) ?: throw HandwritingRecognitionException(
+                    "Native handwriting preprocessing failed",
+                )
+                val debugRecordingId = DebugHandwritingStore.capture(
+                    context = this@CantoneseInputMethodService,
+                    originalPixels = request.pixels,
+                    originalWidth = request.width,
+                    originalHeight = request.height,
+                    modelInputPixels = modelInputPixels,
+                    modelInputWidth = 48,
+                    modelInputHeight = 48,
+                )
+                val candidates = recognizer.predict(
+                    request.pixels,
+                    request.width,
+                    request.height,
+                    HANDWRITING_TOP_K,
+                )
+                debugRecordingId?.let { recordingId ->
+                    DebugHandwritingStore.saveInferenceResult(
+                        this@CantoneseInputMethodService,
+                        recordingId,
+                        candidates.map { candidate ->
+                            DebugHandwritingCandidate(candidate.text, candidate.rank)
+                        },
+                    )
+                }
+                debugRecordingId to candidates
+            }
+
+            // Revalidate on Main immediately before touching the editor. The
+            // request can be invalidated while returning from Dispatchers.Default.
+            if (!isLatestHandwritingRequest(request) || !isInputViewVisible) return
+
+            val (debugRecordingId, candidates) = result
+            val topCandidate = candidates.firstOrNull()?.text
+            if (request.characterId < handwritingCharacterId) {
+                latestHandwritingRequestVersions.remove(request.characterId)
+                if (topCandidate != null) {
+                    currentInputConnection?.setComposingText(topCandidate, 1)
+                    currentInputConnection?.finishComposingText()
+                    markDebugHandwritingChosen(debugRecordingId, topCandidate)
+                }
+                return
+            }
+            if (request.characterId != handwritingCharacterId) return
+
+            activeDebugHandwritingRecordingId = debugRecordingId
+            _handwritingCandidates.value = candidates
+            if (topCandidate != null) {
+                activeHandwritingComposition = topCandidate
+                currentInputConnection?.setComposingText(topCandidate, 1)
+            } else {
+                discardActiveHandwritingComposition()
+            }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: HandwritingRecognitionException) {
+            Log.e(TAG, "Handwriting inference failed", error)
+            if (isLatestHandwritingRequest(request) && request.characterId == handwritingCharacterId) {
+                _handwritingError.value = getString(R.string.error_handwriting_recognition_failed)
+                _handwritingCandidates.value = emptyList()
+            }
+        } catch (error: Throwable) {
+            Log.e(TAG, "Unexpected handwriting recognition error", error)
+            if (
+                isInputViewVisible &&
+                isLatestHandwritingRequest(request) &&
+                request.characterId == handwritingCharacterId
+            ) {
+                _handwritingError.value = getString(
+                    R.string.error_handwriting_recognition_failed,
+                )
+                _handwritingCandidates.value = emptyList()
+            }
+        } finally {
+            if (
+                isLatestHandwritingRequest(request) &&
+                request.characterId == handwritingCharacterId
+            ) {
+                _handwritingRecognizing.value = false
+            }
+        }
+    }
+
+    private fun isLatestHandwritingRequest(request: HandwritingRequest): Boolean =
+        request.sessionGeneration == handwritingGeneration &&
+            latestHandwritingRequestVersions[request.characterId] == request.requestVersion
+
+    private fun invalidateHandwritingCharacterRequest(characterId: Long) {
+        latestHandwritingRequestVersions.remove(characterId)
+        handwritingRecognitionQueue.cancel(characterId)
+    }
+
+    private fun cancelAllHandwritingRecognition(): List<Job> {
+        handwritingGeneration++
+        latestHandwritingRequestVersions.clear()
+        return handwritingRecognitionQueue.cancelAll()
+    }
+
+    private fun markDebugHandwritingChosen(recordingId: String?, text: String) {
+        recordingId ?: return
+        serviceScope.launch(Dispatchers.IO) {
+            DebugHandwritingStore.markChosen(this@CantoneseInputMethodService, recordingId, text)
         }
     }
 
@@ -563,37 +617,26 @@ class CantoneseInputMethodService : InputMethodService(),
     private fun hasActiveHandwritingInput(): Boolean =
         activeHandwritingComposition != null ||
             _handwritingCandidates.value.isNotEmpty() ||
-            _handwritingRecognizing.value
+            _handwritingRecognizing.value ||
+            handwritingRecognitionQueue.jobsSnapshot().isNotEmpty()
 
     private fun acceptActiveHandwritingComposition(replacement: String? = null) {
         if (!hasActiveHandwritingInput() && replacement == null) return
         val acceptedText = replacement ?: activeHandwritingComposition
-        handwritingGeneration++
-        handwritingDebouncer.cancel()
-        handwritingRecognitionJob?.cancel()
+        cancelAllHandwritingRecognition()
         if (acceptedText != null) {
             currentInputConnection?.setComposingText(acceptedText, 1)
             currentInputConnection?.finishComposingText()
         }
-        activeDebugHandwritingRecordingId?.let { recordingId ->
-            if (acceptedText != null) {
-                serviceScope.launch(Dispatchers.IO) {
-                    DebugHandwritingStore.markChosen(
-                        this@CantoneseInputMethodService,
-                        recordingId,
-                        acceptedText,
-                    )
-                }
-            }
+        if (acceptedText != null) {
+            markDebugHandwritingChosen(activeDebugHandwritingRecordingId, acceptedText)
         }
         clearActiveHandwritingState()
     }
 
     private fun discardActiveHandwritingComposition() {
         if (!hasActiveHandwritingInput()) return
-        handwritingGeneration++
-        handwritingDebouncer.cancel()
-        handwritingRecognitionJob?.cancel()
+        cancelAllHandwritingRecognition()
         if (activeHandwritingComposition != null) {
             currentInputConnection?.setComposingText("", 1)
             currentInputConnection?.finishComposingText()
@@ -632,20 +675,18 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun finishInputSession(releaseModel: Boolean) {
         val finishingSession = inputViewSession
-        val jobsToJoin = listOfNotNull(
-            audioRecordJob,
-            transcriptionJob,
-            modelLoadingJob,
-            handwritingRecognitionJob,
-            handwritingLoadingJob,
-        )
+        val jobsToJoin =
+            listOfNotNull(
+                audioRecordJob,
+                transcriptionJob,
+                modelLoadingJob,
+                handwritingLoadingJob,
+            ) + handwritingRecognitionQueue.jobsSnapshot()
 
         // Cancel active recording or loading jobs if active
         stopRecordingInternal(discard = true)
         discardActiveHandwritingComposition()
-        handwritingGeneration++
-        handwritingDebouncer.cancel()
-        handwritingRecognitionJob?.cancel()
+        cancelAllHandwritingRecognition()
         _handwritingCandidates.value = emptyList()
         _handwritingRecognizing.value = false
         activeHandwritingComposition = null
@@ -723,20 +764,20 @@ class CantoneseInputMethodService : InputMethodService(),
         store.clear()
         isInputViewVisible = false
         advanceInputViewSession()
-        handwritingGeneration++
-        handwritingDebouncer.cancel()
+        val handwritingJobs = handwritingRecognitionQueue.jobsSnapshot()
+        cancelAllHandwritingRecognition()
         activeHandwritingComposition = null
         activeDebugHandwritingRecordingId = null
         clearAutofillSuggestion()
         stopClipboardObservation()
         stopRecordingInternal(discard = true)
-        val jobsToJoin = listOfNotNull(
-            audioRecordJob,
-            transcriptionJob,
-            modelLoadingJob,
-            handwritingRecognitionJob,
-            handwritingLoadingJob,
-        )
+        val jobsToJoin =
+            listOfNotNull(
+                audioRecordJob,
+                transcriptionJob,
+                modelLoadingJob,
+                handwritingLoadingJob,
+            ) + handwritingJobs
         jobsToJoin.forEach(Job::cancel)
 
         // Keep this cleanup child alive until all native work has stopped so

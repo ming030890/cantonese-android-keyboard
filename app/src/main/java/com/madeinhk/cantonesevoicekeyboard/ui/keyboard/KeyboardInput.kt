@@ -510,7 +510,7 @@ class KeyboardTouchController(
         }
         if (!pointer.gestureTriggered && dataOnDown != null && pointer.pressedKeyInfo != null) {
             val currentData = key?.currentData
-            if (currentData == dataOnDown) {
+            if (shouldDispatchOriginalKeyUp(dataOnDown, currentData, key?.enabled == true)) {
                 inputDispatcher.sendUp(dataOnDown, pointer.pressedKeyInfo)
             } else {
                 inputDispatcher.sendCancel(dataOnDown, pointer.pressedKeyInfo)
@@ -601,6 +601,12 @@ class KeyboardTouchController(
         pointer.pressedKeyInfo = null
     }
 }
+
+internal fun shouldDispatchOriginalKeyUp(
+    dataOnDown: KeyData,
+    currentData: KeyData?,
+    keyEnabled: Boolean,
+): Boolean = keyEnabled && currentData == dataOnDown
 
 fun performKeyboardHaptic(
     view: View,

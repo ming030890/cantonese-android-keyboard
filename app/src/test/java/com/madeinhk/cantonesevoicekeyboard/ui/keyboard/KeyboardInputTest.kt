@@ -133,6 +133,26 @@ class KeyboardInputTest {
     }
 
     @Test
+    fun keyDisabledDuringPressDoesNotDispatchItsOriginalAction() {
+        val settings = KeyData("toolbar.settings", KeyboardKeyKind.Settings, text = "Settings")
+
+        assertTrue(
+            shouldDispatchOriginalKeyUp(
+                dataOnDown = settings,
+                currentData = settings,
+                keyEnabled = true,
+            ),
+        )
+        assertFalse(
+            shouldDispatchOriginalKeyUp(
+                dataOnDown = settings,
+                currentData = settings,
+                keyEnabled = false,
+            ),
+        )
+    }
+
+    @Test
     fun candidatePageSizeAdaptsWithoutRequiringHorizontalScrolling() {
         assertEquals(1, handwritingCandidatePageSize(150.dp))
         assertEquals(2, handwritingCandidatePageSize(256.dp))
