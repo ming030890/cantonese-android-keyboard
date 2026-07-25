@@ -37,7 +37,7 @@ enum class KeyboardKeyKind {
     SymbolMore,
     Emoji,
     Settings,
-    BackToVoice,
+    Candidate,
     Clipboard,
     Record,
     Utility

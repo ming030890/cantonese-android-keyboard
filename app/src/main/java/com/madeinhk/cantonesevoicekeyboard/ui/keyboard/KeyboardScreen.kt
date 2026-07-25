@@ -1,5 +1,7 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
+import android.graphics.Bitmap
+import android.graphics.Paint
 import android.view.MotionEvent
 import android.view.View
 import androidx.compose.animation.core.*
@@ -7,6 +9,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -50,8 +55,13 @@ import androidx.compose.ui.zIndex
 import androidx.emoji2.emojipicker.EmojiPickerView
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 private val AlphaRowSpacing = 0.dp
@@ -69,6 +79,10 @@ fun KeyboardScreen(
     keyboardInputMode: StateFlow<KeyboardInputMode>,
     autofillSuggestionView: StateFlow<View?>,
     clipboardSuggestion: StateFlow<ClipboardSuggestion?>,
+    handwritingCandidates: StateFlow<List<HandwritingCandidate>>,
+    handwritingRecognizing: StateFlow<Boolean>,
+    handwritingError: StateFlow<String?>,
+    handwritingSession: StateFlow<Long>,
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
@@ -76,6 +90,8 @@ fun KeyboardScreen(
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
     onPasteClipboard: () -> Unit,
+    onHandwritingChanged: (ByteArray, Int, Int) -> Unit,
+    onHandwritingCandidateSelected: (String) -> Unit,
     onAutofillTapped: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
@@ -89,6 +105,10 @@ fun KeyboardScreen(
     val inputMode by keyboardInputMode.collectAsState()
     val autofillView by autofillSuggestionView.collectAsState()
     val clipboard by clipboardSuggestion.collectAsState()
+    val candidates by handwritingCandidates.collectAsState()
+    val handwritingBusy by handwritingRecognizing.collectAsState()
+    val handwritingFailure by handwritingError.collectAsState()
+    val handwritingSessionId by handwritingSession.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -111,6 +131,7 @@ fun KeyboardScreen(
     var keyboardSurfaceOriginInRoot by remember { mutableStateOf(Offset.Zero) }
     var emojiPickerBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
     var autofillBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
+    var handwritingBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
     val keyRegistry = remember { KeyboardKeyRegistry() }
     keyRegistry.beginLayout()
     val toolbarVisible = activePanel != KeyboardPanel.Emoji
@@ -120,7 +141,11 @@ fun KeyboardScreen(
         hasClipboard = clipboard != null,
     )
     val toolbarKeys = if (toolbarVisible) {
-        registerTextToolbarKeys(keyRegistry, toolbarState.secondaryAction)
+        registerTextToolbarKeys(
+            keyRegistry,
+            toolbarState.secondaryAction,
+            if (activePanel == KeyboardPanel.Handwriting) candidates else emptyList(),
+        )
     } else {
         null
     }
@@ -144,6 +169,7 @@ fun KeyboardScreen(
         inputReceiver.onToggleRecording = onToggleRecording
         inputReceiver.onOpenSettings = onOpenSettings
         inputReceiver.onPasteClipboard = onPasteClipboard
+        inputReceiver.onCandidateTapped = onHandwritingCandidateSelected
         inputReceiver.onOpenEmoji = { activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
@@ -158,12 +184,9 @@ fun KeyboardScreen(
                     activePanel = KeyboardPanel.Number
                 }
                 "alpha" -> activePanel = KeyboardPanel.AlphaNum
+                "handwriting" -> activePanel = KeyboardPanel.Handwriting
             }
             onKeyboardInputModeSelected(activePanel.toInputMode())
-        }
-        inputReceiver.onBackToVoice = {
-            activePanel = KeyboardPanel.Voice
-            onKeyboardInputModeSelected(KeyboardInputMode.Voice)
         }
         touchController.setHapticHandler { performKeyboardHaptic(hostView, keyboardHapticConfig) }
     }
@@ -177,16 +200,17 @@ fun KeyboardScreen(
     }
     val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum
     val isTextPanel = activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
-    // Voice needs the same vertical room as the text panels for its recording status
-    // and bottom utility row. Keep one consistent keyboard surface height.
+    // Handwriting and text panels share one stable surface height so the toolbar
+    // and bottom utility row never jump when the mode changes.
     val rowCount = KeyboardUiDefaults.MinimumRowCount + TextPanelAdditionalRows
     val effectiveRowCount = rowCount.coerceAtLeast(KeyboardUiDefaults.MinimumRowCount)
     val keyboardHeight = KeyboardUiDefaults.RowHeight * effectiveRowCount
-    val keyboardTopPadding = if (isTextPanel) 4.dp else 12.dp
+    val isWritingPanel = isTextPanel || activePanel == KeyboardPanel.Handwriting
+    val keyboardTopPadding = if (isWritingPanel) 4.dp else 12.dp
     val keyboardBottomPadding =
-        if (isTextPanel) TextKeyboardBottomPadding else DefaultKeyboardBottomPadding
+        if (isWritingPanel) TextKeyboardBottomPadding else DefaultKeyboardBottomPadding
     val keyboardVerticalArrangement =
-        if (isTextPanel) Arrangement.spacedBy(AlphaBottomRowSpacing) else Arrangement.SpaceBetween
+        if (isWritingPanel) Arrangement.spacedBy(AlphaBottomRowSpacing) else Arrangement.SpaceBetween
     // Main Keyboard container with premium glassmorphic/charcoal aesthetics
     BoxWithConstraints(
         modifier = Modifier
@@ -222,6 +246,12 @@ fun KeyboardScreen(
                         y = event.y
                     )
                     || passToAutofill
+                    || shouldPassToHandwritingCanvas(
+                        handwritingPanelActive = activePanel == KeyboardPanel.Handwriting,
+                        handwritingBounds = handwritingBoundsInSurface,
+                        x = event.x,
+                        y = event.y,
+                    )
                 ) {
                     false
                 } else {
@@ -260,6 +290,12 @@ fun KeyboardScreen(
                     keyRegistry = keyRegistry,
                     keys = checkNotNull(toolbarKeys),
                     secondaryAction = toolbarState.secondaryAction,
+                    candidates = candidates,
+                    showHandwritingCandidates = activePanel == KeyboardPanel.Handwriting,
+                    voiceState = state,
+                    volume = volume,
+                    handwritingBusy = handwritingBusy,
+                    handwritingError = handwritingFailure,
                     autofillView = autofillView,
                     clipboard = clipboard,
                     surfaceOriginInRoot = keyboardSurfaceOriginInRoot,
@@ -304,40 +340,23 @@ fun KeyboardScreen(
                         standardKeyTouchWidth = standardKeyTouchWidth,
                     )
                 }
-                KeyboardPanel.Voice -> {
-                    // Central voice control: the mic and its state-driven label read as one
-                    // cohesive cluster, vertically centered so there's no floating dead space.
-                    Column(
+                KeyboardPanel.Handwriting -> {
+                    HandwritingPanel(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        RecordTriggerVisual(
-                            state = state,
-                            key = keyRegistry.key(
-                                id = "voice.record",
-                                data = KeyData("voice.record", KeyboardKeyKind.Record),
-                                rowId = "voice.record"
-                            ),
-                            keyRegistry = keyRegistry
-                        )
-                        Spacer(modifier = Modifier.height(14.dp))
-                        // Fixed-height label slot keeps the mic from jumping as the status changes.
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 44.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            KeyboardStatusLabel(
-                                state = state,
-                                volume = volume,
-                                onOpenSettings = onOpenSettings
+                        candidates = candidates,
+                        sessionKey = handwritingSessionId,
+                        voiceActive = state == KeyboardUiState.Recording ||
+                            state == KeyboardUiState.Transcribing,
+                        onBoundsChanged = { bounds ->
+                            handwritingBoundsInSurface = bounds.translate(
+                                -keyboardSurfaceOriginInRoot.x,
+                                -keyboardSurfaceOriginInRoot.y,
                             )
-                        }
-                    }
+                        },
+                        onDrawingChanged = onHandwritingChanged,
+                    )
                 }
             }
 
@@ -398,7 +417,7 @@ fun KeyboardScreen(
                     KeyVisual(
                         key = keyRegistry.key(
                             id = "bottom.secondary",
-                            data = if (activePanel == KeyboardPanel.Voice) {
+                            data = if (activePanel == KeyboardPanel.Handwriting) {
                                 KeyData("bottom.secondary", KeyboardKeyKind.ModeSwitch, text = "alpha")
                             } else {
                                 KeyData("bottom.secondary", KeyboardKeyKind.Settings)
@@ -413,7 +432,7 @@ fun KeyboardScreen(
                         verticalPadding = 8.dp,
                         utilityStyle = true,
                     ) {
-                        if (activePanel == KeyboardPanel.Voice) {
+                        if (activePanel == KeyboardPanel.Handwriting) {
                             KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                         } else {
                             SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
@@ -502,35 +521,19 @@ private fun UnifiedKeyboardToolbar(
     keyRegistry: KeyboardKeyRegistry,
     keys: TextToolbarKeys,
     secondaryAction: ToolbarSecondaryAction?,
+    candidates: List<HandwritingCandidate>,
+    showHandwritingCandidates: Boolean,
+    voiceState: KeyboardUiState,
+    volume: Float,
+    handwritingBusy: Boolean,
+    handwritingError: String?,
     autofillView: View?,
     clipboard: ClipboardSuggestion?,
     surfaceOriginInRoot: Offset,
     onAutofillBoundsChanged: (Rect) -> Unit,
 ) {
     val keyboardColors = BrandTheme.colors
-
-    if (secondaryAction == ToolbarSecondaryAction.Clipboard) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(KeyboardUiDefaults.ToolbarHeight)
-                .padding(horizontal = KeyboardUiDefaults.KeyboardHorizontalPadding),
-        ) {
-            ToolbarSettingsVisual(
-                key = keys.settings,
-                keyRegistry = keyRegistry,
-                modifier = Modifier.align(Alignment.CenterStart),
-            )
-            ClipboardToolbarChip(
-                key = keys.clipboard,
-                keyRegistry = keyRegistry,
-                clipboard = checkNotNull(clipboard),
-                keyboardColors = keyboardColors,
-                modifier = Modifier.align(Alignment.Center),
-            )
-        }
-        return
-    }
+    val candidatesVisible = showHandwritingCandidates && candidates.isNotEmpty()
 
     Row(
         modifier = Modifier
@@ -540,64 +543,147 @@ private fun UnifiedKeyboardToolbar(
         horizontalArrangement = Arrangement.spacedBy(KeyboardUiDefaults.ToolbarIconSpacing),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (secondaryAction == null) {
-            Spacer(modifier = Modifier.weight(1f))
+        if (!candidatesVisible) {
+            ToolbarSettingsVisual(key = keys.settings, keyRegistry = keyRegistry)
         }
-        ToolbarSettingsVisual(key = keys.settings, keyRegistry = keyRegistry)
-        when (secondaryAction) {
-            ToolbarSecondaryAction.Voice -> ToolbarIconVisual(
+        Box(
+            modifier = Modifier
+                .then(if (candidatesVisible) Modifier.fillMaxWidth() else Modifier.weight(1f))
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center,
+        ) {
+            when {
+                voiceState == KeyboardUiState.Recording -> {
+                    VoiceToolbarStatus(volume = volume, label = stringResource(R.string.keyboard_status_recording))
+                }
+                voiceState == KeyboardUiState.Transcribing -> {
+                    VoiceToolbarStatus(volume = 0f, label = stringResource(R.string.keyboard_status_transcribing))
+                }
+                voiceState == KeyboardUiState.LoadingModel -> {
+                    ToolbarStatusText(stringResource(R.string.keyboard_status_loading_model), TranscribeYellow)
+                }
+                voiceState is KeyboardUiState.Error -> {
+                    ToolbarStatusText(voiceState.message, MaterialTheme.colorScheme.error)
+                }
+                showHandwritingCandidates && handwritingError != null -> {
+                    ToolbarStatusText(handwritingError, MaterialTheme.colorScheme.error)
+                }
+                secondaryAction == ToolbarSecondaryAction.Autofill -> {
+                    val providerView = checkNotNull(autofillView)
+                    if (LocalInspectionMode.current) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surface),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.keyboard_toolbar_autofill),
+                                color = keyboardColors.keyboardKeyOnSurface,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    } else {
+                        AndroidView(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(8.dp))
+                                .onGloballyPositioned { coordinates ->
+                                    val bounds = coordinates.boundsInRoot()
+                                    onAutofillBoundsChanged(
+                                        Rect(
+                                            left = bounds.left - surfaceOriginInRoot.x,
+                                            top = bounds.top - surfaceOriginInRoot.y,
+                                            right = bounds.right - surfaceOriginInRoot.x,
+                                            bottom = bounds.bottom - surfaceOriginInRoot.y,
+                                        )
+                                    )
+                                },
+                            factory = { providerView },
+                            update = {},
+                        )
+                    }
+                }
+                secondaryAction == ToolbarSecondaryAction.Clipboard -> {
+                    ClipboardToolbarChip(
+                        key = keys.clipboard,
+                        keyRegistry = keyRegistry,
+                        clipboard = checkNotNull(clipboard),
+                        keyboardColors = keyboardColors,
+                        modifier = Modifier.width(104.dp),
+                    )
+                }
+                candidatesVisible -> {
+                    HandwritingCandidateStrip(
+                        candidates = candidates,
+                        keys = keys.candidates,
+                        keyRegistry = keyRegistry,
+                    )
+                }
+                showHandwritingCandidates && handwritingBusy -> ToolbarStatusText(
+                    stringResource(R.string.keyboard_status_recognizing),
+                    keyboardColors.keyboardKeyOnSurface,
+                )
+                else -> Unit
+            }
+        }
+        if (!candidatesVisible) {
+            ToolbarIconVisual(
                 key = keys.voice,
                 keyRegistry = keyRegistry,
                 accessibilityDescription = stringResource(R.string.keyboard_toolbar_voice),
             ) {
                 MicIcon(
                     modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
-                    color = keyboardColors.keyboardKeyOnSurface
+                    color = keyboardColors.keyboardKeyOnSurface,
                 )
             }
-            ToolbarSecondaryAction.Autofill -> {
-                val providerView = checkNotNull(autofillView)
-                if (LocalInspectionMode.current) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surface),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = "Autofill suggestion",
-                            color = keyboardColors.keyboardKeyOnSurface,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    }
-                } else {
-                    AndroidView(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(8.dp))
-                            .onGloballyPositioned { coordinates ->
-                                val bounds = coordinates.boundsInRoot()
-                                onAutofillBoundsChanged(
-                                    Rect(
-                                        left = bounds.left - surfaceOriginInRoot.x,
-                                        top = bounds.top - surfaceOriginInRoot.y,
-                                        right = bounds.right - surfaceOriginInRoot.x,
-                                        bottom = bounds.bottom - surfaceOriginInRoot.y,
-                                    )
-                                )
-                            },
-                        factory = { providerView },
-                        update = {}
+        }
+    }
+}
+
+@Composable
+private fun ToolbarStatusText(text: String, color: Color) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Medium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+private fun VoiceToolbarStatus(volume: Float, label: String) {
+    val errorColor = MaterialTheme.colorScheme.error
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        if (volume > 0f) {
+            Canvas(modifier = Modifier.width(36.dp).height(18.dp)) {
+                val center = size.height / 2f
+                val barWidth = size.width / 7f
+                repeat(5) { index ->
+                    val x = barWidth * (index + 1)
+                    val amplitude = size.height * (0.18f + volume * (0.18f + index * 0.03f))
+                    drawLine(
+                        color = errorColor,
+                        start = Offset(x, center - amplitude),
+                        end = Offset(x, center + amplitude),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Round,
                     )
                 }
             }
-            null -> Unit
-            ToolbarSecondaryAction.Clipboard -> error("Clipboard is rendered above")
         }
+        ToolbarStatusText(label, if (volume > 0f) errorColor else TranscribeYellow)
     }
 }
 
@@ -667,11 +753,13 @@ internal data class TextToolbarKeys(
     val settings: KeyModel,
     val voice: KeyModel,
     val clipboard: KeyModel,
+    val candidates: List<KeyModel>,
 )
 
 internal fun registerTextToolbarKeys(
     keyRegistry: KeyboardKeyRegistry,
-    secondaryAction: ToolbarSecondaryAction? = ToolbarSecondaryAction.Voice,
+    secondaryAction: ToolbarSecondaryAction? = null,
+    candidates: List<HandwritingCandidate> = emptyList(),
 ): TextToolbarKeys =
     TextToolbarKeys(
         settings = keyRegistry.key(
@@ -681,9 +769,8 @@ internal fun registerTextToolbarKeys(
         ),
         voice = keyRegistry.key(
             id = "toolbar.voice",
-            data = KeyData("toolbar.voice", KeyboardKeyKind.BackToVoice, text = "Voice input"),
+            data = KeyData("toolbar.voice", KeyboardKeyKind.Record, text = "Voice input"),
             rowId = "toolbar",
-            enabled = secondaryAction == ToolbarSecondaryAction.Voice,
         ),
         clipboard = keyRegistry.key(
             id = "toolbar.clipboard",
@@ -691,7 +778,94 @@ internal fun registerTextToolbarKeys(
             rowId = "toolbar",
             enabled = secondaryAction == ToolbarSecondaryAction.Clipboard,
         ),
+        candidates = candidates.take(10).mapIndexed { index, candidate ->
+            keyRegistry.key(
+                id = "toolbar.candidate.$index",
+                data = KeyData(
+                    keyId = "toolbar.candidate.$index",
+                    kind = KeyboardKeyKind.Candidate,
+                    text = candidate.text,
+                ),
+                rowId = "toolbar",
+                enabled = true,
+            )
+        },
     )
+
+@Composable
+private fun HandwritingCandidateStrip(
+    candidates: List<HandwritingCandidate>,
+    keys: List<KeyModel>,
+    keyRegistry: KeyboardKeyRegistry,
+) {
+    val scrollState = rememberScrollState()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .horizontalScroll(scrollState),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            candidates.take(10).forEachIndexed { index, candidate ->
+                if (index > 0) {
+                    CandidateDivider()
+                }
+                ToolbarCandidateVisual(
+                    key = keys[index],
+                    keyRegistry = keyRegistry,
+                    candidate = candidate,
+                    modifier = Modifier.width(62.dp),
+                )
+            }
+        }
+        ChevronDownIcon(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .size(24.dp),
+            color = BrandTheme.colors.keyboardKeyOnSurface,
+        )
+    }
+}
+
+@Composable
+private fun CandidateDivider() {
+    Box(
+        modifier = Modifier
+            .width(1.dp)
+            .height(30.dp)
+            .background(BrandTheme.colors.keyboardKeyOnSurface.copy(alpha = 0.28f)),
+    )
+}
+
+@Composable
+private fun ToolbarCandidateVisual(
+    key: KeyModel,
+    keyRegistry: KeyboardKeyRegistry,
+    candidate: HandwritingCandidate,
+    modifier: Modifier = Modifier,
+) {
+    KeyVisual(
+        modifier = modifier.height(KeyboardUiDefaults.ToolbarHeight),
+        key = key,
+        keyRegistry = keyRegistry,
+        accessibilityDescription = candidate.text,
+        backgroundColor = Color.Transparent,
+        shape = RectangleShape,
+        restingElevation = 0.dp,
+        pressedScale = 0.96f,
+    ) {
+        Text(
+            text = candidate.text,
+            color = BrandTheme.colors.keyboardKeyOnSurface,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
 
 @Composable
 private fun ToolbarIconVisual(
@@ -748,8 +922,159 @@ private fun ToolbarChipVisual(
     )
 }
 
+private typealias HandwritingStroke = List<Offset>
+
+@Composable
+private fun HandwritingPanel(
+    modifier: Modifier,
+    candidates: List<HandwritingCandidate>,
+    sessionKey: Long,
+    voiceActive: Boolean,
+    onBoundsChanged: (Rect) -> Unit,
+    onDrawingChanged: (ByteArray, Int, Int) -> Unit,
+) {
+    var strokes by remember { mutableStateOf<List<HandwritingStroke>>(emptyList()) }
+    var activeStroke by remember { mutableStateOf<HandwritingStroke>(emptyList()) }
+    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
+    var clearJob by remember { mutableStateOf<Job?>(null) }
+    val scope = rememberCoroutineScope()
+    val strokeColor = MaterialTheme.colorScheme.primary
+    val hintColor = MaterialTheme.colorScheme.onSurfaceVariant
+
+    LaunchedEffect(sessionKey) {
+        clearJob?.cancel()
+        clearJob = null
+        strokes = emptyList()
+        activeStroke = emptyList()
+    }
+
+    LaunchedEffect(candidates) {
+        clearJob?.cancel()
+        if (candidates.isEmpty()) {
+            strokes = emptyList()
+            activeStroke = emptyList()
+        } else {
+            clearJob = scope.launch {
+                delay(1_000L)
+                strokes = emptyList()
+                activeStroke = emptyList()
+            }
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .onGloballyPositioned { coordinates ->
+                canvasSize = coordinates.size
+                val bounds = coordinates.boundsInRoot()
+                onBoundsChanged(Rect(bounds.left, bounds.top, bounds.right, bounds.bottom))
+            }
+            .pointerInteropFilter { event ->
+                if (voiceActive) return@pointerInteropFilter true
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        clearJob?.cancel()
+                        activeStroke = listOf(Offset(event.x, event.y))
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        if (activeStroke.isNotEmpty()) {
+                            activeStroke = activeStroke + Offset(event.x, event.y)
+                        }
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        if (activeStroke.isNotEmpty()) {
+                            val completed = strokes + listOf(activeStroke)
+                            strokes = completed
+                            activeStroke = emptyList()
+                            val bitmap = handwritingBitmap(completed, size = canvasSize)
+                            onDrawingChanged(bitmap.pixels, bitmap.width, bitmap.height)
+                        }
+                    }
+                    MotionEvent.ACTION_CANCEL -> activeStroke = emptyList()
+                }
+                true
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val allStrokes = strokes + listOfNotNull(activeStroke.takeIf { it.isNotEmpty() })
+            allStrokes.forEach { points ->
+                if (points.isEmpty()) {
+                    return@forEach
+                } else if (points.size == 1) {
+                    drawCircle(
+                        color = strokeColor,
+                        radius = 3.5.dp.toPx(),
+                        center = points.first(),
+                    )
+                } else {
+                    points.zipWithNext().forEach { (start, end) ->
+                        drawLine(
+                            color = strokeColor,
+                            start = start,
+                            end = end,
+                            strokeWidth = 7.dp.toPx(),
+                            cap = StrokeCap.Round,
+                        )
+                    }
+                }
+            }
+        }
+        if (strokes.isEmpty() && activeStroke.isEmpty()) {
+            Text(
+                text = stringResource(R.string.keyboard_handwriting_hint),
+                color = hintColor,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+            )
+        }
+    }
+}
+
+internal data class HandwritingBitmap(
+    val pixels: ByteArray,
+    val width: Int,
+    val height: Int,
+)
+
+internal fun handwritingBitmap(
+    strokes: List<HandwritingStroke>,
+    size: IntSize?,
+): HandwritingBitmap {
+    val width = (size?.width ?: 400).coerceAtLeast(1)
+    val height = (size?.height ?: 180).coerceAtLeast(1)
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = android.graphics.Canvas(bitmap)
+    canvas.drawColor(android.graphics.Color.WHITE)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.BLACK
+        style = Paint.Style.STROKE
+        strokeWidth = (width.coerceAtMost(height) * 0.035f).coerceAtLeast(5f)
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+    }
+    strokes.forEach { points ->
+        if (points.isEmpty()) {
+            return@forEach
+        } else if (points.size == 1) {
+            canvas.drawCircle(points.first().x, points.first().y, paint.strokeWidth / 2f, paint)
+        } else {
+            points.zipWithNext().forEach { (start, end) ->
+                canvas.drawLine(start.x, start.y, end.x, end.y, paint)
+            }
+        }
+    }
+    val colors = IntArray(width * height)
+    bitmap.getPixels(colors, 0, width, 0, 0, width, height)
+    return HandwritingBitmap(
+        pixels = ByteArray(colors.size) { index -> android.graphics.Color.red(colors[index]).toByte() },
+        width = width,
+        height = height,
+    )
+}
+
 private enum class KeyboardPanel {
-    Voice,
+    Handwriting,
     Emoji,
     Number,
     AlphaNum
@@ -761,6 +1086,13 @@ internal fun shouldPassToEmojiPicker(
     x: Float,
     y: Float
 ): Boolean = emojiPanelActive && emojiPickerBounds.contains(Offset(x, y))
+
+internal fun shouldPassToHandwritingCanvas(
+    handwritingPanelActive: Boolean,
+    handwritingBounds: Rect,
+    x: Float,
+    y: Float,
+): Boolean = handwritingPanelActive && handwritingBounds.contains(Offset(x, y))
 
 internal fun shouldPassToAutofillView(
     autofillViewPresent: Boolean,
@@ -794,21 +1126,21 @@ enum class KeyboardAction {
 }
 
 enum class KeyboardInputMode {
-    Voice,
+    Handwriting,
     Number,
     AlphaNum
 }
 
 private fun KeyboardInputMode.toPanel(): KeyboardPanel =
     when (this) {
-        KeyboardInputMode.Voice -> KeyboardPanel.Voice
+        KeyboardInputMode.Handwriting -> KeyboardPanel.Handwriting
         KeyboardInputMode.Number -> KeyboardPanel.Number
         KeyboardInputMode.AlphaNum -> KeyboardPanel.AlphaNum
     }
 
 private fun KeyboardPanel.toInputMode(): KeyboardInputMode =
     when (this) {
-        KeyboardPanel.Voice, KeyboardPanel.Emoji -> KeyboardInputMode.Voice
+        KeyboardPanel.Handwriting, KeyboardPanel.Emoji -> KeyboardInputMode.Handwriting
         KeyboardPanel.Number -> KeyboardInputMode.Number
         KeyboardPanel.AlphaNum -> KeyboardInputMode.AlphaNum
     }
@@ -821,8 +1153,8 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
     var onToggleRecording: () -> Unit = {}
     var onOpenSettings: () -> Unit = {}
     var onPasteClipboard: () -> Unit = {}
+    var onCandidateTapped: (String) -> Unit = {}
     var onOpenEmoji: () -> Unit = {}
-    var onBackToVoice: () -> Unit = {}
     var onToggleUppercase: () -> Unit = {}
     var onToggleMoreSymbols: () -> Unit = {}
     var onModeSwitch: (String) -> Unit = {}
@@ -841,7 +1173,7 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
             KeyboardKeyKind.SymbolMore -> onToggleMoreSymbols()
             KeyboardKeyKind.Emoji -> onOpenEmoji()
             KeyboardKeyKind.Settings -> onOpenSettings()
-            KeyboardKeyKind.BackToVoice -> onBackToVoice()
+            KeyboardKeyKind.Candidate -> data.text?.let(onCandidateTapped)
             KeyboardKeyKind.Clipboard -> onPasteClipboard()
             KeyboardKeyKind.Record -> onToggleRecording()
             KeyboardKeyKind.Delete,
@@ -1184,6 +1516,25 @@ private fun AlphaNumBottomRow(
                 text = modeSwitchLabel,
                 color = keyboardColors.keyboardKeyOnSurface,
                 style = keyboardTypography.keyboardModeSwitchKey
+            )
+        }
+        KeyVisual(
+            key = keyRegistry.key(
+                id = "text.bottom.handwriting",
+                data = KeyData(
+                    "text.bottom.handwriting",
+                    KeyboardKeyKind.ModeSwitch,
+                    text = "handwriting",
+                ),
+                rowId = "text.bottom",
+            ),
+            keyRegistry = keyRegistry,
+            modifier = Modifier.weight(1.15f),
+            backgroundColor = keyboardColors.keyboardModifierKeySurface,
+        ) {
+            KeyboardIcon(
+                modifier = Modifier.size(20.dp),
+                color = keyboardColors.keyboardKeyOnSurface,
             )
         }
         KeyVisual(
@@ -2059,6 +2410,30 @@ fun KeyboardActionIcon(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ChevronDownIcon(
+    modifier: Modifier = Modifier,
+    color: Color = Color.White,
+) {
+    Canvas(modifier = modifier) {
+        val strokePx = 2.5.dp.toPx()
+        drawLine(
+            color = color,
+            start = Offset(size.width * 0.20f, size.height * 0.35f),
+            end = Offset(size.width * 0.50f, size.height * 0.65f),
+            strokeWidth = strokePx,
+            cap = StrokeCap.Round,
+        )
+        drawLine(
+            color = color,
+            start = Offset(size.width * 0.50f, size.height * 0.65f),
+            end = Offset(size.width * 0.80f, size.height * 0.35f),
+            strokeWidth = strokePx,
+            cap = StrokeCap.Round,
+        )
     }
 }
 

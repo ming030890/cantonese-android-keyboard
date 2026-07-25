@@ -9,6 +9,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
+import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -171,6 +173,24 @@ fun KeyboardScreenSensitivePasteScreenshot() {
 
 @PreviewTest
 @Preview(
+    name = "Keyboard handwriting candidates",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenHandwritingCandidatesScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        candidates = (0 until 10).map { index ->
+            HandwritingCandidate("字$index", index)
+        },
+    )
+}
+
+@PreviewTest
+@Preview(
     name = "Keyboard autofill placeholder",
     showBackground = true,
     backgroundColor = 0xFF0D1117,
@@ -190,16 +210,17 @@ private fun KeyboardScreenScreenshotContent(
     state: KeyboardUiState,
     volume: Float = 0f,
     action: KeyboardAction = KeyboardAction.Enter,
-    inputMode: KeyboardInputMode = KeyboardInputMode.Voice,
+    inputMode: KeyboardInputMode = KeyboardInputMode.Handwriting,
     initialEmojiPanel: Boolean = false,
     clipboard: ClipboardSuggestion? = null,
     showAutofillPlaceholder: Boolean = false,
+    candidates: List<HandwritingCandidate> = emptyList(),
 ) {
     val context = LocalContext.current
     val autofillView = if (showAutofillPlaceholder) {
         remember(context) {
             TextView(context).apply {
-                text = "Autofill suggestion"
+                text = context.getString(R.string.keyboard_toolbar_autofill)
                 gravity = Gravity.CENTER
                 setTextColor(Color.WHITE)
                 setBackgroundColor(Color.rgb(42, 84, 126))
@@ -214,6 +235,10 @@ private fun KeyboardScreenScreenshotContent(
             volumeLevel = MutableStateFlow(volume),
             keyboardAction = MutableStateFlow(action),
             keyboardInputMode = MutableStateFlow(inputMode),
+            handwritingCandidates = MutableStateFlow(candidates),
+            handwritingRecognizing = MutableStateFlow(false),
+            handwritingError = MutableStateFlow(null),
+            handwritingSession = MutableStateFlow(0L),
             autofillSuggestionView = MutableStateFlow(autofillView),
             clipboardSuggestion = MutableStateFlow(clipboard),
             onToggleRecording = {},
@@ -223,6 +248,8 @@ private fun KeyboardScreenScreenshotContent(
             onSendEnter = {},
             onOpenSettings = {},
             onPasteClipboard = {},
+            onHandwritingChanged = { _, _, _ -> },
+            onHandwritingCandidateSelected = {},
             onEmojiPicked = {},
             initialEmojiPanel = initialEmojiPanel
         )

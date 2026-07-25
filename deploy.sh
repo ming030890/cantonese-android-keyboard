@@ -29,6 +29,8 @@ SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8-v16-manual-code-switching
 PACK_A_ASSETS="$PROJECT_DIR/model_pack_a/src/main/assets/qwen-asr-m4-lmhead-int8"
 PACK_B_ASSETS="$PROJECT_DIR/model_pack_b/src/main/assets/qwen-asr-m4-lmhead-int8"
 RESHARD_SCRIPT="$PROJECT_DIR/scripts/reshard_model.py"
+HANDWRITING_SOURCE_DIR="/Volumes/SSD/stust-handwriting-full/artifacts/type2-baseline-runpod-eu-cz"
+HANDWRITING_ASSETS="$PROJECT_DIR/app/src/main/assets/handwriting"
 
 # Pinned bundletool; auto-downloaded into .tools/ on first use.
 BUNDLETOOL_VERSION="1.18.1"
@@ -56,11 +58,11 @@ fi
 # 1. Locate ADB and verify device connection
 # ---------------------------------------------------------------------------
 if [ "$RELEASE" = "true" ]; then
-    echo -e "${COLOR_INFO}[Step 1/6] Release mode: skipping device check (AAB is for Play upload).${COLOR_RESET}"
+    echo -e "${COLOR_INFO}[Step 1/7] Release mode: skipping device check (AAB is for Play upload).${COLOR_RESET}"
     DEVICE_ID=""
     ADB=""
 else
-    echo -e "${COLOR_INFO}[Step 1/6] Locating ADB and verifying device connection...${COLOR_RESET}"
+    echo -e "${COLOR_INFO}[Step 1/7] Locating ADB and verifying device connection...${COLOR_RESET}"
     ADB="/Users/tony/Library/Android/sdk/platform-tools/adb"
     if [ ! -f "$ADB" ]; then
         if command -v adb &> /dev/null; then
@@ -84,8 +86,9 @@ fi
 # 2. Compile JNI Library
 # ---------------------------------------------------------------------------
 SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libqwen_asr.so"
+HWR_SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libstust_handwriting_inference.so"
 
-echo -e "${COLOR_INFO}[Step 2/6] Compiling native libqwen_asr.so shared library...${COLOR_RESET}"
+echo -e "${COLOR_INFO}[Step 2/7] Compiling native libraries...${COLOR_RESET}"
 if [ ! -d "$PROJECT_DIR/../QwenASR" ]; then
     echo -e "${COLOR_ERROR}Error: QwenASR workspace directory not found at '../QwenASR'.${COLOR_RESET}"
     exit 1
@@ -112,10 +115,18 @@ mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
 cp "$PROJECT_DIR/../QwenASR/target/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
 echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
 
+echo -e "${COLOR_INFO}Compiling the Rust handwriting inference library...${COLOR_RESET}"
+pushd "$PROJECT_DIR/../handwriting-recognizer/rust" > /dev/null
+cargo ndk -t arm64-v8a build --release --features android
+popd > /dev/null
+mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
+cp "$PROJECT_DIR/../handwriting-recognizer/rust/target/aarch64-linux-android/release/libstust_handwriting_inference.so" "$HWR_SO_DEST"
+echo -e "${COLOR_SUCCESS}Handwriting native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
+
 # ---------------------------------------------------------------------------
 # 3. Stage the ASR model into the Play Asset Delivery pack
 # ---------------------------------------------------------------------------
-echo -e "${COLOR_INFO}[Step 3/6] Staging Qwen ASR model shards into both asset packs...${COLOR_RESET}"
+echo -e "${COLOR_INFO}[Step 3/7] Staging Qwen ASR model shards into both asset packs...${COLOR_RESET}"
 SHARD_A="$PACK_A_ASSETS/model-00001-of-00002.safetensors"
 SHARD_B="$PACK_B_ASSETS/model-00002-of-00002.safetensors"
 if [ -d "$SOURCE_MODEL_DIR" ]; then
@@ -139,9 +150,22 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Ensure bundletool is available
+# 4. Stage the handwriting model bundle into app assets
 # ---------------------------------------------------------------------------
-echo -e "${COLOR_INFO}[Step 4/6] Ensuring bundletool is available...${COLOR_RESET}"
+echo -e "${COLOR_INFO}[Step 4/7] Staging handwriting model and labels...${COLOR_RESET}"
+if [ ! -f "$HANDWRITING_SOURCE_DIR/model.safetensors" ] || [ ! -f "$HANDWRITING_SOURCE_DIR/labels.txt" ]; then
+    echo -e "${COLOR_ERROR}Error: handwriting model artifacts are missing from '$HANDWRITING_SOURCE_DIR'.${COLOR_RESET}"
+    exit 1
+fi
+mkdir -p "$HANDWRITING_ASSETS"
+cp "$HANDWRITING_SOURCE_DIR/model.safetensors" "$HANDWRITING_ASSETS/model.safetensors"
+cp "$HANDWRITING_SOURCE_DIR/labels.txt" "$HANDWRITING_ASSETS/labels.txt"
+echo -e "${COLOR_SUCCESS}Handwriting model assets staged.${COLOR_RESET}"
+
+# ---------------------------------------------------------------------------
+# 5. Ensure bundletool is available
+# ---------------------------------------------------------------------------
+echo -e "${COLOR_INFO}[Step 5/7] Ensuring bundletool is available...${COLOR_RESET}"
 if ! command -v java &> /dev/null; then
     echo -e "${COLOR_ERROR}Error: 'java' not found on PATH. bundletool requires a JDK.${COLOR_RESET}"
     exit 1
@@ -157,14 +181,14 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 5. Build the App Bundle (.aab) including the asset pack
+# 6. Build the App Bundle (.aab) including the asset pack
 # ---------------------------------------------------------------------------
 cd "$PROJECT_DIR"
 if [ "$RELEASE" = "true" ]; then
-    echo -e "${COLOR_INFO}[Step 5/6] Building RELEASE App Bundle (.aab) for Play upload...${COLOR_RESET}"
+    echo -e "${COLOR_INFO}[Step 6/7] Building RELEASE App Bundle (.aab) for Play upload...${COLOR_RESET}"
     ./gradlew :app:bundleRelease
 else
-    echo -e "${COLOR_INFO}[Step 5/6] Building debug App Bundle (.aab)...${COLOR_RESET}"
+    echo -e "${COLOR_INFO}[Step 6/7] Building debug App Bundle (.aab)...${COLOR_RESET}"
     ./gradlew :app:bundleDebug
 fi
 if [ ! -f "$AAB_PATH" ]; then
@@ -182,9 +206,9 @@ if [ "$RELEASE" = "true" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# 6. Convert to APK set with local-testing asset packs and install
+# 7. Convert to APK set with local-testing asset packs and install
 # ---------------------------------------------------------------------------
-echo -e "${COLOR_INFO}[Step 6/6] Generating APK set and installing via bundletool (--local-testing)...${COLOR_RESET}"
+echo -e "${COLOR_INFO}[Step 7/7] Generating APK set and installing via bundletool (--local-testing)...${COLOR_RESET}"
 mkdir -p "$(dirname "$APKS_PATH")"
 rm -f "$APKS_PATH"
 

@@ -38,7 +38,7 @@ class KeyboardInputTest {
     fun clipboardToolbarKeyIsRegisteredAndHitAfterSecondaryActionChanges() {
         val registry = KeyboardKeyRegistry()
         registry.beginLayout()
-        val voice = registerTextToolbarKeys(registry, ToolbarSecondaryAction.Voice)
+        val voice = registerTextToolbarKeys(registry)
         registry.updateSurfaceSize(width = 300, height = 100)
         registry.updateVisualBounds(voice.settings, Rect(190f, 20f, 238f, 68f))
         registry.updateVisualBounds(voice.voice, Rect(246f, 20f, 294f, 68f))
@@ -49,7 +49,7 @@ class KeyboardInputTest {
         registry.updateVisualBounds(clipboard.settings, Rect(190f, 20f, 238f, 68f))
         registry.updateVisualBounds(clipboard.clipboard, Rect(246f, 20f, 294f, 68f))
 
-        assertEquals(false, clipboard.voice.enabled)
+        assertTrue(clipboard.voice.enabled)
         assertTrue(clipboard.clipboard.enabled)
         assertSame(clipboard.clipboard, registry.findKeyAt(270f, 40f))
     }
@@ -79,6 +79,59 @@ class KeyboardInputTest {
         assertTrue(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_DOWN, 150f, 30f))
         assertFalse(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_UP, 150f, 30f))
         assertFalse(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_DOWN, 80f, 30f))
+    }
+
+    @Test
+    fun handwritingCanvasPassThroughOnlyAppliesInsideActiveCanvasBounds() {
+        val bounds = Rect(10f, 20f, 190f, 120f)
+
+        assertTrue(shouldPassToHandwritingCanvas(true, bounds, 50f, 60f))
+        assertFalse(shouldPassToHandwritingCanvas(false, bounds, 50f, 60f))
+        assertFalse(shouldPassToHandwritingCanvas(true, bounds, 50f, 140f))
+    }
+
+    @Test
+    fun candidateToolbarKeysStayEnabledAlongsideFixedVoiceKey() {
+        val registry = KeyboardKeyRegistry().apply { beginLayout() }
+        val keys = registerTextToolbarKeys(
+            registry,
+            candidates = listOf(
+                com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("你", 0),
+                com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("尼", 1),
+            ),
+        )
+
+        assertTrue(keys.voice.enabled)
+        assertTrue(keys.candidates[0].enabled)
+        assertTrue(keys.candidates[1].enabled)
+        assertEquals(2, keys.candidates.size)
+    }
+
+    @Test
+    fun candidateKeysRemovedWhenRecognitionReturnsFewerResults() {
+        val registry = KeyboardKeyRegistry()
+        registry.beginLayout()
+        val initial = registerTextToolbarKeys(
+            registry,
+            candidates = listOf(
+                com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("你", 0),
+                com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("尼", 1),
+            ),
+        )
+        registry.updateSurfaceSize(width = 300, height = 100)
+        registry.updateVisualBounds(initial.candidates[1], Rect(100f, 20f, 150f, 68f))
+
+        registry.beginLayout()
+        val updated = registerTextToolbarKeys(
+            registry,
+            candidates = listOf(
+                com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("你", 0),
+            ),
+        )
+        registry.updateSurfaceSize(width = 300, height = 100)
+
+        assertEquals(1, updated.candidates.size)
+        assertTrue(registry.findKeyAt(125f, 40f) == null)
     }
 
     @Test

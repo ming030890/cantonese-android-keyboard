@@ -32,8 +32,8 @@ class ClipboardSuggestionTest {
 
     @Test
     fun voiceHasOnlySettingsWhenThereIsNoSuggestion() {
-        assertTrue(toolbarPresentation(KeyboardInputMode.Voice, false, false).showSettings)
-        assertNull(toolbarPresentation(KeyboardInputMode.Voice, false, false).secondaryAction)
+        assertTrue(toolbarPresentation(KeyboardInputMode.Handwriting, false, false).showSettings)
+        assertNull(toolbarPresentation(KeyboardInputMode.Handwriting, false, false).secondaryAction)
     }
 
     @Test

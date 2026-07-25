@@ -46,7 +46,6 @@ internal object ClipMimeTypes {
 }
 
 internal enum class ToolbarSecondaryAction {
-    Voice,
     Clipboard,
     Autofill,
 }
@@ -56,7 +55,7 @@ internal data class ToolbarPresentation(
     val secondaryAction: ToolbarSecondaryAction?,
 )
 
-/** Autofill wins, then clipboard, then the normal panel control. */
+/** Autofill and clipboard occupy only the shared toolbar center slot. */
 internal fun toolbarPresentation(
     panel: KeyboardInputMode,
     hasAutofill: Boolean,
@@ -65,7 +64,6 @@ internal fun toolbarPresentation(
     secondaryAction = when {
         hasAutofill -> ToolbarSecondaryAction.Autofill
         hasClipboard -> ToolbarSecondaryAction.Clipboard
-        panel == KeyboardInputMode.Voice -> null
-        else -> ToolbarSecondaryAction.Voice
+        else -> null
     },
 )
