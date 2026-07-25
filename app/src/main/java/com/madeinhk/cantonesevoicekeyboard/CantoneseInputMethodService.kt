@@ -60,6 +60,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.joinAll
@@ -81,11 +82,13 @@ class CantoneseInputMethodService : InputMethodService(),
         private const val INLINE_SUGGESTION_MIN_WIDTH_DP = 72
         private const val INLINE_SUGGESTION_HEIGHT_DP = 48
         private const val HANDWRITING_IDLE_DELAY_MS = 100L
+        private const val HANDWRITING_CANDIDATE_TIMEOUT_MS = 3_000L
         private const val HANDWRITING_TOP_K = 10
     }
 
     private data class HandwritingRequest(
         val generation: Long,
+        val candidatesExpireAtMillis: Long,
         val pixels: ByteArray,
         val width: Int,
         val height: Int,
@@ -118,6 +121,9 @@ class CantoneseInputMethodService : InputMethodService(),
     private var transcriptionJob: Job? = null
     private var handwritingLoadingJob: Job? = null
     private var handwritingRecognitionJob: Job? = null
+    private var handwritingCandidateTimeoutJob: Job? = null
+    @Volatile
+    private var activeDebugHandwritingRecordingId: String? = null
     private val handwritingDebouncer = HandwritingDebouncer<HandwritingRequest>(
         scope = serviceScope,
         idleDelayMillis = HANDWRITING_IDLE_DELAY_MS,
@@ -221,8 +227,14 @@ class CantoneseInputMethodService : InputMethodService(),
                         onHandwritingChanged = { pixels, width, height ->
                             recognizeHandwriting(pixels, width, height)
                         },
+                        onHandwritingStrokeStarted = ::onHandwritingStrokeStarted,
                         onHandwritingCandidateSelected = { text ->
                             commitHandwritingCandidate(text)
+                        },
+                        onHandwritingCandidatesInteracted = {
+                            if (_handwritingCandidates.value.isNotEmpty()) {
+                                scheduleHandwritingCandidateTimeout(handwritingGeneration)
+                            }
                         },
                         onAutofillTapped = { clearAutofillSuggestion() },
                         onEmojiPicked = { emoji -> sendEmoji(emoji) }
@@ -243,9 +255,12 @@ class CantoneseInputMethodService : InputMethodService(),
         handwritingGeneration++
         handwritingDebouncer.cancel()
         handwritingRecognitionJob?.cancel()
+        handwritingCandidateTimeoutJob?.cancel()
+        handwritingCandidateTimeoutJob = null
         _handwritingCandidates.value = emptyList()
         _handwritingRecognizing.value = false
         _handwritingError.value = null
+        activeDebugHandwritingRecordingId = null
         clearAutofillSuggestion()
         startClipboardObservation()
         if (!restarting) {
@@ -401,11 +416,43 @@ class CantoneseInputMethodService : InputMethodService(),
     private fun recognizeHandwriting(pixels: ByteArray, width: Int, height: Int) {
         if (!isInputViewVisible || pixels.isEmpty()) return
         val generation = ++handwritingGeneration
+        val candidatesExpireAtMillis =
+            SystemClock.elapsedRealtime() + HANDWRITING_CANDIDATE_TIMEOUT_MS
+        scheduleHandwritingCandidateTimeout(generation)
         _handwritingError.value = null
         _handwritingRecognizing.value = true
         handwritingRecognitionJob = handwritingDebouncer.submit(
-            HandwritingRequest(generation, pixels, width, height),
+            HandwritingRequest(generation, candidatesExpireAtMillis, pixels, width, height),
         )
+    }
+
+    private fun scheduleHandwritingCandidateTimeout(generation: Long) {
+        handwritingCandidateTimeoutJob?.cancel()
+        val timeoutJob = serviceScope.launch {
+            delay(HANDWRITING_CANDIDATE_TIMEOUT_MS)
+            if (generation == handwritingGeneration) {
+                _handwritingCandidates.value = emptyList()
+            }
+        }
+        handwritingCandidateTimeoutJob = timeoutJob
+        timeoutJob.invokeOnCompletion {
+            if (handwritingCandidateTimeoutJob === timeoutJob) {
+                handwritingCandidateTimeoutJob = null
+            }
+        }
+    }
+
+    private fun onHandwritingStrokeStarted() {
+        if (!isInputViewVisible) return
+        // A new touch means the previous ACTION_UP was not actually the last
+        // interaction. Cancel its idle inference and candidate expiry; ACTION_UP
+        // will submit a fresh bitmap containing all strokes.
+        handwritingGeneration++
+        handwritingDebouncer.cancel()
+        handwritingRecognitionJob?.cancel()
+        handwritingCandidateTimeoutJob?.cancel()
+        handwritingCandidateTimeoutJob = null
+        _handwritingRecognizing.value = false
     }
 
     private suspend fun recognizeHandwritingAfterIdle(request: HandwritingRequest) {
@@ -417,17 +464,43 @@ class CantoneseInputMethodService : InputMethodService(),
                 }
 
                 val recognizer = handwritingRecognizer
+                val debugRecordingId = DebugHandwritingStore.capture(
+                    this@CantoneseInputMethodService,
+                    request.pixels,
+                    request.width,
+                    request.height,
+                )
                 if (recognizer == null) {
                     _handwritingError.value = getString(R.string.error_handwriting_model_unavailable)
                     _handwritingCandidates.value = emptyList()
                 } else {
                     try {
-                        _handwritingCandidates.value = recognizer.predict(
+                        val candidates = recognizer.predict(
                             request.pixels,
                             request.width,
                             request.height,
                             HANDWRITING_TOP_K,
                         )
+                        debugRecordingId?.let { recordingId ->
+                            DebugHandwritingStore.saveInferenceResult(
+                                this@CantoneseInputMethodService,
+                                recordingId,
+                                candidates.map { candidate ->
+                                    DebugHandwritingCandidate(candidate.text, candidate.rank)
+                                },
+                            )
+                        }
+                        _handwritingCandidates.value =
+                            if (
+                                request.generation == handwritingGeneration &&
+                                SystemClock.elapsedRealtime() < request.candidatesExpireAtMillis
+                            ) {
+                                activeDebugHandwritingRecordingId = debugRecordingId
+                                candidates
+                            } else {
+                                activeDebugHandwritingRecordingId = null
+                                emptyList()
+                            }
                     } catch (error: HandwritingRecognitionException) {
                         Log.e(TAG, "Handwriting inference failed", error)
                         _handwritingError.value = getString(
@@ -459,9 +532,17 @@ class CantoneseInputMethodService : InputMethodService(),
         handwritingGeneration++
         handwritingDebouncer.cancel()
         handwritingRecognitionJob?.cancel()
+        handwritingCandidateTimeoutJob?.cancel()
+        handwritingCandidateTimeoutJob = null
         _handwritingCandidates.value = emptyList()
         _handwritingRecognizing.value = false
         _handwritingError.value = null
+        activeDebugHandwritingRecordingId?.let { recordingId ->
+            serviceScope.launch(Dispatchers.IO) {
+                DebugHandwritingStore.markChosen(this@CantoneseInputMethodService, recordingId, text)
+            }
+        }
+        activeDebugHandwritingRecordingId = null
         commitText(text)
     }
 
@@ -499,8 +580,11 @@ class CantoneseInputMethodService : InputMethodService(),
         handwritingGeneration++
         handwritingDebouncer.cancel()
         handwritingRecognitionJob?.cancel()
+        handwritingCandidateTimeoutJob?.cancel()
+        handwritingCandidateTimeoutJob = null
         _handwritingCandidates.value = emptyList()
         _handwritingRecognizing.value = false
+        activeDebugHandwritingRecordingId = null
         if (releaseModel) {
             modelLoadingJob?.cancel()
             modelLoadingJob = null
@@ -575,6 +659,9 @@ class CantoneseInputMethodService : InputMethodService(),
         advanceInputViewSession()
         handwritingGeneration++
         handwritingDebouncer.cancel()
+        handwritingCandidateTimeoutJob?.cancel()
+        handwritingCandidateTimeoutJob = null
+        activeDebugHandwritingRecordingId = null
         clearAutofillSuggestion()
         stopClipboardObservation()
         stopRecordingInternal(discard = true)

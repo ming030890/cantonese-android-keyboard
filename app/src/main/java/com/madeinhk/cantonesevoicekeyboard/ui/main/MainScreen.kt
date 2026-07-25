@@ -45,6 +45,8 @@ import com.madeinhk.cantonesevoicekeyboard.ModelAssetPack
 import com.madeinhk.cantonesevoicekeyboard.ModelDownloadStatus
 import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
 import com.madeinhk.cantonesevoicekeyboard.DebugAudio
+import com.madeinhk.cantonesevoicekeyboard.DebugHandwriting
+import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.madeinhk.cantonesevoicekeyboard.theme.*
@@ -63,6 +65,7 @@ fun MainScreen(
   var keyboardSelected by remember { mutableStateOf(false) }
   var modelStatus by remember { mutableStateOf<ModelDownloadStatus>(ModelDownloadStatus.NotStarted) }
   var storeDebugAudio by remember { mutableStateOf(DebugAudioSettings.isStoreDebugAudioEnabled(context)) }
+  var storeDebugHandwriting by remember { mutableStateOf(DebugHandwritingSettings.isStoreDebugHandwritingEnabled(context)) }
   var retryKey by remember { mutableIntStateOf(0) }
 
   // Observe the model asset-pack download live (progress, install, ready, failure).
@@ -80,6 +83,7 @@ fun MainScreen(
     val currentIme = Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
     keyboardSelected = currentIme?.contains(context.packageName) == true
     storeDebugAudio = DebugAudioSettings.isStoreDebugAudioEnabled(context)
+    storeDebugHandwriting = DebugHandwritingSettings.isStoreDebugHandwritingEnabled(context)
   }
 
   // Refresh status when window gains focus (e.g. returning from system dialog overlays like the IME picker)
@@ -130,6 +134,12 @@ fun MainScreen(
       storeDebugAudio = enabled
     },
     onOpenDebugAudio = { onItemClick(DebugAudio) },
+    storeDebugHandwriting = storeDebugHandwriting,
+    onStoreDebugHandwritingChange = { enabled ->
+        DebugHandwritingSettings.setStoreDebugHandwritingEnabled(context, enabled)
+        storeDebugHandwriting = enabled
+    },
+    onOpenDebugHandwriting = { onItemClick(DebugHandwriting) },
     modifier = modifier
   )
 }
@@ -151,6 +161,9 @@ fun MainScreenContent(
   storeDebugAudio: Boolean,
   onStoreDebugAudioChange: (Boolean) -> Unit,
   onOpenDebugAudio: () -> Unit = {},
+  storeDebugHandwriting: Boolean = false,
+  onStoreDebugHandwritingChange: (Boolean) -> Unit = {},
+  onOpenDebugHandwriting: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
   // Backdrop gradient comes from the theme (decided once per light/dark there),
@@ -209,7 +222,10 @@ fun MainScreenContent(
       DeveloperOptionsCard(
         storeDebugAudio = storeDebugAudio,
         onStoreDebugAudioChange = onStoreDebugAudioChange,
-        onOpenDebugAudio = onOpenDebugAudio
+        onOpenDebugAudio = onOpenDebugAudio,
+        storeDebugHandwriting = storeDebugHandwriting,
+        onStoreDebugHandwritingChange = onStoreDebugHandwritingChange,
+        onOpenDebugHandwriting = onOpenDebugHandwriting,
       )
 
       Spacer(modifier = Modifier.height(24.dp))
@@ -578,6 +594,9 @@ fun DeveloperOptionsCard(
   storeDebugAudio: Boolean,
   onStoreDebugAudioChange: (Boolean) -> Unit,
   onOpenDebugAudio: () -> Unit = {},
+  storeDebugHandwriting: Boolean = false,
+  onStoreDebugHandwritingChange: (Boolean) -> Unit = {},
+  onOpenDebugHandwriting: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
   val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -635,6 +654,41 @@ fun DeveloperOptionsCard(
         modifier = Modifier.align(Alignment.End)
       ) {
         Text(stringResource(R.string.developer_manage_audio))
+      }
+      Spacer(modifier = Modifier.height(12.dp))
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+            text = stringResource(id = R.string.developer_store_handwriting_title),
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold
+          )
+          Spacer(modifier = Modifier.height(2.dp))
+          Text(
+            text = stringResource(id = R.string.developer_store_handwriting_desc),
+            color = textVariantColor,
+            fontSize = 12.sp,
+            lineHeight = 16.sp
+          )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Switch(
+          checked = storeDebugHandwriting,
+          onCheckedChange = onStoreDebugHandwritingChange
+        )
+      }
+      Spacer(modifier = Modifier.height(8.dp))
+      TextButton(
+        onClick = onOpenDebugHandwriting,
+        enabled = storeDebugHandwriting,
+        modifier = Modifier.align(Alignment.End)
+      ) {
+        Text(stringResource(R.string.developer_manage_handwriting))
       }
     }
   }

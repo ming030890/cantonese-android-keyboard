@@ -33,6 +33,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -70,6 +72,7 @@ private val KeyboardHorizontalPadding = KeyboardUiDefaults.KeyboardHorizontalPad
 private val DefaultKeyboardBottomPadding = 40.dp
 private val TextKeyboardBottomPadding = 20.dp
 private const val TextPanelAdditionalRows = 2
+private const val HandwritingInkClearDelayMillis = 100L
 
 @Composable
 fun KeyboardScreen(
@@ -91,7 +94,9 @@ fun KeyboardScreen(
     onOpenSettings: () -> Unit,
     onPasteClipboard: () -> Unit,
     onHandwritingChanged: (ByteArray, Int, Int) -> Unit,
+    onHandwritingStrokeStarted: () -> Unit = {},
     onHandwritingCandidateSelected: (String) -> Unit,
+    onHandwritingCandidatesInteracted: () -> Unit = {},
     onAutofillTapped: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
@@ -300,6 +305,7 @@ fun KeyboardScreen(
                     clipboard = clipboard,
                     surfaceOriginInRoot = keyboardSurfaceOriginInRoot,
                     onAutofillBoundsChanged = { autofillBoundsInSurface = it },
+                    onHandwritingCandidatesInteracted = onHandwritingCandidatesInteracted,
                 )
             }
 
@@ -345,10 +351,10 @@ fun KeyboardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        candidates = candidates,
                         sessionKey = handwritingSessionId,
                         voiceActive = state == KeyboardUiState.Recording ||
                             state == KeyboardUiState.Transcribing,
+                        onStrokeStarted = onHandwritingStrokeStarted,
                         onBoundsChanged = { bounds ->
                             handwritingBoundsInSurface = bounds.translate(
                                 -keyboardSurfaceOriginInRoot.x,
@@ -531,6 +537,7 @@ private fun UnifiedKeyboardToolbar(
     clipboard: ClipboardSuggestion?,
     surfaceOriginInRoot: Offset,
     onAutofillBoundsChanged: (Rect) -> Unit,
+    onHandwritingCandidatesInteracted: () -> Unit,
 ) {
     val keyboardColors = BrandTheme.colors
     val candidatesVisible = showHandwritingCandidates && candidates.isNotEmpty()
@@ -608,6 +615,14 @@ private fun UnifiedKeyboardToolbar(
                         )
                     }
                 }
+                candidatesVisible -> {
+                    HandwritingCandidateStrip(
+                        candidates = candidates,
+                        keys = keys.candidates,
+                        keyRegistry = keyRegistry,
+                        onInteracted = onHandwritingCandidatesInteracted,
+                    )
+                }
                 secondaryAction == ToolbarSecondaryAction.Clipboard -> {
                     ClipboardToolbarChip(
                         key = keys.clipboard,
@@ -615,13 +630,6 @@ private fun UnifiedKeyboardToolbar(
                         clipboard = checkNotNull(clipboard),
                         keyboardColors = keyboardColors,
                         modifier = Modifier.width(104.dp),
-                    )
-                }
-                candidatesVisible -> {
-                    HandwritingCandidateStrip(
-                        candidates = candidates,
-                        keys = keys.candidates,
-                        keyRegistry = keyRegistry,
                     )
                 }
                 showHandwritingCandidates && handwritingBusy -> ToolbarStatusText(
@@ -797,6 +805,7 @@ private fun HandwritingCandidateStrip(
     candidates: List<HandwritingCandidate>,
     keys: List<KeyModel>,
     keyRegistry: KeyboardKeyRegistry,
+    onInteracted: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     Row(
@@ -806,6 +815,16 @@ private fun HandwritingCandidateStrip(
         Row(
             modifier = Modifier
                 .weight(1f)
+                .pointerInput(onInteracted) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(PointerEventPass.Initial)
+                            if (event.changes.any { it.pressed || it.previousPressed }) {
+                                onInteracted()
+                            }
+                        }
+                    }
+                }
                 .horizontalScroll(scrollState),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -927,9 +946,9 @@ private typealias HandwritingStroke = List<Offset>
 @Composable
 private fun HandwritingPanel(
     modifier: Modifier,
-    candidates: List<HandwritingCandidate>,
     sessionKey: Long,
     voiceActive: Boolean,
+    onStrokeStarted: () -> Unit,
     onBoundsChanged: (Rect) -> Unit,
     onDrawingChanged: (ByteArray, Int, Int) -> Unit,
 ) {
@@ -948,20 +967,6 @@ private fun HandwritingPanel(
         activeStroke = emptyList()
     }
 
-    LaunchedEffect(candidates) {
-        clearJob?.cancel()
-        if (candidates.isEmpty()) {
-            strokes = emptyList()
-            activeStroke = emptyList()
-        } else {
-            clearJob = scope.launch {
-                delay(1_000L)
-                strokes = emptyList()
-                activeStroke = emptyList()
-            }
-        }
-    }
-
     Box(
         modifier = modifier
             .onGloballyPositioned { coordinates ->
@@ -974,6 +979,7 @@ private fun HandwritingPanel(
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         clearJob?.cancel()
+                        onStrokeStarted()
                         activeStroke = listOf(Offset(event.x, event.y))
                     }
                     MotionEvent.ACTION_MOVE -> {
@@ -988,6 +994,11 @@ private fun HandwritingPanel(
                             activeStroke = emptyList()
                             val bitmap = handwritingBitmap(completed, size = canvasSize)
                             onDrawingChanged(bitmap.pixels, bitmap.width, bitmap.height)
+                            clearJob = scope.launch {
+                                delay(HandwritingInkClearDelayMillis)
+                                strokes = emptyList()
+                                activeStroke = emptyList()
+                            }
                         }
                     }
                     MotionEvent.ACTION_CANCEL -> activeStroke = emptyList()

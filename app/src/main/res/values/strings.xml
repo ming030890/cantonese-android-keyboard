@@ -42,6 +42,9 @@
     <string name="developer_store_audio_title">Training data debug mode</string>
     <string name="developer_store_audio_desc">Keep the latest 100 recordings, model output, and VAD metadata so bad results can be corrected and synced.</string>
     <string name="developer_manage_audio">Manage saved recordings</string>
+    <string name="developer_store_handwriting_title">Handwriting data debug mode</string>
+    <string name="developer_store_handwriting_desc">Keep the latest 100 handwriting samples, candidates, and annotations so recognition errors can be corrected and synced.</string>
+    <string name="developer_manage_handwriting">Manage saved handwriting</string>
 
     <!-- Debug audio collection -->
     <string name="debug_audio_title">Training recordings</string>
@@ -81,6 +84,19 @@
     <string name="debug_remove">Remove</string>
     <string name="debug_backfilling_model">Running current VAD + model for old recordings: %1$d/%2$d</string>
     <string name="debug_backfill_result">Model backfill completed %1$d; failed %2$d</string>
+    <string name="debug_handwriting_title">Training handwriting</string>
+    <string name="debug_handwriting_count">%1$d of 100 samples</string>
+    <string name="debug_handwriting_no_samples">No handwriting samples yet. Use handwriting input while debug mode is enabled.</string>
+    <string name="debug_handwriting_sample">Handwriting sample</string>
+    <string name="debug_handwriting_candidates">Candidates</string>
+    <string name="debug_handwriting_chosen">Chosen character</string>
+    <string name="debug_handwriting_none_chosen">No candidate chosen</string>
+    <string name="debug_handwriting_model_top1">Top candidate</string>
+    <string name="debug_handwriting_correction">Correct character</string>
+    <string name="debug_handwriting_annotation_title">Correct handwriting</string>
+    <string name="debug_handwriting_no_candidates">No candidates returned</string>
+    <string name="debug_handwriting_remove_confirm_title">Remove this handwriting sample?</string>
+    <string name="debug_handwriting_remove_confirm_desc">This permanently deletes the local handwriting image and metadata.</string>
     <string name="debug_whole_input_title">Complete microphone input</string>
     <string name="debug_whole_input_desc">Listen to everything captured before VAD. Compare this with the model segments below to find missing or incorrect VAD cuts.</string>
     <string name="debug_play_whole_audio">Play complete input</string>
