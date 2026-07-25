@@ -173,6 +173,7 @@ class CantoneseInputMethodService : InputMethodService(),
     }
 
     private var audioRecordJob: Job? = null
+    private var voiceInputGeneration = 0L
     @Volatile
     private var activeAudioRecord: AudioRecord? = null
     @Volatile
@@ -424,6 +425,7 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun onHandwritingStrokeStarted(startsNewCharacter: Boolean) {
         if (!isInputViewVisible) return
+        stopVoiceInputForHandwriting()
         if (startsNewCharacter) {
             acceptActiveHandwritingComposition()
         }
@@ -434,6 +436,32 @@ class CantoneseInputMethodService : InputMethodService(),
         handwritingDebouncer.cancel()
         handwritingRecognitionJob?.cancel()
         _handwritingRecognizing.value = false
+    }
+
+    private fun stopVoiceInputForHandwriting() {
+        val voiceState = _uiState.value
+        if (
+            !isRecording &&
+            voiceState != KeyboardUiState.Recording &&
+            voiceState != KeyboardUiState.Transcribing
+        ) {
+            return
+        }
+
+        // Invalidate callbacks from this voice session before stopping it so
+        // late native deltas cannot overwrite the handwriting composition.
+        voiceInputGeneration++
+        currentInputConnection?.setComposingText("", 1)
+        currentInputConnection?.finishComposingText()
+
+        if (isRecording || voiceState == KeyboardUiState.Recording) {
+            stopRecordingInternal(discard = true)
+        } else {
+            // The microphone has already stopped and native finalization may
+            // still be unwinding. Its generation check will discard the result.
+            _volumeLevel.value = 0f
+            _uiState.value = KeyboardUiState.Idle
+        }
     }
 
     private suspend fun recognizeHandwritingAfterIdle(request: HandwritingRequest) {
@@ -967,17 +995,21 @@ class CantoneseInputMethodService : InputMethodService(),
         _uiState.value = KeyboardUiState.Recording
         val debugAudioStore = DebugAudioStore.createIfEnabled(this)
         activeDebugAudioStore = debugAudioStore
-        activeDebugTranscript = StringBuffer()
+        val debugTranscript = StringBuffer()
+        activeDebugTranscript = debugTranscript
         val session = inputViewSession
+        val voiceGeneration = ++voiceInputGeneration
         var composingTranscript = ""
 
         val listener = object : QAsrEngine.VadListener {
             override fun onTranscriptDelta(textDelta: String) {
-                activeDebugTranscript.append(textDelta)
+                if (voiceGeneration != voiceInputGeneration) return
+                debugTranscript.append(textDelta)
                 serviceScope.launch(Dispatchers.Main.immediate) {
                     if (
                         isInputViewVisible &&
                         session == inputViewSession &&
+                        voiceGeneration == voiceInputGeneration &&
                         textDelta.isNotEmpty()
                     ) {
                         composingTranscript += textDelta
@@ -988,7 +1020,11 @@ class CantoneseInputMethodService : InputMethodService(),
 
             override fun onTranscriptComplete() {
                 serviceScope.launch(Dispatchers.Main.immediate) {
-                    if (isInputViewVisible && session == inputViewSession) {
+                    if (
+                        isInputViewVisible &&
+                        session == inputViewSession &&
+                        voiceGeneration == voiceInputGeneration
+                    ) {
                         currentInputConnection?.finishComposingText()
                     }
                     composingTranscript = ""
@@ -997,7 +1033,11 @@ class CantoneseInputMethodService : InputMethodService(),
 
             override fun onTranscriptError() {
                 serviceScope.launch(Dispatchers.Main.immediate) {
-                    if (isInputViewVisible && session == inputViewSession) {
+                    if (
+                        isInputViewVisible &&
+                        session == inputViewSession &&
+                        voiceGeneration == voiceInputGeneration
+                    ) {
                         currentInputConnection?.setComposingText("", 1)
                         currentInputConnection?.finishComposingText()
                     }
@@ -1086,6 +1126,7 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun stopRecordingInternal(discard: Boolean) {
         val recorderJob = audioRecordJob
+        val debugStore = activeDebugAudioStore
         if (!isRecording && recorderJob == null) return
         isRecording = false
         try {
@@ -1102,8 +1143,10 @@ class CantoneseInputMethodService : InputMethodService(),
                 engineMutex.withLock {
                     qAsrEngine?.stopVadSession(finalize = false)
                 }
-                activeDebugAudioStore?.closeAndDelete()
-                activeDebugAudioStore = null
+                debugStore?.closeAndDelete()
+                if (activeDebugAudioStore === debugStore) {
+                    activeDebugAudioStore = null
+                }
                 if (audioRecordJob === recorderJob) {
                     audioRecordJob = null
                 }
@@ -1112,6 +1155,9 @@ class CantoneseInputMethodService : InputMethodService(),
         }
 
         _uiState.value = KeyboardUiState.Transcribing
+        val stoppedVoiceGeneration = voiceInputGeneration
+        val completedStore = debugStore
+        val completedTranscript = activeDebugTranscript
 
         transcriptionJob = serviceScope.launch(Dispatchers.Default) {
             recorderJob?.join()
@@ -1122,15 +1168,22 @@ class CantoneseInputMethodService : InputMethodService(),
                 qAsrEngine?.stopVadSession(finalize = true)
             }
 
-            val completedStore = activeDebugAudioStore
             if (completedStore != null) {
-                runCatching { completedStore.finish(activeDebugTranscript.toString()) }
-                    .onFailure { Log.w(TAG, "Failed to finalize debug recording", it) }
+                if (stoppedVoiceGeneration == voiceInputGeneration) {
+                    runCatching { completedStore.finish(completedTranscript.toString()) }
+                        .onFailure { Log.w(TAG, "Failed to finalize debug recording", it) }
+                } else {
+                    completedStore.closeAndDelete()
+                }
             }
-            activeDebugAudioStore = null
+            if (activeDebugAudioStore === completedStore) {
+                activeDebugAudioStore = null
+            }
 
             withContext(Dispatchers.Main) {
-                _uiState.value = KeyboardUiState.Idle
+                if (stoppedVoiceGeneration == voiceInputGeneration) {
+                    _uiState.value = KeyboardUiState.Idle
+                }
             }
             transcriptionJob = null
         }

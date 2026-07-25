@@ -29,7 +29,11 @@ data class BrandColors(
     val keyboardBackground: Brush,
     val keyboardKeySurface: Color,
     val keyboardModifierKeySurface: Color,
-    val keyboardKeyOnSurface: Color
+    val keyboardKeyOnSurface: Color,
+    val voiceActive: Color,
+    val voiceActiveContainer: Color,
+    val voiceActivePulse: Color,
+    val voiceOnActive: Color,
 )
 
 @Immutable
@@ -54,7 +58,11 @@ private val DarkBrandColors = BrandColors(
     keyboardBackground = Brush.verticalGradient(listOf(CardGray, DarkMidnight)),
     keyboardKeySurface = CardGray,
     keyboardModifierKeySurface = BorderGray,
-    keyboardKeyOnSurface = Color.White
+    keyboardKeyOnSurface = Color.White,
+    voiceActive = NeonCyan,
+    voiceActiveContainer = DarkVoiceActiveContainer,
+    voiceActivePulse = DarkVoiceActivePulse,
+    voiceOnActive = CarbonBlack,
 )
 
 private val LightBrandColors = BrandColors(
@@ -64,7 +72,11 @@ private val LightBrandColors = BrandColors(
     ),
     keyboardKeySurface = KeyboardKeySurface,
     keyboardModifierKeySurface = KeyboardModifierKeySurface,
-    keyboardKeyOnSurface = KeyboardKeyOnSurface
+    keyboardKeyOnSurface = KeyboardKeyOnSurface,
+    voiceActive = LightPrimaryTeal,
+    voiceActiveContainer = LightVoiceActiveContainer,
+    voiceActivePulse = LightVoiceActivePulse,
+    voiceOnActive = LightSurface,
 )
 
 private val LocalBrandColors = staticCompositionLocalOf { DarkBrandColors }

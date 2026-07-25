@@ -362,8 +362,6 @@ fun KeyboardScreen(
                             .fillMaxWidth()
                             .weight(1f),
                         sessionKey = handwritingSessionId,
-                        voiceActive = state == KeyboardUiState.Recording ||
-                            state == KeyboardUiState.Transcribing,
                         onStrokeStarted = onHandwritingStrokeStarted,
                         onBoundsChanged = { bounds ->
                             handwritingBoundsInSurface = bounds.translate(
@@ -572,13 +570,22 @@ private fun UnifiedKeyboardToolbar(
         ) {
             when {
                 voiceState == KeyboardUiState.Recording -> {
-                    VoiceToolbarStatus(volume = volume, label = stringResource(R.string.keyboard_status_recording))
+                    VoiceToolbarStatus(
+                        volume = volume,
+                        label = stringResource(R.string.keyboard_status_recording),
+                    )
                 }
                 voiceState == KeyboardUiState.Transcribing -> {
-                    VoiceToolbarStatus(volume = 0f, label = stringResource(R.string.keyboard_status_transcribing))
+                    VoiceToolbarStatus(
+                        volume = 0f,
+                        label = stringResource(R.string.keyboard_status_transcribing),
+                    )
                 }
                 voiceState == KeyboardUiState.LoadingModel -> {
-                    ToolbarStatusText(stringResource(R.string.keyboard_status_loading_model), TranscribeYellow)
+                    ToolbarStatusText(
+                        stringResource(R.string.keyboard_status_loading_model),
+                        keyboardColors.keyboardKeyOnSurface,
+                    )
                 }
                 voiceState is KeyboardUiState.Error -> {
                     ToolbarStatusText(voiceState.message, MaterialTheme.colorScheme.error)
@@ -651,16 +658,12 @@ private fun UnifiedKeyboardToolbar(
                 else -> Unit
             }
         }
-        ToolbarIconVisual(
+        VoiceToolbarVisual(
+            state = voiceState,
             key = keys.voice,
             keyRegistry = keyRegistry,
             accessibilityDescription = stringResource(R.string.keyboard_toolbar_voice),
-        ) {
-            MicIcon(
-                modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
-                color = keyboardColors.keyboardKeyOnSurface,
-            )
-        }
+        )
     }
 }
 
@@ -679,7 +682,7 @@ private fun ToolbarStatusText(text: String, color: Color) {
 
 @Composable
 private fun VoiceToolbarStatus(volume: Float, label: String) {
-    val errorColor = MaterialTheme.colorScheme.error
+    val voiceActiveColor = BrandTheme.colors.voiceActive
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -692,7 +695,7 @@ private fun VoiceToolbarStatus(volume: Float, label: String) {
                     val x = barWidth * (index + 1)
                     val amplitude = size.height * (0.18f + volume * (0.18f + index * 0.03f))
                     drawLine(
-                        color = errorColor,
+                        color = voiceActiveColor,
                         start = Offset(x, center - amplitude),
                         end = Offset(x, center + amplitude),
                         strokeWidth = 2.dp.toPx(),
@@ -701,7 +704,112 @@ private fun VoiceToolbarStatus(volume: Float, label: String) {
                 }
             }
         }
-        ToolbarStatusText(label, if (volume > 0f) errorColor else TranscribeYellow)
+        ToolbarStatusText(label, BrandTheme.colors.keyboardKeyOnSurface)
+    }
+}
+
+@Composable
+private fun VoiceToolbarVisual(
+    state: KeyboardUiState,
+    key: KeyModel,
+    keyRegistry: KeyboardKeyRegistry,
+    accessibilityDescription: String,
+) {
+    val keyboardColors = BrandTheme.colors
+
+    ToolbarIconVisual(
+        key = key,
+        keyRegistry = keyRegistry,
+        accessibilityDescription = accessibilityDescription,
+    ) {
+        when (state) {
+            KeyboardUiState.LoadingModel,
+            KeyboardUiState.Transcribing -> {
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(keyboardColors.voiceActiveContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        color = keyboardColors.voiceActive,
+                        strokeWidth = 2.5.dp,
+                    )
+                }
+            }
+            KeyboardUiState.Recording -> {
+                RecordingToolbarIcon(
+                    backgroundColor = keyboardColors.voiceActive,
+                    pulseColor = keyboardColors.voiceActivePulse,
+                    iconColor = keyboardColors.voiceOnActive,
+                )
+            }
+            is KeyboardUiState.Error -> {
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.errorContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    MicIcon(
+                        modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                    )
+                }
+            }
+            KeyboardUiState.Idle -> {
+                MicIcon(
+                    modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
+                    color = keyboardColors.keyboardKeyOnSurface,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecordingToolbarIcon(
+    backgroundColor: Color,
+    pulseColor: Color,
+    iconColor: Color,
+) {
+    val transition = rememberInfiniteTransition(label = "toolbarRecordingPulse")
+    val pulse by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "toolbarRecordingPulseProgress",
+    )
+
+    Box(
+        modifier = Modifier
+            .size(44.dp)
+            .drawBehind {
+                drawCircle(
+                    color = pulseColor.copy(alpha = pulseColor.alpha * (1f - pulse)),
+                    radius = (16.dp + 5.dp * pulse).toPx(),
+                )
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(backgroundColor),
+            contentAlignment = Alignment.Center,
+        ) {
+            MicIcon(
+                modifier = Modifier.size(20.dp),
+                color = iconColor,
+            )
+        }
     }
 }
 
@@ -1048,7 +1156,6 @@ private typealias HandwritingStroke = List<Offset>
 private fun HandwritingPanel(
     modifier: Modifier,
     sessionKey: Long,
-    voiceActive: Boolean,
     onStrokeStarted: (startsNewCharacter: Boolean) -> Unit,
     onBoundsChanged: (Rect) -> Unit,
     onDrawingChanged: (ByteArray, Int, Int) -> Unit,
@@ -1076,7 +1183,6 @@ private fun HandwritingPanel(
                 onBoundsChanged(Rect(bounds.left, bounds.top, bounds.right, bounds.bottom))
             }
             .pointerInteropFilter { event ->
-                if (voiceActive) return@pointerInteropFilter true
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         clearJob?.cancel()
@@ -1085,12 +1191,13 @@ private fun HandwritingPanel(
                     }
                     MotionEvent.ACTION_MOVE -> {
                         if (activeStroke.isNotEmpty()) {
-                            activeStroke = activeStroke + Offset(event.x, event.y)
+                            activeStroke = activeStroke + event.handwritingSamples()
                         }
                     }
                     MotionEvent.ACTION_UP -> {
                         if (activeStroke.isNotEmpty()) {
-                            val completed = strokes + listOf(activeStroke)
+                            val completedStroke = activeStroke + event.handwritingSamples()
+                            val completed = strokes + listOf(completedStroke)
                             strokes = completed
                             activeStroke = emptyList()
                             val bitmap = handwritingBitmap(completed, size = canvasSize)
@@ -1109,6 +1216,7 @@ private fun HandwritingPanel(
         contentAlignment = Alignment.Center,
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokeWidth = handwritingStrokeWidthPx(size.width, size.height)
             val allStrokes = strokes + listOfNotNull(activeStroke.takeIf { it.isNotEmpty() })
             allStrokes.forEach { points ->
                 if (points.isEmpty()) {
@@ -1116,7 +1224,7 @@ private fun HandwritingPanel(
                 } else if (points.size == 1) {
                     drawCircle(
                         color = strokeColor,
-                        radius = 3.5.dp.toPx(),
+                        radius = strokeWidth / 2f,
                         center = points.first(),
                     )
                 } else {
@@ -1125,7 +1233,7 @@ private fun HandwritingPanel(
                             color = strokeColor,
                             start = start,
                             end = end,
-                            strokeWidth = 7.dp.toPx(),
+                            strokeWidth = strokeWidth,
                             cap = StrokeCap.Round,
                         )
                     }
@@ -1149,6 +1257,16 @@ internal data class HandwritingBitmap(
     val height: Int,
 )
 
+private fun MotionEvent.handwritingSamples(): List<Offset> = buildList(historySize + 1) {
+    for (index in 0 until historySize) {
+        add(Offset(getHistoricalX(index), getHistoricalY(index)))
+    }
+    add(Offset(x, y))
+}
+
+internal fun handwritingStrokeWidthPx(width: Float, height: Float): Float =
+    (minOf(width, height) * 0.035f).coerceAtLeast(5f)
+
 internal fun handwritingBitmap(
     strokes: List<HandwritingStroke>,
     size: IntSize?,
@@ -1161,7 +1279,7 @@ internal fun handwritingBitmap(
     val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = android.graphics.Color.BLACK
         style = Paint.Style.STROKE
-        strokeWidth = (width.coerceAtMost(height) * 0.035f).coerceAtLeast(5f)
+        strokeWidth = handwritingStrokeWidthPx(width.toFloat(), height.toFloat())
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
     }
@@ -1993,7 +2111,7 @@ fun KeyboardStatusLabel(
     volume: Float,
     onOpenSettings: () -> Unit
 ) {
-    val primaryColor = MaterialTheme.colorScheme.primary
+    val keyboardColors = BrandTheme.colors
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
     val errorColor = MaterialTheme.colorScheme.error
 
@@ -2012,7 +2130,7 @@ fun KeyboardStatusLabel(
             // to avoid showing two progress indicators at once.
             Text(
                 text = stringResource(R.string.keyboard_status_loading_model),
-                color = primaryColor,
+                color = keyboardColors.keyboardKeyOnSurface,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -2026,7 +2144,7 @@ fun KeyboardStatusLabel(
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = stringResource(R.string.keyboard_status_recording),
-                    color = errorColor,
+                    color = keyboardColors.keyboardKeyOnSurface,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 0.3.sp
@@ -2038,7 +2156,7 @@ fun KeyboardStatusLabel(
             // to avoid showing two progress indicators at once.
             Text(
                 text = stringResource(R.string.keyboard_status_transcribing),
-                color = TranscribeYellow,
+                color = keyboardColors.keyboardKeyOnSurface,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -2098,9 +2216,8 @@ private fun RecordTriggerVisual(
         label = "alpha"
     )
 
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val outlineColor = MaterialTheme.colorScheme.outline
-    val errorColor = MaterialTheme.colorScheme.error
+    val keyboardColors = BrandTheme.colors
+    val colorScheme = MaterialTheme.colorScheme
 
     // Press feedback is driven by the parent keyboard pointer state.
     val isPressed = key.isPressed
@@ -2110,21 +2227,16 @@ private fun RecordTriggerVisual(
         label = "recordPressScale"
     )
 
-    // Button colors dynamically based on status
-    val buttonColor = when (state) {
-        KeyboardUiState.Recording -> errorColor // Pulsing active red
-        KeyboardUiState.Transcribing -> TranscribeYellow // Transcribing yellow
-        KeyboardUiState.LoadingModel -> outlineColor // Loading state gray
-        is KeyboardUiState.Error -> errorColor.copy(alpha = 0.16f)
-        KeyboardUiState.Idle -> primaryColor // Idle glowing cyan
-    }
-
-    val iconColor = when (state) {
-        KeyboardUiState.Recording -> Color.White
-        is KeyboardUiState.Error -> errorColor
-        // Pick black/white for legibility against whatever the button fill is,
-        // so the mic/spinner stays readable in both light and dark themes.
-        else -> if (buttonColor.luminance() > 0.5f) Color.Black else Color.White
+    val (buttonColor, iconColor) = when (state) {
+        KeyboardUiState.Recording ->
+            keyboardColors.voiceActive to keyboardColors.voiceOnActive
+        KeyboardUiState.Transcribing,
+        KeyboardUiState.LoadingModel ->
+            keyboardColors.voiceActiveContainer to keyboardColors.voiceActive
+        is KeyboardUiState.Error ->
+            colorScheme.errorContainer to colorScheme.onErrorContainer
+        KeyboardUiState.Idle ->
+            colorScheme.primary to colorScheme.onPrimary
     }
 
     Box(
@@ -2139,7 +2251,9 @@ private fun RecordTriggerVisual(
                 .drawBehind {
                     if (state is KeyboardUiState.Recording) {
                         drawCircle(
-                            color = buttonColor.copy(alpha = 0.25f * pulseAlpha),
+                            color = keyboardColors.voiceActivePulse.copy(
+                                alpha = keyboardColors.voiceActivePulse.alpha * pulseAlpha,
+                            ),
                             radius = 38.dp.toPx() * pulseScale
                         )
                     }
@@ -2152,14 +2266,7 @@ private fun RecordTriggerVisual(
                     spotColor = buttonColor
                 )
                 .clip(buttonShape)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            buttonColor.copy(alpha = 0.9f),
-                            buttonColor
-                        )
-                    )
-                ),
+                .background(buttonColor),
             contentAlignment = Alignment.Center
         ) {
             if (state is KeyboardUiState.Transcribing || state is KeyboardUiState.LoadingModel) {
@@ -2191,7 +2298,7 @@ fun VoiceWaveform(volume: Float) {
         label = "offset"
     )
 
-    val errorColor = MaterialTheme.colorScheme.error
+    val voiceActiveColor = BrandTheme.colors.voiceActive
 
     Canvas(
         modifier = Modifier
@@ -2215,14 +2322,14 @@ fun VoiceWaveform(volume: Float) {
 
         drawPath(
             path = path,
-            color = errorColor,
+            color = voiceActiveColor,
             style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
         )
     }
 }
 
 @Composable
-fun MicIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
+fun MicIcon(modifier: Modifier = Modifier, color: Color) {
     Icon(
         painter = painterResource(R.drawable.ic_mic_rounded),
         contentDescription = null,

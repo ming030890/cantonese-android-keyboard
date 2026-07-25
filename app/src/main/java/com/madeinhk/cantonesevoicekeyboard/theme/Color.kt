@@ -21,7 +21,6 @@ val AlertAmber = Color(0xFFFFA000)      // Model missing warning indicator
 val PlaceholderGray = Color(0xFF5A5A6A) // Sandboxed input placeholder text
 val ClearRed = Color(0xFFFF2D55)        // Dictation clear warning text
 val TextGray = Color(0xFF8E8E9F)        // Secondary instruction description text
-val TranscribeYellow = Color(0xFFFFD600)  // Active transcription transcribing state
 val SystemBlue = Color(0xFF0A84FF)        // Link/Navigation reference blue
 val IconGray = Color(0xFFD1D1D6)          // Standard key icon monochrome gray
 
@@ -34,6 +33,13 @@ val LightOnSurface = Color(0xFF14141C)      // Primary text on light surfaces
 val LightTextGray = Color(0xFF5A5A6A)       // Secondary text on light surfaces
 val LightGradientTop = Color(0xFFF7F7FB)    // Screen gradient top (light)
 val LightGradientBottom = Color(0xFFE9E9F1) // Screen gradient bottom (light)
+
+// Voice activity colors. Listening is a normal active state, so it uses the
+// brand teal/cyan family; red remains reserved for errors.
+val DarkVoiceActiveContainer = Color(0xFF00363D)
+val DarkVoiceActivePulse = Color(0x3D00E5FF)
+val LightVoiceActiveContainer = Color(0xFFD0EFF2)
+val LightVoiceActivePulse = Color(0x3D00788A)
 
 // Pixel 6a Gboard-inspired light keyboard palette.
 val KeyboardBackgroundTop = Color(0xFFE5EFE2)
