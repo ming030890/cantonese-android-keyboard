@@ -119,6 +119,8 @@
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">Tap to speak</string>
     <string name="keyboard_handwriting_hint">Write a character</string>
+    <string name="keyboard_handwriting_candidates_previous">Previous candidates</string>
+    <string name="keyboard_handwriting_candidates_next">Next candidates</string>
     <string name="keyboard_status_loading_model">Loading model…</string>
     <string name="keyboard_status_recording">Listening… tap to stop</string>
     <string name="keyboard_status_transcribing">Transcribing…</string>

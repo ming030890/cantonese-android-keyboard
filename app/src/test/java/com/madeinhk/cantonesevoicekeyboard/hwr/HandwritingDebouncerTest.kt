@@ -10,6 +10,12 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class HandwritingDebouncerTest {
     @Test
+    fun productionTimingKeepsInferenceAndInkClearingIndependent() {
+        assertEquals(200L, HandwritingInferenceIdleDelayMillis)
+        assertEquals(1_000L, HandwritingInkClearDelayMillis)
+    }
+
+    @Test
     fun onlyTheLatestFrameRunsAfterTheIdleDelay() = runTest {
         val recognized = mutableListOf<Int>()
         val debouncer = HandwritingDebouncer<Int>(this, 100L) { recognized += it }

@@ -2,6 +2,7 @@ package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.unit.dp
 import android.view.MotionEvent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -102,9 +103,47 @@ class KeyboardInputTest {
         )
 
         assertTrue(keys.voice.enabled)
+        assertEquals(KeyboardKeyKind.CandidatePrevious, keys.candidatePrevious.currentData?.kind)
+        assertEquals(KeyboardKeyKind.CandidateNext, keys.candidateNext.currentData?.kind)
         assertTrue(keys.candidates[0].enabled)
         assertTrue(keys.candidates[1].enabled)
         assertEquals(2, keys.candidates.size)
+    }
+
+    @Test
+    fun firstCandidateReplacesHiddenSettingsInHitTesting() {
+        val registry = KeyboardKeyRegistry()
+        registry.beginLayout()
+        val initial = registerTextToolbarKeys(registry)
+        registry.updateSurfaceSize(width = 300, height = 100)
+        registry.updateVisualBounds(initial.settings, Rect(0f, 20f, 48f, 68f))
+
+        registry.beginLayout()
+        val candidates = registerTextToolbarKeys(
+            registry,
+            candidates = listOf(
+                com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("你", 0),
+            ),
+        )
+        registry.updateSurfaceSize(width = 300, height = 100)
+        registry.updateVisualBounds(candidates.candidates[0], Rect(0f, 20f, 62f, 68f))
+
+        assertFalse(candidates.settings.enabled)
+        assertSame(candidates.candidates[0], registry.findKeyAt(24f, 40f))
+    }
+
+    @Test
+    fun candidatePageSizeAdaptsWithoutRequiringHorizontalScrolling() {
+        assertEquals(1, handwritingCandidatePageSize(150.dp))
+        assertEquals(2, handwritingCandidatePageSize(256.dp))
+        assertEquals(3, handwritingCandidatePageSize(296.dp))
+    }
+
+    @Test
+    fun candidatePageCountIncludesAPartialLastPage() {
+        assertEquals(0, handwritingCandidatePageCount(candidateCount = 0, pageSize = 3))
+        assertEquals(1, handwritingCandidatePageCount(candidateCount = 3, pageSize = 3))
+        assertEquals(4, handwritingCandidatePageCount(candidateCount = 10, pageSize = 3))
     }
 
     @Test

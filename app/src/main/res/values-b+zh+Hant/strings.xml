@@ -45,6 +45,8 @@
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">㩒一下開始講嘢</string>
     <string name="keyboard_handwriting_hint">寫一個字</string>
+    <string name="keyboard_handwriting_candidates_previous">上一頁候選字</string>
+    <string name="keyboard_handwriting_candidates_next">下一頁候選字</string>
     <string name="keyboard_status_loading_model">載入緊語音模型…</string>
     <string name="keyboard_status_recording">聆聽緊… 㩒一下停止</string>
     <string name="keyboard_status_transcribing">識別緊…</string>

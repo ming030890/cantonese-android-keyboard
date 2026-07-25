@@ -38,6 +38,8 @@ enum class KeyboardKeyKind {
     Emoji,
     Settings,
     Candidate,
+    CandidatePrevious,
+    CandidateNext,
     Clipboard,
     Record,
     Utility

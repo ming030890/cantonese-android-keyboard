@@ -45,6 +45,8 @@
     <!-- Keyboard Screen IME Strings -->
     <string name="keyboard_status_idle">点按开始说话</string>
     <string name="keyboard_handwriting_hint">写一个字</string>
+    <string name="keyboard_handwriting_candidates_previous">上一页候选字</string>
+    <string name="keyboard_handwriting_candidates_next">下一页候选字</string>
     <string name="keyboard_status_loading_model">正在载入语音模型…</string>
     <string name="keyboard_status_recording">正在聆听… 点按停止</string>
     <string name="keyboard_status_transcribing">识别中…</string>

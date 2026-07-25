@@ -9,7 +9,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +56,7 @@ import androidx.emoji2.emojipicker.EmojiPickerView
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
+import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingInkClearDelayMillis
 import com.madeinhk.cantonesevoicekeyboard.theme.*
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.delay
@@ -72,7 +71,6 @@ private val KeyboardHorizontalPadding = KeyboardUiDefaults.KeyboardHorizontalPad
 private val DefaultKeyboardBottomPadding = 40.dp
 private val TextKeyboardBottomPadding = 20.dp
 private const val TextPanelAdditionalRows = 2
-private const val HandwritingInkClearDelayMillis = 500L
 
 @Composable
 fun KeyboardScreen(
@@ -94,9 +92,8 @@ fun KeyboardScreen(
     onOpenSettings: () -> Unit,
     onPasteClipboard: () -> Unit,
     onHandwritingChanged: (ByteArray, Int, Int) -> Unit,
-    onHandwritingStrokeStarted: () -> Unit = {},
+    onHandwritingStrokeStarted: (startsNewCharacter: Boolean) -> Unit = {},
     onHandwritingCandidateSelected: (String) -> Unit,
-    onHandwritingCandidatesInteracted: () -> Unit = {},
     onAutofillTapped: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
@@ -114,7 +111,10 @@ fun KeyboardScreen(
     val handwritingBusy by handwritingRecognizing.collectAsState()
     val handwritingFailure by handwritingError.collectAsState()
     val handwritingSessionId by handwritingSession.collectAsState()
-    var handwritingCandidateResetKey by remember { mutableIntStateOf(0) }
+    var handwritingCandidatePage by remember { mutableIntStateOf(0) }
+    LaunchedEffect(candidates) {
+        handwritingCandidatePage = 0
+    }
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -176,6 +176,12 @@ fun KeyboardScreen(
         inputReceiver.onOpenSettings = onOpenSettings
         inputReceiver.onPasteClipboard = onPasteClipboard
         inputReceiver.onCandidateTapped = onHandwritingCandidateSelected
+        inputReceiver.onCandidatePrevious = {
+            handwritingCandidatePage = (handwritingCandidatePage - 1).coerceAtLeast(0)
+        }
+        inputReceiver.onCandidateNext = {
+            handwritingCandidatePage++
+        }
         inputReceiver.onOpenEmoji = { activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
@@ -306,8 +312,10 @@ fun KeyboardScreen(
                     clipboard = clipboard,
                     surfaceOriginInRoot = keyboardSurfaceOriginInRoot,
                     onAutofillBoundsChanged = { autofillBoundsInSurface = it },
-                    onHandwritingCandidatesInteracted = onHandwritingCandidatesInteracted,
-                    handwritingCandidateResetKey = handwritingCandidateResetKey,
+                    handwritingCandidatePage = handwritingCandidatePage,
+                    onHandwritingCandidatePageChanged = { page ->
+                        handwritingCandidatePage = page
+                    },
                 )
             }
 
@@ -356,10 +364,7 @@ fun KeyboardScreen(
                         sessionKey = handwritingSessionId,
                         voiceActive = state == KeyboardUiState.Recording ||
                             state == KeyboardUiState.Transcribing,
-                        onStrokeStarted = {
-                            handwritingCandidateResetKey++
-                            onHandwritingStrokeStarted()
-                        },
+                        onStrokeStarted = onHandwritingStrokeStarted,
                         onBoundsChanged = { bounds ->
                             handwritingBoundsInSurface = bounds.translate(
                                 -keyboardSurfaceOriginInRoot.x,
@@ -542,8 +547,8 @@ private fun UnifiedKeyboardToolbar(
     clipboard: ClipboardSuggestion?,
     surfaceOriginInRoot: Offset,
     onAutofillBoundsChanged: (Rect) -> Unit,
-    onHandwritingCandidatesInteracted: () -> Unit,
-    handwritingCandidateResetKey: Int,
+    handwritingCandidatePage: Int,
+    onHandwritingCandidatePageChanged: (Int) -> Unit,
 ) {
     val keyboardColors = BrandTheme.colors
     val candidatesVisible = showHandwritingCandidates && candidates.isNotEmpty()
@@ -561,7 +566,7 @@ private fun UnifiedKeyboardToolbar(
         }
         Box(
             modifier = Modifier
-                .then(if (candidatesVisible) Modifier.fillMaxWidth() else Modifier.weight(1f))
+                .weight(1f)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center,
         ) {
@@ -624,10 +629,10 @@ private fun UnifiedKeyboardToolbar(
                 candidatesVisible -> {
                     HandwritingCandidateStrip(
                         candidates = candidates,
-                        keys = keys.candidates,
+                        keys = keys,
                         keyRegistry = keyRegistry,
-                        onInteracted = onHandwritingCandidatesInteracted,
-                        resetKey = handwritingCandidateResetKey,
+                        page = handwritingCandidatePage,
+                        onPageChanged = onHandwritingCandidatePageChanged,
                     )
                 }
                 secondaryAction == ToolbarSecondaryAction.Clipboard -> {
@@ -646,17 +651,15 @@ private fun UnifiedKeyboardToolbar(
                 else -> Unit
             }
         }
-        if (!candidatesVisible) {
-            ToolbarIconVisual(
-                key = keys.voice,
-                keyRegistry = keyRegistry,
-                accessibilityDescription = stringResource(R.string.keyboard_toolbar_voice),
-            ) {
-                MicIcon(
-                    modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
-                    color = keyboardColors.keyboardKeyOnSurface,
-                )
-            }
+        ToolbarIconVisual(
+            key = keys.voice,
+            keyRegistry = keyRegistry,
+            accessibilityDescription = stringResource(R.string.keyboard_toolbar_voice),
+        ) {
+            MicIcon(
+                modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
+                color = keyboardColors.keyboardKeyOnSurface,
+            )
         }
     }
 }
@@ -768,6 +771,8 @@ internal data class TextToolbarKeys(
     val settings: KeyModel,
     val voice: KeyModel,
     val clipboard: KeyModel,
+    val candidatePrevious: KeyModel,
+    val candidateNext: KeyModel,
     val candidates: List<KeyModel>,
 )
 
@@ -781,6 +786,7 @@ internal fun registerTextToolbarKeys(
             id = "toolbar.settings",
             data = KeyData("toolbar.settings", KeyboardKeyKind.Settings, text = "Settings"),
             rowId = "toolbar",
+            enabled = candidates.isEmpty(),
         ),
         voice = keyRegistry.key(
             id = "toolbar.voice",
@@ -792,6 +798,26 @@ internal fun registerTextToolbarKeys(
             data = KeyData("toolbar.clipboard", KeyboardKeyKind.Clipboard, text = "Paste"),
             rowId = "toolbar",
             enabled = secondaryAction == ToolbarSecondaryAction.Clipboard,
+        ),
+        candidatePrevious = keyRegistry.key(
+            id = "toolbar.candidate.previous",
+            data = KeyData(
+                "toolbar.candidate.previous",
+                KeyboardKeyKind.CandidatePrevious,
+                text = "Previous candidates",
+            ),
+            rowId = "toolbar",
+            enabled = candidates.isNotEmpty(),
+        ),
+        candidateNext = keyRegistry.key(
+            id = "toolbar.candidate.next",
+            data = KeyData(
+                "toolbar.candidate.next",
+                KeyboardKeyKind.CandidateNext,
+                text = "Next candidates",
+            ),
+            rowId = "toolbar",
+            enabled = candidates.isNotEmpty(),
         ),
         candidates = candidates.take(10).mapIndexed { index, candidate ->
             keyRegistry.key(
@@ -810,44 +836,114 @@ internal fun registerTextToolbarKeys(
 @Composable
 private fun HandwritingCandidateStrip(
     candidates: List<HandwritingCandidate>,
-    keys: List<KeyModel>,
+    keys: TextToolbarKeys,
     keyRegistry: KeyboardKeyRegistry,
-    onInteracted: () -> Unit,
-    resetKey: Int,
+    page: Int,
+    onPageChanged: (Int) -> Unit,
 ) {
-    val scrollState = rememberScrollState()
-    LaunchedEffect(resetKey) {
-        scrollState.scrollTo(0)
-    }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val pageSize = handwritingCandidatePageSize(maxWidth)
+        val pageCount = handwritingCandidatePageCount(candidates.size, pageSize)
+        val safePage = page.coerceIn(0, (pageCount - 1).coerceAtLeast(0))
+        val firstCandidate = safePage * pageSize
+        val pageCandidates = candidates.drop(firstCandidate).take(pageSize)
+        val hasPrevious = safePage > 0
+        val hasNext = safePage + 1 < pageCount
+
+        LaunchedEffect(safePage, page) {
+            if (safePage != page) onPageChanged(safePage)
+        }
+
+        keys.candidatePrevious.enabled = hasPrevious
+        keys.candidateNext.enabled = hasNext
+        keys.candidates.forEachIndexed { index, key ->
+            key.enabled = index in firstCandidate until (firstCandidate + pageCandidates.size)
+        }
+
         Row(
             modifier = Modifier
-                .weight(1f)
-                .pointerInput(onInteracted) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent(PointerEventPass.Initial)
-                            if (event.changes.any { it.pressed || it.previousPressed }) {
-                                onInteracted()
-                            }
-                        }
-                    }
-                }
-                .horizontalScroll(scrollState),
+                .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            candidates.take(10).forEachIndexed { index, candidate ->
-                if (index > 0) {
-                    CandidateDivider()
+            CandidatePageArrow(
+                key = keys.candidatePrevious,
+                keyRegistry = keyRegistry,
+                pointsForward = false,
+                visible = hasPrevious,
+                accessibilityDescription = stringResource(
+                    R.string.keyboard_handwriting_candidates_previous,
+                ),
+            )
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                repeat(pageSize) { slot ->
+                    val candidate = pageCandidates.getOrNull(slot)
+                    if (slot > 0 && candidate != null) {
+                        CandidateDivider()
+                    }
+                    if (candidate != null) {
+                        ToolbarCandidateVisual(
+                            key = keys.candidates[firstCandidate + slot],
+                            keyRegistry = keyRegistry,
+                            candidate = candidate,
+                            modifier = Modifier.weight(1f),
+                        )
+                    } else {
+                        Spacer(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                        )
+                    }
                 }
-                ToolbarCandidateVisual(
-                    key = keys[index],
-                    keyRegistry = keyRegistry,
-                    candidate = candidate,
-                    modifier = Modifier.width(62.dp),
+            }
+            CandidatePageArrow(
+                key = keys.candidateNext,
+                keyRegistry = keyRegistry,
+                pointsForward = true,
+                visible = hasNext,
+                accessibilityDescription = stringResource(
+                    R.string.keyboard_handwriting_candidates_next,
+                ),
+            )
+        }
+    }
+}
+
+internal fun handwritingCandidatePageSize(availableWidth: Dp): Int =
+    ((availableWidth.value - KeyboardUiDefaults.ToolbarIconTouchSize.value * 2) / 62f)
+        .toInt()
+        .coerceAtLeast(1)
+
+internal fun handwritingCandidatePageCount(candidateCount: Int, pageSize: Int): Int =
+    if (candidateCount <= 0) 0 else (candidateCount + pageSize - 1) / pageSize
+
+@Composable
+private fun CandidatePageArrow(
+    key: KeyModel,
+    keyRegistry: KeyboardKeyRegistry,
+    pointsForward: Boolean,
+    visible: Boolean,
+    accessibilityDescription: String,
+) {
+    Box(
+        modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconTouchSize),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (visible) {
+            ToolbarIconVisual(
+                key = key,
+                keyRegistry = keyRegistry,
+                accessibilityDescription = accessibilityDescription,
+            ) {
+                CandidateChevronIcon(
+                    pointsForward = pointsForward,
+                    modifier = Modifier.size(18.dp),
+                    color = BrandTheme.colors.keyboardKeyOnSurface,
                 )
             }
         }
@@ -953,7 +1049,7 @@ private fun HandwritingPanel(
     modifier: Modifier,
     sessionKey: Long,
     voiceActive: Boolean,
-    onStrokeStarted: () -> Unit,
+    onStrokeStarted: (startsNewCharacter: Boolean) -> Unit,
     onBoundsChanged: (Rect) -> Unit,
     onDrawingChanged: (ByteArray, Int, Int) -> Unit,
 ) {
@@ -984,7 +1080,7 @@ private fun HandwritingPanel(
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         clearJob?.cancel()
-                        onStrokeStarted()
+                        onStrokeStarted(strokes.isEmpty())
                         activeStroke = listOf(Offset(event.x, event.y))
                     }
                     MotionEvent.ACTION_MOVE -> {
@@ -1170,6 +1266,8 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
     var onOpenSettings: () -> Unit = {}
     var onPasteClipboard: () -> Unit = {}
     var onCandidateTapped: (String) -> Unit = {}
+    var onCandidatePrevious: () -> Unit = {}
+    var onCandidateNext: () -> Unit = {}
     var onOpenEmoji: () -> Unit = {}
     var onToggleUppercase: () -> Unit = {}
     var onToggleMoreSymbols: () -> Unit = {}
@@ -1190,6 +1288,8 @@ private class KeyboardScreenInputReceiver : KeyboardInputReceiver {
             KeyboardKeyKind.Emoji -> onOpenEmoji()
             KeyboardKeyKind.Settings -> onOpenSettings()
             KeyboardKeyKind.Candidate -> data.text?.let(onCandidateTapped)
+            KeyboardKeyKind.CandidatePrevious -> onCandidatePrevious()
+            KeyboardKeyKind.CandidateNext -> onCandidateNext()
             KeyboardKeyKind.Clipboard -> onPasteClipboard()
             KeyboardKeyKind.Record -> onToggleRecording()
             KeyboardKeyKind.Delete,
@@ -2129,6 +2229,32 @@ fun MicIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
         modifier = modifier,
         tint = color
     )
+}
+
+@Composable
+private fun CandidateChevronIcon(
+    pointsForward: Boolean,
+    modifier: Modifier = Modifier,
+    color: Color,
+) {
+    Canvas(modifier = modifier) {
+        val startX = if (pointsForward) size.width * 0.35f else size.width * 0.65f
+        val endX = if (pointsForward) size.width * 0.68f else size.width * 0.32f
+        drawLine(
+            color = color,
+            start = Offset(startX, size.height * 0.2f),
+            end = Offset(endX, size.height * 0.5f),
+            strokeWidth = 2.dp.toPx(),
+            cap = StrokeCap.Round,
+        )
+        drawLine(
+            color = color,
+            start = Offset(endX, size.height * 0.5f),
+            end = Offset(startX, size.height * 0.8f),
+            strokeWidth = 2.dp.toPx(),
+            cap = StrokeCap.Round,
+        )
+    }
 }
 
 @Composable
