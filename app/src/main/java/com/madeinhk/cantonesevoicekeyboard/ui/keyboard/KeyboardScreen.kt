@@ -72,7 +72,7 @@ private val KeyboardHorizontalPadding = KeyboardUiDefaults.KeyboardHorizontalPad
 private val DefaultKeyboardBottomPadding = 40.dp
 private val TextKeyboardBottomPadding = 20.dp
 private const val TextPanelAdditionalRows = 2
-private const val HandwritingInkClearDelayMillis = 100L
+private const val HandwritingInkClearDelayMillis = 500L
 
 @Composable
 fun KeyboardScreen(

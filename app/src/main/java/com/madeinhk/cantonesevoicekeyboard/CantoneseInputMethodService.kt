@@ -81,7 +81,7 @@ class CantoneseInputMethodService : InputMethodService(),
         private const val SAMPLE_RATE = 16000
         private const val INLINE_SUGGESTION_MIN_WIDTH_DP = 72
         private const val INLINE_SUGGESTION_HEIGHT_DP = 48
-        private const val HANDWRITING_IDLE_DELAY_MS = 100L
+        private const val HANDWRITING_IDLE_DELAY_MS = 500L
         private const val HANDWRITING_CANDIDATE_TIMEOUT_MS = 3_000L
         private const val HANDWRITING_TOP_K = 10
     }
