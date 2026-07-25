@@ -851,12 +851,6 @@ private fun HandwritingCandidateStrip(
                 )
             }
         }
-        ChevronDownIcon(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .size(24.dp),
-            color = BrandTheme.colors.keyboardKeyOnSurface,
-        )
     }
 }
 
@@ -2432,30 +2426,6 @@ fun KeyboardActionIcon(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ChevronDownIcon(
-    modifier: Modifier = Modifier,
-    color: Color = Color.White,
-) {
-    Canvas(modifier = modifier) {
-        val strokePx = 2.5.dp.toPx()
-        drawLine(
-            color = color,
-            start = Offset(size.width * 0.20f, size.height * 0.35f),
-            end = Offset(size.width * 0.50f, size.height * 0.65f),
-            strokeWidth = strokePx,
-            cap = StrokeCap.Round,
-        )
-        drawLine(
-            color = color,
-            start = Offset(size.width * 0.50f, size.height * 0.65f),
-            end = Offset(size.width * 0.80f, size.height * 0.35f),
-            strokeWidth = strokePx,
-            cap = StrokeCap.Round,
-        )
     }
 }
 
