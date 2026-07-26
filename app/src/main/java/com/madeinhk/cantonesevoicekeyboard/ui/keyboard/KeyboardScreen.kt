@@ -973,15 +973,17 @@ private fun HandwritingCandidateStrip(
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CandidatePageArrow(
-                key = keys.candidatePrevious,
-                keyRegistry = keyRegistry,
-                pointsForward = false,
-                visible = hasPrevious,
-                accessibilityDescription = stringResource(
-                    R.string.keyboard_handwriting_candidates_previous,
-                ),
-            )
+            if (hasPrevious) {
+                CandidatePageArrow(
+                    key = keys.candidatePrevious,
+                    keyRegistry = keyRegistry,
+                    pointsForward = false,
+                    visible = true,
+                    accessibilityDescription = stringResource(
+                        R.string.keyboard_handwriting_candidates_previous,
+                    ),
+                )
+            }
             Row(
                 modifier = Modifier
                     .weight(1f)
@@ -1079,6 +1081,8 @@ private fun ToolbarCandidateVisual(
         modifier = modifier.height(KeyboardUiDefaults.ToolbarHeight),
         key = key,
         keyRegistry = keyRegistry,
+        horizontalInset = 0.dp,
+        verticalInset = 0.dp,
         accessibilityDescription = candidate.text,
         backgroundColor = Color.Transparent,
         shape = RectangleShape,
@@ -1109,6 +1113,8 @@ private fun ToolbarIconVisual(
             .semantics { contentDescription = accessibilityDescription },
         key = key,
         keyRegistry = keyRegistry,
+        horizontalInset = 0.dp,
+        verticalInset = 0.dp,
         accessibilityDescription = accessibilityDescription,
         backgroundColor = Color.Transparent,
         shape = CircleShape,
@@ -1861,6 +1867,8 @@ private fun KeyVisual(
     pressedOverlayColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
     verticalPadding: Dp = 0.dp,
+    horizontalInset: Dp = KeyboardUiDefaults.HorizontalKeyInset,
+    verticalInset: Dp = KeyboardUiDefaults.VerticalKeyInset,
     utilityStyle: Boolean = false,
     accessibilityDescription: String? = null,
     content: @Composable BoxScope.() -> Unit
@@ -1894,8 +1902,8 @@ private fun KeyVisual(
     ) {
         val touchWidth = maxWidth
         val touchHeight = maxHeight
-        val visibleWidth = touchWidth - KeyboardUiDefaults.HorizontalKeyInset * 2
-        val visibleHeight = touchHeight - KeyboardUiDefaults.VerticalKeyInset * 2
+        val visibleWidth = touchWidth - horizontalInset * 2
+        val visibleHeight = touchHeight - verticalInset * 2
 
         Box(
             modifier = Modifier

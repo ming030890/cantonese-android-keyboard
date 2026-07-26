@@ -194,6 +194,36 @@ class KeyboardInputTest {
     }
 
     @Test
+    fun disabledCandidateGeometryDoesNotShrinkActiveCandidateHitArea() {
+        val registry = KeyboardKeyRegistry()
+        registry.beginLayout()
+        val staleCandidate = registry.key(
+            "candidate.stale",
+            KeyData("candidate.stale", KeyboardKeyKind.Candidate, text = "舊"),
+            "toolbar",
+            enabled = false,
+        )
+        val activeCandidate = registry.key(
+            "candidate.active",
+            KeyData("candidate.active", KeyboardKeyKind.Candidate, text = "新"),
+            "toolbar",
+        )
+        val next = registry.key(
+            "candidate.next",
+            KeyData("candidate.next", KeyboardKeyKind.CandidateNext),
+            "toolbar",
+        )
+        registry.updateSurfaceSize(width = 200, height = 100)
+        registry.updateVisualBounds(staleCandidate, Rect(0f, 20f, 100f, 68f))
+        registry.updateVisualBounds(activeCandidate, Rect(0f, 20f, 100f, 68f))
+        registry.updateVisualBounds(next, Rect(100f, 20f, 148f, 68f))
+
+        assertSame(activeCandidate, registry.findKeyAt(10f, 40f))
+        assertSame(activeCandidate, registry.findKeyAt(90f, 40f))
+        assertSame(next, registry.findKeyAt(120f, 40f))
+    }
+
+    @Test
     fun touchBounds_fillVisualSpacingAndKeyboardEdges() {
         val registry = KeyboardKeyRegistry()
         registry.beginLayout()

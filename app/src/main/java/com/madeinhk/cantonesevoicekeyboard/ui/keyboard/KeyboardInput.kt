@@ -173,6 +173,7 @@ class KeyboardKeyRegistry {
     private fun recomputeTouchBounds() {
         rows.clear()
         for (key in visibleKeys) {
+            if (!key.enabled) continue
             val visual = key.geometry.visualBounds
             if (visual.width <= 0f || visual.height <= 0f || key.rowId.isEmpty()) continue
             var row: RowGeometry? = null
