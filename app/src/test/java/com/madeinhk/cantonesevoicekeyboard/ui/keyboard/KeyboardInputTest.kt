@@ -16,15 +16,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class KeyboardInputTest {
     @Test
-    fun toolbarKeysAreRegisteredAgainAfterARecompositionClearsVisibleKeys() {
+    fun toolbarKeysKeepStableIdentityAcrossRecomposition() {
         val registry = KeyboardKeyRegistry()
-        registry.beginLayout()
         val initial = registerTextToolbarKeys(registry)
+        registry.mount(initial.settings)
+        registry.mount(initial.voice)
         registry.updateSurfaceSize(width = 300, height = 100)
         registry.updateVisualBounds(initial.settings, Rect(190f, 20f, 238f, 68f))
         registry.updateVisualBounds(initial.voice, Rect(246f, 20f, 294f, 68f))
 
-        registry.beginLayout()
         val recomposed = registerTextToolbarKeys(registry)
         registry.updateSurfaceSize(width = 300, height = 100)
 
@@ -36,23 +36,23 @@ class KeyboardInputTest {
     }
 
     @Test
-    fun clipboardToolbarKeyIsRegisteredAndHitAfterSecondaryActionChanges() {
+    fun mountedClipboardTargetParticipatesInToolbarHitTesting() {
         val registry = KeyboardKeyRegistry()
-        registry.beginLayout()
         val voice = registerTextToolbarKeys(registry)
+        registry.mount(voice.settings)
+        registry.mount(voice.voice)
         registry.updateSurfaceSize(width = 300, height = 100)
         registry.updateVisualBounds(voice.settings, Rect(190f, 20f, 238f, 68f))
         registry.updateVisualBounds(voice.voice, Rect(246f, 20f, 294f, 68f))
 
-        registry.beginLayout()
-        val clipboard = registerTextToolbarKeys(registry, ToolbarSecondaryAction.Clipboard)
+        val clipboard = registerTextToolbarKeys(registry)
+        registry.mount(clipboard.clipboard)
         registry.updateSurfaceSize(width = 300, height = 100)
-        registry.updateVisualBounds(clipboard.settings, Rect(190f, 20f, 238f, 68f))
-        registry.updateVisualBounds(clipboard.clipboard, Rect(246f, 20f, 294f, 68f))
+        registry.updateVisualBounds(clipboard.clipboard, Rect(100f, 20f, 180f, 68f))
 
-        assertTrue(clipboard.voice.enabled)
-        assertTrue(clipboard.clipboard.enabled)
-        assertSame(clipboard.clipboard, registry.findKeyAt(270f, 40f))
+        assertTrue(registry.isMounted(clipboard.voice))
+        assertTrue(registry.isMounted(clipboard.clipboard))
+        assertSame(clipboard.clipboard, registry.findKeyAt(140f, 40f))
     }
 
     @Test
@@ -92,8 +92,8 @@ class KeyboardInputTest {
     }
 
     @Test
-    fun candidateToolbarKeysStayEnabledAlongsideFixedVoiceKey() {
-        val registry = KeyboardKeyRegistry().apply { beginLayout() }
+    fun candidateToolbarCreatesSemanticTargetsAlongsideFixedVoiceKey() {
+        val registry = KeyboardKeyRegistry()
         val keys = registerTextToolbarKeys(
             registry,
             candidates = listOf(
@@ -102,52 +102,50 @@ class KeyboardInputTest {
             ),
         )
 
-        assertTrue(keys.voice.enabled)
         assertEquals(KeyboardKeyKind.CandidatePrevious, keys.candidatePrevious.currentData?.kind)
         assertEquals(KeyboardKeyKind.CandidateNext, keys.candidateNext.currentData?.kind)
-        assertTrue(keys.candidates[0].enabled)
-        assertTrue(keys.candidates[1].enabled)
         assertEquals(2, keys.candidates.size)
     }
 
     @Test
     fun firstCandidateReplacesHiddenSettingsInHitTesting() {
         val registry = KeyboardKeyRegistry()
-        registry.beginLayout()
         val initial = registerTextToolbarKeys(registry)
+        registry.mount(initial.settings)
         registry.updateSurfaceSize(width = 300, height = 100)
         registry.updateVisualBounds(initial.settings, Rect(0f, 20f, 48f, 68f))
 
-        registry.beginLayout()
+        registry.unmount(initial.settings)
         val candidates = registerTextToolbarKeys(
             registry,
             candidates = listOf(
                 com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("你", 0),
             ),
         )
+        registry.mount(candidates.candidates[0])
         registry.updateSurfaceSize(width = 300, height = 100)
         registry.updateVisualBounds(candidates.candidates[0], Rect(0f, 20f, 62f, 68f))
 
-        assertFalse(candidates.settings.enabled)
+        assertFalse(registry.isMounted(candidates.settings))
         assertSame(candidates.candidates[0], registry.findKeyAt(24f, 40f))
     }
 
     @Test
-    fun keyDisabledDuringPressDoesNotDispatchItsOriginalAction() {
+    fun keyUnmountedDuringPressDoesNotDispatchItsOriginalAction() {
         val settings = KeyData("toolbar.settings", KeyboardKeyKind.Settings, text = "Settings")
 
         assertTrue(
             shouldDispatchOriginalKeyUp(
                 dataOnDown = settings,
                 currentData = settings,
-                keyEnabled = true,
+                targetStillMounted = true,
             ),
         )
         assertFalse(
             shouldDispatchOriginalKeyUp(
                 dataOnDown = settings,
                 currentData = settings,
-                keyEnabled = false,
+                targetStillMounted = false,
             ),
         )
     }
@@ -169,7 +167,6 @@ class KeyboardInputTest {
     @Test
     fun candidateKeysRemovedWhenRecognitionReturnsFewerResults() {
         val registry = KeyboardKeyRegistry()
-        registry.beginLayout()
         val initial = registerTextToolbarKeys(
             registry,
             candidates = listOf(
@@ -177,10 +174,11 @@ class KeyboardInputTest {
                 com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate("尼", 1),
             ),
         )
+        registry.mount(initial.candidates[1])
         registry.updateSurfaceSize(width = 300, height = 100)
         registry.updateVisualBounds(initial.candidates[1], Rect(100f, 20f, 150f, 68f))
 
-        registry.beginLayout()
+        registry.unmount(initial.candidates[1])
         val updated = registerTextToolbarKeys(
             registry,
             candidates = listOf(
@@ -194,14 +192,12 @@ class KeyboardInputTest {
     }
 
     @Test
-    fun disabledCandidateGeometryDoesNotShrinkActiveCandidateHitArea() {
+    fun unmountedCandidateGeometryDoesNotShrinkActiveCandidateHitArea() {
         val registry = KeyboardKeyRegistry()
-        registry.beginLayout()
         val staleCandidate = registry.key(
             "candidate.stale",
             KeyData("candidate.stale", KeyboardKeyKind.Candidate, text = "舊"),
             "toolbar",
-            enabled = false,
         )
         val activeCandidate = registry.key(
             "candidate.active",
@@ -213,6 +209,8 @@ class KeyboardInputTest {
             KeyData("candidate.next", KeyboardKeyKind.CandidateNext),
             "toolbar",
         )
+        registry.mount(activeCandidate)
+        registry.mount(next)
         registry.updateSurfaceSize(width = 200, height = 100)
         registry.updateVisualBounds(staleCandidate, Rect(0f, 20f, 100f, 68f))
         registry.updateVisualBounds(activeCandidate, Rect(0f, 20f, 100f, 68f))
@@ -226,9 +224,10 @@ class KeyboardInputTest {
     @Test
     fun touchBounds_fillVisualSpacingAndKeyboardEdges() {
         val registry = KeyboardKeyRegistry()
-        registry.beginLayout()
         val left = registry.key("left", KeyData("left", KeyboardKeyKind.Text, text = "a"), "row")
         val right = registry.key("right", KeyData("right", KeyboardKeyKind.Text, text = "b"), "row")
+        registry.mount(left)
+        registry.mount(right)
         registry.updateSurfaceSize(width = 300, height = 100)
         registry.updateVisualBounds(left, Rect(12f, 20f, 140f, 80f))
         registry.updateVisualBounds(right, Rect(160f, 20f, 288f, 80f))
@@ -245,9 +244,10 @@ class KeyboardInputTest {
     @Test
     fun rowsMeetVerticallyAndHitTestingUsesTouchBounds() {
         val registry = KeyboardKeyRegistry()
-        registry.beginLayout()
         val top = registry.key("top", KeyData("top", KeyboardKeyKind.Text, text = "a"), "top")
         val bottom = registry.key("bottom", KeyData("bottom", KeyboardKeyKind.Text, text = "b"), "bottom")
+        registry.mount(top)
+        registry.mount(bottom)
         registry.updateSurfaceSize(width = 200, height = 120)
         registry.updateVisualBounds(top, Rect(20f, 10f, 180f, 40f))
         registry.updateVisualBounds(bottom, Rect(20f, 70f, 180f, 100f))

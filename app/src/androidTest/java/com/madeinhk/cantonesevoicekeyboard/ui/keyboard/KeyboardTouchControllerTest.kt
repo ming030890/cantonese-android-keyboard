@@ -28,13 +28,13 @@ class KeyboardTouchControllerTest {
     }
 
     @Test
-    fun cancelNeverCommitsAndDisabledKeyDoesNothing() {
+    fun cancelNeverCommitsAndUnmountedKeyDoesNothing() {
         val fixture = Fixture()
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(10), floatArrayOf(40f)))
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_CANCEL, 0, intArrayOf(10), floatArrayOf(40f)))
 
         assertEquals(listOf("down:a", "cancel:a"), fixture.events)
-        fixture.b.enabled = false
+        fixture.registry.unmount(fixture.b)
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(11), floatArrayOf(160f)))
         assertEquals(listOf("down:a", "cancel:a"), fixture.events)
     }
@@ -67,24 +67,35 @@ class KeyboardTouchControllerTest {
     }
 
     @Test
-    fun changedKeyDataCancelsSnapshotThenDispatchesReplacementDownUp() {
+    fun changedKeyDataCancelsThePressedSnapshotWithoutRetargeting() {
         val fixture = Fixture()
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(1), floatArrayOf(40f)))
         fixture.a.currentData = KeyData("a", KeyboardKeyKind.Text, text = "A")
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_UP, 0, intArrayOf(1), floatArrayOf(40f)))
 
         assertEquals(
-            listOf("down:a", "cancel:a", "down:a", "up:a"),
+            listOf("down:a", "cancel:a"),
             fixture.events
         )
+    }
+
+    @Test
+    fun unmountedAndRemountedTargetCancelsTheOldPointerSession() {
+        val fixture = Fixture()
+        fixture.controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(1), floatArrayOf(40f)))
+
+        fixture.registry.unmount(fixture.a)
+        fixture.registry.mount(fixture.a)
+        fixture.registry.updateVisualBounds(fixture.a, Rect(10f, 10f, 90f, 70f))
+        fixture.controller.onMotionEvent(event(MotionEvent.ACTION_UP, 0, intArrayOf(1), floatArrayOf(40f)))
+
+        assertEquals(listOf("down:a", "cancel:a"), fixture.events)
     }
 
     private class Fixture {
         val events = mutableListOf<String>()
         var haptics = 0
-        val registry = KeyboardKeyRegistry().apply {
-            beginLayout()
-        }
+        val registry = KeyboardKeyRegistry()
         val a = registry.key("a", KeyData("a", KeyboardKeyKind.Text, text = "a"), "row")
         val b = registry.key("b", KeyData("b", KeyboardKeyKind.Text, text = "b"), "row")
         private val receiver = RecordingReceiver(events)
@@ -92,6 +103,8 @@ class KeyboardTouchControllerTest {
         val controller: KeyboardTouchController
 
         init {
+            registry.mount(a)
+            registry.mount(b)
             registry.updateSurfaceSize(200, 80)
             registry.updateVisualBounds(a, Rect(10f, 10f, 90f, 70f))
             registry.updateVisualBounds(b, Rect(110f, 10f, 190f, 70f))
@@ -124,11 +137,6 @@ class KeyboardTouchControllerTest {
 
         override fun sendCancel(data: KeyData, pressedKeyInfo: PressedKeyInfo?) {
             events += "cancel:${data.keyId}"
-        }
-
-        override fun sendDownUp(data: KeyData) {
-            events += "down:${data.keyId}"
-            events += "up:${data.keyId}"
         }
 
         override fun dispose() = Unit
