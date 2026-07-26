@@ -1,7 +1,6 @@
 package com.madeinhk.cantonesevoicekeyboard
 
 import android.Manifest
-import android.content.ClipData
 import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
@@ -170,7 +169,7 @@ class CantoneseInputMethodService : InputMethodService(),
     private var clipboardManager: ClipboardManager? = null
     private var clipboardGeneration = 0L
     private var dismissedClipboardGeneration: Long? = null
-    private var lastObservedClip: ClipData? = null
+    private var lastObservedClipboardFingerprint: ClipboardFingerprint? = null
     private var clipboardObservationActive = false
     private val clipboardListener = ClipboardManager.OnPrimaryClipChangedListener {
         refreshClipboardSuggestion(forceGeneration = true)
@@ -874,9 +873,15 @@ class CantoneseInputMethodService : InputMethodService(),
     private fun refreshClipboardSuggestion(forceGeneration: Boolean = false) {
         if (!clipboardObservationActive) return
         val clip = clipboardManager?.primaryClip
-        if (forceGeneration || clip !== lastObservedClip) {
+        val fingerprint = clip?.let {
+            ClipboardFingerprint(
+                timestamp = it.description.timestamp,
+                itemCount = it.itemCount,
+            )
+        }
+        if (forceGeneration || fingerprint != lastObservedClipboardFingerprint) {
             clipboardGeneration++
-            lastObservedClip = clip
+            lastObservedClipboardFingerprint = fingerprint
         }
 
         val description = clip?.description
@@ -910,8 +915,10 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun pasteClipboard() {
         acceptActiveHandwritingComposition()
-        // Hide the chip immediately. Re-reading below still validates and commits the
-        // current clipboard item, and the generation remains dismissed until it changes.
+        // Hide and dismiss the chip before re-reading the clipboard. ClipboardManager
+        // may return a new ClipData wrapper for the same item, so object identity cannot
+        // be used to decide whether this generation changed.
+        dismissedClipboardGeneration = clipboardGeneration
         _clipboardSuggestion.value = null
         val manager = clipboardManager ?: return
         val clip = manager.primaryClip
@@ -922,22 +929,15 @@ class CantoneseInputMethodService : InputMethodService(),
             description.mimeTypeCount != 1 ||
             !description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
         ) {
-            refreshClipboardSuggestion(forceGeneration = true)
+            refreshClipboardSuggestion()
             return
         }
 
-        if (clip !== lastObservedClip) {
-            refreshClipboardSuggestion()
-        }
-        val token = clipboardGeneration
         val text = (0 until clip.itemCount)
             .asSequence()
             .mapNotNull { clip.getItemAt(it).coerceToText(this)?.toString() }
             .firstOrNull { it.isNotEmpty() }
 
-        // Dismiss this clipboard generation even if the target disappeared or the item
-        // turned out to be empty after it was re-read.
-        dismissedClipboardGeneration = token
         clearAutofillSuggestion()
         if (text != null) {
             currentInputConnection?.commitText(text, 1)
@@ -947,6 +947,11 @@ class CantoneseInputMethodService : InputMethodService(),
 
     private fun dpToPx(dp: Int): Int =
         (dp * resources.displayMetrics.density).toInt().coerceAtLeast(1)
+
+    private data class ClipboardFingerprint(
+        val timestamp: Long,
+        val itemCount: Int,
+    )
 
     private fun getOrCreateAsrEngine(): QAsrEngine {
         qAsrEngine?.let { return it }
