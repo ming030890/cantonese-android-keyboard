@@ -65,8 +65,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingRecord
+import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingSettings
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingStore
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingSync
 import com.madeinhk.cantonesevoicekeyboard.R
@@ -96,7 +96,7 @@ fun DebugHandwritingScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     }
 
     fun sync() {
-        val folder = DebugAudioSettings.getSyncFolderUri(context) ?: return
+        val folder = DebugHandwritingSettings.getSyncFolderUri(context) ?: return
         if (syncing) return
         scope.launch {
             syncing = true
@@ -120,7 +120,7 @@ fun DebugHandwritingScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
                 )
             }
-            DebugAudioSettings.setSyncFolderUri(context, uri)
+            DebugHandwritingSettings.setSyncFolderUri(context, uri)
             scope.launch { snackbar.showSnackbar(context.getString(R.string.debug_folder_saved)) }
         }
     }
@@ -134,7 +134,11 @@ fun DebugHandwritingScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 title = { Text(stringResource(R.string.debug_handwriting_title)) },
                 navigationIcon = { TextButton(onClick = onBack) { Text(stringResource(R.string.debug_back)) } },
                 actions = {
-                    TextButton(onClick = { folderPicker.launch(DebugAudioSettings.getSyncFolderUri(context)) }) {
+                    TextButton(
+                        onClick = {
+                            folderPicker.launch(DebugHandwritingSettings.getSyncFolderUri(context))
+                        }
+                    ) {
                         Text(stringResource(R.string.debug_choose_folder))
                     }
                 },
@@ -155,7 +159,7 @@ fun DebugHandwritingScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 Button(
                     enabled = records.any { it.isAnnotated && !it.isSynced } && !syncing,
                     onClick = {
-                        if (DebugAudioSettings.getSyncFolderUri(context) == null) {
+                        if (DebugHandwritingSettings.getSyncFolderUri(context) == null) {
                             folderPicker.launch(null)
                         } else {
                             sync()
