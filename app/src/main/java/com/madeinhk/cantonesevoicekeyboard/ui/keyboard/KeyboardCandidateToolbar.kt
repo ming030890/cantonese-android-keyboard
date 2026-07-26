@@ -72,7 +72,7 @@ internal fun registerTextToolbarKeys(
             ),
             rowId = "toolbar",
         ),
-        candidates = candidates.take(10).mapIndexed { index, candidate ->
+        candidates = candidates.mapIndexed { index, candidate ->
             keyRegistry.key(
                 id = "toolbar.candidate.$index",
                 data = KeyData(
@@ -94,13 +94,14 @@ internal fun HandwritingCandidateStrip(
     onPageChanged: (Int) -> Unit,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val pageSize = handwritingCandidatePageSize(maxWidth)
-        val pageCount = handwritingCandidatePageCount(candidates.size, pageSize)
-        val safePage = page.coerceIn(0, (pageCount - 1).coerceAtLeast(0))
-        val firstCandidate = safePage * pageSize
-        val pageCandidates = candidates.drop(firstCandidate).take(pageSize)
-        val hasPrevious = safePage > 0
-        val hasNext = safePage + 1 < pageCount
+        val pages = handwritingCandidatePages(candidates.size, maxWidth)
+        val safePage = page.coerceIn(0, pages.lastIndex.coerceAtLeast(0))
+        val candidatePage = pages.getOrNull(safePage)
+        val firstCandidate = candidatePage?.firstCandidate ?: 0
+        val pageCapacity = candidatePage?.capacity ?: 1
+        val pageCandidates = candidates.drop(firstCandidate).take(pageCapacity)
+        val hasPrevious = candidatePage?.hasPrevious == true
+        val hasNext = candidatePage?.hasNext == true
 
         LaunchedEffect(safePage, page) {
             if (safePage != page) onPageChanged(safePage)
@@ -127,7 +128,7 @@ internal fun HandwritingCandidateStrip(
                     .fillMaxHeight(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                repeat(pageSize) { slot ->
+                repeat(pageCapacity) { slot ->
                     val candidate = pageCandidates.getOrNull(slot)
                     if (slot > 0 && candidate != null) CandidateDivider()
                     if (candidate != null) {
@@ -159,13 +160,64 @@ internal fun HandwritingCandidateStrip(
     }
 }
 
-internal fun handwritingCandidatePageSize(availableWidth: Dp): Int =
-    ((availableWidth.value - KeyboardUiDefaults.ToolbarIconTouchSize.value * 2) / 62f)
+internal data class HandwritingCandidatePage(
+    val firstCandidate: Int,
+    val capacity: Int,
+    val hasPrevious: Boolean,
+    val hasNext: Boolean,
+)
+
+internal fun handwritingCandidateCapacity(availableWidth: Dp, arrowCount: Int): Int =
+    ((availableWidth.value -
+        KeyboardUiDefaults.ToolbarIconTouchSize.value * arrowCount.coerceIn(0, 2)) / 62f)
         .toInt()
         .coerceAtLeast(1)
 
-internal fun handwritingCandidatePageCount(candidateCount: Int, pageSize: Int): Int =
-    if (candidateCount <= 0) 0 else (candidateCount + pageSize - 1) / pageSize
+internal fun handwritingCandidatePages(
+    candidateCount: Int,
+    availableWidth: Dp,
+): List<HandwritingCandidatePage> {
+    if (candidateCount <= 0) return emptyList()
+
+    val noArrowCapacity = handwritingCandidateCapacity(availableWidth, arrowCount = 0)
+    if (candidateCount <= noArrowCapacity) {
+        return listOf(
+            HandwritingCandidatePage(
+                firstCandidate = 0,
+                capacity = noArrowCapacity,
+                hasPrevious = false,
+                hasNext = false,
+            ),
+        )
+    }
+
+    val oneArrowCapacity = handwritingCandidateCapacity(availableWidth, arrowCount = 1)
+    val twoArrowCapacity = handwritingCandidateCapacity(availableWidth, arrowCount = 2)
+    val pages = mutableListOf(
+        HandwritingCandidatePage(
+            firstCandidate = 0,
+            capacity = oneArrowCapacity,
+            hasPrevious = false,
+            hasNext = true,
+        ),
+    )
+    var firstCandidate = oneArrowCapacity
+
+    while (firstCandidate < candidateCount) {
+        val remaining = candidateCount - firstCandidate
+        val isLastPage = remaining <= oneArrowCapacity
+        val capacity = if (isLastPage) oneArrowCapacity else twoArrowCapacity
+        pages += HandwritingCandidatePage(
+            firstCandidate = firstCandidate,
+            capacity = capacity,
+            hasPrevious = true,
+            hasNext = !isLastPage,
+        )
+        firstCandidate += capacity
+    }
+
+    return pages
+}
 
 @Composable
 private fun CandidatePageArrow(

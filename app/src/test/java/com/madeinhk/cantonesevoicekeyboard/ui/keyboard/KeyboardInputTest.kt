@@ -151,17 +151,35 @@ class KeyboardInputTest {
     }
 
     @Test
-    fun candidatePageSizeAdaptsWithoutRequiringHorizontalScrolling() {
-        assertEquals(1, handwritingCandidatePageSize(150.dp))
-        assertEquals(2, handwritingCandidatePageSize(256.dp))
-        assertEquals(3, handwritingCandidatePageSize(296.dp))
+    fun candidateCapacityAdaptsToVisiblePageArrows() {
+        assertEquals(1, handwritingCandidateCapacity(150.dp, arrowCount = 2))
+        assertEquals(2, handwritingCandidateCapacity(256.dp, arrowCount = 2))
+        assertEquals(3, handwritingCandidateCapacity(296.dp, arrowCount = 2))
+        assertEquals(4, handwritingCandidateCapacity(296.dp, arrowCount = 1))
     }
 
     @Test
-    fun candidatePageCountIncludesAPartialLastPage() {
-        assertEquals(0, handwritingCandidatePageCount(candidateCount = 0, pageSize = 3))
-        assertEquals(1, handwritingCandidatePageCount(candidateCount = 3, pageSize = 3))
-        assertEquals(4, handwritingCandidatePageCount(candidateCount = 10, pageSize = 3))
+    fun candidatePagesReclaimSpaceFromHiddenArrows() {
+        val pages = handwritingCandidatePages(candidateCount = 10, availableWidth = 296.dp)
+
+        assertEquals(
+            listOf(
+                HandwritingCandidatePage(0, 4, hasPrevious = false, hasNext = true),
+                HandwritingCandidatePage(4, 3, hasPrevious = true, hasNext = true),
+                HandwritingCandidatePage(7, 4, hasPrevious = true, hasNext = false),
+            ),
+            pages,
+        )
+    }
+
+    @Test
+    fun candidatePagesUseBothArrowSlotsWhenPaginationIsUnnecessary() {
+        assertEquals(
+            listOf(
+                HandwritingCandidatePage(0, 4, hasPrevious = false, hasNext = false),
+            ),
+            handwritingCandidatePages(candidateCount = 3, availableWidth = 296.dp),
+        )
     }
 
     @Test
