@@ -28,7 +28,6 @@ private val AlphaBottomRowSpacing = 4.dp
 private val KeyboardHorizontalPadding = KeyboardUiDefaults.KeyboardHorizontalPadding
 private val DefaultKeyboardBottomPadding = 40.dp
 private val TextKeyboardBottomPadding = 20.dp
-private const val TextPanelAdditionalRows = 2
 
 @Composable
 fun KeyboardScreen(
@@ -168,11 +167,9 @@ fun KeyboardScreen(
     }
     val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum
     val isTextPanel = activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
-    // Handwriting and text panels share one stable surface height so the toolbar
+    // All panels share the same Gboard-matched surface height so the IME window
     // and bottom utility row never jump when the mode changes.
-    val rowCount = KeyboardUiDefaults.MinimumRowCount + TextPanelAdditionalRows
-    val effectiveRowCount = rowCount.coerceAtLeast(KeyboardUiDefaults.MinimumRowCount)
-    val keyboardHeight = KeyboardUiDefaults.RowHeight * effectiveRowCount
+    val keyboardHeight = KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp
     val isWritingPanel = isTextPanel || activePanel == KeyboardPanel.Handwriting
     val keyboardTopPadding = if (isWritingPanel) 4.dp else 12.dp
     val keyboardBottomPadding =
