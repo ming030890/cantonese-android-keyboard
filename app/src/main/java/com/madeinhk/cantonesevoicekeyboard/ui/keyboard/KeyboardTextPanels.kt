@@ -202,7 +202,9 @@ private fun SymbolGridPanel(
                         Text(
                             text = if (showMoreSymbols) "123" else "=<",
                             color = keyboardColors.keyboardKeyOnSurface,
-                            style = keyboardTypography.keyboardSpaceKey,
+                            style = keyboardTypography.keyboardModeSwitchKey,
+                            maxLines = 1,
+                            softWrap = false,
                         )
                     }
                 }
@@ -344,7 +346,7 @@ internal fun AlphaNumBottomRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(KeyboardUiDefaults.RowHeight),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(KeyboardUiDefaults.BottomRowKeySpacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         KeyVisual(
@@ -358,13 +360,15 @@ internal fun AlphaNumBottomRow(
                 rowId = "text.bottom",
             ),
             keyRegistry = keyRegistry,
-            modifier = Modifier.weight(1.15f),
+            modifier = Modifier.weight(1.3f),
             backgroundColor = keyboardColors.keyboardModifierKeySurface,
         ) {
             Text(
                 text = modeSwitchLabel,
                 color = keyboardColors.keyboardKeyOnSurface,
                 style = keyboardTypography.keyboardModeSwitchKey,
+                maxLines = 1,
+                softWrap = false,
             )
         }
         KeyVisual(
@@ -427,7 +431,7 @@ internal fun AlphaNumBottomRow(
                 rowId = "text.bottom",
             ),
             keyRegistry = keyRegistry,
-            modifier = Modifier.weight(3.6f),
+            modifier = Modifier.weight(3.45f),
         ) {
             Text(
                 text = stringResource(R.string.keyboard_key_space),

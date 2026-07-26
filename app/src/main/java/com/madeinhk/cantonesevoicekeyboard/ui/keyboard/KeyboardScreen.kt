@@ -55,6 +55,9 @@ fun KeyboardScreen(
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     initialEmojiPanel: Boolean = false,
+    initialUppercase: Boolean = false,
+    initialShowMoreSymbols: Boolean = false,
+    initialHandwritingCandidatePage: Int = 0,
     debugTouchBounds: Boolean = false,
     keyboardHapticConfig: KeyboardHapticConfig = KeyboardHapticConfig(),
 ) {
@@ -68,9 +71,8 @@ fun KeyboardScreen(
     val handwritingBusy by handwritingRecognizing.collectAsState()
     val handwritingFailure by handwritingError.collectAsState()
     val handwritingSessionId by handwritingSession.collectAsState()
-    var handwritingCandidatePage by remember { mutableIntStateOf(0) }
-    LaunchedEffect(candidates) {
-        handwritingCandidatePage = 0
+    var handwritingCandidatePage by remember(candidates, initialHandwritingCandidatePage) {
+        mutableIntStateOf(initialHandwritingCandidatePage)
     }
 
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -89,8 +91,12 @@ fun KeyboardScreen(
     var activePanel by remember(inputMode, initialEmojiPanel) {
         mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
     }
-    var isUppercase by remember(activePanel) { mutableStateOf(false) }
-    var showMoreSymbols by remember(activePanel) { mutableStateOf(false) }
+    var isUppercase by remember(activePanel, initialUppercase) {
+        mutableStateOf(initialUppercase)
+    }
+    var showMoreSymbols by remember(activePanel, initialShowMoreSymbols) {
+        mutableStateOf(initialShowMoreSymbols)
+    }
     var keyboardSurfaceOriginInRoot by remember { mutableStateOf(Offset.Zero) }
     var emojiPickerBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
     var autofillBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
@@ -351,7 +357,9 @@ fun KeyboardScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(KeyboardUiDefaults.RowHeight),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        KeyboardUiDefaults.BottomRowKeySpacing
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     KeyVisual(
@@ -375,11 +383,11 @@ fun KeyboardScreen(
                         Text(
                             text = "?123",
                             color = textVariantColor,
-                            style = keyboardTypography.keyboardSpaceKey
+                            style = keyboardTypography.keyboardModeSwitchKey,
+                            maxLines = 1,
+                            softWrap = false,
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(6.dp))
 
                     KeyVisual(
                         key = keyRegistry.key(
@@ -406,8 +414,6 @@ fun KeyboardScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(6.dp))
-
                     // Space Key
                     KeyVisual(
                         key = keyRegistry.key(
@@ -430,8 +436,6 @@ fun KeyboardScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(6.dp))
-
                     // Delete Key
                     KeyVisual(
                         key = keyRegistry.key(
@@ -450,8 +454,6 @@ fun KeyboardScreen(
                     ) {
                         BackspaceIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                     }
-
-                    Spacer(modifier = Modifier.width(6.dp))
 
                     // Enter Key - filled accent so the primary commit action stands out.
                     KeyVisual(

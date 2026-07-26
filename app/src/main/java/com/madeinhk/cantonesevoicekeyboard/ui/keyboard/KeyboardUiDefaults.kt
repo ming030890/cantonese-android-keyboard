@@ -14,6 +14,7 @@ object KeyboardUiDefaults {
     val KeyboardHorizontalPadding = 4.dp
     val HorizontalKeyInset = 2.dp
     val VerticalKeyInset = 5.dp
+    val BottomRowKeySpacing = 2.dp
     val ToolbarHeight = 48.dp
     val ToolbarIconTouchSize = 48.dp
     val ToolbarIconSize = 24.dp

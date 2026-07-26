@@ -205,6 +205,233 @@ fun KeyboardScreenAutofillPlaceholderScreenshot() {
     )
 }
 
+@PreviewTest
+@Preview(
+    name = "Keyboard transcribing",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenTranscribingScreenshot() {
+    KeyboardScreenScreenshotContent(state = KeyboardUiState.Transcribing)
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard dark theme",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenDarkThemeScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.AlphaNum,
+        darkTheme = true,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard handwriting recognizing",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenHandwritingRecognizingScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        handwritingRecognizing = true,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard handwriting error",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenHandwritingErrorScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        handwritingError = "Handwriting recognition unavailable.",
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard later candidate page",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenLaterCandidatePageScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        candidates = (0 until 18).map { index ->
+            HandwritingCandidate("字$index", index)
+        },
+        initialHandwritingCandidatePage = 3,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard send action",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenSendActionScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        action = KeyboardAction.Send,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard done action",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenDoneActionScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        action = KeyboardAction.Done,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard previous action",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenPreviousActionScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        action = KeyboardAction.Previous,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard uppercase",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenUppercaseScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.AlphaNum,
+        initialUppercase = true,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard alternate symbols",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenAlternateSymbolsScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Number,
+        initialShowMoreSymbols = true,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard compact width",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 360,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenCompactWidthScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.AlphaNum,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard compact handwriting",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 360,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenCompactHandwritingScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Handwriting,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard compact number",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 360,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenCompactNumberScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Number,
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard compact emoji",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 360,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenCompactEmojiScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        initialEmojiPanel = true,
+    )
+}
+
 @Composable
 private fun KeyboardScreenScreenshotContent(
     state: KeyboardUiState,
@@ -215,6 +442,12 @@ private fun KeyboardScreenScreenshotContent(
     clipboard: ClipboardSuggestion? = null,
     showAutofillPlaceholder: Boolean = false,
     candidates: List<HandwritingCandidate> = emptyList(),
+    darkTheme: Boolean = false,
+    handwritingRecognizing: Boolean = false,
+    handwritingError: String? = null,
+    initialUppercase: Boolean = false,
+    initialShowMoreSymbols: Boolean = false,
+    initialHandwritingCandidatePage: Int = 0,
 ) {
     val context = LocalContext.current
     val autofillView = if (showAutofillPlaceholder) {
@@ -229,15 +462,15 @@ private fun KeyboardScreenScreenshotContent(
     } else {
         null
     }
-    CantoneseVoiceKeyboardTheme(darkTheme = false, dynamicColor = false) {
+    CantoneseVoiceKeyboardTheme(darkTheme = darkTheme, dynamicColor = false) {
         KeyboardScreen(
             uiState = MutableStateFlow(state),
             volumeLevel = MutableStateFlow(volume),
             keyboardAction = MutableStateFlow(action),
             keyboardInputMode = MutableStateFlow(inputMode),
             handwritingCandidates = MutableStateFlow(candidates),
-            handwritingRecognizing = MutableStateFlow(false),
-            handwritingError = MutableStateFlow(null),
+            handwritingRecognizing = MutableStateFlow(handwritingRecognizing),
+            handwritingError = MutableStateFlow(handwritingError),
             handwritingSession = MutableStateFlow(0L),
             autofillSuggestionView = MutableStateFlow(autofillView),
             clipboardSuggestion = MutableStateFlow(clipboard),
@@ -251,7 +484,10 @@ private fun KeyboardScreenScreenshotContent(
             onHandwritingChanged = { _, _, _ -> },
             onHandwritingCandidateSelected = {},
             onEmojiPicked = {},
-            initialEmojiPanel = initialEmojiPanel
+            initialEmojiPanel = initialEmojiPanel,
+            initialUppercase = initialUppercase,
+            initialShowMoreSymbols = initialShowMoreSymbols,
+            initialHandwritingCandidatePage = initialHandwritingCandidatePage,
         )
     }
 }
