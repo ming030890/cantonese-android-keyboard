@@ -11,6 +11,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.madeinhk.cantonesevoicekeyboard.ui.main.MainScreen
 import com.madeinhk.cantonesevoicekeyboard.ui.main.DebugAudioScreen
 import com.madeinhk.cantonesevoicekeyboard.ui.main.DebugHandwritingScreen
+import com.madeinhk.cantonesevoicekeyboard.ui.main.PromptedHandwritingScreen
 
 @Composable
 fun MainNavigation() {
@@ -32,6 +33,12 @@ fun MainNavigation() {
         }
         entry<DebugHandwriting> {
           DebugHandwritingScreen(
+            onBack = { backStack.removeLastOrNull() },
+            modifier = Modifier.safeDrawingPadding()
+          )
+        }
+        entry<PromptedHandwriting> {
+          PromptedHandwritingScreen(
             onBack = { backStack.removeLastOrNull() },
             modifier = Modifier.safeDrawingPadding()
           )

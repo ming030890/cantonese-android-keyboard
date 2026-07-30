@@ -45,6 +45,22 @@
     <string name="developer_store_handwriting_title">Help improve handwriting</string>
     <string name="developer_store_handwriting_desc">Save up to 100 recent handwriting samples on this device so you can review recognition mistakes and sync the corrections you choose.</string>
     <string name="developer_manage_handwriting">Review saved samples</string>
+    <string name="challenge_open">Start the 50-a-day challenge</string>
+
+    <!-- Prompted handwriting evaluation -->
+    <string name="challenge_title">Handwriting challenge</string>
+    <string name="challenge_prompt">Write this character</string>
+    <string name="challenge_daily_progress">Today: %1$d / %2$d</string>
+    <string name="challenge_streak">🔥 %1$d day streak</string>
+    <string name="challenge_lifetime_pending">%1$d characters collected • %2$d waiting to sync</string>
+    <string name="challenge_undo">Undo</string>
+    <string name="challenge_clear">Clear</string>
+    <string name="challenge_skip">Skip</string>
+    <string name="challenge_next">Save &amp; next</string>
+    <string name="challenge_milestone">✨ %1$d today — great rhythm!</string>
+    <string name="challenge_goal_complete">🏆 Daily challenge complete! Keep going if you like.</string>
+    <string name="challenge_choose_drive_hint">Choose a Drive folder to enable automatic backup. Collection works offline meanwhile.</string>
+    <string name="challenge_save_failed">Couldn’t save this sample. Your drawing is still here.</string>
 
     <!-- Debug audio collection -->
     <string name="debug_audio_title">Training recordings</string>

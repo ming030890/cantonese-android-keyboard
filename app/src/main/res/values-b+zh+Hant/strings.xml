@@ -44,6 +44,20 @@
     <string name="developer_store_handwriting_title">幫助改善手寫輸入</string>
     <string name="developer_store_handwriting_desc">喺呢部裝置儲存最多 100 個最近嘅手寫樣本，等你檢查識別錯誤，同步你選擇嘅修正。</string>
     <string name="developer_manage_handwriting">檢視已儲存樣本</string>
+    <string name="challenge_open">開始每日 50 字挑戰</string>
+    <string name="challenge_title">手寫挑戰</string>
+    <string name="challenge_prompt">請寫呢個字</string>
+    <string name="challenge_daily_progress">今日：%1$d / %2$d</string>
+    <string name="challenge_streak">🔥 連續 %1$d 日</string>
+    <string name="challenge_lifetime_pending">已收集 %1$d 個字 • %2$d 個等待同步</string>
+    <string name="challenge_undo">復原</string>
+    <string name="challenge_clear">清除</string>
+    <string name="challenge_skip">略過</string>
+    <string name="challenge_next">儲存並繼續</string>
+    <string name="challenge_milestone">✨ 今日已寫 %1$d 個，節奏好好！</string>
+    <string name="challenge_goal_complete">🏆 完成今日挑戰！想繼續都得。</string>
+    <string name="challenge_choose_drive_hint">揀選雲端硬碟資料夾即可自動備份；目前仍可離線收集。</string>
+    <string name="challenge_save_failed">無法儲存樣本，你嘅筆跡仍然保留。</string>
 
     <!-- Handwriting review -->
     <string name="debug_handwriting_title">檢視手寫樣本</string>

@@ -47,6 +47,7 @@ import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
 import com.madeinhk.cantonesevoicekeyboard.DebugAudio
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwriting
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingSettings
+import com.madeinhk.cantonesevoicekeyboard.PromptedHandwriting
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.madeinhk.cantonesevoicekeyboard.theme.*
@@ -140,6 +141,7 @@ fun MainScreen(
         storeDebugHandwriting = enabled
     },
     onOpenDebugHandwriting = { onItemClick(DebugHandwriting) },
+    onOpenPromptedHandwriting = { onItemClick(PromptedHandwriting) },
     modifier = modifier
   )
 }
@@ -164,6 +166,7 @@ fun MainScreenContent(
   storeDebugHandwriting: Boolean = false,
   onStoreDebugHandwritingChange: (Boolean) -> Unit = {},
   onOpenDebugHandwriting: () -> Unit = {},
+  onOpenPromptedHandwriting: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
   // Backdrop gradient comes from the theme (decided once per light/dark there),
@@ -226,6 +229,7 @@ fun MainScreenContent(
         storeDebugHandwriting = storeDebugHandwriting,
         onStoreDebugHandwritingChange = onStoreDebugHandwritingChange,
         onOpenDebugHandwriting = onOpenDebugHandwriting,
+        onOpenPromptedHandwriting = onOpenPromptedHandwriting,
       )
 
       Spacer(modifier = Modifier.height(24.dp))
@@ -597,6 +601,7 @@ fun DeveloperOptionsCard(
   storeDebugHandwriting: Boolean = false,
   onStoreDebugHandwritingChange: (Boolean) -> Unit = {},
   onOpenDebugHandwriting: () -> Unit = {},
+  onOpenPromptedHandwriting: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
   val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -689,6 +694,12 @@ fun DeveloperOptionsCard(
         modifier = Modifier.align(Alignment.End)
       ) {
         Text(stringResource(R.string.developer_manage_handwriting))
+      }
+      Button(
+        onClick = onOpenPromptedHandwriting,
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+      ) {
+        Text(stringResource(R.string.challenge_open))
       }
     }
   }

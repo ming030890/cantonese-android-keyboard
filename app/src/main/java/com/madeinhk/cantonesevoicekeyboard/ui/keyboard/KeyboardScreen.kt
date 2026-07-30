@@ -24,10 +24,10 @@ import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 import kotlinx.coroutines.flow.StateFlow
 
-private val AlphaBottomRowSpacing = 4.dp
+private val AlphaBottomRowSpacing = KeyboardUiDefaults.WritingPanelSpacing
 private val KeyboardHorizontalPadding = KeyboardUiDefaults.KeyboardHorizontalPadding
 private val DefaultKeyboardBottomPadding = 40.dp
-private val TextKeyboardBottomPadding = 20.dp
+private val TextKeyboardBottomPadding = KeyboardUiDefaults.WritingBottomPadding
 
 @Composable
 fun KeyboardScreen(
@@ -177,7 +177,8 @@ fun KeyboardScreen(
     // and bottom utility row never jump when the mode changes.
     val keyboardHeight = KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp
     val isWritingPanel = isTextPanel || activePanel == KeyboardPanel.Handwriting
-    val keyboardTopPadding = if (isWritingPanel) 4.dp else 12.dp
+    val keyboardTopPadding =
+        if (isWritingPanel) KeyboardUiDefaults.WritingTopPadding else 12.dp
     val keyboardBottomPadding =
         if (isWritingPanel) TextKeyboardBottomPadding else DefaultKeyboardBottomPadding
     val keyboardVerticalArrangement =

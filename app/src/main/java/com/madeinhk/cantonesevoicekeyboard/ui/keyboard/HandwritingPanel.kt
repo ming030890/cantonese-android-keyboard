@@ -23,11 +23,13 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.HandwritingCanvasGeometry
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingInkClearDelayMillis
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -43,6 +45,7 @@ internal fun HandwritingPanel(
     onBoundsChanged: (Rect) -> Unit,
     onDrawingChanged: (ByteArray, Int, Int) -> Unit,
 ) {
+    val context = LocalContext.current
     var strokes by remember { mutableStateOf<List<HandwritingStroke>>(emptyList()) }
     var activeStroke by remember { mutableStateOf<HandwritingStroke>(emptyList()) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
@@ -62,6 +65,7 @@ internal fun HandwritingPanel(
         modifier = modifier
             .onGloballyPositioned { coordinates ->
                 canvasSize = coordinates.size
+                HandwritingCanvasGeometry.record(context, coordinates.size)
                 val bounds = coordinates.boundsInRoot()
                 onBoundsChanged(Rect(bounds.left, bounds.top, bounds.right, bounds.bottom))
             }

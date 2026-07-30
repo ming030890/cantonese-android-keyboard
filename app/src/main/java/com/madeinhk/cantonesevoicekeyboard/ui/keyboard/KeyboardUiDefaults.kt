@@ -16,6 +16,9 @@ object KeyboardUiDefaults {
     val VerticalKeyInset = 5.dp
     val BottomRowKeySpacing = 2.dp
     val ToolbarHeight = 48.dp
+    val WritingTopPadding = 4.dp
+    val WritingBottomPadding = 20.dp
+    val WritingPanelSpacing = 4.dp
     val ToolbarIconTouchSize = 48.dp
     val ToolbarIconSize = 24.dp
     val ToolbarSettingsIconSize = 22.dp
@@ -44,6 +47,16 @@ object KeyboardUiDefaults {
     const val AndroidMaximumVibrationAmplitude = 255
     const val AndroidMinimumVibrationAmplitude = 1
 }
+
+fun handwritingCanvasHeight(navigationBarHeight: Dp): Dp =
+    (
+        KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp -
+            navigationBarHeight -
+            KeyboardUiDefaults.WritingTopPadding -
+            KeyboardUiDefaults.WritingBottomPadding -
+            KeyboardUiDefaults.ToolbarHeight -
+            KeyboardUiDefaults.WritingPanelSpacing
+        ).coerceAtLeast(1.dp)
 
 data class KeyboardHapticConfig(
     val enabled: Boolean = true,

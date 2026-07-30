@@ -5,8 +5,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import androidx.compose.ui.unit.dp
 
 class KeyboardUiDefaultsTest {
+    @Test
+    fun handwritingCanvasUsesTheRemainingKeyboardSurfaceHeight() {
+        assertEquals(269.dp, handwritingCanvasHeight(24.dp))
+        assertEquals(293.dp, handwritingCanvasHeight(0.dp))
+    }
+
     @Test
     fun layoutUsesMinimumRowsAndStandardUnits() {
         val dimensions = keyboardLayoutDimensions(
