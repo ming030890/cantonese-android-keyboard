@@ -38,7 +38,7 @@ class HandwritingBitmapTest {
 
     @Test
     fun displayAndInferenceUseTheSameStrokeWidthRule() {
-        assertEquals(7f, handwritingStrokeWidthPx(400f, 200f))
-        assertEquals(5f, handwritingStrokeWidthPx(100f, 100f))
+        assertEquals(5f, handwritingStrokeWidthPx(400f, 200f))
+        assertEquals(3f, handwritingStrokeWidthPx(100f, 100f))
     }
 }

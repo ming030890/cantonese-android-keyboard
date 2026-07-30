@@ -152,7 +152,8 @@ private fun MotionEvent.handwritingSamples(): List<Offset> = buildList(historySi
 }
 
 internal fun handwritingStrokeWidthPx(width: Float, height: Float): Float =
-    (minOf(width, height) * 0.035f).coerceAtLeast(5f)
+    (minOf(width, height) * KeyboardUiDefaults.HandwritingStrokeWidthFraction)
+        .coerceAtLeast(KeyboardUiDefaults.MinimumHandwritingStrokeWidthPx)
 
 internal fun handwritingBitmap(
     strokes: List<HandwritingStroke>,

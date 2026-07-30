@@ -29,6 +29,9 @@ object KeyboardUiDefaults {
     val VoiceRecordVisualSize = 64.dp
     val VoiceRecordIconSize = 32.dp
 
+    const val HandwritingStrokeWidthFraction = 0.025f
+    const val MinimumHandwritingStrokeWidthPx = 3f
+
     const val MinimumRowCount = 4
     const val StandardRowUnits = 10f
 
