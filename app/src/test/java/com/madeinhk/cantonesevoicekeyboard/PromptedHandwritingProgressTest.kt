@@ -20,6 +20,20 @@ class PromptedHandwritingProgressTest {
     }
 
     @Test
+    fun preferredCharactersComeFirstAndTheRemainderStaysComplete() {
+        val labels = listOf("人", "口", "手", "心", "日")
+        val order = PromptedHandwritingProgress.shuffledClassIds(
+            labels,
+            "writer",
+            "inventory",
+            preferredCharacters = listOf("心", "missing", "心", "人"),
+        )
+
+        assertEquals(listOf(3, 0), order.take(2))
+        assertEquals(labels.indices.toSet(), order.toSet())
+    }
+
+    @Test
     fun nextCharacterNeverRepeatsAndDeferredCharactersFallBack() {
         val order = listOf(3, 1, 2, 0)
         assertEquals(2, PromptedHandwritingProgress.nextClassId(order, setOf(3, 1)))

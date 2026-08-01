@@ -59,6 +59,8 @@ import com.madeinhk.cantonesevoicekeyboard.PromptedHandwritingProgress
 import com.madeinhk.cantonesevoicekeyboard.PromptedHandwritingStore
 import com.madeinhk.cantonesevoicekeyboard.PromptedHandwritingSync
 import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
+import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingInferenceIdleDelayMillis
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognizer
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.PromptedHandwritingCanvas
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardUiDefaults
@@ -66,6 +68,7 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.handwritingCanvasHeight
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.promptedHandwritingBitmap
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.rememberPromptedInkState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -102,6 +105,9 @@ fun PromptedHandwritingScreen(
     val inventory = remember {
         val bytes = context.assets.open("handwriting/labels.txt").use { it.readBytes() }
         val labels = bytes.toString(Charsets.UTF_8).lineSequence().filter(String::isNotEmpty).toList()
+        val commonCharacters = context.resources.openRawResource(R.raw.common_characters).bufferedReader().useLines { lines ->
+            lines.filter(String::isNotEmpty).toList()
+        }
         val hash = PromptedHandwritingProgress.inventoryHash(bytes)
         ChallengeInventory(
             labels,
@@ -110,6 +116,7 @@ fun PromptedHandwritingScreen(
                 labels,
                 PromptedHandwritingProgress.writerId(context),
                 hash,
+                preferredCharacters = commonCharacters,
             ),
         )
     }
@@ -125,6 +132,8 @@ fun PromptedHandwritingScreen(
             )
         )
     }
+    var candidates by remember { mutableStateOf(emptyList<HandwritingCandidate>()) }
+    var recognizing by remember { mutableStateOf(false) }
     var processing by remember { mutableStateOf(false) }
     var pendingCount by remember {
         mutableIntStateOf(PromptedHandwritingStore.list(context).count { !it.synced })
@@ -135,6 +144,8 @@ fun PromptedHandwritingScreen(
     }
 
     fun chooseNext(updated: PromptedChallengeProgress = progress) {
+        candidates = emptyList()
+        recognizing = false
         currentClassId = PromptedHandwritingProgress.nextClassId(
             inventory.order,
             updated.completedClassIds,
@@ -169,6 +180,32 @@ fun PromptedHandwritingScreen(
         onDispose {
             recognizer?.close()
             PromptedHandwritingSync.enqueue(context)
+        }
+    }
+
+    LaunchedEffect(currentClassId, ink.strokes, recognizer) {
+        val classId = currentClassId ?: return@LaunchedEffect
+        val snapshot = ink.snapshot()
+        if (!snapshot.isUsable) {
+            candidates = emptyList()
+            recognizing = false
+            return@LaunchedEffect
+        }
+        delay(HandwritingInferenceIdleDelayMillis)
+        val engine = recognizer ?: return@LaunchedEffect
+        recognizing = true
+        val nextCandidates = runCatching {
+            withContext(Dispatchers.Default) {
+                val bitmap = promptedHandwritingBitmap(snapshot)
+                // Keep the challenge preview on the same native preprocessing and
+                // inference path as the saved sample and the keyboard itself.
+                engine.modelInputPixels(bitmap.pixels, bitmap.width, bitmap.height)
+                engine.predict(bitmap.pixels, bitmap.width, bitmap.height, topK = 4)
+            }
+        }.getOrElse { emptyList() }
+        if (classId == currentClassId && snapshot == ink.snapshot()) {
+            candidates = nextCandidates
+            recognizing = false
         }
     }
 
@@ -320,6 +357,11 @@ fun PromptedHandwritingScreen(
                     }
                 }
             }
+            ChallengeCandidates(
+                candidates = candidates,
+                recognizing = recognizing,
+                modifier = Modifier.padding(top = 12.dp),
+            )
             Spacer(Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -377,6 +419,82 @@ fun PromptedHandwritingScreen(
                     stringResource(R.string.challenge_choose_drive_hint),
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChallengeCandidates(
+    candidates: List<HandwritingCandidate>,
+    recognizing: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    if (candidates.isEmpty() && !recognizing) return
+
+    Card(
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(14.dp),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.challenge_candidates_title),
+                    fontWeight = FontWeight.SemiBold,
+                )
+                if (recognizing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.height(18.dp).width(18.dp),
+                        strokeWidth = 2.dp,
+                    )
+                }
+            }
+            if (candidates.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    candidates.take(4).forEachIndexed { index, candidate ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(58.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outlineVariant,
+                                    RoundedCornerShape(10.dp),
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "${index + 1}",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 11.sp,
+                                )
+                                Text(
+                                    text = candidate.text,
+                                    fontSize = 26.sp,
+                                    lineHeight = 28.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                Text(
+                    text = stringResource(R.string.challenge_candidates_loading),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
                 )
             }
         }

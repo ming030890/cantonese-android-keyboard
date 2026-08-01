@@ -54,6 +54,8 @@
     <string name="challenge_clear">清除</string>
     <string name="challenge_skip">跳过</string>
     <string name="challenge_next">保存并继续</string>
+    <string name="challenge_candidates_title">前 4 个候选字</string>
+    <string name="challenge_candidates_loading">识别中…</string>
     <string name="challenge_milestone">✨ 今天已写 %1$d 个，节奏很好！</string>
     <string name="challenge_goal_complete">🏆 完成今日挑战！想继续也可以。</string>
     <string name="challenge_choose_drive_hint">选择云端硬盘文件夹即可自动备份；目前仍可离线收集。</string>

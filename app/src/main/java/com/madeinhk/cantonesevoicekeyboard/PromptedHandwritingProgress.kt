@@ -77,11 +77,21 @@ internal object PromptedHandwritingProgress {
         labels: List<String>,
         writerId: String,
         inventoryHash: String,
+        preferredCharacters: List<String> = emptyList(),
     ): List<Int> {
         val digest = MessageDigest.getInstance("SHA-256")
             .digest("$writerId:$inventoryHash".toByteArray())
         val seed = ByteBuffer.wrap(digest.copyOfRange(0, Long.SIZE_BYTES)).long
-        return labels.indices.shuffled(Random(seed))
+        val classIds = labels.withIndex().associate { it.value to it.index }
+        val preferredIds = preferredCharacters.asSequence()
+            .mapNotNull(classIds::get)
+            .distinct()
+            .toList()
+        val preferredSet = preferredIds.toSet()
+        val remainingIds = labels.indices
+            .filterNot(preferredSet::contains)
+            .shuffled(Random(seed))
+        return preferredIds + remainingIds
     }
 
     fun nextClassId(

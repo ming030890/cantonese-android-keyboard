@@ -57,6 +57,8 @@
     <string name="challenge_clear">Clear</string>
     <string name="challenge_skip">Skip</string>
     <string name="challenge_next">Save &amp; next</string>
+    <string name="challenge_candidates_title">Top 4 candidates</string>
+    <string name="challenge_candidates_loading">Recognizing…</string>
     <string name="challenge_milestone">✨ %1$d today — great rhythm!</string>
     <string name="challenge_goal_complete">🏆 Daily challenge complete! Keep going if you like.</string>
     <string name="challenge_choose_drive_hint">Choose a Drive folder to enable automatic backup. Collection works offline meanwhile.</string>
