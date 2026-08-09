@@ -19,17 +19,20 @@ echo -e "${COLOR_INFO}==========================================================
 # ---------------------------------------------------------------------------
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE="com.madeinhk.cantonesevoicekeyboard"
+QWEN_ASR_DIR="${QWEN_ASR_DIR:-$PROJECT_DIR/../QwenASR}"
+QWEN_ASR_TARGET_DIR="${QWEN_ASR_TARGET_DIR:-/private/tmp/qwen-asr-android-release-target}"
+HANDWRITING_TARGET_DIR="${HANDWRITING_TARGET_DIR:-/private/tmp/handwriting-android-release-target}"
 
 # Where the raw model lives on the build machine. scripts/reshard_model.py
 # splits its model.safetensors into two ≤480 MiB shards across the two packs.
-SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8-v16-manual-code-switching-cp4000"
+SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8-v20-keyboard-replay-epoch03-mobile"
 # Two asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shard 2 in pack B. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
 PACK_A_ASSETS="$PROJECT_DIR/model_pack_a/src/main/assets/qwen-asr-m4-lmhead-int8"
 PACK_B_ASSETS="$PROJECT_DIR/model_pack_b/src/main/assets/qwen-asr-m4-lmhead-int8"
 RESHARD_SCRIPT="$PROJECT_DIR/scripts/reshard_model.py"
-HANDWRITING_SOURCE_DIR="/Volumes/SSD/stust-handwriting-full/artifacts/type2-baseline-runpod-eu-cz"
+HANDWRITING_SOURCE_DIR="/Volumes/SSD/stust-handwriting-full/artifacts/sdt-traditional-recognition-full-lr1e-3"
 HANDWRITING_ASSETS="$PROJECT_DIR/app/src/main/assets/handwriting"
 
 # Pinned bundletool; auto-downloaded into .tools/ on first use.
@@ -89,38 +92,39 @@ SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libqwen_asr.so"
 HWR_SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libstust_handwriting_inference.so"
 
 echo -e "${COLOR_INFO}[Step 2/7] Compiling native libraries...${COLOR_RESET}"
-if [ ! -d "$PROJECT_DIR/../QwenASR" ]; then
-    echo -e "${COLOR_ERROR}Error: QwenASR workspace directory not found at '../QwenASR'.${COLOR_RESET}"
+if [ ! -d "$QWEN_ASR_DIR" ]; then
+    echo -e "${COLOR_ERROR}Error: QwenASR workspace directory not found at '$QWEN_ASR_DIR'.${COLOR_RESET}"
     exit 1
 fi
 
-pushd "$PROJECT_DIR/../QwenASR" > /dev/null
+pushd "$QWEN_ASR_DIR" > /dev/null
 
 echo -e "${COLOR_INFO}Building Rust crate 'qwen-asr' with native DOTPROD features and OpenBLAS...${COLOR_RESET}"
 
-CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/Users/tony/Documents/keyboard/QwenASR/android-aarch64-clang \
-CC_aarch64_linux_android=/Users/tony/Documents/keyboard/QwenASR/android-aarch64-clang \
+CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$QWEN_ASR_DIR/android-aarch64-clang" \
+CC_aarch64_linux_android="$QWEN_ASR_DIR/android-aarch64-clang" \
 AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar \
 RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
 RUSTFLAGS="-C target-feature=+dotprod" \
 PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
 OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
 OPENBLAS_ANDROID_STATIC=1 \
+CARGO_TARGET_DIR="$QWEN_ASR_TARGET_DIR" \
 cargo build --release --target aarch64-linux-android --features "blas android" -p qwen-asr
 
 popd > /dev/null
 
 echo -e "${COLOR_INFO}Copying compiled .so to keyboard project...${COLOR_RESET}"
 mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
-cp "$PROJECT_DIR/../QwenASR/target/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
+cp "$QWEN_ASR_TARGET_DIR/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
 echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
 
 echo -e "${COLOR_INFO}Compiling the Rust handwriting inference library...${COLOR_RESET}"
 pushd "$PROJECT_DIR/../handwriting-recognizer/rust" > /dev/null
-cargo ndk -t arm64-v8a build --release --features android
+CARGO_TARGET_DIR="$HANDWRITING_TARGET_DIR" cargo ndk -t arm64-v8a build --release --features android
 popd > /dev/null
 mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
-cp "$PROJECT_DIR/../handwriting-recognizer/rust/target/aarch64-linux-android/release/libstust_handwriting_inference.so" "$HWR_SO_DEST"
+cp "$HANDWRITING_TARGET_DIR/aarch64-linux-android/release/libstust_handwriting_inference.so" "$HWR_SO_DEST"
 echo -e "${COLOR_SUCCESS}Handwriting native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
 
 # ---------------------------------------------------------------------------
