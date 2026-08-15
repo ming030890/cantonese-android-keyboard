@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Split a single safetensors file into N shards that each fit under Play's
+Split all model safetensors files into N shards that each fit under Play's
 512 MB per-asset-pack limit, using the HuggingFace
 `model-XXXXX-of-YYYYY.safetensors` naming convention.
 
@@ -148,8 +148,15 @@ def sha256_file(path: Path):
     return h.hexdigest()
 
 
-def build_source_manifest(source: Path, limit: int):
-    files = {"model.safetensors": sha256_file(source / "model.safetensors")}
+def source_model_paths(source: Path):
+    paths = sorted(source.glob("model*.safetensors"))
+    if not paths:
+        sys.exit(f"error: no model*.safetensors files found in {source}")
+    return paths
+
+
+def build_source_manifest(source: Path, model_paths: list[Path], limit: int):
+    files = {path.name: sha256_file(path) for path in model_paths}
     for name in TOKENIZER_FILES:
         path = source / name
         if path.exists():
@@ -172,9 +179,17 @@ def write_manifest(path: Path, manifest):
     path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 
 
-def reshard_raw(src_model: Path, pack_a: Path, pack_b: Path, limit: int):
-    print(f"loading {src_model} without safetensors/torch ...")
-    tensors = load_safetensors_raw(src_model)
+def reshard_raw(src_models: list[Path], pack_a: Path, pack_b: Path, limit: int):
+    print("loading source shards without safetensors/torch ...")
+    tensors = {}
+    for src_model in src_models:
+        print(f"  {src_model}")
+        loaded = load_safetensors_raw(src_model)
+        duplicates = tensors.keys() & loaded.keys()
+        if duplicates:
+            names = ", ".join(sorted(duplicates)[:3])
+            sys.exit(f"error: duplicate tensors across source shards: {names}")
+        tensors.update(loaded)
     total = sum(len(raw) for _, raw in tensors.values())
     print(f"  {len(tensors)} tensors, {total / 1024 / 1024:.1f} MiB total")
 
@@ -215,14 +230,12 @@ def main():
     pack_a = Path(args.pack_a)
     pack_b = Path(args.pack_b)
 
-    src_model = source / "model.safetensors"
-    if not src_model.exists():
-        sys.exit(f"error: {src_model} not found")
+    src_models = source_model_paths(source)
 
     shard1_path = pack_a / "model-00001-of-00002.safetensors"
     shard2_path = pack_b / "model-00002-of-00002.safetensors"
     manifest_path = pack_a / RESHARD_MANIFEST
-    source_manifest = build_source_manifest(source, limit)
+    source_manifest = build_source_manifest(source, src_models, limit)
 
     # Idempotency check: preserve existing shard bytes for code-only releases.
     # A forced rewrite makes Play treat the fast-follow asset packs as changed,
@@ -234,7 +247,7 @@ def main():
             _copy_tokenizer(source, pack_a)
             return
 
-        src_size = src_model.stat().st_size
+        src_size = sum(path.stat().st_size for path in src_models)
         out_size = shard1_path.stat().st_size + shard2_path.stat().st_size
         # The source and split shards each have their own safetensors headers,
         # so the shard total can be slightly larger or smaller. If the delta is
@@ -253,17 +266,23 @@ def main():
         import torch  # noqa: F401  (safetensors.torch needs torch present)
     except ImportError as e:
         print(f"warning: {e}; falling back to raw safetensors sharding")
-        reshard_raw(src_model, pack_a, pack_b, limit)
+        reshard_raw(src_models, pack_a, pack_b, limit)
         _copy_tokenizer(source, pack_a)
         write_manifest(manifest_path, source_manifest)
         print("done.")
         return
 
-    print(f"loading {src_model} ...")
+    print("loading source shards ...")
     tensors = {}
-    with safe_open(str(src_model), framework="pt") as f:
-        for key in f.keys():
-            tensors[key] = f.get_tensor(key)
+    for src_model in src_models:
+        print(f"  {src_model}")
+        with safe_open(str(src_model), framework="pt") as f:
+            duplicates = tensors.keys() & set(f.keys())
+            if duplicates:
+                names = ", ".join(sorted(duplicates)[:3])
+                sys.exit(f"error: duplicate tensors across source shards: {names}")
+            for key in f.keys():
+                tensors[key] = f.get_tensor(key)
     total = sum(t.numel() * t.element_size() for t in tensors.values())
     print(f"  {len(tensors)} tensors, {total / 1024 / 1024:.1f} MiB total")
 

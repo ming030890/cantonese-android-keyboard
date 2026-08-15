@@ -23,9 +23,9 @@ QWEN_ASR_DIR="${QWEN_ASR_DIR:-$PROJECT_DIR/../QwenASR}"
 QWEN_ASR_TARGET_DIR="${QWEN_ASR_TARGET_DIR:-/private/tmp/qwen-asr-android-release-target}"
 HANDWRITING_TARGET_DIR="${HANDWRITING_TARGET_DIR:-/private/tmp/handwriting-android-release-target}"
 
-# Where the raw model lives on the build machine. scripts/reshard_model.py
-# splits its model.safetensors into two ≤480 MiB shards across the two packs.
-SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-m4-lmhead-int8-v20-keyboard-replay-epoch03-mobile"
+# Where the converted model lives on the build machine. scripts/reshard_model.py
+# combines and splits its model*.safetensors tensors into two ≤480 MiB shards.
+SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-v20-0.6b-kleidiai-i8mm-full-encoder-packed"
 # Two asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shard 2 in pack B. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
@@ -107,10 +107,11 @@ AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolc
 RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
 RUSTFLAGS="-C target-feature=+dotprod" \
 PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
-OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
+OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS-0.3.34 \
 OPENBLAS_ANDROID_STATIC=1 \
+KLEIDIAI_LIB_DIR=/private/tmp/qwen-kleidiai-review/build-android-qwen \
 CARGO_TARGET_DIR="$QWEN_ASR_TARGET_DIR" \
-cargo build --release --target aarch64-linux-android --features "blas android" -p qwen-asr
+cargo build --release --target aarch64-linux-android --features "blas android kleidiai" -p qwen-asr
 
 popd > /dev/null
 
