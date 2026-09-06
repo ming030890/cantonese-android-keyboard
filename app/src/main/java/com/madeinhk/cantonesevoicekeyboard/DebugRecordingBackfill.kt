@@ -29,7 +29,8 @@ object DebugRecordingBackfill {
             var completed = 0
             var failed = 0
             try {
-                if (!engine.loadModel(modelDir.absolutePath, 1)) {
+                val optimalThreads = Runtime.getRuntime().availableProcessors().coerceIn(2, 4)
+                if (!engine.loadModel(modelDir.absolutePath, optimalThreads)) {
                     return@withContext DebugBackfillResult(0, missing.size)
                 }
                 engine.setLanguage("Cantonese")
