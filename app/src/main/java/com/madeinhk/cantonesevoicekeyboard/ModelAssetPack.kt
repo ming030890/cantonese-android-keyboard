@@ -197,6 +197,13 @@ object ModelAssetPack {
             return null
         }
 
+        // Clean out any stale or orphaned symlinks from previous model releases
+        // (e.g. migrating from 2 shards to 5 shards) so broken symlinks never
+        // corrupt MultiSafetensors loading.
+        staged.list()?.forEach { name ->
+            File(staged, name).delete()
+        }
+
         // Rebuild symlinks every time: cheap, and absorbs pack-update path
         // changes when Play swaps in a new pack version.
         for (pack in packDirs) {
