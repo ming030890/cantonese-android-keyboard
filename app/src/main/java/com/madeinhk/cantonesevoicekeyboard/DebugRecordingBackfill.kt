@@ -29,7 +29,7 @@ object DebugRecordingBackfill {
             var completed = 0
             var failed = 0
             try {
-                val optimalThreads = Runtime.getRuntime().availableProcessors().coerceIn(2, 4)
+                val optimalThreads = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
                 if (!engine.loadModel(modelDir.absolutePath, optimalThreads)) {
                     return@withContext DebugBackfillResult(0, missing.size)
                 }

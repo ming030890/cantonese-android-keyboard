@@ -154,7 +154,7 @@ internal class VoiceInputCoordinator(
                 }
                 val success = engineMutex.withLock {
                     val activeEngine = getOrCreateEngine()
-                    val optimalThreads = Runtime.getRuntime().availableProcessors().coerceIn(2, 4)
+                    val optimalThreads = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
                     val loaded = activeEngine.loadModel(modelDir.absolutePath, optimalThreads)
                     if (loaded) {
                         activeEngine.setLanguage("Cantonese")
