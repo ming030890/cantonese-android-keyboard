@@ -7,7 +7,7 @@ This repository contains the Android IME and its packaging/deployment flow. The 
 - `../QwenASR` — Rust Qwen ASR engine and Android JNI implementation.
 - `app/src/main/java/com/madeinhk/cantonesevoicekeyboard/` — keyboard service, recording lifecycle, and text insertion.
 - `app/src/main/java/com/qwenasr/QAsrEngine.kt` — Kotlin wrapper for the native JNI API.
-- `model_pack_a/` and `model_pack_b/` — Play Asset Delivery model packs.
+- `model_pack_a/` through `model_pack_e/` — Play Asset Delivery model packs.
 - `deploy.sh` — canonical build, model-staging, packaging, and deployment entry point.
 - `BUILD_SO.md` — manual native-library build reference.
 - `RUN_TEST.md` — instrumented QAsrEngine test workflow.

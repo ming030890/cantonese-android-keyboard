@@ -54,9 +54,13 @@ sealed interface ModelDownloadStatus {
 object ModelAssetPack {
     const val PACK_A = "model_pack_a"
     const val PACK_B = "model_pack_b"
+    const val PACK_C = "model_pack_c"
+    const val PACK_D = "model_pack_d"
+    const val PACK_E = "model_pack_e"
     const val MODEL_DIR_NAME = "qwen-asr-m4-lmhead-int8"
-    private val PACKS = listOf(PACK_A, PACK_B)
+    private val PACKS = listOf(PACK_A, PACK_B, PACK_C, PACK_D, PACK_E)
     private const val TAG = "ModelAssetPack"
+
 
     /** True if both packs are already downloaded and the staged dir can be built. */
     fun isModelAvailable(context: Context): Boolean = stageModelDir(context) != null

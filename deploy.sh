@@ -24,13 +24,16 @@ QWEN_ASR_TARGET_DIR="${QWEN_ASR_TARGET_DIR:-/private/tmp/qwen-asr-android-releas
 HANDWRITING_TARGET_DIR="${HANDWRITING_TARGET_DIR:-/private/tmp/handwriting-android-release-target}"
 
 # Where the converted model lives on the build machine. scripts/reshard_model.py
-# combines and splits its model*.safetensors tensors into two ≤480 MiB shards.
-SOURCE_MODEL_DIR="/Volumes/SSD/qwen-asr-v20-0.6b-kleidiai-i8mm-full-encoder-packed"
-# Two asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
-# shard 2 in pack B. Files placed here are delivered to the device by Play
+# combines and splits its model*.safetensors tensors into five ≤480 MiB shards.
+SOURCE_MODEL_DIR="/Volumes/SSD/qwen3_asr_17b_staged_qat_v18_pack/int8_exports/stage2a_qat_projector_checkpoint-500-kleidiai-packed"
+# Five asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
+# shards 2..5 in packs B..E. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
 PACK_A_ASSETS="$PROJECT_DIR/model_pack_a/src/main/assets/qwen-asr-m4-lmhead-int8"
 PACK_B_ASSETS="$PROJECT_DIR/model_pack_b/src/main/assets/qwen-asr-m4-lmhead-int8"
+PACK_C_ASSETS="$PROJECT_DIR/model_pack_c/src/main/assets/qwen-asr-m4-lmhead-int8"
+PACK_D_ASSETS="$PROJECT_DIR/model_pack_d/src/main/assets/qwen-asr-m4-lmhead-int8"
+PACK_E_ASSETS="$PROJECT_DIR/model_pack_e/src/main/assets/qwen-asr-m4-lmhead-int8"
 RESHARD_SCRIPT="$PROJECT_DIR/scripts/reshard_model.py"
 HANDWRITING_SOURCE_DIR="/Volumes/SSD/stust-handwriting-full/artifacts/sdt-traditional-recognition-full-lr1e-3"
 HANDWRITING_ASSETS="$PROJECT_DIR/app/src/main/assets/handwriting"
@@ -107,9 +110,9 @@ AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolc
 RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
 RUSTFLAGS="-C target-feature=+dotprod" \
 PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
-OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS-0.3.34 \
+OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
 OPENBLAS_ANDROID_STATIC=1 \
-KLEIDIAI_LIB_DIR=/private/tmp/qwen-kleidiai-review/build-android-qwen \
+KLEIDIAI_LIB_DIR=/private/tmp/qwen-v18-kleidiai/build-android \
 CARGO_TARGET_DIR="$QWEN_ASR_TARGET_DIR" \
 cargo build --release --target aarch64-linux-android --features "blas android kleidiai" -p qwen-asr
 
@@ -129,11 +132,25 @@ cp "$HANDWRITING_TARGET_DIR/aarch64-linux-android/release/libstust_handwriting_i
 echo -e "${COLOR_SUCCESS}Handwriting native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
 
 # ---------------------------------------------------------------------------
-# 3. Stage the ASR model into the Play Asset Delivery pack
+# 3. Stage the ASR model into the Play Asset Delivery packs
 # ---------------------------------------------------------------------------
-echo -e "${COLOR_INFO}[Step 3/7] Staging Qwen ASR model shards into both asset packs...${COLOR_RESET}"
-SHARD_A="$PACK_A_ASSETS/model-00001-of-00002.safetensors"
-SHARD_B="$PACK_B_ASSETS/model-00002-of-00002.safetensors"
+echo -e "${COLOR_INFO}[Step 3/7] Staging Qwen ASR model shards into 5 asset packs...${COLOR_RESET}"
+ALL_SHARDS_EXIST=true
+for i in 1 2 3 4 5; do
+    SHARD_FILE="model-$(printf "%05d" "$i")-of-00005.safetensors"
+    case $i in
+        1) PACK_DIR="$PACK_A_ASSETS" ;;
+        2) PACK_DIR="$PACK_B_ASSETS" ;;
+        3) PACK_DIR="$PACK_C_ASSETS" ;;
+        4) PACK_DIR="$PACK_D_ASSETS" ;;
+        5) PACK_DIR="$PACK_E_ASSETS" ;;
+    esac
+    if [ ! -f "$PACK_DIR/$SHARD_FILE" ]; then
+        ALL_SHARDS_EXIST=false
+        break
+    fi
+done
+
 if [ -d "$SOURCE_MODEL_DIR" ]; then
     if ! command -v python3 &> /dev/null; then
         echo -e "${COLOR_ERROR}Error: python3 required to reshard the model.${COLOR_RESET}"
@@ -142,14 +159,13 @@ if [ -d "$SOURCE_MODEL_DIR" ]; then
     echo -e "${COLOR_INFO}Running reshard_model.py from $SOURCE_MODEL_DIR...${COLOR_RESET}"
     python3 "$RESHARD_SCRIPT" \
         --source "$SOURCE_MODEL_DIR" \
-        --pack-a "$PACK_A_ASSETS" \
-        --pack-b "$PACK_B_ASSETS"
-    echo -e "${COLOR_SUCCESS}Shards staged into both asset packs.${COLOR_RESET}"
-elif [ -f "$SHARD_A" ] && [ -f "$SHARD_B" ]; then
+        --packs "$PACK_A_ASSETS" "$PACK_B_ASSETS" "$PACK_C_ASSETS" "$PACK_D_ASSETS" "$PACK_E_ASSETS"
+    echo -e "${COLOR_SUCCESS}Shards staged into all 5 asset packs.${COLOR_RESET}"
+elif [ "$ALL_SHARDS_EXIST" = "true" ]; then
     echo -e "${COLOR_SUCCESS}Shards already staged. Skipping reshard.${COLOR_RESET}"
 else
     echo -e "${COLOR_ERROR}Error: Shards not staged and source '$SOURCE_MODEL_DIR' not found.${COLOR_RESET}"
-    echo -e "${COLOR_ERROR}Either place shards under '$PACK_A_ASSETS' and '$PACK_B_ASSETS',${COLOR_RESET}"
+    echo -e "${COLOR_ERROR}Either place shards under packs A-E,${COLOR_RESET}"
     echo -e "${COLOR_ERROR}or place the source model at '$SOURCE_MODEL_DIR' so the script can shard it.${COLOR_RESET}"
     exit 1
 fi
@@ -243,7 +259,7 @@ LOCAL_TESTING_DIR="/sdcard/Android/data/$PACKAGE/files/local_testing"
 # Freshness check across both packs: skip the full install only when every
 # pack's master split on-device matches what we just built.
 NEED_FULL_INSTALL=false
-for PACK in model_pack_a model_pack_b; do
+for PACK in model_pack_a model_pack_b model_pack_c model_pack_d model_pack_e; do
     PACK_ENTRY=$(unzip -Z1 "$APKS_PATH" 2>/dev/null | grep -E "${PACK}.*\.apk$" | head -n1)
     DEVICE_PACK="$LOCAL_TESTING_DIR/${PACK}-master.apk"
     if [ -z "$PACK_ENTRY" ]; then
@@ -270,7 +286,7 @@ else
     rm -rf "$APP_SPLITS_DIR"
     mkdir -p "$APP_SPLITS_DIR"
     # Extract only the app splits (everything except the asset packs) and reinstall them.
-    unzip -Z1 "$APKS_PATH" | grep -E '\.apk$' | grep -Ev 'model_pack_a|model_pack_b' | while read -r entry; do
+    unzip -Z1 "$APKS_PATH" | grep -E '\.apk$' | grep -Ev 'model_pack_[a-e]' | while read -r entry; do
         unzip -o -j -q "$APKS_PATH" "$entry" -d "$APP_SPLITS_DIR"
     done
     "$ADB" -s "$DEVICE_ID" install-multiple -r -d "$APP_SPLITS_DIR"/*.apk

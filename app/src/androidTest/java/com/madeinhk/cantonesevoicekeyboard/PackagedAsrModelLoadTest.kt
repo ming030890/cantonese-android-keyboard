@@ -18,8 +18,11 @@ class PackagedAsrModelLoadTest {
         assertNotNull("Play Asset Delivery model packs are unavailable", modelDir)
 
         val names = modelDir!!.list()?.toSet().orEmpty()
-        assertTrue("first model shard is missing", "model-00001-of-00002.safetensors" in names)
-        assertTrue("second model shard is missing", "model-00002-of-00002.safetensors" in names)
+        for (i in 1..5) {
+            val shardName = "model-%05d-of-00005.safetensors".format(i)
+            assertTrue("model shard $shardName is missing", shardName in names)
+        }
+
 
         val engine = QAsrEngine()
         try {

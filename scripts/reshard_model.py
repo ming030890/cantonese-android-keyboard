@@ -179,7 +179,7 @@ def write_manifest(path: Path, manifest):
     path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 
 
-def reshard_raw(src_models: list[Path], pack_a: Path, pack_b: Path, limit: int):
+def reshard_raw(src_models: list[Path], pack_dirs: list[Path], limit: int):
     print("loading source shards without safetensors/torch ...")
     tensors = {}
     for src_model in src_models:
@@ -194,70 +194,75 @@ def reshard_raw(src_models: list[Path], pack_a: Path, pack_b: Path, limit: int):
     print(f"  {len(tensors)} tensors, {total / 1024 / 1024:.1f} MiB total")
 
     shards = bin_pack_raw(tensors, limit)
-    if len(shards) != 2:
+    num_shards = len(shards)
+    num_packs = len(pack_dirs)
+    if num_shards > num_packs:
         sys.exit(
-            f"error: bin-pack produced {len(shards)} shards, expected 2. "
-            f"Adjust --limit-mib ({limit // 1024 // 1024} MiB)."
+            f"error: bin-pack produced {num_shards} shards, expected at most {num_packs}. "
+            f"Adjust --limit-mib ({limit // 1024 // 1024} MiB) or provide more packs."
         )
 
-    pack_a.mkdir(parents=True, exist_ok=True)
-    pack_b.mkdir(parents=True, exist_ok=True)
+    for p in pack_dirs:
+        p.mkdir(parents=True, exist_ok=True)
+        for old_shard in p.glob("model-*.safetensors"):
+            old_shard.unlink()
     shards.sort(key=lambda s: -sum(len(raw) for _, raw in s.values()))
 
-    shard1_path = pack_a / "model-00001-of-00002.safetensors"
-    shard2_path = pack_b / "model-00002-of-00002.safetensors"
-
-    print(f"writing {shard1_path} ({len(shards[0])} tensors)...")
-    save_safetensors_raw(shards[0], shard1_path)
-    print(f"  -> {shard1_path.stat().st_size / 1024 / 1024:.1f} MiB")
-
-    print(f"writing {shard2_path} ({len(shards[1])} tensors)...")
-    save_safetensors_raw(shards[1], shard2_path)
-    print(f"  -> {shard2_path.stat().st_size / 1024 / 1024:.1f} MiB")
+    for i, shard in enumerate(shards):
+        shard_path = pack_dirs[i] / f"model-{i+1:05d}-of-{num_shards:05d}.safetensors"
+        print(f"writing {shard_path} ({len(shard)} tensors)...")
+        save_safetensors_raw(shard, shard_path)
+        print(f"  -> {shard_path.stat().st_size / 1024 / 1024:.1f} MiB")
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--source", required=True, help="Directory containing the original model.safetensors + tokenizer files")
-    ap.add_argument("--pack-a", required=True, help="Output dir for shard 1 + tokenizer files (inside model_pack_a)")
-    ap.add_argument("--pack-b", required=True, help="Output dir for shard 2 (inside model_pack_b)")
+    ap.add_argument("--pack-a", help="Output dir for shard 1 + tokenizer files (inside model_pack_a)")
+    ap.add_argument("--pack-b", help="Output dir for shard 2 (inside model_pack_b)")
+    ap.add_argument("--packs", nargs="+", help="Output dirs for all asset packs in order")
     ap.add_argument("--limit-mib", type=int, default=480, help="Per-shard byte budget in MiB (default 480)")
     ap.add_argument("--force", action="store_true", help="Regenerate even if outputs look up to date")
     args = ap.parse_args()
 
     limit = args.limit_mib * 1024 * 1024
     source = Path(args.source)
-    pack_a = Path(args.pack_a)
-    pack_b = Path(args.pack_b)
+    if args.packs:
+        pack_dirs = [Path(p) for p in args.packs]
+    elif args.pack_a and args.pack_b:
+        pack_dirs = [Path(args.pack_a), Path(args.pack_b)]
+    else:
+        sys.exit("error: must provide either --packs or both --pack-a and --pack-b")
 
     src_models = source_model_paths(source)
-
-    shard1_path = pack_a / "model-00001-of-00002.safetensors"
-    shard2_path = pack_b / "model-00002-of-00002.safetensors"
-    manifest_path = pack_a / RESHARD_MANIFEST
+    manifest_path = pack_dirs[0] / RESHARD_MANIFEST
     source_manifest = build_source_manifest(source, src_models, limit)
+
+    num_packs = len(pack_dirs)
+    expected_paths = [
+        pack_dirs[i] / f"model-{i+1:05d}-of-{num_packs:05d}.safetensors"
+        for i in range(num_packs)
+    ]
+    all_exist = all(p.exists() for p in expected_paths)
 
     # Idempotency check: preserve existing shard bytes for code-only releases.
     # A forced rewrite makes Play treat the fast-follow asset packs as changed,
     # causing already-installed users to receive a huge asset-pack update.
-    if not args.force and shard1_path.exists() and shard2_path.exists():
+    if not args.force and all_exist:
         existing_manifest = read_manifest(manifest_path)
         if existing_manifest == source_manifest:
             print("shards already match recorded source fingerprint. Use --force to rebuild.")
-            _copy_tokenizer(source, pack_a)
+            _copy_tokenizer(source, pack_dirs[0])
             return
 
         src_size = sum(path.stat().st_size for path in src_models)
-        out_size = shard1_path.stat().st_size + shard2_path.stat().st_size
-        # The source and split shards each have their own safetensors headers,
-        # so the shard total can be slightly larger or smaller. If the delta is
-        # tiny, seed the manifest and treat the existing shard bytes as current.
+        out_size = sum(p.stat().st_size for p in expected_paths)
         if abs(out_size - src_size) < 2 * 1024 * 1024:
             print(f"shards already present and size-consistent ({out_size / 1024 / 1024:.1f} MiB total).")
             print(f"recording source fingerprint in {manifest_path}. Use --force to rebuild.")
-            pack_a.mkdir(parents=True, exist_ok=True)
+            pack_dirs[0].mkdir(parents=True, exist_ok=True)
             write_manifest(manifest_path, source_manifest)
-            _copy_tokenizer(source, pack_a)
+            _copy_tokenizer(source, pack_dirs[0])
             return
 
     try:
@@ -266,8 +271,8 @@ def main():
         import torch  # noqa: F401  (safetensors.torch needs torch present)
     except ImportError as e:
         print(f"warning: {e}; falling back to raw safetensors sharding")
-        reshard_raw(src_models, pack_a, pack_b, limit)
-        _copy_tokenizer(source, pack_a)
+        reshard_raw(src_models, pack_dirs, limit)
+        _copy_tokenizer(source, pack_dirs[0])
         write_manifest(manifest_path, source_manifest)
         print("done.")
         return
@@ -287,31 +292,32 @@ def main():
     print(f"  {len(tensors)} tensors, {total / 1024 / 1024:.1f} MiB total")
 
     shards = bin_pack(tensors, limit)
-    if len(shards) != 2:
+    num_shards = len(shards)
+    if num_shards > num_packs:
         sys.exit(
-            f"error: bin-pack produced {len(shards)} shards, expected 2. "
-            f"Adjust --limit-mib (currently {args.limit_mib} MiB)."
+            f"error: bin-pack produced {num_shards} shards, expected at most {num_packs}. "
+            f"Adjust --limit-mib (currently {args.limit_mib} MiB) or provide more packs."
         )
 
-    pack_a.mkdir(parents=True, exist_ok=True)
-    pack_b.mkdir(parents=True, exist_ok=True)
+    for p in pack_dirs:
+        p.mkdir(parents=True, exist_ok=True)
+        for old_shard in p.glob("model-*.safetensors"):
+            old_shard.unlink()
 
-    # Sort shards deterministically: largest first goes to shard 1 so the
-    # smaller one is in pack_b (matches typical fast-follow ordering).
+    # Sort shards deterministically: largest first
     shards.sort(key=lambda s: -sum(t.numel() * t.element_size() for t in s.values()))
 
-    print(f"writing {shard1_path} ({len(shards[0])} tensors)...")
-    save_file(shards[0], str(shard1_path))
-    print(f"  -> {shard1_path.stat().st_size / 1024 / 1024:.1f} MiB")
+    for i, shard in enumerate(shards):
+        shard_path = pack_dirs[i] / f"model-{i+1:05d}-of-{num_shards:05d}.safetensors"
+        print(f"writing {shard_path} ({len(shard)} tensors)...")
+        save_file(shard, str(shard_path))
+        print(f"  -> {shard_path.stat().st_size / 1024 / 1024:.1f} MiB")
 
-    print(f"writing {shard2_path} ({len(shards[1])} tensors)...")
-    save_file(shards[1], str(shard2_path))
-    print(f"  -> {shard2_path.stat().st_size / 1024 / 1024:.1f} MiB")
-
-    _copy_tokenizer(source, pack_a)
+    _copy_tokenizer(source, pack_dirs[0])
     write_manifest(manifest_path, source_manifest)
 
     print("done.")
+
 
 
 def _copy_tokenizer(source: Path, pack_a: Path):

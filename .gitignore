@@ -60,8 +60,7 @@ keystore.properties
 /dataset/seeds_mtr.jsonl
 
 # Generated Play Asset Delivery model shards
-/model_pack_a/src/main/assets/qwen-asr-m4-lmhead-int8/
-/model_pack_b/src/main/assets/qwen-asr-m4-lmhead-int8/
+/model_pack_*/src/main/assets/qwen-asr-m4-lmhead-int8/
 
 # Generated handwriting model bundle staged by deploy.sh
 /app/src/main/assets/handwriting/

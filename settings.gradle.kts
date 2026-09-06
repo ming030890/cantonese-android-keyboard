@@ -33,3 +33,7 @@ rootProject.name = "Cantonese Voice Keyboard"
 include(":app")
 include(":model_pack_a")
 include(":model_pack_b")
+include(":model_pack_c")
+include(":model_pack_d")
+include(":model_pack_e")
+
