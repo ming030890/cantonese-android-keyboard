@@ -101,7 +101,6 @@ internal class VoiceInputCoordinator(
         )
         if (releaseModel) {
             modelLoadingJob?.cancel()
-            modelLoadingJob = null
         }
         scope.launch(Dispatchers.Default) {
             jobs.joinAll()
@@ -137,7 +136,9 @@ internal class VoiceInputCoordinator(
             _state.value = KeyboardUiState.Idle
             return
         }
-        if (modelLoadingJob?.isActive == true) {
+        // Cancelling a coroutine cannot interrupt nativeLoadModel(). Keep treating the job as
+        // in-flight until JNI returns so a quick keyboard reopen cannot start a second load.
+        if (modelLoadingJob?.isCompleted == false) {
             _state.value = KeyboardUiState.LoadingModel
             return
         }
@@ -154,8 +155,7 @@ internal class VoiceInputCoordinator(
                 }
                 val success = engineMutex.withLock {
                     val activeEngine = getOrCreateEngine()
-                    val optimalThreads = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
-                    val loaded = activeEngine.loadModel(modelDir.absolutePath, optimalThreads)
+                    val loaded = activeEngine.loadModel(modelDir.absolutePath, 1)
                     if (loaded) {
                         activeEngine.setLanguage("Cantonese")
                         activeEngine.setChineseVariant("")
@@ -197,7 +197,12 @@ internal class VoiceInputCoordinator(
             }
         }
         modelLoadingJob = load
-        load.invokeOnCompletion { if (modelLoadingJob === load) modelLoadingJob = null }
+        load.invokeOnCompletion { cause ->
+            if (modelLoadingJob === load) modelLoadingJob = null
+            if (cause is CancellationException && isInputViewVisible() && !modelLoaded) {
+                scope.launch { ensureModelLoadingStarted(currentSession()) }
+            }
+        }
     }
 
     private fun getOrCreateEngine(): QAsrEngine =
@@ -262,20 +267,21 @@ internal class VoiceInputCoordinator(
         activeDebugTranscript = debugTranscript
         val session = currentSession()
         val voiceGeneration = ++generation
-        var composingTranscript = ""
         val listener = object : QAsrEngine.VadListener {
             override fun onTranscriptDelta(textDelta: String) {
                 if (voiceGeneration != generation) return
                 debugTranscript.append(textDelta)
+            }
+
+            override fun onHypothesisChanged(text: String) {
+                if (voiceGeneration != generation) return
                 scope.launch {
                     if (
                         isInputViewVisible() &&
                         session == currentSession() &&
-                        voiceGeneration == generation &&
-                        textDelta.isNotEmpty()
+                        voiceGeneration == generation
                     ) {
-                        composingTranscript += textDelta
-                        editor.setComposingText(composingTranscript)
+                        editor.setComposingText(text)
                     }
                 }
             }
@@ -287,7 +293,6 @@ internal class VoiceInputCoordinator(
                         session == currentSession() &&
                         voiceGeneration == generation
                     ) editor.finishComposingText()
-                    composingTranscript = ""
                 }
             }
 
@@ -301,7 +306,6 @@ internal class VoiceInputCoordinator(
                         editor.setComposingText("")
                         editor.finishComposingText()
                     }
-                    composingTranscript = ""
                 }
             }
         }

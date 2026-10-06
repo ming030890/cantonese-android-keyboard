@@ -7,6 +7,7 @@ import java.nio.ByteBuffer
 class QAsrEngine {
     interface VadListener {
         fun onTranscriptDelta(textDelta: String)
+        fun onHypothesisChanged(text: String)
         fun onTranscriptComplete()
         fun onTranscriptError()
     }

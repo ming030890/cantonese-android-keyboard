@@ -36,7 +36,12 @@ from pathlib import Path
 # for the safetensors header and any future tensor reordering.
 SHARD_LIMIT_BYTES = 480 * 1024 * 1024
 
-TOKENIZER_FILES = ["vocab.json", "merges.txt"]
+TOKENIZER_FILES = [
+    "vocab.json",
+    "merges.txt",
+    "cantonese_zhconv_adapter.json",
+    "cantonese_zhconv_adapter.safetensors",
+]
 RESHARD_MANIFEST = ".reshard_manifest.json"
 
 

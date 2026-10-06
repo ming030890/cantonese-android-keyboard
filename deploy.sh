@@ -25,7 +25,7 @@ HANDWRITING_TARGET_DIR="${HANDWRITING_TARGET_DIR:-/private/tmp/handwriting-andro
 
 # Where the converted model lives on the build machine. scripts/reshard_model.py
 # combines and splits its model*.safetensors tensors into five ≤480 MiB shards.
-SOURCE_MODEL_DIR="/Volumes/SSD/qwen3_asr_17b_staged_qat_v18_pack/int8_exports/stage2a_qat_projector_checkpoint-500-kleidiai-packed"
+SOURCE_MODEL_DIR="/Volumes/SSD/Confucius4-R2T2-kleidiai-packed"
 # Five asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shards 2..5 in packs B..E. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
@@ -168,6 +168,13 @@ else
     echo -e "${COLOR_ERROR}Either place shards under packs A-E,${COLOR_RESET}"
     echo -e "${COLOR_ERROR}or place the source model at '$SOURCE_MODEL_DIR' so the script can shard it.${COLOR_RESET}"
     exit 1
+fi
+
+ADAPTER_SOURCE_DIR="$PROJECT_DIR/../dataset/cantonese-zhconv/results"
+if [ -f "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.safetensors" ] && [ -f "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.json" ]; then
+    cp "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.safetensors" "$PACK_A_ASSETS/"
+    cp "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.json" "$PACK_A_ASSETS/"
+    echo -e "${COLOR_SUCCESS}In-decoder Cantonese conversion adapter staged into pack A.${COLOR_RESET}"
 fi
 
 # ---------------------------------------------------------------------------

@@ -29,8 +29,7 @@ object DebugRecordingBackfill {
             var completed = 0
             var failed = 0
             try {
-                val optimalThreads = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
-                if (!engine.loadModel(modelDir.absolutePath, optimalThreads)) {
+                if (!engine.loadModel(modelDir.absolutePath, 1)) {
                     return@withContext DebugBackfillResult(0, missing.size)
                 }
                 engine.setLanguage("Cantonese")
@@ -72,6 +71,7 @@ object DebugRecordingBackfill {
                 transcript.append(textDelta)
             }
 
+            override fun onHypothesisChanged(text: String) = Unit
             override fun onTranscriptComplete() = Unit
             override fun onTranscriptError() = Unit
         }
