@@ -32,6 +32,7 @@ internal enum class SymbolVariant {
 
 @Composable
 internal fun NumberPanel(
+    rowHeight: Dp,
     modifier: Modifier = Modifier,
     variant: SymbolVariant,
     keyRegistry: KeyboardKeyRegistry,
@@ -53,6 +54,7 @@ internal fun NumberPanel(
     }
 
     SymbolGridPanel(
+        rowHeight = rowHeight,
         modifier = modifier,
         rows = rows,
         variant = variant,
@@ -64,6 +66,7 @@ internal fun NumberPanel(
 
 @Composable
 fun AlphaNumPanel(
+    rowHeight: Dp,
     modifier: Modifier = Modifier,
     keyRegistry: KeyboardKeyRegistry,
     isUppercase: Boolean,
@@ -74,6 +77,7 @@ fun AlphaNumPanel(
         verticalArrangement = Arrangement.spacedBy(AlphaRowSpacing),
     ) {
         KeyRow(
+            rowHeight = rowHeight,
             labels = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
             uppercase = isUppercase,
             keyRegistry = keyRegistry,
@@ -81,6 +85,7 @@ fun AlphaNumPanel(
             standardKeyTouchWidth = standardKeyTouchWidth,
         )
         KeyRow(
+            rowHeight = rowHeight,
             labels = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
             uppercase = isUppercase,
             leadingWeight = 0.5f,
@@ -89,12 +94,13 @@ fun AlphaNumPanel(
             rowId = "alpha.row1",
             standardKeyTouchWidth = standardKeyTouchWidth,
         )
-        BottomLetterRow(isUppercase = isUppercase, keyRegistry = keyRegistry)
+        BottomLetterRow(isUppercase = isUppercase, keyRegistry = keyRegistry, rowHeight = rowHeight)
     }
 }
 
 @Composable
 private fun BottomLetterRow(
+    rowHeight: Dp,
     isUppercase: Boolean,
     keyRegistry: KeyboardKeyRegistry,
 ) {
@@ -102,7 +108,7 @@ private fun BottomLetterRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(KeyboardUiDefaults.RowHeight),
+            .height(rowHeight),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -160,6 +166,7 @@ private fun BottomLetterRow(
 
 @Composable
 private fun SymbolGridPanel(
+    rowHeight: Dp,
     modifier: Modifier = Modifier,
     rows: List<List<String>>,
     variant: SymbolVariant,
@@ -177,7 +184,7 @@ private fun SymbolGridPanel(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(KeyboardUiDefaults.RowHeight),
+                    .height(rowHeight),
                 horizontalArrangement = if (index == 2) {
                     Arrangement.spacedBy(5.dp)
                 } else {
@@ -286,6 +293,7 @@ internal fun String.toSymbolCommitValue(variant: SymbolVariant): String {
 
 @Composable
 private fun KeyRow(
+    rowHeight: Dp,
     labels: List<String>,
     uppercase: Boolean = false,
     leadingWeight: Float = 0f,
@@ -298,7 +306,7 @@ private fun KeyRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(KeyboardUiDefaults.RowHeight),
+            .height(rowHeight),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -332,6 +340,7 @@ private fun KeyRow(
 
 @Composable
 internal fun AlphaNumBottomRow(
+    rowHeight: Dp,
     action: KeyboardAction,
     keyRegistry: KeyboardKeyRegistry,
     modeSwitchLabel: String,
@@ -345,7 +354,7 @@ internal fun AlphaNumBottomRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(KeyboardUiDefaults.RowHeight),
+            .height(rowHeight),
         horizontalArrangement = Arrangement.spacedBy(KeyboardUiDefaults.BottomRowKeySpacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {

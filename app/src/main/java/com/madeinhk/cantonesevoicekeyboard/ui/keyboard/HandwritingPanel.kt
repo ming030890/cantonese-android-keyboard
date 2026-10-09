@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
@@ -46,6 +47,7 @@ internal fun HandwritingPanel(
     onDrawingChanged: (ByteArray, Int, Int) -> Unit,
 ) {
     val context = LocalContext.current
+    val inspectionMode = LocalInspectionMode.current
     var strokes by remember { mutableStateOf<List<HandwritingStroke>>(emptyList()) }
     var activeStroke by remember { mutableStateOf<HandwritingStroke>(emptyList()) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
@@ -65,7 +67,9 @@ internal fun HandwritingPanel(
         modifier = modifier
             .onGloballyPositioned { coordinates ->
                 canvasSize = coordinates.size
-                HandwritingCanvasGeometry.record(context, coordinates.size)
+                if (!inspectionMode) {
+                    HandwritingCanvasGeometry.record(context, coordinates.size)
+                }
                 val bounds = coordinates.boundsInRoot()
                 onBoundsChanged(Rect(bounds.left, bounds.top, bounds.right, bounds.bottom))
             }

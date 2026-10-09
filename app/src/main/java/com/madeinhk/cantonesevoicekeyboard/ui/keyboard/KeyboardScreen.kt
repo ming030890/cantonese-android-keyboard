@@ -173,16 +173,20 @@ fun KeyboardScreen(
     }
     val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum
     val isTextPanel = activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
-    // All panels share the same Gboard-matched surface height so the IME window
-    // and bottom utility row never jump when the mode changes.
     val keyboardHeight = KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp
     val isWritingPanel = isTextPanel || activePanel == KeyboardPanel.Handwriting
     val keyboardTopPadding =
         if (isWritingPanel) KeyboardUiDefaults.WritingTopPadding else 12.dp
-    val keyboardBottomPadding =
-        if (isWritingPanel) TextKeyboardBottomPadding else DefaultKeyboardBottomPadding
-    val keyboardVerticalArrangement =
-        if (isWritingPanel) Arrangement.spacedBy(AlphaBottomRowSpacing) else Arrangement.SpaceBetween
+    val keyboardBottomPadding = when {
+        isTextPanel -> 0.dp
+        activePanel == KeyboardPanel.Handwriting -> TextKeyboardBottomPadding
+        else -> DefaultKeyboardBottomPadding
+    }
+    val keyboardVerticalArrangement = when {
+        isTextPanel -> Arrangement.Top
+        isWritingPanel -> Arrangement.spacedBy(AlphaBottomRowSpacing)
+        else -> Arrangement.SpaceBetween
+    }
     // Main Keyboard container with premium glassmorphic/charcoal aesthetics
     BoxWithConstraints(
         modifier = Modifier
@@ -238,6 +242,10 @@ fun KeyboardScreen(
             }
     ) {
         val availableWidth = maxWidth - KeyboardHorizontalPadding * 2
+        // maxHeight already excludes the navigation-bar inset. Share all space
+        // below the toolbar equally; visual key insets provide the row gaps.
+        val textRowHeight = (maxHeight - keyboardTopPadding -
+            KeyboardUiDefaults.ToolbarHeight) / 4
         val standardKeyTouchWidth =
             availableWidth / KeyboardUiDefaults.StandardRowUnits
         Box(
@@ -299,8 +307,10 @@ fun KeyboardScreen(
                 }
                 KeyboardPanel.Number -> {
                     NumberPanel(
+                        rowHeight = textRowHeight,
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .height(textRowHeight * 3),
                         variant = symbolVariant,
                         keyRegistry = keyRegistry,
                         showMoreSymbols = showMoreSymbols,
@@ -309,8 +319,10 @@ fun KeyboardScreen(
                 }
                 KeyboardPanel.AlphaNum -> {
                     AlphaNumPanel(
+                        rowHeight = textRowHeight,
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .height(textRowHeight * 3),
                         keyRegistry = keyRegistry,
                         isUppercase = isUppercase,
                         standardKeyTouchWidth = standardKeyTouchWidth,
@@ -336,6 +348,7 @@ fun KeyboardScreen(
 
             if (isAlphaPanel) {
                 AlphaNumBottomRow(
+                    rowHeight = textRowHeight,
                     action = action,
                     keyRegistry = keyRegistry,
                     modeSwitchLabel = "?123",
@@ -345,6 +358,7 @@ fun KeyboardScreen(
                 )
             } else if (activePanel == KeyboardPanel.Number) {
                 AlphaNumBottomRow(
+                    rowHeight = textRowHeight,
                     action = action,
                     keyRegistry = keyRegistry,
                     modeSwitchLabel = "ABC",

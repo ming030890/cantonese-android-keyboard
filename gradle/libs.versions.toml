@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "9.0.1"
+androidGradlePlugin = "9.5.0-alpha09"
 androidxCore = "1.18.0"
 androidxLifecycle = "2.10.0"
 androidxActivity = "1.13.0"
@@ -15,7 +15,7 @@ kotlin = "2.3.20"
 nav3Core = "1.0.1"
 lifecycleViewmodelNav3 = "2.10.0"
 playAssetDelivery = "2.3.0"
-screenshot = "0.0.1-alpha15"
+screenshot = "0.0.1-alpha16"
 work = "2.11.2"
 
 [libraries]
@@ -50,4 +50,3 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }

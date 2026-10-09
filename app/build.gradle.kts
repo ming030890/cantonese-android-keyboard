@@ -4,7 +4,6 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
-  alias(libs.plugins.screenshot)
 }
 
 // Signing credentials are loaded from keystore.properties (gitignored) or
@@ -28,7 +27,6 @@ val hasReleaseSigning = ksFile != null && ksPassword != null &&
 android {
     namespace = "com.madeinhk.cantonesevoicekeyboard"
     compileSdk = 36
-    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
     defaultConfig {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
@@ -83,6 +81,29 @@ android {
         excludes += "/META-INF/{AL2.0,LGPL2.1}"
       }
     }
+
+    testOptions {
+      unitTests.isIncludeAndroidResources = true
+
+      screenshotTests.create("screenshotTest") {
+        engineVersion = libs.versions.screenshot.get()
+        targetVariants.add("debug")
+
+        dependencies {
+          implementation(libs.androidx.compose.ui.tooling)
+          implementation(libs.screenshot.validation.api)
+        }
+      }
+    }
+}
+
+androidComponents {
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        (variantBuilder as com.android.build.api.variant.HasHostTestsBuilder)
+            .hostTests
+            .getValue(com.android.build.api.variant.HostTestBuilder.UNIT_TEST_TYPE)
+            .enable = true
+    }
 }
 
 kotlin {
@@ -93,7 +114,6 @@ dependencies {
   val composeBom = platform(libs.androidx.compose.bom)
   implementation(composeBom)
   androidTestImplementation(composeBom)
-  screenshotTestImplementation(composeBom)
 
   // Play Asset Delivery (model download / location resolution)
   implementation(libs.play.asset.delivery)
@@ -116,8 +136,6 @@ dependencies {
   implementation(libs.androidx.emoji2.emojipicker)
   // Tooling
   debugImplementation(libs.androidx.compose.ui.tooling)
-  screenshotTestImplementation(libs.androidx.compose.ui.tooling)
-  screenshotTestImplementation(libs.screenshot.validation.api)
   // Instrumented tests
   androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   debugImplementation(libs.androidx.compose.ui.test.manifest)

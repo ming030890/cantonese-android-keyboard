@@ -150,7 +150,6 @@ internal fun UnifiedKeyboardToolbar(
                     keyRegistry = keyRegistry,
                     clipboard = checkNotNull(clipboard),
                     keyboardColors = keyboardColors,
-                    modifier = Modifier.width(104.dp),
                 )
                 showHandwritingCandidates && handwritingBusy -> ToolbarStatusText(
                     stringResource(R.string.keyboard_status_recognizing),
@@ -341,7 +340,9 @@ private fun ClipboardToolbarChip(
         key = key,
         keyRegistry = keyRegistry,
         accessibilityDescription = description,
-        modifier = modifier.width(104.dp),
+        modifier = modifier.width(
+            if (clipboard.isSensitive) 132.dp else 220.dp,
+        ),
     ) {
         ClipboardIcon(
             modifier = Modifier.size(20.dp),
@@ -359,7 +360,7 @@ private fun ClipboardToolbarChip(
             fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.widthIn(max = 160.dp),
         )
     }
 }
@@ -383,11 +384,14 @@ private fun ToolbarChipVisual(
         shape = RoundedCornerShape(percent = 50),
         restingElevation = 0.dp,
         pressedScale = 0.98f,
+        horizontalInset = 0.dp,
+        verticalInset = 2.dp,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             content = content,
         )
