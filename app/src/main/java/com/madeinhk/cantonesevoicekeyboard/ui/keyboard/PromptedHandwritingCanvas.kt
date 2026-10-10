@@ -155,7 +155,7 @@ internal fun PromptedHandwritingCanvas(
 internal fun promptedHandwritingBitmap(snapshot: PromptedInkSnapshot): HandwritingBitmap =
     handwritingBitmap(
         strokes = snapshot.strokes.map { stroke ->
-            stroke.map { point -> Offset(point.x, point.y) }
+            stroke.map { point -> com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint(point.x, point.y, point.elapsedMillis) }
         },
         size = snapshot.canvasSize,
     )

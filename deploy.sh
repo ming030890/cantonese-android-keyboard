@@ -35,7 +35,7 @@ PACK_C_ASSETS="$PROJECT_DIR/model_pack_c/src/main/assets/qwen-asr-m4-lmhead-int8
 PACK_D_ASSETS="$PROJECT_DIR/model_pack_d/src/main/assets/qwen-asr-m4-lmhead-int8"
 PACK_E_ASSETS="$PROJECT_DIR/model_pack_e/src/main/assets/qwen-asr-m4-lmhead-int8"
 RESHARD_SCRIPT="$PROJECT_DIR/scripts/reshard_model.py"
-HANDWRITING_SOURCE_DIR="/Volumes/SSD/stust-handwriting-full/artifacts/sdt-traditional-recognition-full-lr1e-3"
+HANDWRITING_SOURCE_DIR="${HANDWRITING_SOURCE_DIR:-$PROJECT_DIR/../mlkit_model}"
 HANDWRITING_ASSETS="$PROJECT_DIR/app/src/main/assets/handwriting"
 
 # Pinned bundletool; auto-downloaded into .tools/ on first use.
@@ -188,6 +188,9 @@ fi
 mkdir -p "$HANDWRITING_ASSETS"
 cp "$HANDWRITING_SOURCE_DIR/model.safetensors" "$HANDWRITING_ASSETS/model.safetensors"
 cp "$HANDWRITING_SOURCE_DIR/labels.txt" "$HANDWRITING_ASSETS/labels.txt"
+if [ -f "$HANDWRITING_SOURCE_DIR/lm_csr.bin" ]; then
+    cp "$HANDWRITING_SOURCE_DIR/lm_csr.bin" "$HANDWRITING_ASSETS/lm_csr.bin"
+fi
 echo -e "${COLOR_SUCCESS}Handwriting model assets staged.${COLOR_RESET}"
 
 # ---------------------------------------------------------------------------

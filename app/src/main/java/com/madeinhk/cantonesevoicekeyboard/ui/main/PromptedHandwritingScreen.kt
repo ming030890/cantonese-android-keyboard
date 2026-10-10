@@ -196,11 +196,15 @@ fun PromptedHandwritingScreen(
         recognizing = true
         val nextCandidates = runCatching {
             withContext(Dispatchers.Default) {
-                val bitmap = promptedHandwritingBitmap(snapshot)
-                // Keep the challenge preview on the same native preprocessing and
-                // inference path as the saved sample and the keyboard itself.
-                engine.modelInputPixels(bitmap.pixels, bitmap.width, bitmap.height)
-                engine.predict(bitmap.pixels, bitmap.width, bitmap.height, topK = 4)
+                val strokePoints = snapshot.strokes.map { stroke ->
+                    stroke.map { pt -> com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint(pt.x, pt.y, pt.elapsedMillis) }
+                }
+                engine.predictStrokes(
+                    strokePoints,
+                    snapshot.canvasSize.width.toFloat(),
+                    snapshot.canvasSize.height.toFloat(),
+                    topK = 4,
+                )
             }
         }.getOrElse { emptyList() }
         if (classId == currentClassId && snapshot == ink.snapshot()) {
@@ -237,21 +241,19 @@ fun PromptedHandwritingScreen(
                         )
                     } else {
                         runCatching {
-                            val modelInput = engine.modelInputPixels(
-                                bitmap.pixels,
-                                bitmap.width,
-                                bitmap.height,
-                            )
-                            val predictions = engine.predict(
-                                bitmap.pixels,
-                                bitmap.width,
-                                bitmap.height,
+                            val strokePoints = snapshot.strokes.map { stroke ->
+                                stroke.map { pt -> com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint(pt.x, pt.y, pt.elapsedMillis) }
+                            }
+                            val predictions = engine.predictStrokes(
+                                strokePoints,
+                                snapshot.canvasSize.width.toFloat(),
+                                snapshot.canvasSize.height.toFloat(),
                                 10,
                             )
                             PromptedHandwritingStore.finalizeInference(
                                 context,
                                 recordId,
-                                modelInput,
+                                modelInput = null,
                                 predictions = predictions,
                             )
                         }.onFailure {

@@ -8,6 +8,12 @@ data class HandwritingCandidate(
     val rank: Int,
 )
 
+data class StrokePoint(
+    val x: Float,
+    val y: Float,
+    val timeMs: Long,
+)
+
 class HandwritingRecognitionException(message: String) : RuntimeException(message)
 
 interface HandwritingRecognitionEngine : AutoCloseable {
@@ -19,6 +25,14 @@ interface HandwritingRecognitionEngine : AutoCloseable {
         height: Int,
         topK: Int = 10,
     ): List<HandwritingCandidate>
+
+    fun predictStrokes(
+        strokes: List<List<StrokePoint>>,
+        canvasWidth: Float,
+        canvasHeight: Float,
+        topK: Int = 10,
+        prevChar: String? = null,
+    ): List<HandwritingCandidate> = emptyList()
 }
 
 /**
@@ -32,6 +46,7 @@ class HandwritingRecognizer private constructor(
         private const val TAG = "HandwritingRecognizer"
         private const val MODEL_ASSET = "handwriting/model.safetensors"
         private const val LABELS_ASSET = "handwriting/labels.txt"
+        private const val LM_ASSET = "handwriting/lm_csr.bin"
 
         @Volatile
         private var nativeLibraryLoaded = false
@@ -51,7 +66,10 @@ class HandwritingRecognizer private constructor(
                 val appContext = context.applicationContext
                 val model = appContext.assets.open(MODEL_ASSET).use { it.readBytes() }
                 val labels = appContext.assets.open(LABELS_ASSET).use { it.readBytes() }
-                val handle = nativeCreate(model, labels)
+                val lm = runCatching {
+                    appContext.assets.open(LM_ASSET).use { it.readBytes() }
+                }.getOrNull() ?: ByteArray(0)
+                val handle = nativeCreate(model, labels, lm)
                 if (handle == 0L) {
                     null
                 } else {
@@ -63,7 +81,7 @@ class HandwritingRecognizer private constructor(
         }
 
         @JvmStatic
-        private external fun nativeCreate(modelBytes: ByteArray, labelBytes: ByteArray): Long
+        private external fun nativeCreate(modelBytes: ByteArray, labelBytes: ByteArray, lmBytes: ByteArray): Long
 
         @JvmStatic
         private external fun nativeDestroy(handle: Long)
@@ -84,6 +102,17 @@ class HandwritingRecognizer private constructor(
             width: Int,
             height: Int,
         ): ByteArray?
+
+        @JvmStatic
+        private external fun nativePredictStrokes(
+            handle: Long,
+            flatPoints: FloatArray,
+            strokeCounts: IntArray,
+            canvasWidth: Float,
+            canvasHeight: Float,
+            topK: Int,
+            prevChar: String?,
+        ): Array<String>?
     }
 
     @Synchronized
@@ -123,6 +152,84 @@ class HandwritingRecognizer private constructor(
         }
         val predictions = nativePredict(handle, pixels, width, height, topK)
             ?: throw HandwritingRecognitionException("Native handwriting inference failed")
+        return predictions.mapIndexed { rank, text ->
+            HandwritingCandidate(text = text, rank = rank)
+        }
+    }
+
+    @Synchronized
+    override fun predictStrokes(
+        strokes: List<List<StrokePoint>>,
+        canvasWidth: Float,
+        canvasHeight: Float,
+        topK: Int,
+        prevChar: String?,
+    ): List<HandwritingCandidate> {
+        val handle = nativeHandle
+        if (handle == 0L) {
+            throw HandwritingRecognitionException("The handwriting recognizer is closed")
+        }
+        if (strokes.isEmpty() || canvasWidth <= 0f || canvasHeight <= 0f) {
+            return emptyList()
+        }
+        if (topK <= 0) {
+            throw HandwritingRecognitionException("topK must be positive")
+        }
+        val totalPoints = strokes.sumOf { it.size }
+        if (totalPoints == 0) return emptyList()
+
+        Log.i(TAG, "predictStrokes: ${strokes.size} strokes, total points=$totalPoints, canvas=${canvasWidth}x${canvasHeight}, prevChar=$prevChar")
+
+        val flatPoints = FloatArray(totalPoints * 3)
+        val strokeCounts = IntArray(strokes.size)
+        var offset = 0
+        strokes.forEachIndexed { strokeIdx, stroke ->
+            strokeCounts[strokeIdx] = stroke.size
+            for (pt in stroke) {
+                flatPoints[offset++] = pt.x
+                flatPoints[offset++] = pt.y
+                flatPoints[offset++] = pt.timeMs.toFloat()
+            }
+        }
+
+        val predictions = nativePredictStrokes(
+            handle,
+            flatPoints,
+            strokeCounts,
+            canvasWidth,
+            canvasHeight,
+            topK,
+            prevChar,
+        ) ?: throw HandwritingRecognitionException("Native handwriting stroke inference failed")
+
+        Log.i(TAG, "predictStrokes result: ${predictions.joinToString(", ")}")
+
+        runCatching {
+            val file = java.io.File("/sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/last_input_strokes.json")
+            file.parentFile?.mkdirs()
+            val json = org.json.JSONObject()
+            json.put("canvas_width", canvasWidth)
+            json.put("canvas_height", canvasHeight)
+            val strokesArray = org.json.JSONArray()
+            for (stroke in strokes) {
+                val ptsArray = org.json.JSONArray()
+                for (pt in stroke) {
+                    val p = org.json.JSONObject()
+                    p.put("x", pt.x)
+                    p.put("y", pt.y)
+                    p.put("t", pt.timeMs)
+                    ptsArray.put(p)
+                }
+                strokesArray.put(ptsArray)
+            }
+            json.put("strokes", strokesArray)
+            val predsArray = org.json.JSONArray()
+            for (p in predictions) predsArray.put(p)
+            json.put("predictions", predsArray)
+            file.writeText(json.toString(2))
+            Log.i(TAG, "Saved debug strokes to ${file.absolutePath}")
+        }
+
         return predictions.mapIndexed { rank, text ->
             HandwritingCandidate(text = text, rank = rank)
         }

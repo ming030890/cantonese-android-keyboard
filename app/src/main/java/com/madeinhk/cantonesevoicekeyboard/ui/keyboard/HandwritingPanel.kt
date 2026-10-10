@@ -34,7 +34,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private typealias HandwritingStroke = List<Offset>
+import com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint
+
+private typealias HandwritingStroke = List<StrokePoint>
 
 @Composable
 internal fun HandwritingPanel(
@@ -42,7 +44,7 @@ internal fun HandwritingPanel(
     sessionKey: Long,
     onStrokeStarted: (startsNewCharacter: Boolean) -> Unit,
     onBoundsChanged: (Rect) -> Unit,
-    onDrawingChanged: (ByteArray, Int, Int) -> Unit,
+    onStrokesChanged: (List<List<StrokePoint>>, Float, Float, ByteArray, Int, Int) -> Unit,
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -76,21 +78,30 @@ internal fun HandwritingPanel(
                     MotionEvent.ACTION_DOWN -> {
                         clearJob?.cancel()
                         onStrokeStarted(strokes.isEmpty())
-                        activeStroke = listOf(Offset(event.x, event.y))
+                        activeStroke = listOf(StrokePoint(event.x, event.y, event.eventTime))
                     }
                     MotionEvent.ACTION_MOVE -> {
                         if (activeStroke.isNotEmpty()) {
-                            activeStroke = activeStroke + event.handwritingSamples()
+                            activeStroke = activeStroke + event.handwritingStrokeSamples()
                         }
                     }
                     MotionEvent.ACTION_UP -> {
                         if (activeStroke.isNotEmpty()) {
-                            val completedStroke = activeStroke + event.handwritingSamples()
+                            val completedStroke = activeStroke + event.handwritingStrokeSamples()
                             val completed = strokes + listOf(completedStroke)
                             strokes = completed
                             activeStroke = emptyList()
+                            val width = canvasSize.width.coerceAtLeast(1)
+                            val height = canvasSize.height.coerceAtLeast(1)
                             val bitmap = handwritingBitmap(completed, size = canvasSize)
-                            onDrawingChanged(bitmap.pixels, bitmap.width, bitmap.height)
+                            onStrokesChanged(
+                                completed,
+                                width.toFloat(),
+                                height.toFloat(),
+                                bitmap.pixels,
+                                bitmap.width,
+                                bitmap.height,
+                            )
                             clearJob = scope.launch {
                                 delay(HandwritingInkClearDelayMillis)
                                 strokes = emptyList()
@@ -114,14 +125,14 @@ internal fun HandwritingPanel(
                     drawCircle(
                         color = strokeColor,
                         radius = strokeWidth / 2f,
-                        center = points.first(),
+                        center = Offset(points.first().x, points.first().y),
                     )
                 } else {
                     points.zipWithNext().forEach { (start, end) ->
                         drawLine(
                             color = strokeColor,
-                            start = start,
-                            end = end,
+                            start = Offset(start.x, start.y),
+                            end = Offset(end.x, end.y),
                             strokeWidth = strokeWidth,
                             cap = StrokeCap.Round,
                         )
@@ -145,11 +156,11 @@ internal data class HandwritingBitmap(
     val height: Int,
 )
 
-private fun MotionEvent.handwritingSamples(): List<Offset> = buildList(historySize + 1) {
+private fun MotionEvent.handwritingStrokeSamples(): List<StrokePoint> = buildList(historySize + 1) {
     for (index in 0 until historySize) {
-        add(Offset(getHistoricalX(index), getHistoricalY(index)))
+        add(StrokePoint(getHistoricalX(index), getHistoricalY(index), getHistoricalEventTime(index)))
     }
-    add(Offset(x, y))
+    add(StrokePoint(x, y, eventTime))
 }
 
 internal fun handwritingStrokeWidthPx(width: Float, height: Float): Float =

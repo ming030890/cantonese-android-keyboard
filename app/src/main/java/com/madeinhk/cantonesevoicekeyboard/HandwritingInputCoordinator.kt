@@ -35,6 +35,9 @@ internal class HandwritingInputCoordinator(
         val generation: Long,
         val characterId: Long,
         val version: Long,
+        val strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>,
+        val canvasWidth: Float,
+        val canvasHeight: Float,
         val pixels: ByteArray,
         val width: Int,
         val height: Int,
@@ -73,15 +76,22 @@ internal class HandwritingInputCoordinator(
         ensureLoadingStarted(session)
     }
 
-    fun recognize(pixels: ByteArray, width: Int, height: Int) {
-        if (!isInputViewVisible() || pixels.isEmpty()) return
+    fun recognize(
+        strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>,
+        canvasWidth: Float,
+        canvasHeight: Float,
+        pixels: ByteArray,
+        width: Int,
+        height: Int,
+    ) {
+        if (!isInputViewVisible() || (strokes.isEmpty() && pixels.isEmpty())) return
         val version = ++requestVersion
         latestVersions[characterId] = version
         _error.value = null
         _recognizing.value = true
         queue.submit(
             characterId,
-            Request(generation, characterId, version, pixels, width, height),
+            Request(generation, characterId, version, strokes, canvasWidth, canvasHeight, pixels, width, height),
         )
     }
 
@@ -198,11 +208,13 @@ internal class HandwritingInputCoordinator(
                 return
             }
             val result = withContext(Dispatchers.Default) {
-                val modelPixels = activeRecognizer.modelInputPixels(
-                    request.pixels,
-                    request.width,
-                    request.height,
-                ) ?: throw HandwritingRecognitionException("Native handwriting preprocessing failed")
+                val modelPixels = runCatching {
+                    activeRecognizer.modelInputPixels(
+                        request.pixels,
+                        request.width,
+                        request.height,
+                    )
+                }.getOrNull() ?: ByteArray(48 * 48)
                 val recordingId = DebugHandwritingStore.capture(
                     context,
                     request.pixels,
@@ -212,12 +224,23 @@ internal class HandwritingInputCoordinator(
                     48,
                     48,
                 )
-                val predictions = activeRecognizer.predict(
-                    request.pixels,
-                    request.width,
-                    request.height,
-                    TOP_K,
-                )
+                val predictions = if (request.strokes.isNotEmpty() && request.canvasWidth > 0f && request.canvasHeight > 0f) {
+                    val prevChar = editor.getTextBeforeCursor(1)?.takeLast(1)?.takeIf { it.isNotBlank() }
+                    activeRecognizer.predictStrokes(
+                        request.strokes,
+                        request.canvasWidth,
+                        request.canvasHeight,
+                        TOP_K,
+                        prevChar,
+                    )
+                } else {
+                    activeRecognizer.predict(
+                        request.pixels,
+                        request.width,
+                        request.height,
+                        TOP_K,
+                    )
+                }
                 recordingId?.let {
                     DebugHandwritingStore.saveInferenceResult(
                         context,

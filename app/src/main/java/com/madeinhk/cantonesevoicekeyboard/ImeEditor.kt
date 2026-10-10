@@ -22,6 +22,10 @@ internal class ImeEditor(
         connection()?.commitText(text, 1)
     }
 
+    fun getTextBeforeCursor(length: Int): String? {
+        return connection()?.getTextBeforeCursor(length, 0)?.toString()
+    }
+
     fun deleteSelectionOrPreviousCharacter() {
         connection()?.run {
             if (shouldDeleteSelection(getSelectedText(0))) {

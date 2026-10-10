@@ -46,7 +46,7 @@ fun KeyboardScreen(
     onSendEnter: () -> Unit,
     onOpenSettings: () -> Unit,
     onPasteClipboard: () -> Unit,
-    onHandwritingChanged: (ByteArray, Int, Int) -> Unit,
+    onHandwritingChanged: (strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>, canvasWidth: Float, canvasHeight: Float, pixels: ByteArray, width: Int, height: Int) -> Unit,
     onHandwritingStrokeStarted: (startsNewCharacter: Boolean) -> Unit = {},
     onHandwritingCandidateSelected: (String) -> Unit,
     onAutofillTapped: () -> Unit = {},
@@ -340,7 +340,7 @@ fun KeyboardScreen(
                                 -keyboardSurfaceOriginInRoot.y,
                             )
                         },
-                        onDrawingChanged = onHandwritingChanged,
+                        onStrokesChanged = onHandwritingChanged,
                     )
                 }
             }

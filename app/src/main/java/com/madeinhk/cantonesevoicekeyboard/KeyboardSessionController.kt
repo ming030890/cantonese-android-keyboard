@@ -136,8 +136,14 @@ internal class KeyboardSessionController(
 
     fun pasteClipboard() = suggestions.pasteClipboard()
 
-    fun recognizeHandwriting(pixels: ByteArray, width: Int, height: Int) =
-        handwriting.recognize(pixels, width, height)
+    fun recognizeHandwriting(
+        strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>,
+        canvasWidth: Float,
+        canvasHeight: Float,
+        pixels: ByteArray,
+        width: Int,
+        height: Int,
+    ) = handwriting.recognize(strokes, canvasWidth, canvasHeight, pixels, width, height)
 
     fun onHandwritingStrokeStarted(startsNewCharacter: Boolean) =
         handwriting.onStrokeStarted(startsNewCharacter)

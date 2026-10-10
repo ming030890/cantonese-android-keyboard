@@ -481,7 +481,7 @@ private fun KeyboardScreenScreenshotContent(
             onSendEnter = {},
             onOpenSettings = {},
             onPasteClipboard = {},
-            onHandwritingChanged = { _, _, _ -> },
+            onHandwritingChanged = { _, _, _, _, _, _ -> },
             onHandwritingCandidateSelected = {},
             onEmojiPicked = {},
             initialEmojiPanel = initialEmojiPanel,
