@@ -267,6 +267,7 @@ internal class VoiceInputCoordinator(
         }
         recording = true
         activeAudioRecord = audioRecord
+        activeEngine.preloadEncoder()
         _state.value = KeyboardUiState.Recording
         val debugStore = DebugAudioStore.createIfEnabled(context)
         activeDebugStore = debugStore

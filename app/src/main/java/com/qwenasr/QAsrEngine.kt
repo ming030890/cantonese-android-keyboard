@@ -189,6 +189,30 @@ class QAsrEngine {
     }
 
     /**
+     * Advise the kernel to preload Shard 1 (Audio Encoder: 320 MB) into RAM via MADV_WILLNEED.
+     */
+    fun preloadEncoder() {
+        synchronized(this) {
+            val handle = nativeHandle
+            if (handle != 0L) {
+                nativePreloadEncoder(handle)
+            }
+        }
+    }
+
+    /**
+     * Advise the kernel to preload Shards 2..N (LLM Decoder: 1.64 GB) into RAM via MADV_WILLNEED.
+     */
+    fun preloadDecoder() {
+        synchronized(this) {
+            val handle = nativeHandle
+            if (handle != 0L) {
+                nativePreloadDecoder(handle)
+            }
+        }
+    }
+
+    /**
      * Free native memory allocations and release native engine resources.
      */
     fun free() {
@@ -213,5 +237,7 @@ class QAsrEngine {
     private external fun nativeSetChineseVariant(handle: Long, variant: String): Boolean
     private external fun nativeSetPrompt(handle: Long, prompt: String)
     private external fun nativeSetSegmentSec(handle: Long, sec: Float)
+    private external fun nativePreloadEncoder(handle: Long)
+    private external fun nativePreloadDecoder(handle: Long)
     private external fun nativeFree(handle: Long)
 }

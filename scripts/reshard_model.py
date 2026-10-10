@@ -45,68 +45,75 @@ TOKENIZER_FILES = [
 RESHARD_MANIFEST = ".reshard_manifest.json"
 
 
-def bin_pack(tensors, limit):
-    """
-    Greedy first-fit-decreasing bin pack of tensors into shards <= limit bytes.
-    Returns a list of dicts {name: tensor}. Larger tensors go first so a
-    single oversized tensor (>limit) fails loudly instead of silently
-    spilling.
-    """
-    items = sorted(
-        tensors.items(),
-        key=lambda kv: kv[1].numel() * kv[1].element_size(),
-        reverse=True,
-    )
-    shards: list[tuple[dict, int]] = []  # (tensors, size)
-    for name, t in items:
-        sz = t.numel() * t.element_size()
-        if sz > limit:
-            raise RuntimeError(
-                f"Tensor '{name}' is {sz / 1024 / 1024:.1f} MiB, larger than "
-                f"per-shard limit {limit / 1024 / 1024:.0f} MiB. "
-                "Increase SHARD_LIMIT_BYTES or split into more packs."
-            )
-        placed = False
-        for shard, current in shards:
-            if current + sz <= limit:
-                shard[name] = t
-                shards[shards.index((shard, current))] = (shard, current + sz)
-                placed = True
-                break
-        if not placed:
-            shards.append(({name: t}, sz))
-    return [s for s, _ in shards]
+def is_encoder_tensor(name: str) -> bool:
+    return "audio_tower" in name or "conv" in name
 
 
-def bin_pack_raw(tensors, limit):
+def decoder_order_key(name: str):
+    if "embed_tokens" in name:
+        return (0, 0, 0, name)
+    if "thinker.model.layers." in name:
+        layer_idx = int(name.split(".layers.")[1].split(".")[0])
+        sub_prio = 0
+        if "input_layernorm" in name:
+            sub_prio = 0
+        elif "self_attn" in name:
+            sub_prio = 1
+        elif "post_attention_layernorm" in name:
+            sub_prio = 2
+        elif "mlp" in name:
+            sub_prio = 3
+        return (1, layer_idx, sub_prio, name)
+    if "thinker.model.norm" in name:
+        return (2, 0, 0, name)
+    if "thinker.lm_head" in name:
+        return (3, 0, 0, name)
+    return (4, 0, 0, name)
+
+
+def partition_shards(tensors, limit, num_packs):
     """
-    Dependency-free version of bin_pack for raw safetensors entries.
-    tensors maps name -> (meta, raw_bytes).
+    Segregate into:
+      Shard 1 (pack 0): Audio Encoder tensors (<= limit)
+      Shards 2..N: LLM Decoder tensors in strictly ascending forward execution order
     """
-    items = sorted(
-        tensors.items(),
-        key=lambda kv: len(kv[1][1]),
-        reverse=True,
-    )
-    shards: list[tuple[dict, int]] = []
-    for name, (meta, raw) in items:
-        sz = len(raw)
-        if sz > limit:
-            raise RuntimeError(
-                f"Tensor '{name}' is {sz / 1024 / 1024:.1f} MiB, larger than "
-                f"per-shard limit {limit / 1024 / 1024:.0f} MiB. "
-                "Increase SHARD_LIMIT_BYTES or split into more packs."
-            )
-        placed = False
-        for idx, (shard, current) in enumerate(shards):
-            if current + sz <= limit:
-                shard[name] = (meta, raw)
-                shards[idx] = (shard, current + sz)
-                placed = True
-                break
-        if not placed:
-            shards.append(({name: (meta, raw)}, sz))
-    return [s for s, _ in shards]
+    def get_size(val):
+        if hasattr(val, "numel"):  # torch.Tensor
+            return val.numel() * val.element_size()
+        else:  # (meta, raw_bytes)
+            return len(val[1])
+
+    encoder_tensors = {}
+    decoder_tensors = {}
+    for k, v in tensors.items():
+        if is_encoder_tensor(k):
+            encoder_tensors[k] = v
+        else:
+            decoder_tensors[k] = v
+
+    enc_total = sum(get_size(v) for v in encoder_tensors.values())
+    if enc_total > limit:
+        raise RuntimeError(
+            f"Encoder total size ({enc_total / 1024 / 1024:.1f} MiB) exceeds shard limit ({limit / 1024 / 1024} MiB)"
+        )
+
+    sorted_dec = sorted(decoder_tensors.items(), key=lambda kv: decoder_order_key(kv[0]))
+
+    max_dec_packs = num_packs - 1
+    dec_shards = [{} for _ in range(max_dec_packs)]
+    cur_shard = 0
+    cur_size = 0
+
+    for name, item in sorted_dec:
+        sz = get_size(item)
+        if cur_size + sz > limit and cur_shard < max_dec_packs - 1:
+            cur_shard += 1
+            cur_size = 0
+        dec_shards[cur_shard][name] = item
+        cur_size += sz
+
+    dec_shards = [s for s in dec_shards if s]
+    return [encoder_tensors] + dec_shards
 
 
 def load_safetensors_raw(path: Path):
@@ -138,6 +145,9 @@ def save_safetensors_raw(tensors, path: Path):
         offset = next_offset
 
     header_json = json.dumps(header, separators=(",", ":")).encode("utf-8")
+    # Pad header with spaces so data starts on a 64-byte cache-line boundary
+    pad_len = (64 - ((8 + len(header_json)) % 64)) % 64
+    header_json += b" " * pad_len
     with path.open("wb") as f:
         f.write(struct.pack("<Q", len(header_json)))
         f.write(header_json)
@@ -198,12 +208,12 @@ def reshard_raw(src_models: list[Path], pack_dirs: list[Path], limit: int):
     total = sum(len(raw) for _, raw in tensors.values())
     print(f"  {len(tensors)} tensors, {total / 1024 / 1024:.1f} MiB total")
 
-    shards = bin_pack_raw(tensors, limit)
-    num_shards = len(shards)
     num_packs = len(pack_dirs)
+    shards = partition_shards(tensors, limit, num_packs)
+    num_shards = len(shards)
     if num_shards > num_packs:
         sys.exit(
-            f"error: bin-pack produced {num_shards} shards, expected at most {num_packs}. "
+            f"error: partitioning produced {num_shards} shards, expected at most {num_packs}. "
             f"Adjust --limit-mib ({limit // 1024 // 1024} MiB) or provide more packs."
         )
 
@@ -211,7 +221,6 @@ def reshard_raw(src_models: list[Path], pack_dirs: list[Path], limit: int):
         p.mkdir(parents=True, exist_ok=True)
         for old_shard in p.glob("model-*.safetensors"):
             old_shard.unlink()
-    shards.sort(key=lambda s: -sum(len(raw) for _, raw in s.values()))
 
     for i, shard in enumerate(shards):
         shard_path = pack_dirs[i] / f"model-{i+1:05d}-of-{num_shards:05d}.safetensors"
@@ -270,57 +279,9 @@ def main():
             _copy_tokenizer(source, pack_dirs[0])
             return
 
-    try:
-        from safetensors import safe_open
-        from safetensors.torch import save_file
-        import torch  # noqa: F401  (safetensors.torch needs torch present)
-    except ImportError as e:
-        print(f"warning: {e}; falling back to raw safetensors sharding")
-        reshard_raw(src_models, pack_dirs, limit)
-        _copy_tokenizer(source, pack_dirs[0])
-        write_manifest(manifest_path, source_manifest)
-        print("done.")
-        return
-
-    print("loading source shards ...")
-    tensors = {}
-    for src_model in src_models:
-        print(f"  {src_model}")
-        with safe_open(str(src_model), framework="pt") as f:
-            duplicates = tensors.keys() & set(f.keys())
-            if duplicates:
-                names = ", ".join(sorted(duplicates)[:3])
-                sys.exit(f"error: duplicate tensors across source shards: {names}")
-            for key in f.keys():
-                tensors[key] = f.get_tensor(key)
-    total = sum(t.numel() * t.element_size() for t in tensors.values())
-    print(f"  {len(tensors)} tensors, {total / 1024 / 1024:.1f} MiB total")
-
-    shards = bin_pack(tensors, limit)
-    num_shards = len(shards)
-    if num_shards > num_packs:
-        sys.exit(
-            f"error: bin-pack produced {num_shards} shards, expected at most {num_packs}. "
-            f"Adjust --limit-mib (currently {args.limit_mib} MiB) or provide more packs."
-        )
-
-    for p in pack_dirs:
-        p.mkdir(parents=True, exist_ok=True)
-        for old_shard in p.glob("model-*.safetensors"):
-            old_shard.unlink()
-
-    # Sort shards deterministically: largest first
-    shards.sort(key=lambda s: -sum(t.numel() * t.element_size() for t in s.values()))
-
-    for i, shard in enumerate(shards):
-        shard_path = pack_dirs[i] / f"model-{i+1:05d}-of-{num_shards:05d}.safetensors"
-        print(f"writing {shard_path} ({len(shard)} tensors)...")
-        save_file(shard, str(shard_path))
-        print(f"  -> {shard_path.stat().st_size / 1024 / 1024:.1f} MiB")
-
+    reshard_raw(src_models, pack_dirs, limit)
     _copy_tokenizer(source, pack_dirs[0])
     write_manifest(manifest_path, source_manifest)
-
     print("done.")
 
 
