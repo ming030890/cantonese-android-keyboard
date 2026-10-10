@@ -67,7 +67,7 @@ fun KeyboardScreenRecordingScreenshot() {
 @Composable
 fun KeyboardScreenErrorScreenshot() {
     KeyboardScreenScreenshotContent(
-        state = KeyboardUiState.Error("Model assets are not available.")
+        state = KeyboardUiState.Error("Model download failed", canRetryModelDownload = true)
     )
 }
 

@@ -43,3 +43,13 @@ bash -n deploy.sh
 ```
 
 For Android code changes, run the narrowest relevant Gradle check first, then the appropriate assemble or connected test. For native changes, build the JNI library through `deploy.sh` or the command documented in `BUILD_SO.md`; do not rely on an old packaged `.so`.
+
+## UI verification and efficient iteration
+
+- Before changing spacing, identify which element owns the unused space and whether system insets are included. Check the proposed change against the user's height and sizing requirements; moving a gap elsewhere does not resolve it.
+- Verify navigation-bar overlap in the actual keyboard service with a focused text field. An ordinary preview activity or screenshot preview cannot establish that the IME clears system navigation. Identify the connected device before installing a build.
+- For apps using Play Asset Delivery, a standalone APK is not a complete deployment. Use the local-testing bundle installation and verify the app reports the model ready before handing it back; do not assume an APK update preserves access to the packs.
+- Update screenshot baselines first, inspect them, then run baseline verification separately. Combining update and verification caused a task-dependency error in this setup.
+- Inspect the specific defect in the rendered image before accepting a baseline. If preview configuration changes, check for obsolete generated baselines before staging files.
+- Deliver a short playable capture when the user asks to review animation. If the capture uses a simulated recording state, say so; a still screenshot only verifies layout.
+- Use longer waits and compact output for slow builds or uploads. Increase the wait interval when repeated polls return no new information.

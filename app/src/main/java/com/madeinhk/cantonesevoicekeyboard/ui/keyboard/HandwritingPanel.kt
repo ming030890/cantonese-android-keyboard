@@ -26,9 +26,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.sp
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.HandwritingCanvasGeometry
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingInkClearDelayMillis
@@ -135,8 +133,7 @@ internal fun HandwritingPanel(
             Text(
                 text = stringResource(R.string.keyboard_handwriting_hint),
                 color = hintColor,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
+                style = com.madeinhk.cantonesevoicekeyboard.theme.KeyboardStatusTextStyle,
             )
         }
     }

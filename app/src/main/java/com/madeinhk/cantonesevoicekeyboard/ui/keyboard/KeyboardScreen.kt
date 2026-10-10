@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 private val AlphaBottomRowSpacing = KeyboardUiDefaults.WritingPanelSpacing
 private val KeyboardHorizontalPadding = KeyboardUiDefaults.KeyboardHorizontalPadding
-private val DefaultKeyboardBottomPadding = 40.dp
-private val TextKeyboardBottomPadding = KeyboardUiDefaults.WritingBottomPadding
 
 @Composable
 fun KeyboardScreen(
@@ -173,15 +171,17 @@ fun KeyboardScreen(
     }
     val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum
     val isTextPanel = activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
+    // Android exposes the IME dismiss/switch controls as a caption bar.
+    // Union takes the maximum on each edge rather than double-counting bars.
+    val systemPadding = WindowInsets.navigationBars
+        .union(WindowInsets.captionBar)
+        .union(WindowInsets.displayCutout)
+        .asPaddingValues()
     val keyboardHeight = KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp
     val isWritingPanel = isTextPanel || activePanel == KeyboardPanel.Handwriting
     val keyboardTopPadding =
         if (isWritingPanel) KeyboardUiDefaults.WritingTopPadding else 12.dp
-    val keyboardBottomPadding = when {
-        isTextPanel -> 0.dp
-        activePanel == KeyboardPanel.Handwriting -> TextKeyboardBottomPadding
-        else -> DefaultKeyboardBottomPadding
-    }
+    val keyboardBottomPadding = systemPadding.calculateBottomPadding()
     val keyboardVerticalArrangement = when {
         isTextPanel -> Arrangement.Top
         isWritingPanel -> Arrangement.spacedBy(AlphaBottomRowSpacing)
@@ -193,7 +193,6 @@ fun KeyboardScreen(
             .fillMaxWidth()
             .height(keyboardHeight)
             .background(brush = keyboardColors.keyboardBackground)
-            .navigationBarsPadding()
             .onGloballyPositioned { coordinates ->
                 keyboardSurfaceOriginInRoot = coordinates.boundsInRoot().topLeft
                 keyRegistry.updateSurfaceCoordinates(coordinates)
@@ -242,20 +241,20 @@ fun KeyboardScreen(
             }
     ) {
         val availableWidth = maxWidth - KeyboardHorizontalPadding * 2
-        // maxHeight already excludes the navigation-bar inset. Share all space
-        // below the toolbar equally; visual key insets provide the row gaps.
+            - systemPadding.calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)
+            - systemPadding.calculateRightPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)
+        // Share the safe area below the toolbar equally across all four rows.
         val textRowHeight = (maxHeight - keyboardTopPadding -
-            KeyboardUiDefaults.ToolbarHeight) / 4
+            keyboardBottomPadding - KeyboardUiDefaults.ToolbarHeight) / 4
         val standardKeyTouchWidth =
             availableWidth / KeyboardUiDefaults.StandardRowUnits
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                // Extra bottom inset so the key row clears the system nav bar / IME-switch globe.
-                // navigationBarsPadding() is often ~0 in the IME window, so this fixed gap carries it.
+                // Reserve the system-owned IME navigation area inside the surface.
                 .padding(
-                    start = KeyboardHorizontalPadding,
-                    end = KeyboardHorizontalPadding,
+                    start = KeyboardHorizontalPadding + systemPadding.calculateStartPadding(androidx.compose.ui.platform.LocalLayoutDirection.current),
+                    end = KeyboardHorizontalPadding + systemPadding.calculateEndPadding(androidx.compose.ui.platform.LocalLayoutDirection.current),
                     top = keyboardTopPadding,
                     bottom = keyboardBottomPadding
                 )

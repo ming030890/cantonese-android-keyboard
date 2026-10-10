@@ -58,7 +58,11 @@ internal class VoiceInputCoordinator(
     fun onInputViewStarted(session: Long) = ensureModelLoadingStarted(session)
 
     fun toggle() {
-        if (_state.value is KeyboardUiState.Error) return
+        val error = _state.value as? KeyboardUiState.Error
+        if (error != null) {
+            if (error.canRetryModelDownload) ensureModelLoadingStarted(currentSession())
+            return
+        }
         if (
             ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) !=
             PackageManager.PERMISSION_GRANTED
@@ -139,20 +143,23 @@ internal class VoiceInputCoordinator(
         // Cancelling a coroutine cannot interrupt nativeLoadModel(). Keep treating the job as
         // in-flight until JNI returns so a quick keyboard reopen cannot start a second load.
         if (modelLoadingJob?.isCompleted == false) {
-            _state.value = KeyboardUiState.LoadingModel
             return
         }
         _state.value = KeyboardUiState.LoadingModel
         val load = scope.launch(Dispatchers.Default) {
             val startedAt = SystemClock.elapsedRealtime()
             try {
-                val modelDir = ModelAssetPack.resolveModelDir(context)
+                val modelDir = ModelAssetPack.resolveModelDir(context) {
+                    _state.value = KeyboardUiState.DownloadingModel
+                }
                 if (modelDir == null) {
                     _state.value = KeyboardUiState.Error(
                         context.getString(R.string.error_model_not_found),
+                        canRetryModelDownload = true,
                     )
                     return@launch
                 }
+                _state.value = KeyboardUiState.LoadingModel
                 val success = engineMutex.withLock {
                     val activeEngine = getOrCreateEngine()
                     val loaded = activeEngine.loadModel(modelDir.absolutePath, 1)

@@ -2,12 +2,12 @@ package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
 import android.view.View
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -21,10 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -35,13 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandColors
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
+import com.madeinhk.cantonesevoicekeyboard.theme.KeyboardStatusTextStyle
 
 @Composable
 internal fun UnifiedKeyboardToolbar(
@@ -83,19 +86,21 @@ internal fun UnifiedKeyboardToolbar(
         ) {
             when {
                 voiceState == KeyboardUiState.Recording -> VoiceToolbarStatus(
-                    volume = volume,
                     label = stringResource(R.string.keyboard_status_recording),
                 )
                 voiceState == KeyboardUiState.Transcribing -> VoiceToolbarStatus(
-                    volume = 0f,
                     label = stringResource(R.string.keyboard_status_transcribing),
                 )
                 voiceState == KeyboardUiState.LoadingModel -> ToolbarStatusText(
                     stringResource(R.string.keyboard_status_loading_model),
                     keyboardColors.keyboardKeyOnSurface,
                 )
+                voiceState == KeyboardUiState.DownloadingModel -> ToolbarStatusText(
+                    stringResource(R.string.keyboard_status_downloading_model),
+                    keyboardColors.keyboardKeyOnSurface,
+                )
                 voiceState is KeyboardUiState.Error -> {
-                    ToolbarStatusText(voiceState.message, MaterialTheme.colorScheme.error)
+                    ToolbarStatusText(voiceState.message, keyboardColors.keyboardKeyOnSurface)
                 }
                 showHandwritingCandidates && handwritingError != null -> {
                     ToolbarStatusText(handwritingError, MaterialTheme.colorScheme.error)
@@ -113,7 +118,7 @@ internal fun UnifiedKeyboardToolbar(
                             Text(
                                 text = stringResource(R.string.keyboard_toolbar_autofill),
                                 color = keyboardColors.keyboardKeyOnSurface,
-                                fontSize = 14.sp,
+                                style = KeyboardStatusTextStyle,
                                 fontWeight = FontWeight.Medium,
                             )
                         }
@@ -158,10 +163,14 @@ internal fun UnifiedKeyboardToolbar(
             }
         }
         VoiceToolbarVisual(
+            volume = volume,
             state = voiceState,
             key = keys.voice,
             keyRegistry = keyRegistry,
-            accessibilityDescription = stringResource(R.string.keyboard_toolbar_voice),
+            accessibilityDescription = stringResource(
+                if ((voiceState as? KeyboardUiState.Error)?.canRetryModelDownload == true)
+                    R.string.keyboard_model_retry else R.string.keyboard_toolbar_voice,
+            ),
         )
     }
 }
@@ -171,8 +180,7 @@ private fun ToolbarStatusText(text: String, color: Color) {
     Text(
         text = text,
         color = color,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Medium,
+        style = KeyboardStatusTextStyle,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Center,
@@ -180,35 +188,13 @@ private fun ToolbarStatusText(text: String, color: Color) {
 }
 
 @Composable
-private fun VoiceToolbarStatus(volume: Float, label: String) {
-    val voiceActiveColor = BrandTheme.colors.voiceActive
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        if (volume > 0f) {
-            Canvas(modifier = Modifier.width(36.dp).height(18.dp)) {
-                val center = size.height / 2f
-                val barWidth = size.width / 7f
-                repeat(5) { index ->
-                    val x = barWidth * (index + 1)
-                    val amplitude = size.height * (0.18f + volume * (0.18f + index * 0.03f))
-                    drawLine(
-                        color = voiceActiveColor,
-                        start = Offset(x, center - amplitude),
-                        end = Offset(x, center + amplitude),
-                        strokeWidth = 2.dp.toPx(),
-                        cap = StrokeCap.Round,
-                    )
-                }
-            }
-        }
-        ToolbarStatusText(label, BrandTheme.colors.keyboardKeyOnSurface)
-    }
+private fun VoiceToolbarStatus(label: String) {
+    ToolbarStatusText(label, BrandTheme.colors.keyboardKeyOnSurface)
 }
 
 @Composable
 private fun VoiceToolbarVisual(
+    volume: Float,
     state: KeyboardUiState,
     key: KeyModel,
     keyRegistry: KeyboardKeyRegistry,
@@ -222,6 +208,7 @@ private fun VoiceToolbarVisual(
     ) {
         when (state) {
             KeyboardUiState.LoadingModel,
+            KeyboardUiState.DownloadingModel,
             KeyboardUiState.Transcribing,
             -> Box(
                 modifier = Modifier
@@ -237,6 +224,7 @@ private fun VoiceToolbarVisual(
                 )
             }
             KeyboardUiState.Recording -> RecordingToolbarIcon(
+                volume = volume,
                 backgroundColor = keyboardColors.voiceActive,
                 pulseColor = keyboardColors.voiceActivePulse,
                 iconColor = keyboardColors.voiceOnActive,
@@ -245,13 +233,22 @@ private fun VoiceToolbarVisual(
                 modifier = Modifier
                     .size(34.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.errorContainer),
+                    .background(Color.Transparent),
                 contentAlignment = Alignment.Center,
             ) {
-                MicIcon(
-                    modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                )
+                if (state.canRetryModelDownload) {
+                    Text(
+                        text = stringResource(R.string.keyboard_model_retry),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = KeyboardStatusTextStyle,
+                        fontWeight = FontWeight.Medium,
+                    )
+                } else {
+                    MicIcon(
+                        modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
+                        color = keyboardColors.keyboardKeyOnSurface,
+                    )
+                }
             }
             KeyboardUiState.Idle -> MicIcon(
                 modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
@@ -263,17 +260,24 @@ private fun VoiceToolbarVisual(
 
 @Composable
 private fun RecordingToolbarIcon(
+    volume: Float,
     backgroundColor: Color,
     pulseColor: Color,
     iconColor: Color,
 ) {
     val transition = rememberInfiniteTransition(label = "toolbarRecordingPulse")
+    val rotation by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(2400, easing = LinearEasing)),
+        label = "listeningRingRotation",
+    )
     val pulse by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Restart,
+            repeatMode = RepeatMode.Reverse,
         ),
         label = "toolbarRecordingPulseProgress",
     )
@@ -286,12 +290,23 @@ private fun RecordingToolbarIcon(
                     color = pulseColor.copy(alpha = pulseColor.alpha * (1f - pulse)),
                     radius = (16.dp + 5.dp * pulse).toPx(),
                 )
+                rotate(rotation) {
+                    drawCircle(
+                        brush = Brush.sweepGradient(listOf(
+                            Color(0xFF4285F4), Color(0xFF34A853),
+                            Color(0xFFFBBC05), Color(0xFFEA4335), Color(0xFF4285F4),
+                        )),
+                        radius = (19.dp + pulse.dp).toPx(),
+                        style = Stroke(width = 2.dp.toPx()),
+                    )
+                }
             },
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
                 .size(32.dp)
+                .scale(1f + 0.10f * pulse + 0.06f * volume.coerceIn(0f, 1f))
                 .clip(CircleShape)
                 .background(backgroundColor),
             contentAlignment = Alignment.Center,
@@ -356,7 +371,7 @@ private fun ClipboardToolbarChip(
                 clipboard.preview.orEmpty()
             },
             color = keyboardColors.keyboardKeyOnSurface,
-            fontSize = 15.sp,
+            style = KeyboardStatusTextStyle,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

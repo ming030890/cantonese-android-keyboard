@@ -24,7 +24,7 @@ object KeyboardUiDefaults {
     val ToolbarSettingsIconSize = 22.dp
     val ToolbarIconSpacing = 8.dp
     val StandardKeyCornerRadius = 6.dp
-    val StandardKeyFontSize = 28.sp
+    val StandardKeyFontSize = 26.sp
     val VoiceRecordTouchSize = 72.dp
     val VoiceRecordVisualSize = 64.dp
     val VoiceRecordIconSize = 32.dp

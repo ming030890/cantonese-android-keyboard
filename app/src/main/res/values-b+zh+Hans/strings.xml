@@ -71,7 +71,7 @@
     <string name="keyboard_handwriting_candidates_previous">上一页候选字</string>
     <string name="keyboard_handwriting_candidates_next">下一页候选字</string>
     <string name="keyboard_status_loading_model">正在载入语音模型…</string>
-    <string name="keyboard_status_recording">正在聆听… 点按停止</string>
+    <string name="keyboard_status_recording">请说话</string>
     <string name="keyboard_status_transcribing">识别中…</string>
     <string name="keyboard_status_recognizing">识别中…</string>
     <string name="keyboard_status_error_setup">点按前往设置</string>
@@ -85,7 +85,9 @@
 
     <!-- Input Method Service Error Strings -->
     <string name="error_external_storage_unavailable">无法访问设备存储空间。</string>
-    <string name="error_model_not_found">语音模型仍在下载中，请稍后再试。</string>
+    <string name="error_model_not_found">模型下载失败</string>
+    <string name="keyboard_model_retry">重试</string>
+    <string name="keyboard_status_downloading_model">正在下载模型…</string>
     <string name="error_failed_initialize_asr">无法启动语音引擎。</string>
     <string name="error_handwriting_model_unavailable">无法启动手写识别。</string>
     <string name="error_handwriting_recognition_failed">手写识别失败，请重试。</string>

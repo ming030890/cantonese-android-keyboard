@@ -117,12 +117,13 @@ object ModelAssetPack {
      * necessary. Suspends until both packs finish downloading. Returns `null`
      * if either pack could not be made available.
      */
-    suspend fun resolveModelDir(context: Context): File? {
+    suspend fun resolveModelDir(context: Context, onDownloadStarted: () -> Unit = {}): File? {
         stageModelDir(context)?.let {
             Log.i(TAG, "resolveModelDir: staged model already available at ${it.absolutePath}")
             return it
         }
 
+        onDownloadStarted()
         val manager = AssetPackManagerFactory.getInstance(context.applicationContext)
         val ready = awaitBothPacks(manager)
         Log.i(TAG, "resolveModelDir: awaitBothPacks ready=$ready")

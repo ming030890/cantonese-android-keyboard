@@ -2,6 +2,7 @@ package com.madeinhk.cantonesevoicekeyboard.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -38,7 +39,8 @@ val Typography =
 
 val KeyboardKeyTextStyle =
   TextStyle(
-    fontFamily = FontFamily.Default,
+    fontFamily = FontFamily.SansSerif,
+    platformStyle = PlatformTextStyle(includeFontPadding = false),
     fontWeight = FontWeight.Normal,
     fontSize = KeyboardUiDefaults.StandardKeyFontSize,
     lineHeight = 30.sp,
@@ -47,7 +49,8 @@ val KeyboardKeyTextStyle =
 
 val KeyboardUtilityKeyTextStyle =
   TextStyle(
-    fontFamily = FontFamily.Default,
+    fontFamily = FontFamily.SansSerif,
+    platformStyle = PlatformTextStyle(includeFontPadding = false),
     fontWeight = FontWeight.Normal,
     fontSize = KeyboardUiDefaults.StandardKeyFontSize,
     lineHeight = 30.sp,
@@ -65,18 +68,30 @@ val KeyboardHintTextStyle =
 
 val KeyboardSpaceKeyTextStyle =
   TextStyle(
-    fontFamily = FontFamily.Default,
+    fontFamily = FontFamily.SansSerif,
+    platformStyle = PlatformTextStyle(includeFontPadding = false),
     fontWeight = FontWeight.Normal,
-    fontSize = 12.sp,
-    lineHeight = 14.sp,
+    fontSize = 14.sp,
+    lineHeight = 18.sp,
     letterSpacing = 0.sp,
   )
 
 val KeyboardModeSwitchKeyTextStyle =
   TextStyle(
-    fontFamily = FontFamily.Default,
+    fontFamily = FontFamily.SansSerif,
+    platformStyle = PlatformTextStyle(includeFontPadding = false),
     fontWeight = FontWeight.Normal,
-    fontSize = 18.sp,
+    fontSize = 16.sp,
     lineHeight = 20.sp,
     letterSpacing = 0.sp,
   )
+
+// Keyboard labels must not inherit the companion app's body-text tracking.
+val KeyboardStatusTextStyle = TextStyle(
+    fontFamily = FontFamily.SansSerif,
+    fontWeight = FontWeight.Normal,
+    fontSize = 14.sp,
+    lineHeight = 20.sp,
+    letterSpacing = 0.sp,
+    platformStyle = PlatformTextStyle(includeFontPadding = false),
+)
