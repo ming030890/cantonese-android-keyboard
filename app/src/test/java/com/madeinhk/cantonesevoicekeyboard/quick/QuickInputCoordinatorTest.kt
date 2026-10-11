@@ -1,0 +1,247 @@
+package com.madeinhk.cantonesevoicekeyboard.quick
+
+import android.view.inputmethod.InputConnection
+import com.madeinhk.cantonesevoicekeyboard.ImeEditor
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
+
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+class QuickInputCoordinatorTest {
+
+    private lateinit var coordinator: QuickInputCoordinator
+    private var lastComposingText: String? = null
+    private var lastCommittedText: String? = null
+
+    @Before
+    fun setUp() {
+        val engine = object : QuickCandidateEngine {
+            override fun candidates(version: Int, code: String, left: String, right: String) =
+                listOf("係", "你").mapIndexed { i, text -> QuickCandidate(text, i) }
+        }
+
+        val handler = object : InvocationHandler {
+            override fun invoke(proxy: Any?, method: Method, args: Array<out Any>?): Any? {
+                when (method.name) {
+                    "setComposingText" -> {
+                        lastComposingText = args?.get(0)?.toString()
+                        return true
+                    }
+                    "commitText" -> {
+                        lastCommittedText = args?.get(0)?.toString()
+                        return true
+                    }
+                    "finishComposingText" -> {
+                        lastComposingText = ""
+                        return true
+                    }
+                }
+                return null
+            }
+        }
+
+        val proxyConnection = Proxy.newProxyInstance(
+            InputConnection::class.java.classLoader,
+            arrayOf(InputConnection::class.java),
+            handler
+        ) as InputConnection
+
+        val editor = ImeEditor(
+            connection = { proxyConnection },
+            editorInfo = { null }
+        )
+
+        coordinator = QuickInputCoordinator(
+            engineLoader = { engine },
+            editor = editor,
+            initialVersion = 3
+        )
+    }
+
+    @Test
+    fun forwardsCommittedContextWithoutQuickCodeAndChangesVersion() {
+        var request: List<String>? = null
+        val backend = object : QuickCandidateEngine {
+            override fun candidates(version: Int, code: String, left: String, right: String): List<QuickCandidate> {
+                request = listOf(version.toString(), code, left, right)
+                return listOf(QuickCandidate("你", 0))
+            }
+        }
+        val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+            arrayOf(InputConnection::class.java)) { _, method, _ ->
+            when (method.name) {
+                "getTextBeforeCursor" -> "我係of"
+                "getTextAfterCursor" -> "呀"
+                else -> true
+            }
+        } as InputConnection
+        val c = QuickInputCoordinator({ backend }, ImeEditor({ connection }, { null }))
+        c.onKey("o"); c.onKey("f")
+        assertEquals(listOf("3", "of", "我係", "呀"), request)
+        c.setVersion(5)
+        assertEquals(listOf("5", "of", "我係", "呀"), request)
+        c.close()
+        assertTrue(c.candidates.value.isEmpty())
+    }
+
+    @Test
+    fun predictsWithoutCodeAndRefreshesAfterSelectionAndDiscard() {
+        var before = "我想"
+        var requests = 0
+        val backend = object : QuickCandidateEngine {
+            override fun candidates(version: Int, code: String, left: String, right: String) = listOf(QuickCandidate("你", 0))
+            override fun predictions(left: String, right: String, limit: Int): List<QuickCandidate> {
+                assertEquals(before, left)
+                assertEquals("呀", right)
+                assertEquals(3, limit)
+                requests++
+                return listOf(QuickCandidate("食", 0))
+            }
+        }
+        val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+            arrayOf(InputConnection::class.java)) { _, method, args ->
+            when (method.name) {
+                "getTextBeforeCursor" -> before
+                "getTextAfterCursor" -> "呀"
+                "commitText" -> { before += args!![0].toString(); true }
+                else -> true
+            }
+        } as InputConnection
+        val c = QuickInputCoordinator({ backend }, ImeEditor({ connection }, { null }))
+        c.refreshPredictions()
+        assertEquals("食", c.candidates.value.single().text)
+        assertFalse(c.hasActiveInput())
+        c.selectCandidate("食")
+        assertEquals("我想食", before)
+        assertEquals(2, requests)
+        assertEquals("食", c.candidates.value.single().text)
+        c.discard()
+        assertTrue(c.candidates.value.isEmpty())
+        c.close()
+        c.refreshPredictions()
+        assertTrue(c.candidates.value.isEmpty())
+    }
+
+    @Test
+    fun predictionAddsWordBoundaryButQuickSelectionDoesNot() {
+        var committed = ""
+        val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+            arrayOf(InputConnection::class.java)) { _, method, args ->
+            when (method.name) {
+                "getTextBeforeCursor" -> "like"
+                "getTextAfterCursor" -> "today"
+                "commitText" -> { committed = args!![0].toString(); true }
+                else -> true
+            }
+        } as InputConnection
+        val c = QuickInputCoordinator({ null }, ImeEditor({ connection }, { null }))
+        c.selectCandidate("it")
+        assertEquals(" it ", committed)
+        c.onKey("o")
+        c.selectCandidate("你")
+        assertEquals("你", committed)
+        c.close()
+    }
+
+    @Test
+    fun cancelledLookupCannotRestoreCandidates() = kotlinx.coroutines.test.runTest {
+        val entered = java.util.concurrent.CountDownLatch(1)
+        val release = java.util.concurrent.CountDownLatch(1)
+        val finished = java.util.concurrent.CountDownLatch(1)
+        val backend = object : QuickCandidateEngine {
+            override fun candidates(version: Int, code: String, left: String, right: String): List<QuickCandidate> {
+                entered.countDown()
+                check(release.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                finished.countDown()
+                return listOf(QuickCandidate("你", 0))
+            }
+        }
+        val c = QuickInputCoordinator({ backend }, ImeEditor({ null }, { null }), scope = this)
+        c.onKey("o")
+        testScheduler.runCurrent()
+        assertTrue(entered.await(5, java.util.concurrent.TimeUnit.SECONDS))
+        c.discard()
+        release.countDown()
+        assertTrue(finished.await(5, java.util.concurrent.TimeUnit.SECONDS))
+        testScheduler.advanceUntilIdle()
+        assertTrue(c.candidates.value.isEmpty())
+        assertFalse(c.hasActiveInput())
+    }
+
+    @Test
+    fun testTypingQuickCodeProducesCandidates() {
+        coordinator.onKey("o")
+        assertEquals("o", coordinator.getComposingText())
+        assertEquals("o", lastComposingText)
+        assertFalse(coordinator.candidates.value.isEmpty())
+
+        coordinator.onKey("f")
+        assertEquals("of", coordinator.getComposingText())
+        assertEquals("of", lastComposingText)
+        val candidates = coordinator.candidates.value
+        assertTrue(candidates.size >= 2)
+        assertEquals("係", candidates[0].text)
+        assertEquals("你", candidates[1].text)
+    }
+
+    @Test
+    fun testSelectingCandidateCommitsChineseCharacter() {
+        coordinator.onKey("o")
+        coordinator.onKey("f")
+        coordinator.selectCandidate("你")
+
+        assertEquals("你", lastCommittedText)
+        assertFalse(coordinator.hasActiveInput())
+        assertTrue(coordinator.candidates.value.isEmpty())
+    }
+
+    @Test
+    fun testTypingSpaceCommitsEnglishWord() {
+        // User types "hello"
+        "hello".forEach { coordinator.onKey(it.toString()) }
+        assertEquals("hello", coordinator.getComposingText())
+        // For >2 letters, candidates are empty
+        assertTrue(coordinator.candidates.value.isEmpty())
+
+        // User taps space -> "Tap space, it was typing english."
+        coordinator.onSpace()
+        assertEquals("hello ", lastCommittedText)
+        assertFalse(coordinator.hasActiveInput())
+    }
+
+    @Test
+    fun testTypingSpaceOnTwoLetterCodeCommitsEnglish() {
+        coordinator.onKey("o")
+        coordinator.onKey("f")
+        // Instead of candidate, user taps space
+        coordinator.onSpace()
+        assertEquals("of ", lastCommittedText)
+        assertFalse(coordinator.hasActiveInput())
+    }
+
+    @Test
+    fun testBackspaceDeletesFromComposingBuffer() {
+        coordinator.onKey("o")
+        coordinator.onKey("f")
+        assertEquals("of", coordinator.getComposingText())
+
+        val handled1 = coordinator.onDelete()
+        assertTrue(handled1)
+        assertEquals("o", coordinator.getComposingText())
+        assertEquals("o", lastComposingText)
+
+        val handled2 = coordinator.onDelete()
+        assertTrue(handled2)
+        assertEquals("", coordinator.getComposingText())
+        assertFalse(coordinator.hasActiveInput())
+
+        // Next delete is not handled by coordinator
+        val handled3 = coordinator.onDelete()
+        assertFalse(handled3)
+    }
+}

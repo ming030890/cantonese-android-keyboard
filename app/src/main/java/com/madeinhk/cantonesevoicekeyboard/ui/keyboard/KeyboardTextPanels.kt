@@ -384,17 +384,20 @@ internal fun AlphaNumBottomRow(
             )
         }
         val context = LocalContext.current
-        val isHandwritingEnabled = remember(context) {
-            KeyboardSettings.isLayoutEnabled(context, KeyboardSettings.LAYOUT_HANDWRITING)
+        val enabledLayouts = remember(context) {
+            KeyboardSettings.getEnabledLayouts(context)
+        }
+        val nextTarget = remember(enabledLayouts) {
+            computeNextLayoutTarget(KeyboardInputMode.AlphaNum, enabledLayouts)
         }
         KeyVisual(
             key = keyRegistry.key(
                 id = "text.bottom.handwriting",
-                data = if (isHandwritingEnabled) {
+                data = if (nextTarget != null) {
                     KeyData(
                         "text.bottom.handwriting",
                         KeyboardKeyKind.ModeSwitch,
-                        text = "handwriting",
+                        text = nextTarget,
                     )
                 } else {
                     KeyData(
@@ -408,7 +411,7 @@ internal fun AlphaNumBottomRow(
             modifier = Modifier.weight(1.15f),
             backgroundColor = keyboardColors.keyboardModifierKeySurface,
         ) {
-            if (isHandwritingEnabled) {
+            if (nextTarget != null) {
                 KeyboardIcon(
                     modifier = Modifier.size(20.dp),
                     color = keyboardColors.keyboardKeyOnSurface,

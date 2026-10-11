@@ -76,3 +76,6 @@ google-services.json
 *.bak
 __pycache__/
 *.pyc
+
+# Generated neural LM export and calibrated fusion bundle staged by deploy.sh
+/app/src/main/assets/language_model/

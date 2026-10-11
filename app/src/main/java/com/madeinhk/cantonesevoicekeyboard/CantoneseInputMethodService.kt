@@ -78,6 +78,8 @@ class CantoneseInputMethodService :
                         handwritingRecognizing = controller.handwritingRecognizing,
                         handwritingError = controller.handwritingError,
                         handwritingSession = controller.handwritingSession,
+                        quickCandidates = controller.quickCandidates,
+                        onQuickKey = controller::onQuickKey,
                         autofillSuggestionView = controller.autofillSuggestionView,
                         clipboardSuggestion = controller.clipboardSuggestion,
                         onToggleRecording = controller::toggleRecording,

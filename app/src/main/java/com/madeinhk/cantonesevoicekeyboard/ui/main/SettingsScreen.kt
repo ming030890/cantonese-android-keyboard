@@ -62,6 +62,9 @@ fun SettingsScreen(
     var multilingualTyping by remember {
         mutableStateOf(KeyboardSettings.isMultilingualTypingEnabled(context))
     }
+    var quickVersion by remember {
+        mutableIntStateOf(KeyboardSettings.getQuickVersion(context))
+    }
 
     SettingsScreenContent(
         enabledLayouts = enabledLayouts,
@@ -82,6 +85,11 @@ fun SettingsScreen(
             KeyboardSettings.setMultilingualTypingEnabled(context, enabled)
             multilingualTyping = enabled
         },
+        quickVersion = quickVersion,
+        onQuickVersionChange = { version ->
+            KeyboardSettings.setQuickVersion(context, version)
+            quickVersion = version
+        },
         onBack = onBack,
         modifier = modifier
     )
@@ -94,6 +102,8 @@ fun SettingsScreenContent(
     multilingualTyping: Boolean,
     onMultilingualTypingChange: (Boolean) -> Unit,
     onBack: () -> Unit,
+    quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
+    onQuickVersionChange: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -126,7 +136,9 @@ fun SettingsScreenContent(
             // Keyboard Layouts Carousel Card
             KeyboardLayoutsSelectorCard(
                 enabledLayouts = enabledLayouts,
-                onToggleLayout = onToggleLayout
+                onToggleLayout = onToggleLayout,
+                quickVersion = quickVersion,
+                onQuickVersionChange = onQuickVersionChange
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -146,6 +158,14 @@ fun SettingsScreenContent(
             MultilingualTypingCard(
                 checked = multilingualTyping,
                 onCheckedChange = onMultilingualTypingChange
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Quick Version Selector Card
+            QuickVersionCard(
+                selectedVersion = quickVersion,
+                onVersionChange = onQuickVersionChange
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -202,6 +222,8 @@ private fun SettingsBackButton(onBack: () -> Unit) {
 fun KeyboardLayoutsSelectorCard(
     enabledLayouts: Set<String>,
     onToggleLayout: (String) -> Unit,
+    quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
+    onQuickVersionChange: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -227,7 +249,24 @@ fun KeyboardLayoutsSelectorCard(
                 preview = { MiniQwertyPreview() }
             )
 
-            // 2. Handwriting
+            // 2. Quick (Cantonese Quick)
+            val isQuickSelected = enabledLayouts.contains(KeyboardSettings.LAYOUT_QUICK)
+            KeyboardLayoutItem(
+                title = stringResource(R.string.settings_layout_quick),
+                isSelected = isQuickSelected,
+                onToggle = { onToggleLayout(KeyboardSettings.LAYOUT_QUICK) },
+                preview = { MiniQuickPreview() },
+                extraContent = if (isQuickSelected) {
+                    {
+                        QuickVersionMiniPills(
+                            selectedVersion = quickVersion,
+                            onVersionChange = onQuickVersionChange
+                        )
+                    }
+                } else null
+            )
+
+            // 3. Handwriting
             val isHandwritingSelected = enabledLayouts.contains(KeyboardSettings.LAYOUT_HANDWRITING)
             KeyboardLayoutItem(
                 title = stringResource(R.string.settings_layout_handwriting),
@@ -235,15 +274,45 @@ fun KeyboardLayoutsSelectorCard(
                 onToggle = { onToggleLayout(KeyboardSettings.LAYOUT_HANDWRITING) },
                 preview = { MiniHandwritingPreview() }
             )
+        }
+    }
+}
 
-            // 3. Peeking Layout Item (e.g. QWERTZ / AZERTY / PC)
-            KeyboardLayoutItem(
-                title = "QWERTZ",
-                isSelected = false,
-                enabled = false,
-                onToggle = {},
-                preview = { MiniPeekingPreview() }
-            )
+@Composable
+private fun QuickVersionMiniPills(
+    selectedVersion: Int,
+    onVersionChange: (Int) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        listOf(
+            KeyboardSettings.QUICK_VERSION_3 to "3",
+            KeyboardSettings.QUICK_VERSION_5 to "5",
+        ).forEach { (ver, label) ->
+            val isVerSelected = selectedVersion == ver
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(26.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = if (isVerSelected) MintAccentColor else MiniKeySurface,
+                border = if (!isVerSelected) BorderStroke(1.dp, CardBorderColor) else null,
+                onClick = { onVersionChange(ver) }
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = label,
+                        color = if (isVerSelected) MintOnAccentColor else PrimaryTextColor,
+                        fontSize = 12.sp,
+                        fontWeight = if (isVerSelected) FontWeight.Bold else FontWeight.Medium,
+                    )
+                }
+            }
         }
     }
 }
@@ -255,6 +324,7 @@ private fun KeyboardLayoutItem(
     onToggle: () -> Unit,
     preview: @Composable () -> Unit,
     enabled: Boolean = true,
+    extraContent: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -343,6 +413,9 @@ private fun KeyboardLayoutItem(
                     )
                 }
             }
+        }
+        if (extraContent != null) {
+            extraContent()
         }
     }
 }
@@ -469,10 +542,10 @@ fun MiniHandwritingPreview() {
 }
 
 /**
- * Peeking layout preview on the right edge.
+ * Quick (速成) layout preview with Cangjie radicals.
  */
 @Composable
-fun MiniPeekingPreview() {
+fun MiniQuickPreview() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -494,8 +567,12 @@ fun MiniPeekingPreview() {
             horizontalArrangement = Arrangement.spacedBy(1.5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            listOf("q", "w", "e", "r", "t", "z", "u", "i", "o", "p").forEach { l ->
-                MiniKeyCap(text = l, modifier = Modifier.weight(1f))
+            val row1 = listOf(
+                "q" to "手", "w" to "田", "e" to "水", "r" to "口", "t" to "廿",
+                "y" to "卜", "u" to "山", "i" to "戈", "o" to "人", "p" to "心"
+            )
+            row1.forEach { (l, h) ->
+                MiniKeyWithHint(letter = l, hint = h, modifier = Modifier.weight(1f))
             }
         }
 
@@ -507,8 +584,12 @@ fun MiniPeekingPreview() {
             horizontalArrangement = Arrangement.spacedBy(1.5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            listOf("a", "s", "d", "f", "g", "h", "j", "k", "l").forEach { l ->
-                MiniKeyCap(text = l, modifier = Modifier.weight(1f))
+            val row2 = listOf(
+                "a" to "日", "s" to "尸", "d" to "木", "f" to "火", "g" to "土",
+                "h" to "竹", "j" to "十", "k" to "大", "l" to "中"
+            )
+            row2.forEach { (l, h) ->
+                MiniKeyWithHint(letter = l, hint = h, modifier = Modifier.weight(1f))
             }
         }
 
@@ -519,8 +600,12 @@ fun MiniPeekingPreview() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             MiniKeyCap(text = "⇧", modifier = Modifier.weight(1.2f), textSize = 6.sp)
-            listOf("y", "x", "c", "v", "b", "n", "m").forEach { l ->
-                MiniKeyCap(text = l, modifier = Modifier.weight(1f))
+            val row3 = listOf(
+                "z" to "重", "x" to "難", "c" to "金", "v" to "女",
+                "b" to "月", "n" to "弓", "m" to "一"
+            )
+            row3.forEach { (l, h) ->
+                MiniKeyWithHint(letter = l, hint = h, modifier = Modifier.weight(1f))
             }
             MiniKeyCap(text = "⌫", modifier = Modifier.weight(1.2f), textSize = 6.sp)
         }
@@ -536,6 +621,70 @@ fun MiniPeekingPreview() {
             MiniKeyCap(text = "Space", modifier = Modifier.weight(3.6f), textSize = 5.sp)
             MiniKeyCap(text = ".", modifier = Modifier.weight(0.9f))
             MiniKeyCap(text = "↵", modifier = Modifier.weight(1.2f), textSize = 6.sp)
+        }
+    }
+}
+
+@Composable
+fun QuickVersionCard(
+    selectedVersion: Int,
+    onVersionChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        border = BorderStroke(1.dp, CardBorderColor)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 18.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.settings_quick_version_title),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = PrimaryTextColor
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.settings_quick_version_desc),
+                fontSize = 13.sp,
+                color = SecondaryTextColor,
+                lineHeight = 18.sp
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                listOf(
+                    KeyboardSettings.QUICK_VERSION_3 to stringResource(R.string.settings_quick_version_3),
+                    KeyboardSettings.QUICK_VERSION_5 to stringResource(R.string.settings_quick_version_5),
+                ).forEach { (ver, label) ->
+                    val isVerSelected = selectedVersion == ver
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(38.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (isVerSelected) MintAccentColor else MiniKeySurface,
+                        border = if (!isVerSelected) BorderStroke(1.dp, CardBorderColor) else null,
+                        onClick = { onVersionChange(ver) }
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = label,
+                                color = if (isVerSelected) MintOnAccentColor else PrimaryTextColor,
+                                fontSize = 14.sp,
+                                fontWeight = if (isVerSelected) FontWeight.SemiBold else FontWeight.Normal,
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

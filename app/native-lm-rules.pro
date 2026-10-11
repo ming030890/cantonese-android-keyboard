@@ -1,0 +1,2 @@
+-keep class com.madeinhk.cantonesevoicekeyboard.quick.NativeQuickEngine { *; }
+-keep class com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognizer { native <methods>; }

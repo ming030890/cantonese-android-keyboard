@@ -53,6 +53,60 @@ fun SettingsScreenOnlyHandwritingSelectedScreenshot() {
 
 @PreviewTest
 @Preview(
+    name = "Settings screen all layouts selected",
+    showBackground = true,
+    widthDp = 412,
+    heightDp = 915,
+)
+@Composable
+fun SettingsScreenAllThreeLayoutsSelectedScreenshot() {
+    SettingsScreenScreenshotContent(
+        enabledLayouts = setOf(
+            KeyboardSettings.LAYOUT_QUICK,
+            KeyboardSettings.LAYOUT_ENGLISH,
+            KeyboardSettings.LAYOUT_HANDWRITING
+        ),
+        darkTheme = true
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Settings screen only quick selected",
+    showBackground = true,
+    widthDp = 412,
+    heightDp = 915,
+)
+@Composable
+fun SettingsScreenOnlyQuickSelectedScreenshot() {
+    SettingsScreenScreenshotContent(
+        enabledLayouts = setOf(KeyboardSettings.LAYOUT_QUICK),
+        darkTheme = true
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Settings screen quick version 5 selected",
+    showBackground = true,
+    widthDp = 412,
+    heightDp = 915,
+)
+@Composable
+fun SettingsScreenQuickVersion5SelectedScreenshot() {
+    SettingsScreenScreenshotContent(
+        enabledLayouts = setOf(
+            KeyboardSettings.LAYOUT_QUICK,
+            KeyboardSettings.LAYOUT_ENGLISH,
+            KeyboardSettings.LAYOUT_HANDWRITING
+        ),
+        quickVersion = KeyboardSettings.QUICK_VERSION_5,
+        darkTheme = true
+    )
+}
+
+@PreviewTest
+@Preview(
     name = "Settings screen light theme",
     showBackground = true,
     widthDp = 412,
@@ -69,6 +123,7 @@ fun SettingsScreenLightThemeScreenshot() {
 @Composable
 private fun SettingsScreenScreenshotContent(
     enabledLayouts: Set<String>,
+    quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
     darkTheme: Boolean = true,
     multilingualTyping: Boolean = false,
 ) {
@@ -78,6 +133,8 @@ private fun SettingsScreenScreenshotContent(
             onToggleLayout = {},
             multilingualTyping = multilingualTyping,
             onMultilingualTypingChange = {},
+            quickVersion = quickVersion,
+            onQuickVersionChange = {},
             onBack = {}
         )
     }

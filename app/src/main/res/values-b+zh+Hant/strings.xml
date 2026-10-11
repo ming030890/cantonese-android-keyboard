@@ -103,7 +103,12 @@
     <string name="settings_keyboard_layouts_section">鍵盤佈局</string>
     <string name="settings_layout_qwerty">QWERTY</string>
     <string name="settings_layout_handwriting">手寫</string>
+    <string name="settings_layout_quick">速成</string>
     <string name="settings_language_settings_header">語言設定</string>
+    <string name="settings_quick_version_title">速成版本</string>
+    <string name="settings_quick_version_desc">選擇速成輸入法嘅倉頡標準版本</string>
+    <string name="settings_quick_version_3">三代</string>
+    <string name="settings_quick_version_5">五代</string>
     <string name="settings_multilingual_typing_title">多語言輸入</string>
     <string name="settings_multilingual_typing_desc">僅喺啟用多種語言時適用</string>
     <string name="settings_preferences_header">偏好設定</string>

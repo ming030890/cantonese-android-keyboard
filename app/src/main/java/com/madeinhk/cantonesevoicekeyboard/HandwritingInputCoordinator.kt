@@ -207,7 +207,10 @@ internal class HandwritingInputCoordinator(
                 }
                 return
             }
+            val leftContext = editor.getTextBeforeCursor(512).orEmpty()
+            val rightContext = editor.getTextAfterCursor(256).orEmpty()
             val result = withContext(Dispatchers.Default) {
+                activeRecognizer.setLanguageContext(leftContext, rightContext)
                 val modelPixels = runCatching {
                     activeRecognizer.modelInputPixels(
                         request.pixels,
@@ -225,7 +228,7 @@ internal class HandwritingInputCoordinator(
                     48,
                 )
                 val predictions = if (request.strokes.isNotEmpty() && request.canvasWidth > 0f && request.canvasHeight > 0f) {
-                    val prevChar = editor.getTextBeforeCursor(1)?.takeLast(1)?.takeIf { it.isNotBlank() }
+                    val prevChar = leftContext.takeLast(1).takeIf { it.isNotBlank() }
                     activeRecognizer.predictStrokes(
                         request.strokes,
                         request.canvasWidth,

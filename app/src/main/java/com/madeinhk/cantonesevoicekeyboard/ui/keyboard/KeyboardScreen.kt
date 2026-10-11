@@ -24,6 +24,7 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 private val AlphaBottomRowSpacing = KeyboardUiDefaults.WritingPanelSpacing
@@ -41,6 +42,8 @@ fun KeyboardScreen(
     handwritingRecognizing: StateFlow<Boolean>,
     handwritingError: StateFlow<String?>,
     handwritingSession: StateFlow<Long>,
+    quickCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow<List<HandwritingCandidate>>(emptyList()),
+    onQuickKey: (String) -> Unit = {},
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
@@ -68,10 +71,25 @@ fun KeyboardScreen(
     val autofillView by autofillSuggestionView.collectAsState()
     val clipboard by clipboardSuggestion.collectAsState()
     val candidates by handwritingCandidates.collectAsState()
+    val qCandidates by quickCandidates.collectAsState()
     val handwritingBusy by handwritingRecognizing.collectAsState()
     val handwritingFailure by handwritingError.collectAsState()
     val handwritingSessionId by handwritingSession.collectAsState()
-    var handwritingCandidatePage by remember(candidates, initialHandwritingCandidatePage) {
+
+    var activePanel by remember(inputMode, initialEmojiPanel) {
+        mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
+    }
+    var previousPanelBeforeNumber by remember(inputMode) {
+        mutableStateOf(inputMode.toPanel())
+    }
+    val isQuickPanel = activePanel == KeyboardPanel.Quick
+    val isHandwritingPanel = activePanel == KeyboardPanel.Handwriting
+    val activeCandidateList = when {
+        isQuickPanel -> qCandidates
+        isHandwritingPanel -> candidates
+        else -> emptyList()
+    }
+    var candidatePage by remember(activeCandidateList, initialHandwritingCandidatePage) {
         mutableIntStateOf(initialHandwritingCandidatePage)
     }
 
@@ -87,9 +105,6 @@ fun KeyboardScreen(
                 SymbolVariant.Chinese
             }
         )
-    }
-    var activePanel by remember(inputMode, initialEmojiPanel) {
-        mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
     }
     var isUppercase by remember(activePanel, initialUppercase) {
         mutableStateOf(initialUppercase)
@@ -111,7 +126,7 @@ fun KeyboardScreen(
     val toolbarKeys = if (toolbarVisible) {
         registerTextToolbarKeys(
             keyRegistry,
-            candidates = if (activePanel == KeyboardPanel.Handwriting) candidates else emptyList(),
+            candidates = activeCandidateList,
         )
     } else {
         null
@@ -129,7 +144,13 @@ fun KeyboardScreen(
     }
     val hostView = LocalView.current
     SideEffect {
-        inputReceiver.onCommitText = onCommitText
+        inputReceiver.onCommitText = { text ->
+            if (activePanel == KeyboardPanel.Quick) {
+                onQuickKey(text)
+            } else {
+                onCommitText(text)
+            }
+        }
         inputReceiver.onDelete = onDeleteSurroundingText
         inputReceiver.onSendSpace = onSendSpace
         inputReceiver.onSendEnter = onSendEnter
@@ -138,10 +159,10 @@ fun KeyboardScreen(
         inputReceiver.onPasteClipboard = onPasteClipboard
         inputReceiver.onCandidateTapped = onHandwritingCandidateSelected
         inputReceiver.onCandidatePrevious = {
-            handwritingCandidatePage = (handwritingCandidatePage - 1).coerceAtLeast(0)
+            candidatePage = (candidatePage - 1).coerceAtLeast(0)
         }
         inputReceiver.onCandidateNext = {
-            handwritingCandidatePage++
+            candidatePage++
         }
         inputReceiver.onOpenEmoji = { activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
@@ -149,14 +170,17 @@ fun KeyboardScreen(
         inputReceiver.onModeSwitch = { target ->
             when (target) {
                 "number.chinese" -> {
+                    previousPanelBeforeNumber = activePanel
                     symbolVariant = SymbolVariant.Chinese
                     activePanel = KeyboardPanel.Number
                 }
                 "number.english" -> {
+                    previousPanelBeforeNumber = activePanel
                     symbolVariant = SymbolVariant.English
                     activePanel = KeyboardPanel.Number
                 }
                 "alpha" -> activePanel = KeyboardPanel.AlphaNum
+                "quick" -> activePanel = KeyboardPanel.Quick
                 "handwriting" -> activePanel = KeyboardPanel.Handwriting
             }
             onKeyboardInputModeSelected(activePanel.toInputMode())
@@ -172,7 +196,9 @@ fun KeyboardScreen(
         onDispose { touchController.dispose() }
     }
     val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum
-    val isTextPanel = activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Number
+    val isTextPanel = activePanel == KeyboardPanel.AlphaNum ||
+        activePanel == KeyboardPanel.Number ||
+        activePanel == KeyboardPanel.Quick
     // Android exposes the IME dismiss/switch controls as a caption bar.
     // Union takes the maximum on each edge rather than double-counting bars.
     val systemPadding = WindowInsets.navigationBars
@@ -271,19 +297,19 @@ fun KeyboardScreen(
                     keyRegistry = keyRegistry,
                     keys = checkNotNull(toolbarKeys),
                     secondaryAction = toolbarState.secondaryAction,
-                    candidates = candidates,
-                    showHandwritingCandidates = activePanel == KeyboardPanel.Handwriting,
+                    candidates = activeCandidateList,
+                    showHandwritingCandidates = isHandwritingPanel || (isQuickPanel && qCandidates.isNotEmpty()),
                     voiceState = state,
                     volume = volume,
-                    handwritingBusy = handwritingBusy,
-                    handwritingError = handwritingFailure,
+                    handwritingBusy = if (isHandwritingPanel) handwritingBusy else false,
+                    handwritingError = if (isHandwritingPanel) handwritingFailure else null,
                     autofillView = autofillView,
                     clipboard = clipboard,
                     surfaceOriginInRoot = keyboardSurfaceOriginInRoot,
                     onAutofillBoundsChanged = { autofillBoundsInSurface = it },
-                    handwritingCandidatePage = handwritingCandidatePage,
+                    handwritingCandidatePage = candidatePage,
                     onHandwritingCandidatePageChanged = { page ->
-                        handwritingCandidatePage = page
+                        candidatePage = page
                     },
                 )
             }
@@ -329,6 +355,17 @@ fun KeyboardScreen(
                         standardKeyTouchWidth = standardKeyTouchWidth,
                     )
                 }
+                KeyboardPanel.Quick -> {
+                    QuickPanel(
+                        rowHeight = textRowHeight,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(textRowHeight * 3),
+                        keyRegistry = keyRegistry,
+                        isUppercase = isUppercase,
+                        standardKeyTouchWidth = standardKeyTouchWidth,
+                    )
+                }
                 KeyboardPanel.Handwriting -> {
                     HandwritingPanel(
                         modifier = Modifier
@@ -347,7 +384,18 @@ fun KeyboardScreen(
                 }
             }
 
-            if (isAlphaPanel) {
+            if (isQuickPanel) {
+                QuickBottomRow(
+                    rowHeight = textRowHeight,
+                    action = action,
+                    keyRegistry = keyRegistry,
+                    currentMode = KeyboardInputMode.Quick,
+                    modeSwitchLabel = "?123",
+                    modeSwitchTarget = "number.chinese",
+                    commaValue = ",",
+                    periodValue = ".",
+                )
+            } else if (isAlphaPanel) {
                 AlphaNumBottomRow(
                     rowHeight = textRowHeight,
                     action = action,
@@ -358,12 +406,22 @@ fun KeyboardScreen(
                     periodValue = "."
                 )
             } else if (activePanel == KeyboardPanel.Number) {
+                val backTarget = when (previousPanelBeforeNumber) {
+                    KeyboardPanel.Quick -> "quick"
+                    KeyboardPanel.Handwriting -> "handwriting"
+                    else -> "alpha"
+                }
+                val backLabel = when (previousPanelBeforeNumber) {
+                    KeyboardPanel.Quick -> "速"
+                    KeyboardPanel.Handwriting -> "手寫"
+                    else -> "ABC"
+                }
                 AlphaNumBottomRow(
                     rowHeight = textRowHeight,
                     action = action,
                     keyRegistry = keyRegistry,
-                    modeSwitchLabel = "ABC",
-                    modeSwitchTarget = "alpha",
+                    modeSwitchLabel = backLabel,
+                    modeSwitchTarget = backTarget,
                     commaValue = ",".toSymbolCommitValue(symbolVariant),
                     periodValue = ".".toSymbolCommitValue(symbolVariant)
                 )
@@ -406,15 +464,18 @@ fun KeyboardScreen(
                     }
 
                     val context = LocalContext.current
-                    val isEnglishEnabled = remember(context) {
-                        KeyboardSettings.isLayoutEnabled(context, KeyboardSettings.LAYOUT_ENGLISH)
+                    val enabledLayouts = remember(context) {
+                        KeyboardSettings.getEnabledLayouts(context)
                     }
-                    val showAlphaSwitch = activePanel == KeyboardPanel.Handwriting && isEnglishEnabled
+                    val nextLayoutTarget = remember(enabledLayouts) {
+                        computeNextLayoutTarget(KeyboardInputMode.Handwriting, enabledLayouts)
+                    }
+                    val showLayoutSwitch = activePanel == KeyboardPanel.Handwriting && nextLayoutTarget != null
                     KeyVisual(
                         key = keyRegistry.key(
                             id = "bottom.secondary",
-                            data = if (showAlphaSwitch) {
-                                KeyData("bottom.secondary", KeyboardKeyKind.ModeSwitch, text = "alpha")
+                            data = if (showLayoutSwitch) {
+                                KeyData("bottom.secondary", KeyboardKeyKind.ModeSwitch, text = nextLayoutTarget)
                             } else {
                                 KeyData("bottom.secondary", KeyboardKeyKind.Settings)
                             },
@@ -428,7 +489,7 @@ fun KeyboardScreen(
                         verticalPadding = 8.dp,
                         utilityStyle = true,
                     ) {
-                        if (showAlphaSwitch) {
+                        if (showLayoutSwitch) {
                             KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                         } else {
                             SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
@@ -510,7 +571,8 @@ private enum class KeyboardPanel {
     Handwriting,
     Emoji,
     Number,
-    AlphaNum
+    AlphaNum,
+    Quick,
 }
 
 private fun KeyboardInputMode.toPanel(): KeyboardPanel =
@@ -518,6 +580,7 @@ private fun KeyboardInputMode.toPanel(): KeyboardPanel =
         KeyboardInputMode.Handwriting -> KeyboardPanel.Handwriting
         KeyboardInputMode.Number -> KeyboardPanel.Number
         KeyboardInputMode.AlphaNum -> KeyboardPanel.AlphaNum
+        KeyboardInputMode.Quick -> KeyboardPanel.Quick
     }
 
 private fun KeyboardPanel.toInputMode(): KeyboardInputMode =
@@ -525,4 +588,5 @@ private fun KeyboardPanel.toInputMode(): KeyboardInputMode =
         KeyboardPanel.Handwriting, KeyboardPanel.Emoji -> KeyboardInputMode.Handwriting
         KeyboardPanel.Number -> KeyboardInputMode.Number
         KeyboardPanel.AlphaNum -> KeyboardInputMode.AlphaNum
+        KeyboardPanel.Quick -> KeyboardInputMode.Quick
     }

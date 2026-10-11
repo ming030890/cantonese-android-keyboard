@@ -7,11 +7,12 @@ import org.junit.Test
 class KeyboardSettingsTest {
 
     @Test
-    fun defaultLayoutsContainsBothEnglishAndHandwriting() {
+    fun defaultLayoutsContainsExpectedLayouts() {
         val defaults = KeyboardSettings.DEFAULT_LAYOUTS
         assertTrue(defaults.contains(KeyboardSettings.LAYOUT_ENGLISH))
+        assertTrue(defaults.contains(KeyboardSettings.LAYOUT_QUICK))
         assertTrue(defaults.contains(KeyboardSettings.LAYOUT_HANDWRITING))
-        assertEquals(2, defaults.size)
+        assertEquals(3, defaults.size)
     }
 
     @Test

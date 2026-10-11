@@ -103,7 +103,12 @@
     <string name="settings_keyboard_layouts_section">键盘布局</string>
     <string name="settings_layout_qwerty">QWERTY</string>
     <string name="settings_layout_handwriting">手写</string>
+    <string name="settings_layout_quick">速成</string>
     <string name="settings_language_settings_header">语言设置</string>
+    <string name="settings_quick_version_title">速成版本</string>
+    <string name="settings_quick_version_desc">选择速成输入法的仓颉标准版本</string>
+    <string name="settings_quick_version_3">三代</string>
+    <string name="settings_quick_version_5">五代</string>
     <string name="settings_multilingual_typing_title">多语言输入</string>
     <string name="settings_multilingual_typing_desc">仅在启用多种语言时适用</string>
     <string name="settings_preferences_header">偏好设置</string>

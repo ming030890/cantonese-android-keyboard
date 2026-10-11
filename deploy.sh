@@ -124,12 +124,40 @@ cp "$QWEN_ASR_TARGET_DIR/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST
 echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
 
 echo -e "${COLOR_INFO}Compiling the Rust handwriting inference library...${COLOR_RESET}"
-pushd "$PROJECT_DIR/../handwriting-recognizer/rust" > /dev/null
-CARGO_TARGET_DIR="$HANDWRITING_TARGET_DIR" cargo ndk -t arm64-v8a build --release --features android
+NATIVE_LM_LINKER="${NATIVE_LM_LINKER:-/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android32-clang}"
+pushd "${TMPDIR:-/private/tmp}" > /dev/null
+CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$HANDWRITING_TARGET_DIR" cargo build --manifest-path "$PROJECT_DIR/../handwriting-recognizer/rust/Cargo.toml" --target aarch64-linux-android --release --features android --lib
 popd > /dev/null
 mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
 cp "$HANDWRITING_TARGET_DIR/aarch64-linux-android/release/libstust_handwriting_inference.so" "$HWR_SO_DEST"
 echo -e "${COLOR_SUCCESS}Handwriting native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
+
+# Quick and handwriting share this standalone candidate language model.
+LM_TARGET_DIR="${LM_TARGET_DIR:-/private/tmp/cantonese-ngram-android-target}"
+LM_MANIFEST="$QWEN_ASR_DIR/crates/cantonese-ngram/Cargo.toml"
+# Use an independent working directory to avoid inheriting ASR linker flags.
+pushd "${TMPDIR:-/private/tmp}" > /dev/null
+CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$LM_TARGET_DIR" cargo build --manifest-path "$LM_MANIFEST" --target aarch64-linux-android --release --features android --lib
+popd > /dev/null
+cp "$LM_TARGET_DIR/aarch64-linux-android/release/libcantonese_ngram.so" "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/"
+LM_SOURCE="${LM_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/nested-curriculum-128-256-512-v7/export-width256/rust/model.cng}"
+LM_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/model.cng"
+if [ -f "$LM_SOURCE" ]; then
+    mkdir -p "$(dirname "$LM_ASSET")"
+    cp "$LM_SOURCE" "$LM_ASSET"
+elif [ ! -f "$LM_ASSET" ]; then
+    echo "Missing Rust LM export: $LM_SOURCE" >&2
+    exit 1
+fi
+
+HWR_FUSION_SOURCE="${HWR_FUSION_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique/fusion.json}"
+HWR_FUSION_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/handwriting_fusion.json"
+if [ -f "$HWR_FUSION_SOURCE" ]; then
+    cp "$HWR_FUSION_SOURCE" "$HWR_FUSION_ASSET"
+elif [ ! -f "$HWR_FUSION_ASSET" ]; then
+    echo "Missing handwriting fusion calibration: $HWR_FUSION_SOURCE" >&2
+    exit 1
+fi
 
 # ---------------------------------------------------------------------------
 # 3. Stage the ASR model into the Play Asset Delivery packs

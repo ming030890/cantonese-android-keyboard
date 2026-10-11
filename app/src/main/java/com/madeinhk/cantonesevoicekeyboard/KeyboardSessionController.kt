@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InlineSuggestionsRequest
 import android.view.inputmethod.InlineSuggestionsResponse
+import com.madeinhk.cantonesevoicekeyboard.quick.QuickInputCoordinator
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardAction
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,11 @@ internal class KeyboardSessionController(
         isInputViewVisible = { inputViewVisible },
         stopVoiceInput = voice::stopForHandwriting,
     )
+    private val quick = QuickInputCoordinator(
+        context = service,
+        editor = editor,
+        initialVersion = KeyboardSettings.getQuickVersion(service),
+    )
     private val suggestions = KeyboardSuggestionCoordinator(
         service = service,
         editor = editor,
@@ -42,6 +48,7 @@ internal class KeyboardSessionController(
     val uiState = voice.state
     val volumeLevel = voice.volume
     val handwritingCandidates = handwriting.candidates
+    val quickCandidates = quick.candidates
     val handwritingRecognizing = handwriting.recognizing
     val handwritingError = handwriting.error
     val autofillSuggestionView = suggestions.autofillSuggestionView
@@ -49,14 +56,27 @@ internal class KeyboardSessionController(
 
     private val _keyboardAction = MutableStateFlow(KeyboardAction.Enter)
     val keyboardAction = _keyboardAction.asStateFlow()
-    private val _keyboardInputMode = MutableStateFlow(
-        if (!KeyboardSettings.isLayoutEnabled(service, KeyboardSettings.LAYOUT_HANDWRITING) &&
-            KeyboardSettings.isLayoutEnabled(service, KeyboardSettings.LAYOUT_ENGLISH)
-        ) {
-            KeyboardInputMode.AlphaNum
-        } else {
-            KeyboardInputMode.Handwriting
+
+    private var lastUserSelectedLayout: KeyboardInputMode? = null
+
+    private fun isLayoutSupported(mode: KeyboardInputMode, enabled: Set<String>): Boolean =
+        when (mode) {
+            KeyboardInputMode.Quick -> enabled.contains(KeyboardSettings.LAYOUT_QUICK)
+            KeyboardInputMode.AlphaNum -> enabled.contains(KeyboardSettings.LAYOUT_ENGLISH)
+            KeyboardInputMode.Handwriting -> enabled.contains(KeyboardSettings.LAYOUT_HANDWRITING)
+            KeyboardInputMode.Number -> true
         }
+
+    private fun defaultInputMode(enabled: Set<String>): KeyboardInputMode =
+        when {
+            enabled.contains(KeyboardSettings.LAYOUT_QUICK) -> KeyboardInputMode.Quick
+            enabled.contains(KeyboardSettings.LAYOUT_ENGLISH) -> KeyboardInputMode.AlphaNum
+            enabled.contains(KeyboardSettings.LAYOUT_HANDWRITING) -> KeyboardInputMode.Handwriting
+            else -> KeyboardInputMode.Quick
+        }
+
+    private val _keyboardInputMode = MutableStateFlow(
+        defaultInputMode(KeyboardSettings.getEnabledLayouts(service))
     )
     val keyboardInputMode = _keyboardInputMode.asStateFlow()
     private val _handwritingSession = MutableStateFlow(0L)
@@ -71,6 +91,7 @@ internal class KeyboardSessionController(
     }
 
     fun onStartInputView(info: EditorInfo?) {
+        quick.setVersion(KeyboardSettings.getQuickVersion(service))
         updateEditorPresentation(info)
         ensureValidInputMode()
         suggestions.onInputStarted()
@@ -78,21 +99,18 @@ internal class KeyboardSessionController(
         val session = advanceSession()
         voice.onInputViewStarted(session)
         handwriting.onInputViewStarted(session)
+        refreshQuickPredictions()
     }
 
     private fun ensureValidInputMode() {
         val enabledLayouts = KeyboardSettings.getEnabledLayouts(service)
-        val hasHandwriting = enabledLayouts.contains(KeyboardSettings.LAYOUT_HANDWRITING)
-        val hasEnglish = enabledLayouts.contains(KeyboardSettings.LAYOUT_ENGLISH)
-
-        if (!hasHandwriting && _keyboardInputMode.value == KeyboardInputMode.Handwriting) {
-            _keyboardInputMode.value = KeyboardInputMode.AlphaNum
-        } else if (!hasEnglish && _keyboardInputMode.value == KeyboardInputMode.AlphaNum) {
-            _keyboardInputMode.value = KeyboardInputMode.Handwriting
+        if (!isLayoutSupported(_keyboardInputMode.value, enabledLayouts)) {
+            _keyboardInputMode.value = defaultInputMode(enabledLayouts)
         }
     }
 
     fun onFinishInput() {
+        quick.discard()
         handwriting.discard()
         advanceSession()
         suggestions.onInputFinished()
@@ -100,6 +118,7 @@ internal class KeyboardSessionController(
     }
 
     fun onFinishInputView() {
+        quick.discard()
         handwriting.discard()
         suggestions.onInputFinished()
         inputViewVisible = false
@@ -107,6 +126,7 @@ internal class KeyboardSessionController(
     }
 
     fun onWindowHidden() {
+        quick.discard()
         handwriting.discard()
         advanceSession()
         suggestions.onInputFinished()
@@ -114,7 +134,14 @@ internal class KeyboardSessionController(
         finishSession(releaseModel = true)
     }
 
-    fun onSelectionChanged() = suggestions.onSelectionChanged()
+    private fun refreshQuickPredictions() {
+        if (inputViewVisible && _keyboardInputMode.value == KeyboardInputMode.Quick) quick.refreshPredictions()
+    }
+
+    fun onSelectionChanged() {
+        suggestions.onSelectionChanged()
+        refreshQuickPredictions()
+    }
 
     fun destroy() {
         inputViewVisible = false
@@ -122,6 +149,7 @@ internal class KeyboardSessionController(
         suggestions.onInputFinished()
         voice.destroy()
         handwriting.destroy()
+        quick.close()
     }
 
     fun createInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest =
@@ -131,28 +159,52 @@ internal class KeyboardSessionController(
         suggestions.onInlineSuggestionsResponse(response)
 
     fun toggleRecording() {
-        if (!voice.isRecording()) handwriting.accept()
+        if (!voice.isRecording()) {
+            quick.discard()
+            handwriting.accept()
+        }
         voice.toggle()
     }
 
     fun deleteSurroundingText() {
         suggestions.clearAutofill()
-        if (handwriting.hasActiveInput()) handwriting.discard()
-        else editor.deleteSelectionOrPreviousCharacter()
+        if (quick.hasActiveInput()) {
+            quick.onDelete()
+        } else if (handwriting.hasActiveInput()) {
+            handwriting.discard()
+        } else {
+            editor.deleteSelectionOrPreviousCharacter()
+            refreshQuickPredictions()
+        }
     }
 
     fun commitText(text: String) {
         suggestions.clearAutofill()
+        if (quick.hasActiveInput()) quick.discard()
         handwriting.accept()
         editor.commitText(text)
+        refreshQuickPredictions()
     }
 
-    fun sendSpace() = commitText(" ")
+    fun onQuickKey(char: String) {
+        suggestions.clearAutofill()
+        quick.onKey(char)
+    }
+
+    fun sendSpace() {
+        if (quick.hasActiveInput()) {
+            quick.onSpace()
+        } else {
+            commitText(" ")
+        }
+    }
 
     fun sendEnter() {
         suggestions.clearAutofill()
+        if (quick.hasActiveInput()) quick.discard()
         handwriting.accept()
         editor.sendEnter()
+        refreshQuickPredictions()
     }
 
     fun pasteClipboard() = suggestions.pasteClipboard()
@@ -169,21 +221,44 @@ internal class KeyboardSessionController(
     fun onHandwritingStrokeStarted(startsNewCharacter: Boolean) =
         handwriting.onStrokeStarted(startsNewCharacter)
 
-    fun selectHandwritingCandidate(text: String) = handwriting.selectCandidate(text)
+    fun selectCandidate(text: String) {
+        if (_keyboardInputMode.value == KeyboardInputMode.Quick) {
+            quick.selectCandidate(text)
+        } else {
+            handwriting.selectCandidate(text)
+        }
+    }
+
+    fun selectHandwritingCandidate(text: String) = selectCandidate(text)
 
     fun selectKeyboardInputMode(mode: KeyboardInputMode) {
+        quick.discard()
         handwriting.accept()
+        lastUserSelectedLayout = mode
         _keyboardInputMode.value = mode
+        refreshQuickPredictions()
     }
 
     fun onAutofillTapped() = suggestions.onAutofillTapped()
 
     private fun updateEditorPresentation(info: EditorInfo?) {
         _keyboardAction.value = keyboardActionFor(info)
-        _keyboardInputMode.value = keyboardInputModeFor(info)
+        val targetMode = keyboardInputModeFor(info)
+        if (targetMode == KeyboardInputMode.Number || targetMode == KeyboardInputMode.AlphaNum) {
+            _keyboardInputMode.value = targetMode
+        } else {
+            val enabledLayouts = KeyboardSettings.getEnabledLayouts(service)
+            val selected = lastUserSelectedLayout
+            if (selected != null && isLayoutSupported(selected, enabledLayouts)) {
+                _keyboardInputMode.value = selected
+            } else {
+                _keyboardInputMode.value = defaultInputMode(enabledLayouts)
+            }
+        }
     }
 
     private fun finishSession(releaseModel: Boolean) {
+        quick.discard()
         voice.finish(releaseModel, inputViewSession)
         handwriting.finish(releaseModel, inputViewSession)
     }

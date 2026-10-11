@@ -10,17 +10,41 @@ object KeyboardSettings {
     private const val KEY_ENABLED_LAYOUTS = "enabled_layouts"
     private const val KEY_MULTILINGUAL = "multilingual_typing"
     private const val KEY_HAPTIC = "haptic_feedback"
+    private const val KEY_QUICK_VERSION = "quick_version"
 
     const val LAYOUT_ENGLISH = "english"
     const val LAYOUT_HANDWRITING = "handwriting"
+    const val LAYOUT_QUICK = "quick"
 
-    val DEFAULT_LAYOUTS = setOf(LAYOUT_ENGLISH, LAYOUT_HANDWRITING)
+    const val QUICK_VERSION_3 = 3
+    const val QUICK_VERSION_5 = 5
+    const val DEFAULT_QUICK_VERSION = QUICK_VERSION_3
+
+    val DEFAULT_LAYOUTS = setOf(LAYOUT_ENGLISH, LAYOUT_QUICK, LAYOUT_HANDWRITING)
 
     private val _enabledLayoutsFlow = MutableStateFlow<Set<String>>(DEFAULT_LAYOUTS)
     val enabledLayoutsFlow: StateFlow<Set<String>> = _enabledLayoutsFlow.asStateFlow()
 
+    private val _quickVersionFlow = MutableStateFlow(DEFAULT_QUICK_VERSION)
+    val quickVersionFlow: StateFlow<Int> = _quickVersionFlow.asStateFlow()
+
     fun init(context: Context) {
         _enabledLayoutsFlow.value = getEnabledLayouts(context)
+        _quickVersionFlow.value = getQuickVersion(context)
+    }
+
+    fun getQuickVersion(context: Context): Int {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getInt(KEY_QUICK_VERSION, DEFAULT_QUICK_VERSION)
+    }
+
+    fun setQuickVersion(context: Context, version: Int) {
+        val safeVersion = if (version == QUICK_VERSION_5) QUICK_VERSION_5 else QUICK_VERSION_3
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_QUICK_VERSION, safeVersion)
+            .apply()
+        _quickVersionFlow.value = safeVersion
     }
 
     fun getEnabledLayouts(context: Context): Set<String> {

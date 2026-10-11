@@ -137,6 +137,62 @@ fun KeyboardScreenAlphaNumPanelScreenshot() {
 
 @PreviewTest
 @Preview(
+    name = "Keyboard quick panel",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenQuickPanelScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Quick
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard quick candidates",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenQuickCandidatesScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Quick,
+        candidates = listOf(
+            HandwritingCandidate("係", 0),
+            HandwritingCandidate("你", 1),
+            HandwritingCandidate("個", 2),
+            HandwritingCandidate("好", 3),
+            HandwritingCandidate("我", 4),
+        ),
+    )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard quick uppercase",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenQuickUppercaseScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Quick,
+        initialUppercase = true,
+    )
+}
+
+@PreviewTest
+@Preview(
     name = "Keyboard clipboard preview",
     showBackground = true,
     backgroundColor = 0xFF0D1117,
@@ -386,6 +442,22 @@ fun KeyboardScreenCompactWidthScreenshot() {
 
 @PreviewTest
 @Preview(
+    name = "Keyboard compact quick",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 360,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenCompactQuickScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.Quick,
+    )
+}
+
+@PreviewTest
+@Preview(
     name = "Keyboard compact handwriting",
     showBackground = true,
     backgroundColor = 0xFF0D1117,
@@ -469,6 +541,7 @@ private fun KeyboardScreenScreenshotContent(
             keyboardAction = MutableStateFlow(action),
             keyboardInputMode = MutableStateFlow(inputMode),
             handwritingCandidates = MutableStateFlow(candidates),
+            quickCandidates = MutableStateFlow(candidates),
             handwritingRecognizing = MutableStateFlow(handwritingRecognizing),
             handwritingError = MutableStateFlow(handwritingError),
             handwritingSession = MutableStateFlow(0L),

@@ -17,6 +17,7 @@ data class StrokePoint(
 class HandwritingRecognitionException(message: String) : RuntimeException(message)
 
 interface HandwritingRecognitionEngine : AutoCloseable {
+    fun setLanguageContext(left: String, right: String) {}
     fun modelInputPixels(pixels: ByteArray, width: Int, height: Int): ByteArray? = null
 
     fun predict(
@@ -69,7 +70,22 @@ class HandwritingRecognizer private constructor(
                 val lm = runCatching {
                     appContext.assets.open(LM_ASSET).use { it.readBytes() }
                 }.getOrNull() ?: ByteArray(0)
-                val handle = nativeCreate(model, labels, lm)
+                val neural = runCatching { appContext.assets.open("language_model/model.cng").use { it.readBytes() } }.getOrElse { ByteArray(0) }
+                val fusion = if (neural.isEmpty()) ByteArray(0) else runCatching {
+                    appContext.assets.open("language_model/handwriting_fusion.json").use { it.readBytes() }
+                }.getOrElse { ByteArray(0) }
+                if (fusion.isNotEmpty()) {
+                    val calibration = org.json.JSONObject(fusion.toString(Charsets.UTF_8))
+                    check(calibration.getInt("version") == 1) { "Unsupported handwriting fusion version" }
+                    fun sha(bytes: ByteArray) = java.security.MessageDigest.getInstance("SHA-256")
+                        .digest(bytes).joinToString("") { "%02x".format(it.toInt() and 0xff) }
+                    check(calibration.getString("neural_model_sha256") == sha(neural)) { "Fusion calibration LM mismatch" }
+                    val inputs = calibration.getJSONObject("inputs")
+                    for ((name, bytes) in listOf("handwriting_model_sha256" to model, "labels_sha256" to labels, "counts_sha256" to lm)) {
+                        check(inputs.getString(name) == sha(bytes)) { "Fusion calibration $name mismatch" }
+                    }
+                }
+                val handle = nativeCreate(model, labels, lm, neural, fusion)
                 if (handle == 0L) {
                     null
                 } else {
@@ -81,7 +97,10 @@ class HandwritingRecognizer private constructor(
         }
 
         @JvmStatic
-        private external fun nativeCreate(modelBytes: ByteArray, labelBytes: ByteArray, lmBytes: ByteArray): Long
+        private external fun nativeCreate(modelBytes: ByteArray, labelBytes: ByteArray, lmBytes: ByteArray, neuralBytes: ByteArray, fusionBytes: ByteArray): Long
+
+        @JvmStatic
+        private external fun nativeSetLanguageContext(handle: Long, left: String, right: String)
 
         @JvmStatic
         private external fun nativeDestroy(handle: Long)
@@ -113,6 +132,11 @@ class HandwritingRecognizer private constructor(
             topK: Int,
             prevChar: String?,
         ): Array<String>?
+    }
+
+    @Synchronized
+    override fun setLanguageContext(left: String, right: String) {
+        if (nativeHandle != 0L) nativeSetLanguageContext(nativeHandle, left, right)
     }
 
     @Synchronized
