@@ -48,9 +48,11 @@ import com.madeinhk.cantonesevoicekeyboard.DebugAudio
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwriting
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingSettings
 import com.madeinhk.cantonesevoicekeyboard.PromptedHandwriting
+import com.madeinhk.cantonesevoicekeyboard.Settings as KeyboardSettingsNavKey
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.madeinhk.cantonesevoicekeyboard.theme.*
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.SettingsIcon
 
 @Composable
 fun MainScreen(
@@ -142,6 +144,7 @@ fun MainScreen(
     },
     onOpenDebugHandwriting = { onItemClick(DebugHandwriting) },
     onOpenPromptedHandwriting = { onItemClick(PromptedHandwriting) },
+    onOpenSettings = { onItemClick(KeyboardSettingsNavKey) },
     modifier = modifier
   )
 }
@@ -167,6 +170,7 @@ fun MainScreenContent(
   onStoreDebugHandwritingChange: (Boolean) -> Unit = {},
   onOpenDebugHandwriting: () -> Unit = {},
   onOpenPromptedHandwriting: () -> Unit = {},
+  onOpenSettings: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
   // Backdrop gradient comes from the theme (decided once per light/dark there),
@@ -182,7 +186,7 @@ fun MainScreenContent(
         .verticalScroll(rememberScrollState()),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      AppHeader()
+      AppHeader(onOpenSettings = onOpenSettings)
 
       // Quick Setup Walkthrough Cards
       SetupStepCard(
@@ -238,28 +242,45 @@ fun MainScreenContent(
 }
 
 @Composable
-fun AppHeader(modifier: Modifier = Modifier) {
-  Column(
-    modifier = modifier.fillMaxWidth(),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    MicLogo(modifier = Modifier.padding(top = 16.dp, bottom = 12.dp))
-    Text(
-      text = stringResource(id = R.string.app_header_title),
-      color = MaterialTheme.colorScheme.onBackground,
-      fontSize = 22.sp,
-      fontWeight = FontWeight.Black,
-      letterSpacing = 1.sp
-    )
-    Spacer(modifier = Modifier.height(4.dp))
-    Text(
-      text = stringResource(id = R.string.app_header_subtitle),
-      color = MaterialTheme.colorScheme.primary,
-      fontSize = 12.sp,
-      fontWeight = FontWeight.SemiBold,
-      letterSpacing = 2.sp
-    )
-    Spacer(modifier = Modifier.height(16.dp))
+fun AppHeader(
+  onOpenSettings: () -> Unit = {},
+  modifier: Modifier = Modifier
+) {
+  Box(modifier = modifier.fillMaxWidth()) {
+    IconButton(
+      onClick = onOpenSettings,
+      modifier = Modifier
+        .align(Alignment.TopEnd)
+        .padding(top = 8.dp)
+        .size(40.dp)
+        .clip(CircleShape)
+        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+    ) {
+      SettingsIcon(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onSurface)
+    }
+
+    Column(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+      MicLogo(modifier = Modifier.padding(top = 16.dp, bottom = 12.dp))
+      Text(
+        text = stringResource(id = R.string.app_header_title),
+        color = MaterialTheme.colorScheme.onBackground,
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Black,
+        letterSpacing = 1.sp
+      )
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(
+        text = stringResource(id = R.string.app_header_subtitle),
+        color = MaterialTheme.colorScheme.primary,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 2.sp
+      )
+      Spacer(modifier = Modifier.height(16.dp))
+    }
   }
 }
 

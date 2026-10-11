@@ -96,4 +96,21 @@
     <string name="error_audio_permission_missing">缺少麦克风权限。</string>
     <string name="error_microphone_init_failed">无法启动麦克风。</string>
     <string name="error_failed_access_microphone">无法访问麦克风。</string>
+
+    <!-- New Settings Screen Strings -->
+    <string name="settings_screen_title">English (UK)</string>
+    <string name="settings_screen_label">设置</string>
+    <string name="settings_keyboard_layouts_section">键盘布局</string>
+    <string name="settings_layout_qwerty">QWERTY</string>
+    <string name="settings_layout_handwriting">手写</string>
+    <string name="settings_language_settings_header">语言设置</string>
+    <string name="settings_multilingual_typing_title">多语言输入</string>
+    <string name="settings_multilingual_typing_desc">仅在启用多种语言时适用</string>
+    <string name="settings_preferences_header">偏好设置</string>
+    <string name="settings_haptic_title">按键震动反馈</string>
+    <string name="settings_haptic_desc">按键时震动</string>
+    <string name="settings_onboarding_header">新手导览</string>
+    <string name="settings_open_onboarding_title">设置与新手指南</string>
+    <string name="settings_open_onboarding_desc">检查麦克风权限、系统键盘启用及试用输入框</string>
+    <string name="settings_at_least_one_layout">必须选择至少一个键盘布局</string>
 </resources>

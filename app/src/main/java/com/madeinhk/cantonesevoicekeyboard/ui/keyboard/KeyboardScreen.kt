@@ -15,9 +15,11 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
@@ -403,10 +405,15 @@ fun KeyboardScreen(
                         )
                     }
 
+                    val context = LocalContext.current
+                    val isEnglishEnabled = remember(context) {
+                        KeyboardSettings.isLayoutEnabled(context, KeyboardSettings.LAYOUT_ENGLISH)
+                    }
+                    val showAlphaSwitch = activePanel == KeyboardPanel.Handwriting && isEnglishEnabled
                     KeyVisual(
                         key = keyRegistry.key(
                             id = "bottom.secondary",
-                            data = if (activePanel == KeyboardPanel.Handwriting) {
+                            data = if (showAlphaSwitch) {
                                 KeyData("bottom.secondary", KeyboardKeyKind.ModeSwitch, text = "alpha")
                             } else {
                                 KeyData("bottom.secondary", KeyboardKeyKind.Settings)
@@ -421,7 +428,7 @@ fun KeyboardScreen(
                         verticalPadding = 8.dp,
                         utilityStyle = true,
                     ) {
-                        if (activePanel == KeyboardPanel.Handwriting) {
+                        if (showAlphaSwitch) {
                             KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
                         } else {
                             SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)

@@ -49,7 +49,15 @@ internal class KeyboardSessionController(
 
     private val _keyboardAction = MutableStateFlow(KeyboardAction.Enter)
     val keyboardAction = _keyboardAction.asStateFlow()
-    private val _keyboardInputMode = MutableStateFlow(KeyboardInputMode.Handwriting)
+    private val _keyboardInputMode = MutableStateFlow(
+        if (!KeyboardSettings.isLayoutEnabled(service, KeyboardSettings.LAYOUT_HANDWRITING) &&
+            KeyboardSettings.isLayoutEnabled(service, KeyboardSettings.LAYOUT_ENGLISH)
+        ) {
+            KeyboardInputMode.AlphaNum
+        } else {
+            KeyboardInputMode.Handwriting
+        }
+    )
     val keyboardInputMode = _keyboardInputMode.asStateFlow()
     private val _handwritingSession = MutableStateFlow(0L)
     val handwritingSession = _handwritingSession.asStateFlow()
@@ -64,11 +72,24 @@ internal class KeyboardSessionController(
 
     fun onStartInputView(info: EditorInfo?) {
         updateEditorPresentation(info)
+        ensureValidInputMode()
         suggestions.onInputStarted()
         inputViewVisible = true
         val session = advanceSession()
         voice.onInputViewStarted(session)
         handwriting.onInputViewStarted(session)
+    }
+
+    private fun ensureValidInputMode() {
+        val enabledLayouts = KeyboardSettings.getEnabledLayouts(service)
+        val hasHandwriting = enabledLayouts.contains(KeyboardSettings.LAYOUT_HANDWRITING)
+        val hasEnglish = enabledLayouts.contains(KeyboardSettings.LAYOUT_ENGLISH)
+
+        if (!hasHandwriting && _keyboardInputMode.value == KeyboardInputMode.Handwriting) {
+            _keyboardInputMode.value = KeyboardInputMode.AlphaNum
+        } else if (!hasEnglish && _keyboardInputMode.value == KeyboardInputMode.AlphaNum) {
+            _keyboardInputMode.value = KeyboardInputMode.Handwriting
+        }
     }
 
     fun onFinishInput() {

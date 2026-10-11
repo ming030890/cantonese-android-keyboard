@@ -19,7 +19,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.remember
 import androidx.compose.ui.zIndex
+import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 
@@ -380,24 +383,42 @@ internal fun AlphaNumBottomRow(
                 softWrap = false,
             )
         }
+        val context = LocalContext.current
+        val isHandwritingEnabled = remember(context) {
+            KeyboardSettings.isLayoutEnabled(context, KeyboardSettings.LAYOUT_HANDWRITING)
+        }
         KeyVisual(
             key = keyRegistry.key(
                 id = "text.bottom.handwriting",
-                data = KeyData(
-                    "text.bottom.handwriting",
-                    KeyboardKeyKind.ModeSwitch,
-                    text = "handwriting",
-                ),
+                data = if (isHandwritingEnabled) {
+                    KeyData(
+                        "text.bottom.handwriting",
+                        KeyboardKeyKind.ModeSwitch,
+                        text = "handwriting",
+                    )
+                } else {
+                    KeyData(
+                        "text.bottom.handwriting",
+                        KeyboardKeyKind.Settings,
+                    )
+                },
                 rowId = "text.bottom",
             ),
             keyRegistry = keyRegistry,
             modifier = Modifier.weight(1.15f),
             backgroundColor = keyboardColors.keyboardModifierKeySurface,
         ) {
-            KeyboardIcon(
-                modifier = Modifier.size(20.dp),
-                color = keyboardColors.keyboardKeyOnSurface,
-            )
+            if (isHandwritingEnabled) {
+                KeyboardIcon(
+                    modifier = Modifier.size(20.dp),
+                    color = keyboardColors.keyboardKeyOnSurface,
+                )
+            } else {
+                SettingsIcon(
+                    modifier = Modifier.size(20.dp),
+                    color = keyboardColors.keyboardKeyOnSurface,
+                )
+            }
         }
         KeyVisual(
             key = keyRegistry.key(
