@@ -21,7 +21,6 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE="com.madeinhk.cantonesevoicekeyboard"
 QWEN_ASR_DIR="${QWEN_ASR_DIR:-$PROJECT_DIR/../QwenASR}"
 QWEN_ASR_TARGET_DIR="${QWEN_ASR_TARGET_DIR:-/private/tmp/qwen-asr-android-release-target}"
-HANDWRITING_TARGET_DIR="${HANDWRITING_TARGET_DIR:-/private/tmp/handwriting-android-release-target}"
 
 # Where the converted model lives on the build machine. scripts/reshard_model.py
 # combines and splits its model*.safetensors tensors into five ≤480 MiB shards.
@@ -92,7 +91,7 @@ fi
 # 2. Compile JNI Library
 # ---------------------------------------------------------------------------
 SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libqwen_asr.so"
-HWR_SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libstust_handwriting_inference.so"
+ENGINE_SO_DEST="$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libcantonese_engine.so"
 
 echo -e "${COLOR_INFO}[Step 2/7] Compiling native libraries...${COLOR_RESET}"
 if [ ! -d "$QWEN_ASR_DIR" ]; then
@@ -123,24 +122,19 @@ mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
 cp "$QWEN_ASR_TARGET_DIR/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
 echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
 
-echo -e "${COLOR_INFO}Compiling the Rust handwriting inference library...${COLOR_RESET}"
+echo -e "${COLOR_INFO}Compiling unified Cantonese engine (handwriting + Quick + LM)...${COLOR_RESET}"
 NATIVE_LM_LINKER="${NATIVE_LM_LINKER:-/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android32-clang}"
+ENGINE_TARGET_DIR="${ENGINE_TARGET_DIR:-/private/tmp/cantonese-engine-android-target}"
+ENGINE_MANIFEST="$QWEN_ASR_DIR/crates/cantonese-ngram/Cargo.toml"
 pushd "${TMPDIR:-/private/tmp}" > /dev/null
-CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$HANDWRITING_TARGET_DIR" cargo build --manifest-path "$PROJECT_DIR/../handwriting-recognizer/rust/Cargo.toml" --target aarch64-linux-android --release --features android --lib
+CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$ENGINE_TARGET_DIR" cargo build --manifest-path "$ENGINE_MANIFEST" --target aarch64-linux-android --release --features android --lib
 popd > /dev/null
 mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
-cp "$HANDWRITING_TARGET_DIR/aarch64-linux-android/release/libstust_handwriting_inference.so" "$HWR_SO_DEST"
-echo -e "${COLOR_SUCCESS}Handwriting native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
-
-# Quick and handwriting share this standalone candidate language model.
-LM_TARGET_DIR="${LM_TARGET_DIR:-/private/tmp/cantonese-ngram-android-target}"
-LM_MANIFEST="$QWEN_ASR_DIR/crates/cantonese-ngram/Cargo.toml"
-# Use an independent working directory to avoid inheriting ASR linker flags.
-pushd "${TMPDIR:-/private/tmp}" > /dev/null
-CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$LM_TARGET_DIR" cargo build --manifest-path "$LM_MANIFEST" --target aarch64-linux-android --release --features android --lib
-popd > /dev/null
-cp "$LM_TARGET_DIR/aarch64-linux-android/release/libcantonese_ngram.so" "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/"
-LM_SOURCE="${LM_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/nested-curriculum-128-256-512-v7/export-width256/rust/model.cng}"
+rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libstust_handwriting_inference.so"
+rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libcantonese_ngram.so"
+cp "$ENGINE_TARGET_DIR/aarch64-linux-android/release/libcantonese_engine.so" "$ENGINE_SO_DEST"
+echo -e "${COLOR_SUCCESS}Unified Cantonese engine compiled and placed in jniLibs!${COLOR_RESET}"
+LM_SOURCE="${LM_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/dense-short-context-v11-small-complete/audit-final/model.cng}"
 LM_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/model.cng"
 if [ -f "$LM_SOURCE" ]; then
     mkdir -p "$(dirname "$LM_ASSET")"
@@ -150,7 +144,7 @@ elif [ ! -f "$LM_ASSET" ]; then
     exit 1
 fi
 
-HWR_FUSION_SOURCE="${HWR_FUSION_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique/fusion.json}"
+HWR_FUSION_SOURCE="${HWR_FUSION_SOURCE:-$PROJECT_DIR/config/language_model/handwriting_fusion_v11.json}"
 HWR_FUSION_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/handwriting_fusion.json"
 if [ -f "$HWR_FUSION_SOURCE" ]; then
     cp "$HWR_FUSION_SOURCE" "$HWR_FUSION_ASSET"
@@ -220,6 +214,16 @@ if [ -f "$HANDWRITING_SOURCE_DIR/lm_csr.bin" ]; then
     cp "$HANDWRITING_SOURCE_DIR/lm_csr.bin" "$HANDWRITING_ASSETS/lm_csr.bin"
 fi
 echo -e "${COLOR_SUCCESS}Handwriting model assets staged.${COLOR_RESET}"
+if python3 - "$LM_ASSET" <<'PY'
+import json,struct,sys
+with open(sys.argv[1],'rb') as f:
+    magic=f.read(4);size=struct.unpack('<I',f.read(4))[0];metadata=json.loads(f.read(size))
+sys.exit(0 if magic==b'CNG1' and metadata.get('neural_short_contexts') else 1)
+PY
+then
+    rm -f "$HANDWRITING_ASSETS/lm_csr.bin"
+fi
+python3 "$PROJECT_DIR/scripts/verify_language_model_assets.py" --project "$PROJECT_DIR"
 
 # ---------------------------------------------------------------------------
 # 5. Ensure bundletool is available
@@ -254,6 +258,7 @@ if [ ! -f "$AAB_PATH" ]; then
     echo -e "${COLOR_ERROR}Error: Expected bundle not found at $AAB_PATH${COLOR_RESET}"
     exit 1
 fi
+python3 "$PROJECT_DIR/scripts/verify_language_model_assets.py" --project "$PROJECT_DIR" --package "$AAB_PATH"
 
 if [ "$RELEASE" = "true" ]; then
     echo -e "${COLOR_SUCCESS}================================================================${COLOR_RESET}"

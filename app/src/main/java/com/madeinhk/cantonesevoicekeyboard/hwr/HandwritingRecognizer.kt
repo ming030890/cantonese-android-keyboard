@@ -54,7 +54,7 @@ class HandwritingRecognizer private constructor(
 
         init {
             try {
-                System.loadLibrary("stust_handwriting_inference")
+                System.loadLibrary("cantonese_engine")
                 nativeLibraryLoaded = true
             } catch (error: UnsatisfiedLinkError) {
                 Log.e(TAG, "Handwriting native library is unavailable", error)

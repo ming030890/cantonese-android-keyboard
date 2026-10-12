@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "weights": {
+    "unigram": 0,
+    "bigram": 0,
+    "neural": 1.25
+  },
+  "inputs": {
+    "handwriting_model_sha256": "b6916eacca94eeeaafd6d3c4b957e218a5681b55e8374f98d9109bfefa98af26",
+    "labels_sha256": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
+    "counts_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "neural_model_sha256": "38f7b0f066e218e4d1e1703c02f070152006e1f0020f796d9e84e2c5efdaf0ca",
+  "calibration_protocol_sha256": "ca00d8de169fa687b5c461e008c6c04a84646a5bd957fe4e8b694a85f92c2082",
+  "selection": "unique training trajectories and TRAIN text only; frozen before audit",
+  "training_cases_by_mode": {
+    "Neural": 6000
+  },
+  "training_count_source_sha256": "a413ec84e51b2f88c90af9b17ed4610d024743499ec72d1d61e7e78e3b2834e8",
+  "policy": "neural_only_zero_one_and_longer_context"
+}

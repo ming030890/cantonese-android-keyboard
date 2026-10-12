@@ -12,7 +12,7 @@ internal interface QuickCandidateEngine : AutoCloseable {
 /** Dictionary lookup, tokenization and ranking belong to the standalone Rust LM crate. */
 internal class NativeQuickEngine private constructor(private var handle: Long) : QuickCandidateEngine {
     companion object {
-        init { System.loadLibrary("cantonese_ngram") }
+        init { System.loadLibrary("cantonese_engine") }
 
         fun load(context: Context): NativeQuickEngine {
             val assets = context.applicationContext.assets
@@ -22,7 +22,8 @@ internal class NativeQuickEngine private constructor(private var handle: Long) :
                 ByteArray(0)
             }
             val handle = nativeCreate(read("quick/quick3.bin"), read("quick/quick5.bin"), neural,
-                read("handwriting/lm_csr.bin"), read("handwriting/labels.txt"))
+                runCatching { read("handwriting/lm_csr.bin") }.getOrElse { ByteArray(0) },
+                read("handwriting/labels.txt"))
             check(handle != 0L) { "Could not create Quick engine" }
             return NativeQuickEngine(handle)
         }

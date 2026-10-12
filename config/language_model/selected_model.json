@@ -1,0 +1,24 @@
+{
+  "model_source": "/Volumes/SSD/cantonese_ngram/experiments/dense-short-context-v11-small-complete/audit-final/model.cng",
+  "model_sha256": "38f7b0f066e218e4d1e1703c02f070152006e1f0020f796d9e84e2c5efdaf0ca",
+  "model_bytes": 5860722,
+  "config": {
+    "vocab_size": 34081,
+    "left": 8,
+    "right": 4,
+    "embedding": 128,
+    "hidden": 256,
+    "activation": "relu",
+    "residual_blocks": 2,
+    "layer_norm": true,
+    "ffn_hidden": 512
+  },
+  "fusion_source": "config/language_model/handwriting_fusion_v11.json",
+  "fusion_sha256": "fee3448006424ae17104d865d42076eae645b30fef1ccc731beb01898b30caec",
+  "neural_short_contexts": true,
+  "count_table_packaged": false,
+  "selection": "User selected the smallest completed model after repaired v13 architecture comparison; embedding128/residual256/two blocks/FFN512. No new training or calibration.",
+  "evaluation_report": "ARCHITECTURE_COMPARISON_V13.md",
+  "native_commit": "50445c16263165c58909917b3fcc503d85aa9149",
+  "native_repository": "QwenASR"
+}
