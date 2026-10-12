@@ -1,6 +1,6 @@
 {
-  "model_source": "/Volumes/SSD/cantonese_ngram/experiments/dense-short-context-v11-small-complete/audit-final/model.cng",
-  "model_sha256": "38f7b0f066e218e4d1e1703c02f070152006e1f0020f796d9e84e2c5efdaf0ca",
+  "model_source": "/Volumes/SSD/cantonese_ngram/experiments/count-coverage-repair-v14-support/audit-overall-final/model.cng",
+  "model_sha256": "e650467f9f2ba35aefc478f8fa93f9e3151af04f10e6b673f8dba5c94126581c",
   "model_bytes": 5860722,
   "config": {
     "vocab_size": 34081,
@@ -13,12 +13,12 @@
     "layer_norm": true,
     "ffn_hidden": 512
   },
-  "fusion_source": "config/language_model/handwriting_fusion_v11.json",
-  "fusion_sha256": "fee3448006424ae17104d865d42076eae645b30fef1ccc731beb01898b30caec",
+  "fusion_source": "config/language_model/handwriting_fusion_v14.json",
+  "fusion_sha256": "1ad601a6b5051bd30e71c1efdad48379b12157ab175c7bc059e58de33f500efb",
   "neural_short_contexts": true,
   "count_table_packaged": false,
-  "selection": "User selected the smallest completed model after repaired v13 architecture comparison; embedding128/residual256/two blocks/FFN512. No new training or calibration.",
-  "evaluation_report": "ARCHITECTURE_COMPARISON_V13.md",
-  "native_commit": "50445c16263165c58909917b3fcc503d85aa9149",
+  "selection": "User selected the new best overall model. Count coverage repaired; automatic early stopping at 29000 support-phase steps selects 24000. Same embedding128/residual256/two-block/FFN512 architecture; full count, text, Quick, handwriting, unigram and Rust runtime gates pass.",
+  "evaluation_report": "LANGUAGE_MODEL_COUNT_REPAIR_V14.md",
+  "native_commit": "b1b50c55056a601cba58de5df083c46e1687a2f6",
   "native_repository": "QwenASR"
 }

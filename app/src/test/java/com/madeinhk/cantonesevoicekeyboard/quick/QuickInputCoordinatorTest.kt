@@ -2,6 +2,7 @@ package com.madeinhk.cantonesevoicekeyboard.quick
 
 import android.view.inputmethod.InputConnection
 import com.madeinhk.cantonesevoicekeyboard.ImeEditor
+import kotlinx.coroutines.flow.first
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -102,9 +103,9 @@ class QuickInputCoordinatorTest {
             override fun predictions(left: String, right: String, limit: Int): List<QuickCandidate> {
                 assertEquals(before, left)
                 assertEquals("呀", right)
-                assertEquals(3, limit)
+                assertEquals(100, limit)
                 requests++
-                return listOf(QuickCandidate("食", 0))
+                return (0 until limit).map { QuickCandidate(if (it == 0) "食" else "候選$it", it) }
             }
         }
         val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
@@ -118,12 +119,15 @@ class QuickInputCoordinatorTest {
         } as InputConnection
         val c = QuickInputCoordinator({ backend }, ImeEditor({ connection }, { null }))
         c.refreshPredictions()
-        assertEquals("食", c.candidates.value.single().text)
+        assertEquals(100, c.candidates.value.size)
+        assertEquals("食", c.candidates.value.first().text)
+        assertEquals("候選99", c.candidates.value.last().text)
         assertFalse(c.hasActiveInput())
         c.selectCandidate("食")
         assertEquals("我想食", before)
         assertEquals(2, requests)
-        assertEquals("食", c.candidates.value.single().text)
+        assertEquals(100, c.candidates.value.size)
+        assertEquals("食", c.candidates.value.first().text)
         c.discard()
         assertTrue(c.candidates.value.isEmpty())
         c.close()
@@ -209,8 +213,8 @@ class QuickInputCoordinatorTest {
         // User types "hello"
         "hello".forEach { coordinator.onKey(it.toString()) }
         assertEquals("hello", coordinator.getComposingText())
-        // For >2 letters, candidates are empty
-        assertTrue(coordinator.candidates.value.isEmpty())
+        // Phrase lookup continues beyond a single two-letter code.
+        assertFalse(coordinator.candidates.value.isEmpty())
 
         // User taps space -> "Tap space, it was typing english."
         coordinator.onSpace()
@@ -294,6 +298,85 @@ class QuickInputCoordinatorTest {
     }
 
     @Test
+    fun continuousCodesSelectAndDeleteWholePhrase() {
+        val codes = mutableListOf<String>()
+        var committed = ""
+        val backend = object : QuickCandidateEngine {
+            override fun candidates(version: Int, code: String, left: String, right: String): List<QuickCandidate> {
+                codes += code
+                return if (code == "hion") listOf(QuickCandidate("我們", 0), QuickCandidate("我今", 1))
+                    else listOf(QuickCandidate("我", 0))
+            }
+        }
+        val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+            arrayOf(InputConnection::class.java)) { _, method, args ->
+            when (method.name) {
+                "commitText" -> { committed = args!![0].toString(); true }
+                else -> if (method.returnType == java.lang.Boolean.TYPE) true else null
+            }
+        } as InputConnection
+        val c = QuickInputCoordinator({ backend }, ImeEditor({ connection }, { null }))
+        "hion".forEach { c.onKey(it.toString()) }
+        assertEquals("hion", c.getComposingText())
+        assertEquals(listOf("我們", "我今"), c.candidates.value.map { it.text })
+        c.onDelete()
+        assertEquals("hio", codes.last())
+        c.onKey("n")
+        c.selectCandidate("我們")
+        assertEquals("我們", committed)
+        assertFalse(c.hasActiveInput())
+        c.close()
+    }
+
+    @Test
+    fun sixCharactersRemainSelectableUntilNextKey() {
+        for (targetCode in listOf("hionhionhion", "qqqqqq", "qhionqhion")) {
+            val committed = mutableListOf<String>()
+            val targetBackend = object : QuickCandidateEngine {
+                override fun candidates(version: Int, code: String, left: String, right: String) =
+                    listOf(QuickCandidate(if (code == targetCode) "𠮷們手我們手" else "手", 0))
+            }
+            val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+                arrayOf(InputConnection::class.java)) { _, method, args ->
+                if (method.name == "commitText") { committed += args!![0].toString(); true } else if (method.returnType == java.lang.Boolean.TYPE) true else null
+            } as InputConnection
+            val c = QuickInputCoordinator({ targetBackend }, ImeEditor({ connection }, { null }))
+            targetCode.forEach { c.onKey(it.toString()) }
+            assertTrue(committed.isEmpty())
+            assertEquals(targetCode, c.getComposingText())
+            c.onKey("q")
+            assertEquals(listOf("𠮷們手我們手"), committed)
+            assertEquals("q", c.getComposingText())
+            c.close()
+        }
+    }
+
+    @Test
+    fun capResolvesCurrentCodeWhenAsyncCandidatesAreNotReady() = kotlinx.coroutines.test.runTest {
+        val committed = mutableListOf<String>()
+        val backend = object : QuickCandidateEngine {
+            override fun candidates(version: Int, code: String, left: String, right: String) =
+                listOf(QuickCandidate(if (code == "qqqqqq") "手手手手手手" else "手", 0))
+        }
+        val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+            arrayOf(InputConnection::class.java)) { _, method, args ->
+            if (method.name == "commitText") { committed += args!![0].toString(); true } else if (method.returnType == java.lang.Boolean.TYPE) true else null
+        } as InputConnection
+        val c = QuickInputCoordinator({ backend }, ImeEditor({ connection }, { null }),
+            scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() +
+                kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)))
+        "qqqqqqq".forEach { c.onKey(it.toString()) }
+        assertEquals(listOf("手手手手手手"), committed)
+        assertEquals("q", c.getComposingText())
+        testScheduler.runCurrent()
+        val result = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            kotlinx.coroutines.withTimeout(5_000) { c.candidates.first { it.isNotEmpty() } }
+        }
+        assertEquals("手", result.first().text)
+        c.close()
+    }
+
+    @Test
     fun getPredictionsDelegatesToBackend() {
         val backend = object : QuickCandidateEngine {
             override fun candidates(version: Int, code: String, left: String, right: String) = emptyList<QuickCandidate>()
@@ -305,6 +388,7 @@ class QuickInputCoordinatorTest {
         val preds = c.getPredictions("你", "", 5)
         assertEquals(5, preds.size)
         assertEquals("你1", preds[0].text)
+        assertEquals(100, c.getPredictions("你", "").size)
         c.close()
     }
 }

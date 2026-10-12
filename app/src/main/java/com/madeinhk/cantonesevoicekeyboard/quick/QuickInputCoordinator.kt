@@ -13,6 +13,13 @@ internal class QuickInputCoordinator(
     initialVersion: Int = 3,
     private val scope: CoroutineScope? = null,
 ) : AutoCloseable {
+    companion object {
+        // Match the native engine's maximum so next-word candidates can be paged.
+        private const val PREDICTION_LIMIT = 100
+        private const val MAX_COMPOSING_CHARACTERS = 6
+        private const val MAX_COMPOSING_CODE_LENGTH = MAX_COMPOSING_CHARACTERS * 2
+    }
+
     constructor(
         context: Context,
         editor: ImeEditor,
@@ -31,6 +38,7 @@ internal class QuickInputCoordinator(
     private var pending: Job? = null
     private var currentVersion = initialVersion
     private var composingText = ""
+    private var candidatesForCode: String? = null
     private val _candidates = MutableStateFlow<List<QuickCandidate>>(emptyList())
     val candidates = _candidates.asStateFlow()
 
@@ -52,6 +60,17 @@ internal class QuickInputCoordinator(
             accept()
             editor.commitText(char)
             return
+        }
+        if (composingText.length >= MAX_COMPOSING_CHARACTERS) {
+            // A one-letter root also counts as one Chinese character. Resolve the
+            // current code if its asynchronous lookup has not finished yet.
+            val top = if (candidatesForCode == composingText) _candidates.value.firstOrNull()
+                else candidateLookup(composingText, currentVersion)().firstOrNull()
+            if (top?.text?.let { it.codePointCount(0, it.length) >= MAX_COMPOSING_CHARACTERS } == true ||
+                composingText.length >= MAX_COMPOSING_CODE_LENGTH) {
+                editor.commitText(top?.text ?: composingText)
+                clearComposingState()
+            }
         }
         composingText += char
         editor.setComposingText(composingText)
@@ -84,7 +103,7 @@ internal class QuickInputCoordinator(
 
     fun refreshPredictions() { if (!hasActiveInput()) refreshCandidates() }
 
-    fun getPredictions(left: String, right: String, limit: Int = 3): List<QuickCandidate> = runCatching {
+    fun getPredictions(left: String, right: String, limit: Int = PREDICTION_LIMIT): List<QuickCandidate> = runCatching {
         backend()?.predictions(left, right, limit).orEmpty()
     }.onFailure { Log.e("QuickInputCoordinator", "Quick prediction failed", it) }.getOrDefault(emptyList())
 
@@ -135,20 +154,37 @@ internal class QuickInputCoordinator(
         val code = composingText
         val version = currentVersion
         _candidates.value = emptyList()
-        if (closed || code.length > 2) return
-        // InputConnection includes the composing code before the cursor.
-        val before = editor.getTextBeforeCursor(512).orEmpty()
-        val left = before.removeSuffix(code)
-        val right = editor.getTextAfterCursor(256).orEmpty()
-        fun lookup(): List<QuickCandidate> = runCatching {
-            backend()?.let { if (code.isEmpty()) it.predictions(left, right, 3) else it.candidates(version, code, left, right) }.orEmpty()
-        }.onFailure { Log.e("QuickInputCoordinator", "Quick inference failed", it) }.getOrDefault(emptyList())
-        if (scope == null) { _candidates.value = lookup(); return }
+        candidatesForCode = null
+        if (closed || code.length > MAX_COMPOSING_CODE_LENGTH) return
+        val lookup = candidateLookup(code, version)
+        if (scope == null) {
+            _candidates.value = lookup()
+            candidatesForCode = code
+            return
+        }
         pending = scope.launch {
             val result = withContext(Dispatchers.Default) { lookup() }
             if (!closed && requestId == id && composingText == code && currentVersion == version) {
                 _candidates.value = result
+                candidatesForCode = code
             }
+        }
+    }
+
+    private fun candidateLookup(code: String, version: Int): () -> List<QuickCandidate> {
+        // InputConnection includes the composing code before the cursor.
+        val before = editor.getTextBeforeCursor(512).orEmpty()
+        val left = before.removeSuffix(code)
+        val right = editor.getTextAfterCursor(256).orEmpty()
+        return {
+            runCatching {
+                backend()?.let {
+                    if (code.isEmpty()) it.predictions(left, right, PREDICTION_LIMIT)
+                    else it.candidates(version, code, left, right)
+                }.orEmpty()
+            }.onFailure {
+                Log.e("QuickInputCoordinator", "Quick inference failed", it)
+            }.getOrDefault(emptyList())
         }
     }
 
@@ -156,6 +192,7 @@ internal class QuickInputCoordinator(
         pending?.cancel()
         ++requestId
         composingText = ""
+        candidatesForCode = null
         _candidates.value = emptyList()
     }
 

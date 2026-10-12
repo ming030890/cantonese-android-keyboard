@@ -1,30 +1,28 @@
 # Selected keyboard language model
 
-Release 44 selects the completed two-block model following the repaired v13
-[architecture comparison](ARCHITECTURE_COMPARISON_V13.md). It uses 34,081 actual
-tokens, embedding 128, residual width 256, two residual blocks and FFN width 512.
-The INT8 CNG1 asset is 5,860,722 bytes. One token-input network predicts unigrams
-from empty context, bigrams from one token, and longer-context predictions.
-No count table or context lookup is packaged.
+Release 46 uses the repaired model selected at 24,000 support-phase steps.
+Automatic early stopping ended training at 29,000 steps after five evaluations
+without a qualifying overall improvement. Selection considers count agreement
+and representative contextual typing accuracy, with phrase and regression gates.
 
-The committed `config/language_model/selected_model.json` binds its source,
-architecture, model checksum and fusion checksum. Model SHA256:
-`38f7b0f066e218e4d1e1703c02f070152006e1f0020f796d9e84e2c5efdaf0ca`.
-The external SSD source is
-`/Volumes/SSD/cantonese_ngram/experiments/dense-short-context-v11-small-complete/audit-final/model.cng`.
-Generated assets and native libraries remain gitignored; `deploy.sh --release`
-stages this model and the frozen `handwriting_fusion_v11.json`, rebuilds the
-unified Rust engine, removes obsolete libraries/count assets, and verifies the
-actual AAB asset/native hashes against its build inputs and selected manifest.
+The architecture is unchanged: 34,081 tokens, embedding 128, residual width 256,
+two residual blocks and FFN 512. The INT8 CNG1 export is 5,860,722 bytes.
+One neural model handles empty, one-token and longer contexts. No count table,
+context lookup, separate parent model or inference fallback is packaged.
 
-Handwriting retains the previously frozen neural fusion weight 1.25, with zero
-count weights. Quick and handwriting load `libcantonese_engine.so`; both use
-neural scores for empty/one-token context. Existing legacy-format support in the
-runtime does not add extra inference tables to this asset.
+Model SHA256:
+`e650467f9f2ba35aefc478f8fa93f9e3151af04f10e6b673f8dba5c94126581c`.
+Immutable SSD source:
+`/Volumes/SSD/cantonese_ngram/experiments/count-coverage-repair-v14-support/audit-overall-final/model.cng`.
 
-On repaired development evaluation, the selected model has Quick5 one-token
-context top-1/top-3 78.92%/93.40%, handwriting top-1 76.65%, and natural text
-next-token top-3 30.028%. Count teacher top-1/top-3 81.07%/96.85% measures training
-memorization, not typing accuracy. Extra depth/embedding size showed no consistent
-application advantage. Wider FFN improved count/Quick top-1 with mixed regressions.
-The user chose the smaller model. Reserved confirmation remains unscored.
+`config/language_model/selected_model.json` binds architecture, model checksum,
+fusion checksum and native commit. `deploy.sh --release` stages this source and
+`handwriting_fusion_v14.json`, rebuilds the shared native engines, and verifies
+the actual AAB against its selected inputs. Handwriting keeps the frozen neural
+weight 1.25, with zero count weights and no calibration fitting.
+
+See [the repair and evaluation report](LANGUAGE_MODEL_COUNT_REPAIR_V14.md).
+The new model ranks 麵 first after 雲吞. Common-phrase TRAIN count top-one improves
+from 23.49% to 55.97%; prospective confirmation phrase top-three with two preceding
+tokens improves from 17.95% to 21.70%. These are distinct metrics. Full-prefix
+natural-text top-three changes from 30.03% to 29.53%, a slight regression.

@@ -134,7 +134,7 @@ rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libstust_handwriting_inferenc
 rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libcantonese_ngram.so"
 cp "$ENGINE_TARGET_DIR/aarch64-linux-android/release/libcantonese_engine.so" "$ENGINE_SO_DEST"
 echo -e "${COLOR_SUCCESS}Unified Cantonese engine compiled and placed in jniLibs!${COLOR_RESET}"
-LM_SOURCE="${LM_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/dense-short-context-v11-small-complete/audit-final/model.cng}"
+LM_SOURCE="${LM_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/count-coverage-repair-v14-support/audit-overall-final/model.cng}"
 LM_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/model.cng"
 if [ -f "$LM_SOURCE" ]; then
     mkdir -p "$(dirname "$LM_ASSET")"
@@ -144,7 +144,7 @@ elif [ ! -f "$LM_ASSET" ]; then
     exit 1
 fi
 
-HWR_FUSION_SOURCE="${HWR_FUSION_SOURCE:-$PROJECT_DIR/config/language_model/handwriting_fusion_v11.json}"
+HWR_FUSION_SOURCE="${HWR_FUSION_SOURCE:-$PROJECT_DIR/config/language_model/handwriting_fusion_v14.json}"
 HWR_FUSION_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/handwriting_fusion.json"
 if [ -f "$HWR_FUSION_SOURCE" ]; then
     cp "$HWR_FUSION_SOURCE" "$HWR_FUSION_ASSET"
