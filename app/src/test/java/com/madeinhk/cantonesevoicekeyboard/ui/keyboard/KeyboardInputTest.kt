@@ -347,4 +347,39 @@ class KeyboardInputTest {
         dispatcher.sendUp(consuming, consumingInfo)
         assertFalse(events.takeLast(1).contains("up"))
     }
+
+    @Test
+    fun typingKeysTriggerVoiceInterruptionOnKeyDown() {
+        val receiver = KeyboardScreenInputReceiver()
+        var interruptedCount = 0
+        receiver.onInterruptVoice = { interruptedCount++ }
+
+        receiver.onKeyDown(KeyData("a", KeyboardKeyKind.Text, text = "a"))
+        assertEquals(1, interruptedCount)
+
+        receiver.onKeyDown(KeyData("space", KeyboardKeyKind.Space))
+        assertEquals(2, interruptedCount)
+
+        receiver.onKeyDown(KeyData("enter", KeyboardKeyKind.Enter))
+        assertEquals(3, interruptedCount)
+
+        receiver.onKeyDown(KeyData("delete", KeyboardKeyKind.Delete))
+        assertEquals(4, interruptedCount)
+
+        receiver.onKeyDown(KeyData("mode", KeyboardKeyKind.ModeSwitch))
+        assertEquals(5, interruptedCount)
+
+        receiver.onKeyDown(KeyData("emoji", KeyboardKeyKind.Emoji))
+        assertEquals(6, interruptedCount)
+
+        receiver.onKeyDown(KeyData("candidate", KeyboardKeyKind.Candidate, text = "你"))
+        assertEquals(7, interruptedCount)
+
+        receiver.onKeyDown(KeyData("paste", KeyboardKeyKind.Clipboard))
+        assertEquals(8, interruptedCount)
+
+        // Record key should NOT interrupt voice (it toggles voice)
+        receiver.onKeyDown(KeyData("mic", KeyboardKeyKind.Record))
+        assertEquals(8, interruptedCount)
+    }
 }

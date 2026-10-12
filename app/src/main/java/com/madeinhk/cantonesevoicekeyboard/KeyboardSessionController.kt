@@ -26,17 +26,18 @@ internal class KeyboardSessionController(
         currentSession = { inputViewSession },
         isInputViewVisible = { inputViewVisible },
     )
+    private val quick = QuickInputCoordinator(
+        context = service,
+        editor = editor,
+        initialVersion = KeyboardSettings.getQuickVersion(service),
+    )
     private val handwriting = HandwritingInputCoordinator(
         context = service,
         editor = editor,
         currentSession = { inputViewSession },
         isInputViewVisible = { inputViewVisible },
         stopVoiceInput = voice::stopForHandwriting,
-    )
-    private val quick = QuickInputCoordinator(
-        context = service,
-        editor = editor,
-        initialVersion = KeyboardSettings.getQuickVersion(service),
+        predictionProvider = quick::getPredictions,
     )
     private val suggestions = KeyboardSuggestionCoordinator(
         service = service,
@@ -99,7 +100,7 @@ internal class KeyboardSessionController(
         val session = advanceSession()
         voice.onInputViewStarted(session)
         handwriting.onInputViewStarted(session)
-        refreshQuickPredictions()
+        refreshPredictions()
     }
 
     private fun ensureValidInputMode() {
@@ -134,13 +135,18 @@ internal class KeyboardSessionController(
         finishSession(releaseModel = true)
     }
 
-    private fun refreshQuickPredictions() {
-        if (inputViewVisible && _keyboardInputMode.value == KeyboardInputMode.Quick) quick.refreshPredictions()
+    private fun refreshPredictions() {
+        if (!inputViewVisible) return
+        when (_keyboardInputMode.value) {
+            KeyboardInputMode.Quick -> quick.refreshPredictions()
+            KeyboardInputMode.Handwriting -> handwriting.refreshPredictions()
+            else -> {}
+        }
     }
 
     fun onSelectionChanged() {
         suggestions.onSelectionChanged()
-        refreshQuickPredictions()
+        refreshPredictions()
     }
 
     fun destroy() {
@@ -160,38 +166,54 @@ internal class KeyboardSessionController(
 
     fun toggleRecording() {
         if (!voice.isRecording()) {
-            quick.discard()
+            quick.accept()
             handwriting.accept()
         }
         voice.toggle()
     }
 
+    fun interruptVoiceInput() {
+        voice.interrupt()
+        suggestions.onUserTyped()
+    }
+
     fun deleteSurroundingText() {
-        suggestions.clearAutofill()
+        val wasVoiceActive = voice.isRecording() || voice.state.value == KeyboardUiState.Transcribing
+        voice.interrupt()
+        suggestions.onUserTyped()
+        if (wasVoiceActive) {
+            refreshPredictions()
+            return
+        }
         if (quick.hasActiveInput()) {
             quick.onDelete()
         } else if (handwriting.hasActiveInput()) {
             handwriting.discard()
+            refreshPredictions()
         } else {
             editor.deleteSelectionOrPreviousCharacter()
-            refreshQuickPredictions()
+            refreshPredictions()
         }
     }
 
     fun commitText(text: String) {
-        suggestions.clearAutofill()
-        if (quick.hasActiveInput()) quick.discard()
+        voice.interrupt()
+        suggestions.onUserTyped()
+        if (quick.hasActiveInput()) quick.accept()
         handwriting.accept()
         editor.commitText(text)
-        refreshQuickPredictions()
+        refreshPredictions()
     }
 
     fun onQuickKey(char: String) {
-        suggestions.clearAutofill()
+        voice.interrupt()
+        suggestions.onUserTyped()
         quick.onKey(char)
     }
 
     fun sendSpace() {
+        voice.interrupt()
+        suggestions.onUserTyped()
         if (quick.hasActiveInput()) {
             quick.onSpace()
         } else {
@@ -200,14 +222,18 @@ internal class KeyboardSessionController(
     }
 
     fun sendEnter() {
-        suggestions.clearAutofill()
-        if (quick.hasActiveInput()) quick.discard()
+        voice.interrupt()
+        suggestions.onUserTyped()
+        if (quick.hasActiveInput()) quick.accept()
         handwriting.accept()
         editor.sendEnter()
-        refreshQuickPredictions()
+        refreshPredictions()
     }
 
-    fun pasteClipboard() = suggestions.pasteClipboard()
+    fun pasteClipboard() {
+        voice.interrupt()
+        suggestions.pasteClipboard()
+    }
 
     fun recognizeHandwriting(
         strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>,
@@ -218,10 +244,14 @@ internal class KeyboardSessionController(
         height: Int,
     ) = handwriting.recognize(strokes, canvasWidth, canvasHeight, pixels, width, height)
 
-    fun onHandwritingStrokeStarted(startsNewCharacter: Boolean) =
+    fun onHandwritingStrokeStarted(startsNewCharacter: Boolean) {
+        suggestions.onUserTyped()
         handwriting.onStrokeStarted(startsNewCharacter)
+    }
 
     fun selectCandidate(text: String) {
+        voice.interrupt()
+        suggestions.onUserTyped()
         if (_keyboardInputMode.value == KeyboardInputMode.Quick) {
             quick.selectCandidate(text)
         } else {
@@ -232,11 +262,13 @@ internal class KeyboardSessionController(
     fun selectHandwritingCandidate(text: String) = selectCandidate(text)
 
     fun selectKeyboardInputMode(mode: KeyboardInputMode) {
-        quick.discard()
+        voice.interrupt()
+        suggestions.onUserTyped()
+        quick.accept()
         handwriting.accept()
         lastUserSelectedLayout = mode
         _keyboardInputMode.value = mode
-        refreshQuickPredictions()
+        refreshPredictions()
     }
 
     fun onAutofillTapped() = suggestions.onAutofillTapped()

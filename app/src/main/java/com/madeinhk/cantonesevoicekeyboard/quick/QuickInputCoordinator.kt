@@ -48,6 +48,11 @@ internal class QuickInputCoordinator(
     fun getComposingText(): String = composingText
 
     fun onKey(char: String) {
+        if (char.length != 1 || (char[0] !in 'a'..'z' && char[0] !in 'A'..'Z')) {
+            accept()
+            editor.commitText(char)
+            return
+        }
         composingText += char
         editor.setComposingText(composingText)
         refreshCandidates()
@@ -78,6 +83,10 @@ internal class QuickInputCoordinator(
     }
 
     fun refreshPredictions() { if (!hasActiveInput()) refreshCandidates() }
+
+    fun getPredictions(left: String, right: String, limit: Int = 3): List<QuickCandidate> = runCatching {
+        backend()?.predictions(left, right, limit).orEmpty()
+    }.onFailure { Log.e("QuickInputCoordinator", "Quick prediction failed", it) }.getOrDefault(emptyList())
 
     fun onDelete(): Boolean {
         if (composingText.isNotEmpty()) {

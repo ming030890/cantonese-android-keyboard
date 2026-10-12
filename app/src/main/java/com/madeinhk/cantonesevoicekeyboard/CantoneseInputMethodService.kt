@@ -95,6 +95,7 @@ class CantoneseInputMethodService :
                         onKeyboardInputModeSelected = controller::selectKeyboardInputMode,
                         onAutofillTapped = controller::onAutofillTapped,
                         onEmojiPicked = controller::commitText,
+                        onInterruptVoice = controller::interruptVoiceInput,
                     )
                 }
             }

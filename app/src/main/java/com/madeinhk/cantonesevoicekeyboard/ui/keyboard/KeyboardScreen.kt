@@ -57,6 +57,7 @@ fun KeyboardScreen(
     onAutofillTapped: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
+    onInterruptVoice: () -> Unit = {},
     initialEmojiPanel: Boolean = false,
     initialUppercase: Boolean = false,
     initialShowMoreSymbols: Boolean = false,
@@ -121,7 +122,7 @@ fun KeyboardScreen(
     val toolbarState = toolbarPresentation(
         panel = activePanel.toInputMode(),
         hasAutofill = autofillView != null,
-        hasClipboard = clipboard != null,
+        hasClipboard = clipboard != null && activeCandidateList.isEmpty() && !handwritingBusy,
     )
     val toolbarKeys = if (toolbarVisible) {
         registerTextToolbarKeys(
@@ -145,7 +146,7 @@ fun KeyboardScreen(
     val hostView = LocalView.current
     SideEffect {
         inputReceiver.onCommitText = { text ->
-            if (activePanel == KeyboardPanel.Quick) {
+            if (activePanel == KeyboardPanel.Quick && text.length == 1 && (text[0] in 'a'..'z' || text[0] in 'A'..'Z')) {
                 onQuickKey(text)
             } else {
                 onCommitText(text)
@@ -158,6 +159,7 @@ fun KeyboardScreen(
         inputReceiver.onOpenSettings = onOpenSettings
         inputReceiver.onPasteClipboard = onPasteClipboard
         inputReceiver.onCandidateTapped = onHandwritingCandidateSelected
+        inputReceiver.onInterruptVoice = onInterruptVoice
         inputReceiver.onCandidatePrevious = {
             candidatePage = (candidatePage - 1).coerceAtLeast(0)
         }

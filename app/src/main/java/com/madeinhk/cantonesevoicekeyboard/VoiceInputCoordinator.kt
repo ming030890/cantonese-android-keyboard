@@ -75,7 +75,7 @@ internal class VoiceInputCoordinator(
         if (recording) stop(discard = false) else start()
     }
 
-    fun stopForHandwriting() {
+    fun interrupt() {
         val voiceState = _state.value
         if (
             !recording &&
@@ -92,6 +92,8 @@ internal class VoiceInputCoordinator(
             _state.value = KeyboardUiState.Idle
         }
     }
+
+    fun stopForHandwriting() = interrupt()
 
     fun isRecording(): Boolean = recording
 

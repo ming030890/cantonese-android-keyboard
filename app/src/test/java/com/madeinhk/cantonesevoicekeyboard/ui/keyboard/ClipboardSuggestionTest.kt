@@ -124,4 +124,15 @@ class ClipboardSuggestionTest {
             clipboardSuggestionFor(snapshot.copy(token = 6L), dismissedToken = 5L)?.preview,
         )
     }
+
+    @Test
+    fun typingStateSuppressesClipboardFromToolbarPresentation() {
+        val presentation = toolbarPresentation(
+            panel = KeyboardInputMode.AlphaNum,
+            hasAutofill = false,
+            hasClipboard = false,
+        )
+
+        assertNull(presentation.secondaryAction)
+    }
 }

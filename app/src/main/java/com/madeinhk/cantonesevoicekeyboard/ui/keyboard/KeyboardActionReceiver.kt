@@ -20,8 +20,12 @@ internal class KeyboardScreenInputReceiver : KeyboardInputReceiver {
     var onToggleUppercase: () -> Unit = {}
     var onToggleMoreSymbols: () -> Unit = {}
     var onModeSwitch: (String) -> Unit = {}
+    var onInterruptVoice: () -> Unit = {}
 
     override fun onKeyDown(data: KeyData) {
+        if (data.kind != KeyboardKeyKind.Record && data.kind != KeyboardKeyKind.Utility) {
+            onInterruptVoice()
+        }
         if (data.kind == KeyboardKeyKind.Delete) onDelete()
     }
 

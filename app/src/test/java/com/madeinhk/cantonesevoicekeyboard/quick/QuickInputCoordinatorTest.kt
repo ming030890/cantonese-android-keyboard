@@ -17,9 +17,11 @@ class QuickInputCoordinatorTest {
     private lateinit var coordinator: QuickInputCoordinator
     private var lastComposingText: String? = null
     private var lastCommittedText: String? = null
+    private val committedTexts = mutableListOf<String>()
 
     @Before
     fun setUp() {
+        committedTexts.clear()
         val engine = object : QuickCandidateEngine {
             override fun candidates(version: Int, code: String, left: String, right: String) =
                 listOf("係", "你").mapIndexed { i, text -> QuickCandidate(text, i) }
@@ -33,7 +35,9 @@ class QuickInputCoordinatorTest {
                         return true
                     }
                     "commitText" -> {
-                        lastCommittedText = args?.get(0)?.toString()
+                        val text = args?.get(0)?.toString().orEmpty()
+                        lastCommittedText = text
+                        committedTexts += text
                         return true
                     }
                     "finishComposingText" -> {
@@ -243,5 +247,64 @@ class QuickInputCoordinatorTest {
         // Next delete is not handled by coordinator
         val handled3 = coordinator.onDelete()
         assertFalse(handled3)
+    }
+
+    @Test
+    fun testAcceptCommitsComposingText() {
+        "you".forEach { coordinator.onKey(it.toString()) }
+        assertEquals("you", coordinator.getComposingText())
+        assertTrue(coordinator.hasActiveInput())
+
+        coordinator.accept()
+        assertEquals("you", lastCommittedText)
+        assertEquals(listOf("you"), committedTexts)
+        assertFalse(coordinator.hasActiveInput())
+        assertEquals("", coordinator.getComposingText())
+    }
+
+    @Test
+    fun testTypingNonLetterKeyCommitsComposingTextAndPunctuation() {
+        "you".forEach { coordinator.onKey(it.toString()) }
+        assertEquals("you", coordinator.getComposingText())
+        assertTrue(coordinator.hasActiveInput())
+
+        coordinator.onKey("?")
+        assertEquals(listOf("you", "?"), committedTexts)
+        assertFalse(coordinator.hasActiveInput())
+        assertEquals("", coordinator.getComposingText())
+    }
+
+    @Test
+    fun testTypingSentenceWithQuestionMarkDoesNotDeleteYou() {
+        // "how" + space
+        "how".forEach { coordinator.onKey(it.toString()) }
+        coordinator.onSpace()
+        // "are" + space
+        "are".forEach { coordinator.onKey(it.toString()) }
+        coordinator.onSpace()
+        // "you"
+        "you".forEach { coordinator.onKey(it.toString()) }
+        assertEquals("you", coordinator.getComposingText())
+        assertTrue(coordinator.hasActiveInput())
+
+        // type '?'
+        coordinator.onKey("?")
+        assertEquals(listOf("how ", "are ", "you", "?"), committedTexts)
+        assertFalse(coordinator.hasActiveInput())
+    }
+
+    @Test
+    fun getPredictionsDelegatesToBackend() {
+        val backend = object : QuickCandidateEngine {
+            override fun candidates(version: Int, code: String, left: String, right: String) = emptyList<QuickCandidate>()
+            override fun predictions(left: String, right: String, limit: Int): List<QuickCandidate> {
+                return (1..limit).map { QuickCandidate("$left$it", it - 1) }
+            }
+        }
+        val c = QuickInputCoordinator({ backend }, ImeEditor({ null }, { null }))
+        val preds = c.getPredictions("你", "", 5)
+        assertEquals(5, preds.size)
+        assertEquals("你1", preds[0].text)
+        c.close()
     }
 }

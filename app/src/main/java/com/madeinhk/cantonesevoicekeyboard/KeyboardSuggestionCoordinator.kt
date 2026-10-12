@@ -39,6 +39,7 @@ internal class KeyboardSuggestionCoordinator(
     private var clipboardManager: ClipboardManager? = null
     private var clipboardGeneration = 0L
     private var dismissedClipboardGeneration: Long? = null
+    private var userTypedInSession = false
     private var lastObservedFingerprint: ClipboardFingerprint? = null
     private var observingClipboard = false
     private val clipboardListener = ClipboardManager.OnPrimaryClipChangedListener {
@@ -46,13 +47,22 @@ internal class KeyboardSuggestionCoordinator(
     }
 
     fun onInputStarted() {
+        userTypedInSession = false
         clearAutofill()
         startClipboardObservation()
+        refreshClipboardSuggestion()
     }
 
     fun onInputFinished() {
+        userTypedInSession = false
         clearAutofill()
         stopClipboardObservation()
+    }
+
+    fun onUserTyped() {
+        userTypedInSession = true
+        _clipboardSuggestion.value = null
+        clearAutofill()
     }
 
     fun onSelectionChanged() = clearAutofill()
@@ -103,6 +113,7 @@ internal class KeyboardSuggestionCoordinator(
     fun pasteClipboard() {
         acceptHandwriting()
         dismissedClipboardGeneration = clipboardGeneration
+        userTypedInSession = true
         _clipboardSuggestion.value = null
         val manager = clipboardManager ?: return
         val clip = manager.primaryClip
@@ -143,6 +154,10 @@ internal class KeyboardSuggestionCoordinator(
 
     private fun refreshClipboardSuggestion(forceGeneration: Boolean = false) {
         if (!observingClipboard) return
+        if (userTypedInSession) {
+            _clipboardSuggestion.value = null
+            return
+        }
         val clip = clipboardManager?.primaryClip
         val fingerprint = clip?.let {
             ClipboardFingerprint(it.description.timestamp, it.itemCount)
