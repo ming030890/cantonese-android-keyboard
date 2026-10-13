@@ -43,7 +43,10 @@ fun KeyboardScreen(
     handwritingError: StateFlow<String?>,
     handwritingSession: StateFlow<Long>,
     quickCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow<List<HandwritingCandidate>>(emptyList()),
+    englishCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow(emptyList()),
     onQuickKey: (String) -> Unit = {},
+    onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
+    onVisiblePanelChanged: (KeyboardInputMode?) -> Unit = {},
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
@@ -65,17 +68,97 @@ fun KeyboardScreen(
     debugTouchBounds: Boolean = false,
     keyboardHapticConfig: KeyboardHapticConfig = KeyboardHapticConfig(),
 ) {
-    val state by uiState.collectAsState()
+    val voice by uiState.collectAsState()
     val volume by volumeLevel.collectAsState()
     val action by keyboardAction.collectAsState()
     val inputMode by keyboardInputMode.collectAsState()
     val autofillView by autofillSuggestionView.collectAsState()
     val clipboard by clipboardSuggestion.collectAsState()
-    val candidates by handwritingCandidates.collectAsState()
-    val qCandidates by quickCandidates.collectAsState()
+    val handwritingCandidates by handwritingCandidates.collectAsState()
     val handwritingBusy by handwritingRecognizing.collectAsState()
-    val handwritingFailure by handwritingError.collectAsState()
-    val handwritingSessionId by handwritingSession.collectAsState()
+    val handwritingError by handwritingError.collectAsState()
+    val handwritingSession by handwritingSession.collectAsState()
+    val quickCandidates by quickCandidates.collectAsState()
+    val englishCandidates by englishCandidates.collectAsState()
+    KeyboardScreen(
+        renderState = KeyboardRenderState(
+            voice = voice,
+            volume = volume,
+            action = action,
+            inputMode = inputMode,
+            clipboard = clipboard,
+            handwritingCandidates = handwritingCandidates,
+            handwritingBusy = handwritingBusy,
+            handwritingError = handwritingError,
+            handwritingSession = handwritingSession,
+            quickCandidates = quickCandidates,
+            englishCandidates = englishCandidates,
+        ),
+        autofillView = autofillView,
+        onQuickKey = onQuickKey,
+        onTouchEvidence = onTouchEvidence,
+        onVisiblePanelChanged = onVisiblePanelChanged,
+        onToggleRecording = onToggleRecording,
+        onDeleteSurroundingText = onDeleteSurroundingText,
+        onCommitText = onCommitText,
+        onSendSpace = onSendSpace,
+        onSendEnter = onSendEnter,
+        onOpenSettings = onOpenSettings,
+        onPasteClipboard = onPasteClipboard,
+        onHandwritingChanged = onHandwritingChanged,
+        onHandwritingStrokeStarted = onHandwritingStrokeStarted,
+        onHandwritingCandidateSelected = onHandwritingCandidateSelected,
+        onAutofillTapped = onAutofillTapped,
+        onEmojiPicked = onEmojiPicked,
+        onKeyboardInputModeSelected = onKeyboardInputModeSelected,
+        onInterruptVoice = onInterruptVoice,
+        initialEmojiPanel = initialEmojiPanel,
+        initialUppercase = initialUppercase,
+        initialShowMoreSymbols = initialShowMoreSymbols,
+        initialHandwritingCandidatePage = initialHandwritingCandidatePage,
+        debugTouchBounds = debugTouchBounds,
+        keyboardHapticConfig = keyboardHapticConfig,
+    )
+}
+
+@Composable
+fun KeyboardScreen(
+    renderState: KeyboardRenderState,
+    autofillView: View? = null,
+    onQuickKey: (String) -> Unit = {},
+    onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
+    onVisiblePanelChanged: (KeyboardInputMode?) -> Unit = {},
+    onToggleRecording: () -> Unit,
+    onDeleteSurroundingText: () -> Unit,
+    onCommitText: (String) -> Unit,
+    onSendSpace: () -> Unit,
+    onSendEnter: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onPasteClipboard: () -> Unit,
+    onHandwritingChanged: (strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>, canvasWidth: Float, canvasHeight: Float, pixels: ByteArray, width: Int, height: Int) -> Unit,
+    onHandwritingStrokeStarted: (startsNewCharacter: Boolean) -> Unit = {},
+    onHandwritingCandidateSelected: (String) -> Unit,
+    onAutofillTapped: () -> Unit = {},
+    onEmojiPicked: (String) -> Unit,
+    onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
+    onInterruptVoice: () -> Unit = {},
+    initialEmojiPanel: Boolean = false,
+    initialUppercase: Boolean = false,
+    initialShowMoreSymbols: Boolean = false,
+    initialHandwritingCandidatePage: Int = 0,
+    debugTouchBounds: Boolean = false,
+    keyboardHapticConfig: KeyboardHapticConfig = KeyboardHapticConfig(),
+) {
+    val state = renderState.voice
+    val volume = renderState.volume
+    val action = renderState.action
+    val inputMode = renderState.inputMode
+    val clipboard = renderState.clipboard
+    val candidates = renderState.handwritingCandidates
+    val qCandidates = renderState.quickCandidates
+    val handwritingBusy = renderState.handwritingBusy
+    val handwritingFailure = renderState.handwritingError
+    val handwritingSessionId = renderState.handwritingSession
 
     var activePanel by remember(inputMode, initialEmojiPanel) {
         mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
@@ -88,6 +171,7 @@ fun KeyboardScreen(
     val activeCandidateList = when {
         isQuickPanel -> qCandidates
         isHandwritingPanel -> candidates
+        activePanel == KeyboardPanel.AlphaNum -> renderState.englishCandidates
         else -> emptyList()
     }
     var candidatePage by remember(activeCandidateList, initialHandwritingCandidatePage) {
@@ -122,7 +206,7 @@ fun KeyboardScreen(
     val toolbarState = toolbarPresentation(
         panel = activePanel.toInputMode(),
         hasAutofill = autofillView != null,
-        hasClipboard = clipboard != null && activeCandidateList.isEmpty() && !handwritingBusy,
+        hasClipboard = clipboard != null,
     )
     val toolbarKeys = if (toolbarVisible) {
         registerTextToolbarKeys(
@@ -145,12 +229,9 @@ fun KeyboardScreen(
     }
     val hostView = LocalView.current
     SideEffect {
+        inputReceiver.onTouchEvidence = onTouchEvidence
         inputReceiver.onCommitText = { text ->
-            if (activePanel == KeyboardPanel.Quick && text.length == 1 && (text[0] in 'a'..'z' || text[0] in 'A'..'Z')) {
-                onQuickKey(text)
-            } else {
-                onCommitText(text)
-            }
+            dispatchKeyboardText(activePanel.toInputMode(), text, onQuickKey, onCommitText)
         }
         inputReceiver.onDelete = onDeleteSurroundingText
         inputReceiver.onSendSpace = onSendSpace
@@ -166,7 +247,7 @@ fun KeyboardScreen(
         inputReceiver.onCandidateNext = {
             candidatePage++
         }
-        inputReceiver.onOpenEmoji = { activePanel = KeyboardPanel.Emoji }
+        inputReceiver.onOpenEmoji = { onVisiblePanelChanged(null); activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
         inputReceiver.onModeSwitch = { target ->
@@ -185,7 +266,8 @@ fun KeyboardScreen(
                 "quick" -> activePanel = KeyboardPanel.Quick
                 "handwriting" -> activePanel = KeyboardPanel.Handwriting
             }
-            onKeyboardInputModeSelected(activePanel.toInputMode())
+            onVisiblePanelChanged(activePanel.toInputMode())
+            if (activePanel != KeyboardPanel.Number) onKeyboardInputModeSelected(activePanel.toInputMode())
         }
         touchController.setHapticHandler { performKeyboardHaptic(hostView, keyboardHapticConfig) }
     }
@@ -300,7 +382,7 @@ fun KeyboardScreen(
                     keys = checkNotNull(toolbarKeys),
                     secondaryAction = toolbarState.secondaryAction,
                     candidates = activeCandidateList,
-                    showHandwritingCandidates = isHandwritingPanel || (isQuickPanel && qCandidates.isNotEmpty()),
+                    showHandwritingCandidates = isHandwritingPanel || activeCandidateList.isNotEmpty(),
                     voiceState = state,
                     volume = volume,
                     handwritingBusy = if (isHandwritingPanel) handwritingBusy else false,

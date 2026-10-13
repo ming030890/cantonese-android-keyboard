@@ -86,6 +86,21 @@ class ClipboardSuggestionTest {
         assertNull(
             clipboardSuggestionFor(
                 ClipboardSnapshot(
+                    token = 4L,
+                    isSensitive = false,
+                    items = listOf(ClipboardItemSnapshot(setOf(ClipMimeTypes.TEXT_PLAIN), "")),
+                ),
+                dismissedToken = null,
+            )
+        )
+    }
+
+    @Test
+    fun richClipboardUsesAdvertisedPlainTextVersion() {
+        assertEquals(
+            "rich text",
+            clipboardSuggestionFor(
+                ClipboardSnapshot(
                     token = 6L,
                     isSensitive = false,
                     items = listOf(
@@ -96,18 +111,10 @@ class ClipboardSuggestionTest {
                     ),
                 ),
                 dismissedToken = null,
-            )
+            )?.preview
         )
-        assertNull(
-            clipboardSuggestionFor(
-                ClipboardSnapshot(
-                    token = 4L,
-                    isSensitive = false,
-                    items = listOf(ClipboardItemSnapshot(setOf(ClipMimeTypes.TEXT_PLAIN), "")),
-                ),
-                dismissedToken = null,
-            )
-        )
+        assertNull(clipboardSuggestionFor(ClipboardSnapshot(7L,
+            listOf(ClipboardItemSnapshot(setOf("text/html"), "<b>HTML only</b>")), false), null))
     }
 
     @Test

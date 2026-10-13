@@ -20,6 +20,16 @@ object KeyboardSettings {
     const val QUICK_VERSION_5 = 5
     const val DEFAULT_QUICK_VERSION = QUICK_VERSION_3
 
+    fun isAutocorrectEnabled(context: Context, layout: String): Boolean =
+        layout in setOf(LAYOUT_ENGLISH, LAYOUT_QUICK) && context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean("autocorrect_$layout", true)
+
+    fun setAutocorrectEnabled(context: Context, layout: String, enabled: Boolean) {
+        require(layout == LAYOUT_ENGLISH || layout == LAYOUT_QUICK)
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+            .putBoolean("autocorrect_$layout", enabled).apply()
+    }
+
     val DEFAULT_LAYOUTS = setOf(LAYOUT_ENGLISH, LAYOUT_QUICK, LAYOUT_HANDWRITING)
 
     private val _enabledLayoutsFlow = MutableStateFlow<Set<String>>(DEFAULT_LAYOUTS)

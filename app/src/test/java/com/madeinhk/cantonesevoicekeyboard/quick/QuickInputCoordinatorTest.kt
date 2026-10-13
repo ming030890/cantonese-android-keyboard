@@ -352,6 +352,30 @@ class QuickInputCoordinatorTest {
     }
 
     @Test
+    fun codeLengthAloneDoesNotCommitMissingOrShortCandidates() {
+        for (text in listOf(null, "我們")) {
+            val committed = mutableListOf<String>()
+            val backend = object : QuickCandidateEngine {
+                override fun candidates(version: Int, code: String, left: String, right: String) =
+                    text?.let { listOf(QuickCandidate(it, 0)) }.orEmpty()
+            }
+            val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+                arrayOf(InputConnection::class.java)) { _, method, args ->
+                if (method.name == "commitText") {
+                    committed += args!![0].toString()
+                    true
+                } else if (method.returnType == java.lang.Boolean.TYPE) true else null
+            } as InputConnection
+            val c = QuickInputCoordinator({ backend }, ImeEditor({ connection }, { null }))
+            val code = "hionhionhionhion"
+            code.forEach { c.onKey(it.toString()) }
+            assertTrue(committed.isEmpty())
+            assertEquals(code, c.getComposingText())
+            c.close()
+        }
+    }
+
+    @Test
     fun capResolvesCurrentCodeWhenAsyncCandidatesAreNotReady() = kotlinx.coroutines.test.runTest {
         val committed = mutableListOf<String>()
         val backend = object : QuickCandidateEngine {

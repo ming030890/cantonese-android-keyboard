@@ -1,7 +1,7 @@
 package com.madeinhk.cantonesevoicekeyboard.quick
 
 import android.content.Context
-import com.madeinhk.cantonesevoicekeyboard.ImeEditor
+import com.madeinhk.cantonesevoicekeyboard.KeyboardEditor
 import android.util.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,20 +9,20 @@ import kotlinx.coroutines.flow.asStateFlow
 
 internal class QuickInputCoordinator(
     private val engineLoader: () -> QuickCandidateEngine?,
-    private val editor: ImeEditor,
+    private val editor: KeyboardEditor,
     initialVersion: Int = 3,
     private val scope: CoroutineScope? = null,
+    private val lookupDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : AutoCloseable {
     companion object {
         // Match the native engine's maximum so next-word candidates can be paged.
         private const val PREDICTION_LIMIT = 100
         private const val MAX_COMPOSING_CHARACTERS = 6
-        private const val MAX_COMPOSING_CODE_LENGTH = MAX_COMPOSING_CHARACTERS * 2
     }
 
     constructor(
         context: Context,
-        editor: ImeEditor,
+        editor: KeyboardEditor,
         initialVersion: Int = 3,
     ) : this(
         engineLoader = { NativeQuickEngine.load(context) },
@@ -55,20 +55,35 @@ internal class QuickInputCoordinator(
 
     fun getComposingText(): String = composingText
 
+    var protectEnglish: (String) -> Boolean = { false }
+
+    fun hasChineseCodeMatch(): Boolean = composingText.length <= 2 &&
+        (candidatesForCode != composingText || _candidates.value.any { candidate -> candidate.text.any { it.code > 127 } })
+
+    /** Called on the English worker, sharing the same native NN instead of loading a second copy. */
+    fun englishContextHandle(): Long = (backend() as? NativeQuickEngine)?.englishContextHandle() ?: 0L
+
+    fun completeExternalCommit() { clearComposingState(); refreshCandidates() }
+
+    fun restoreComposingText(text: String) {
+        composingText = text
+        editor.setComposingText(text)
+        refreshCandidates()
+    }
+
     fun onKey(char: String) {
         if (char.length != 1 || (char[0] !in 'a'..'z' && char[0] !in 'A'..'Z')) {
             accept()
             editor.commitText(char)
             return
         }
-        if (composingText.length >= MAX_COMPOSING_CHARACTERS) {
+        if (composingText.length >= MAX_COMPOSING_CHARACTERS && !protectEnglish(composingText)) {
             // A one-letter root also counts as one Chinese character. Resolve the
             // current code if its asynchronous lookup has not finished yet.
             val top = if (candidatesForCode == composingText) _candidates.value.firstOrNull()
                 else candidateLookup(composingText, currentVersion)().firstOrNull()
-            if (top?.text?.let { it.codePointCount(0, it.length) >= MAX_COMPOSING_CHARACTERS } == true ||
-                composingText.length >= MAX_COMPOSING_CODE_LENGTH) {
-                editor.commitText(top?.text ?: composingText)
+            if (top != null && top.text.codePointCount(0, top.text.length) >= MAX_COMPOSING_CHARACTERS) {
+                editor.commitText(top.text)
                 clearComposingState()
             }
         }
@@ -155,7 +170,7 @@ internal class QuickInputCoordinator(
         val version = currentVersion
         _candidates.value = emptyList()
         candidatesForCode = null
-        if (closed || code.length > MAX_COMPOSING_CODE_LENGTH) return
+        if (closed) return
         val lookup = candidateLookup(code, version)
         if (scope == null) {
             _candidates.value = lookup()
@@ -163,7 +178,7 @@ internal class QuickInputCoordinator(
             return
         }
         pending = scope.launch {
-            val result = withContext(Dispatchers.Default) { lookup() }
+            val result = withContext(lookupDispatcher) { lookup() }
             if (!closed && requestId == id && composingText == code && currentVersion == version) {
                 _candidates.value = result
                 candidatesForCode = code

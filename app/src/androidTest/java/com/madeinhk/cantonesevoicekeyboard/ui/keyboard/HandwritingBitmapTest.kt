@@ -1,6 +1,6 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
-import androidx.compose.ui.geometry.Offset
+import com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint
 import androidx.compose.ui.unit.IntSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
@@ -14,7 +14,7 @@ class HandwritingBitmapTest {
     fun rasterizesAStrokeAsWhiteBackgroundWithDarkInk() {
         val bitmap = handwritingBitmap(
             strokes = listOf(
-                listOf(Offset(4f, 4f), Offset(28f, 28f)),
+                listOf(StrokePoint(4f, 4f, 0), StrokePoint(28f, 28f, 1)),
             ),
             size = IntSize(32, 32),
         )
@@ -29,7 +29,7 @@ class HandwritingBitmapTest {
     @Test
     fun rasterizesASinglePointInsteadOfDroppingIt() {
         val bitmap = handwritingBitmap(
-            strokes = listOf(listOf(Offset(16f, 16f))),
+            strokes = listOf(listOf(StrokePoint(16f, 16f, 0))),
             size = IntSize(32, 32),
         )
 

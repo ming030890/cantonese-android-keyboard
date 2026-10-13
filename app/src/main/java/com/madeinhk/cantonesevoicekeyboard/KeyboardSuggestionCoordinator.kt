@@ -14,60 +14,55 @@ import android.widget.inline.InlineContentView
 import android.widget.inline.InlinePresentationSpec
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.ClipboardItemSnapshot
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.ClipboardSnapshot
-import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.ClipboardSuggestion
-import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.clipboardSuggestionFor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 internal class KeyboardSuggestionCoordinator(
     private val service: InputMethodService,
-    private val editor: ImeEditor,
+    private val editor: KeyboardEditor,
     private val isInputViewVisible: () -> Boolean,
     private val acceptHandwriting: () -> Unit,
-) {
+) : SuggestionSession {
     companion object {
         private const val INLINE_SUGGESTION_MIN_WIDTH_DP = 72
         private const val INLINE_SUGGESTION_HEIGHT_DP = 48
     }
 
     private val _autofillSuggestionView = MutableStateFlow<View?>(null)
-    val autofillSuggestionView = _autofillSuggestionView.asStateFlow()
-    private val _clipboardSuggestion = MutableStateFlow<ClipboardSuggestion?>(null)
-    val clipboardSuggestion = _clipboardSuggestion.asStateFlow()
+    override val autofillSuggestionView = _autofillSuggestionView.asStateFlow()
+    private val clipboard = ClipboardSession()
+    override val clipboardSuggestion = clipboard.suggestion
 
     private var autofillGeneration = 0L
     private var clipboardManager: ClipboardManager? = null
     private var clipboardGeneration = 0L
-    private var dismissedClipboardGeneration: Long? = null
-    private var userTypedInSession = false
     private var lastObservedFingerprint: ClipboardFingerprint? = null
     private var observingClipboard = false
     private val clipboardListener = ClipboardManager.OnPrimaryClipChangedListener {
         refreshClipboardSuggestion(forceGeneration = true)
     }
 
-    fun onInputStarted() {
-        userTypedInSession = false
+    override fun onInputStarted() {
+        clipboard.start()
         clearAutofill()
         startClipboardObservation()
         refreshClipboardSuggestion()
     }
 
-    fun onInputFinished() {
-        userTypedInSession = false
+    override fun onInputFinished() {
+        clipboard.finish()
         clearAutofill()
         stopClipboardObservation()
     }
 
-    fun onUserTyped() {
-        userTypedInSession = true
-        _clipboardSuggestion.value = null
+    override fun onUserTyped() {
+        clipboard.onUserTyped()
         clearAutofill()
     }
 
-    fun onSelectionChanged() = clearAutofill()
+    override fun onSelectionChanged() = clearAutofill()
 
-    fun createInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest {
+    override fun createInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest {
         clearAutofill()
         val minWidth = dpToPx(INLINE_SUGGESTION_MIN_WIDTH_DP)
         val height = dpToPx(INLINE_SUGGESTION_HEIGHT_DP)
@@ -80,7 +75,7 @@ internal class KeyboardSuggestionCoordinator(
             .build()
     }
 
-    fun onInlineSuggestionsResponse(response: InlineSuggestionsResponse): Boolean {
+    override fun onInlineSuggestionsResponse(response: InlineSuggestionsResponse): Boolean {
         val suggestion = response.inlineSuggestions.firstOrNull()
         if (suggestion == null) {
             clearAutofill()
@@ -100,7 +95,7 @@ internal class KeyboardSuggestionCoordinator(
         return true
     }
 
-    fun onAutofillTapped() {
+    override fun onAutofillTapped() {
         acceptHandwriting()
         clearAutofill()
     }
@@ -110,18 +105,15 @@ internal class KeyboardSuggestionCoordinator(
         _autofillSuggestionView.value = null
     }
 
-    fun pasteClipboard() {
+    override fun pasteClipboard() {
         acceptHandwriting()
-        dismissedClipboardGeneration = clipboardGeneration
-        userTypedInSession = true
-        _clipboardSuggestion.value = null
+        clipboard.onPaste()
         val manager = clipboardManager ?: return
         val clip = manager.primaryClip
         val description = clip?.description
         if (
             clip == null ||
             description == null ||
-            description.mimeTypeCount != 1 ||
             !description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
         ) {
             refreshClipboardSuggestion()
@@ -129,7 +121,7 @@ internal class KeyboardSuggestionCoordinator(
         }
         val text = (0 until clip.itemCount)
             .asSequence()
-            .mapNotNull { clip.getItemAt(it).coerceToText(service)?.toString() }
+            .mapNotNull { clip.getItemAt(it).text?.toString() }
             .firstOrNull(String::isNotEmpty)
         clearAutofill()
         if (text != null) editor.commitText(text)
@@ -149,15 +141,11 @@ internal class KeyboardSuggestionCoordinator(
         if (!observingClipboard) return
         clipboardManager?.removePrimaryClipChangedListener(clipboardListener)
         observingClipboard = false
-        _clipboardSuggestion.value = null
+        clipboard.finish()
     }
 
     private fun refreshClipboardSuggestion(forceGeneration: Boolean = false) {
         if (!observingClipboard) return
-        if (userTypedInSession) {
-            _clipboardSuggestion.value = null
-            return
-        }
         val clip = clipboardManager?.primaryClip
         val fingerprint = clip?.let {
             ClipboardFingerprint(it.description.timestamp, it.itemCount)
@@ -185,10 +173,7 @@ internal class KeyboardSuggestionCoordinator(
                 )
             }
         }
-        _clipboardSuggestion.value = clipboardSuggestionFor(
-            ClipboardSnapshot(clipboardGeneration, items, sensitive),
-            dismissedClipboardGeneration,
-        )
+        clipboard.update(ClipboardSnapshot(clipboardGeneration, items, sensitive))
     }
 
     private fun inflate(

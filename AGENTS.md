@@ -53,3 +53,23 @@ For Android code changes, run the narrowest relevant Gradle check first, then th
 - Inspect the specific defect in the rendered image before accepting a baseline. If preview configuration changes, check for obsolete generated baselines before staging files.
 - Deliver a short playable capture when the user asks to review animation. If the capture uses a simulated recording state, say so; a still screenshot only verifies layout.
 - Use longer waits and compact output for slow builds or uploads. Increase the wait interval when repeated polls return no new information.
+
+## Keyboard behavior regression workflow
+
+Read `KEYBOARD_QA_SPEC.md` for expected behavior, confirmed decisions, and coverage gaps.
+Confirm pending product decisions before changing their behavior; keep the spec and tests
+in sync. For keyboard state or event handling changes, add a regression sequence using
+`app/src/scenarioTest/java/com/madeinhk/cantonesevoicekeyboard/KeyboardScenario.kt`.
+Exercise the production controller and key receiver with fake platform/model dependencies.
+Assert committed/composing editor text, resulting candidates, and toolbar presentation.
+Use an injected test dispatcher and advance virtual time for asynchronous sequences.
+
+When visible behavior changes, render the resulting scenario snapshot in screenshot tests.
+Update only the intended baselines, inspect the generated images yourself, then validate
+separately. Never update baselines just to silence a failing test. Do not hand routine
+state/sequence QA back to the user.
+
+Run `./gradlew :app:verifyKeyboard` before handing off keyboard changes. Normal deployment
+runs this same gate and stops on unit, screenshot, or build failures. This does not replace
+on-device verification of Android integration such as navigation insets, asset delivery,
+clipboard permissions, inline autofill inflation, microphone capture, or native inference.

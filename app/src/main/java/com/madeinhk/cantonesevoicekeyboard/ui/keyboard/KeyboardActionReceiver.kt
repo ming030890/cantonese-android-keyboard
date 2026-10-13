@@ -6,6 +6,7 @@ package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
  * Coordinate lookup and pointer state deliberately stop before this boundary.
  */
 internal class KeyboardScreenInputReceiver : KeyboardInputReceiver {
+    var onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {}
     var onCommitText: (String) -> Unit = {}
     var onDelete: () -> Unit = {}
     var onSendSpace: () -> Unit = {}
@@ -50,9 +51,27 @@ internal class KeyboardScreenInputReceiver : KeyboardInputReceiver {
         }
     }
 
+    override fun onKeyUp(data: KeyData, touch: com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) {
+        onTouchEvidence(touch)
+        onKeyUp(data)
+        onTouchEvidence(null)
+    }
+
     override fun onKeyCancel(data: KeyData) = Unit
 
     override fun onKeyRepeat(data: KeyData) {
         if (data.kind == KeyboardKeyKind.Delete) onDelete()
     }
+}
+
+/** Shared by the live screen and sequence tests so text routing cannot diverge. */
+internal fun dispatchKeyboardText(
+    mode: KeyboardInputMode,
+    text: String,
+    onQuickKey: (String) -> Unit,
+    onCommitText: (String) -> Unit,
+) {
+    if (mode == KeyboardInputMode.Quick && text.length == 1 &&
+        (text[0] in 'a'..'z' || text[0] in 'A'..'Z')) onQuickKey(text)
+    else onCommitText(text)
 }

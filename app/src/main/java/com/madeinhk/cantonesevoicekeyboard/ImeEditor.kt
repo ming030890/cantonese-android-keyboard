@@ -9,27 +9,27 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 internal class ImeEditor(
     private val connection: () -> InputConnection?,
     private val editorInfo: () -> EditorInfo?,
-) {
-    fun setComposingText(text: String) {
+) : KeyboardEditor {
+    override fun setComposingText(text: String) {
         connection()?.setComposingText(text, 1)
     }
 
-    fun finishComposingText() {
+    override fun finishComposingText() {
         connection()?.finishComposingText()
     }
 
-    fun commitText(text: String) {
+    override fun commitText(text: String) {
         connection()?.commitText(text, 1)
     }
 
-    fun getTextBeforeCursor(length: Int): String? {
+    override fun getTextBeforeCursor(length: Int): String? {
         return connection()?.getTextBeforeCursor(length, 0)?.toString()
     }
 
-    fun getTextAfterCursor(length: Int): String? =
+    override fun getTextAfterCursor(length: Int): String? =
         connection()?.getTextAfterCursor(length, 0)?.toString()
 
-    fun deleteSelectionOrPreviousCharacter() {
+    override fun deleteSelectionOrPreviousCharacter() {
         connection()?.run {
             if (shouldDeleteSelection(getSelectedText(0))) {
                 commitText("", 1)
@@ -39,7 +39,7 @@ internal class ImeEditor(
         }
     }
 
-    fun sendEnter() {
+    override fun sendEnter() {
         val inputConnection = connection() ?: return
         val info = editorInfo()
         when (val command = resolveEnterCommand(info?.actionId ?: 0, info?.imeOptions)) {
@@ -47,6 +47,25 @@ internal class ImeEditor(
                 inputConnection.performEditorAction(command.actionId)
             EditorEnterCommand.CommitNewline -> inputConnection.commitText("\n", 1)
         }
+    }
+
+    override fun enterDelimiter(): String? {
+        val info = editorInfo()
+        return if (resolveEnterCommand(info?.actionId ?: 0, info?.imeOptions) == EditorEnterCommand.CommitNewline) "\n" else null
+    }
+
+    override fun cursorSelection(): Pair<Int, Int>? = connection()
+        ?.getExtractedText(android.view.inputmethod.ExtractedTextRequest(), 0)
+        ?.let { (it.startOffset + it.selectionStart) to (it.startOffset + it.selectionEnd) }
+
+    override fun replaceTextBeforeCursor(expected: String, replacement: String): Boolean {
+        val input = connection() ?: return false
+        if (!input.getSelectedText(0).isNullOrEmpty() ||
+            input.getTextBeforeCursor(expected.length, 0)?.toString() != expected) return false
+        input.beginBatchEdit()
+        return try {
+            input.deleteSurroundingText(expected.length, 0) && input.commitText(replacement, 1)
+        } finally { input.endBatchEdit() }
     }
 }
 

@@ -21,14 +21,14 @@ import kotlinx.coroutines.withContext
 
 internal class HandwritingInputCoordinator(
     private val context: Context? = null,
-    private val editor: ImeEditor,
+    private val editor: KeyboardEditor,
     private val currentSession: () -> Long,
     private val isInputViewVisible: () -> Boolean,
     private val stopVoiceInput: () -> Unit,
     private val predictionProvider: ((left: String, right: String, limit: Int) -> List<HandwritingCandidate>)? = null,
     coroutineScope: CoroutineScope? = null,
     private val synchronousPredictionsForTest: Boolean = false,
-) {
+) : HandwritingSession {
     companion object {
         private const val TAG = "CantoneseIME"
         private const val TOP_K = 10
@@ -66,23 +66,23 @@ internal class HandwritingInputCoordinator(
     private var predictionRequestId = 0L
 
     private val _candidates = MutableStateFlow<List<HandwritingCandidate>>(emptyList())
-    val candidates = _candidates.asStateFlow()
+    override val candidates = _candidates.asStateFlow()
     private val _recognizing = MutableStateFlow(false)
-    val recognizing = _recognizing.asStateFlow()
+    override val recognizing = _recognizing.asStateFlow()
     private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
+    override val error = _error.asStateFlow()
 
-    fun onInputStarted() {
+    override fun onInputStarted() {
         cancelAll()
         characterId = 0L
         clearState()
     }
 
-    fun onInputViewStarted(session: Long) {
+    override fun onInputViewStarted(session: Long) {
         ensureLoadingStarted(session)
     }
 
-    fun recognize(
+    override fun recognize(
         strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>,
         canvasWidth: Float,
         canvasHeight: Float,
@@ -102,7 +102,7 @@ internal class HandwritingInputCoordinator(
         )
     }
 
-    fun onStrokeStarted(startsNewCharacter: Boolean) {
+    override fun onStrokeStarted(startsNewCharacter: Boolean) {
         if (!isInputViewVisible()) return
         stopVoiceInput()
         cancelPredictions()
@@ -116,7 +116,7 @@ internal class HandwritingInputCoordinator(
         }
     }
 
-    fun selectCandidate(text: String) {
+    override fun selectCandidate(text: String) {
         if (text.isEmpty()) return
         if (isShowingPredictions) {
             cancelPredictions()
@@ -133,13 +133,13 @@ internal class HandwritingInputCoordinator(
         }
     }
 
-    fun hasActiveInput(): Boolean =
+    override fun hasActiveInput(): Boolean =
         composition != null ||
             (!isShowingPredictions && _candidates.value.isNotEmpty()) ||
             _recognizing.value ||
             queue.jobsSnapshot().isNotEmpty()
 
-    fun refreshPredictions() {
+    override fun refreshPredictions() {
         if (!isInputViewVisible() || hasActiveInput()) return
         val provider = predictionProvider ?: return
         cancelPredictions()
@@ -186,7 +186,7 @@ internal class HandwritingInputCoordinator(
         }
     }
 
-    fun accept(replacement: String? = null) {
+    override fun accept(replacement: String?) {
         cancelPredictions()
         if (!hasActiveInput() && replacement == null) return
         val accepted = replacement ?: composition
@@ -199,7 +199,7 @@ internal class HandwritingInputCoordinator(
         clearState()
     }
 
-    fun discard() {
+    override fun discard() {
         cancelPredictions()
         if (!hasActiveInput()) return
         cancelAll()
@@ -210,7 +210,7 @@ internal class HandwritingInputCoordinator(
         clearState()
     }
 
-    fun finish(releaseModel: Boolean, session: Long) {
+    override fun finish(releaseModel: Boolean, session: Long) {
         val jobs = listOfNotNull(loadingJob) + queue.jobsSnapshot()
         discard()
         cancelAll()
@@ -226,7 +226,7 @@ internal class HandwritingInputCoordinator(
         }
     }
 
-    fun destroy() {
+    override fun destroy() {
         val jobs = listOfNotNull(loadingJob) + queue.jobsSnapshot()
         cancelAll()
         cancelPredictions()

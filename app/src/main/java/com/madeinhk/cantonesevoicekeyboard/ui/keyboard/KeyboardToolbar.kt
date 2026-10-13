@@ -65,7 +65,14 @@ internal fun UnifiedKeyboardToolbar(
     onHandwritingCandidatePageChanged: (Int) -> Unit,
 ) {
     val keyboardColors = BrandTheme.colors
-    val candidatesVisible = showHandwritingCandidates && candidates.isNotEmpty()
+    val content = keyboardToolbarContent(
+        voice = voiceState,
+        secondaryAction = secondaryAction,
+        hasCandidates = showHandwritingCandidates && candidates.isNotEmpty(),
+        handwritingError = handwritingError.takeIf { showHandwritingCandidates },
+        handwritingBusy = showHandwritingCandidates && handwritingBusy,
+    )
+    val candidatesVisible = content == KeyboardToolbarContent.Candidates
 
     Row(
         modifier = Modifier
@@ -102,10 +109,10 @@ internal fun UnifiedKeyboardToolbar(
                 voiceState is KeyboardUiState.Error -> {
                     ToolbarStatusText(voiceState.message, keyboardColors.keyboardKeyOnSurface)
                 }
-                showHandwritingCandidates && handwritingError != null -> {
-                    ToolbarStatusText(handwritingError, MaterialTheme.colorScheme.error)
+                content == KeyboardToolbarContent.HandwritingError -> {
+                    ToolbarStatusText(checkNotNull(handwritingError), MaterialTheme.colorScheme.error)
                 }
-                secondaryAction == ToolbarSecondaryAction.Autofill -> {
+                content == KeyboardToolbarContent.Autofill -> {
                     val providerView = checkNotNull(autofillView)
                     if (LocalInspectionMode.current) {
                         Box(
@@ -150,13 +157,13 @@ internal fun UnifiedKeyboardToolbar(
                     page = handwritingCandidatePage,
                     onPageChanged = onHandwritingCandidatePageChanged,
                 )
-                secondaryAction == ToolbarSecondaryAction.Clipboard -> ClipboardToolbarChip(
+                content == KeyboardToolbarContent.Clipboard -> ClipboardToolbarChip(
                     key = keys.clipboard,
                     keyRegistry = keyRegistry,
                     clipboard = checkNotNull(clipboard),
                     keyboardColors = keyboardColors,
                 )
-                showHandwritingCandidates && handwritingBusy -> ToolbarStatusText(
+                content == KeyboardToolbarContent.Recognizing -> ToolbarStatusText(
                     stringResource(R.string.keyboard_status_recognizing),
                     keyboardColors.keyboardKeyOnSurface,
                 )

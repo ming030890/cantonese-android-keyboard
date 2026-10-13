@@ -79,6 +79,9 @@ class CantoneseInputMethodService :
                         handwritingError = controller.handwritingError,
                         handwritingSession = controller.handwritingSession,
                         quickCandidates = controller.quickCandidates,
+                        englishCandidates = controller.englishCandidates,
+                        onTouchEvidence = controller::onTouchEvidence,
+                        onVisiblePanelChanged = controller::onVisiblePanelChanged,
                         onQuickKey = controller::onQuickKey,
                         autofillSuggestionView = controller.autofillSuggestionView,
                         clipboardSuggestion = controller.clipboardSuggestion,
@@ -152,7 +155,7 @@ class CantoneseInputMethodService :
             oldSelStart != newSelStart ||
             oldSelEnd != newSelEnd ||
             candidatesStart != candidatesEnd
-        ) controller.onSelectionChanged()
+        ) controller.onSelectionChanged(newSelStart, newSelEnd, candidatesEnd)
     }
 
     override fun onCreateInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest =

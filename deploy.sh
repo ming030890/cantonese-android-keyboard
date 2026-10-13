@@ -126,6 +126,9 @@ echo -e "${COLOR_INFO}Compiling unified Cantonese engine (handwriting + Quick + 
 NATIVE_LM_LINKER="${NATIVE_LM_LINKER:-/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android32-clang}"
 ENGINE_TARGET_DIR="${ENGINE_TARGET_DIR:-/private/tmp/cantonese-engine-android-target}"
 ENGINE_MANIFEST="$QWEN_ASR_DIR/crates/cantonese-ngram/Cargo.toml"
+mkdir -p "$PROJECT_DIR/app/src/main/assets/english"
+CARGO_TARGET_DIR="$ENGINE_TARGET_DIR/host" cargo run --manifest-path "$ENGINE_MANIFEST" --release --bin pack_english -- \
+    "$QWEN_ASR_DIR/crates/cantonese-ngram/data/english/en.txt" "$PROJECT_DIR/app/src/main/assets/english/en.bin"
 pushd "${TMPDIR:-/private/tmp}" > /dev/null
 CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$ENGINE_TARGET_DIR" cargo build --manifest-path "$ENGINE_MANIFEST" --target aarch64-linux-android --release --features android --lib
 popd > /dev/null
@@ -249,10 +252,10 @@ fi
 cd "$PROJECT_DIR"
 if [ "$RELEASE" = "true" ]; then
     echo -e "${COLOR_INFO}[Step 6/7] Building RELEASE App Bundle (.aab) for Play upload...${COLOR_RESET}"
-    ./gradlew :app:bundleRelease
+    ./gradlew :app:verifyKeyboard :app:bundleRelease
 else
     echo -e "${COLOR_INFO}[Step 6/7] Building debug App Bundle (.aab)...${COLOR_RESET}"
-    ./gradlew :app:bundleDebug
+    ./gradlew :app:verifyKeyboard :app:bundleDebug
 fi
 if [ ! -f "$AAB_PATH" ]; then
     echo -e "${COLOR_ERROR}Error: Expected bundle not found at $AAB_PATH${COLOR_RESET}"

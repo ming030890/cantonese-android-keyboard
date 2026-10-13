@@ -8,6 +8,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence
 
 private const val DefaultLongPressDelayMillis = 450L
 private const val DefaultRepeatIntervalMillis = 55L
@@ -16,11 +17,13 @@ class PressedKeyInfo(
     val downTimeMillis: Long,
     internal var job: Job? = null,
     var blockUp: Boolean = false,
+    var touchEvidence: EnglishTouchEvidence? = null,
 )
 
 interface KeyboardInputReceiver {
     fun onKeyDown(data: KeyData)
     fun onKeyUp(data: KeyData)
+    fun onKeyUp(data: KeyData, touch: EnglishTouchEvidence?) = onKeyUp(data)
     fun onKeyCancel(data: KeyData)
     fun onKeyRepeat(data: KeyData)
 }
@@ -72,7 +75,7 @@ class CoroutineKeyboardInputDispatcher(
 
     override fun sendUp(data: KeyData, pressedKeyInfo: PressedKeyInfo?) {
         pressedKeyInfo?.job?.cancel()
-        if (pressedKeyInfo?.blockUp != true) receiver.onKeyUp(data)
+        if (pressedKeyInfo?.blockUp != true) receiver.onKeyUp(data, pressedKeyInfo?.touchEvidence)
     }
 
     override fun sendCancel(data: KeyData, pressedKeyInfo: PressedKeyInfo?) {

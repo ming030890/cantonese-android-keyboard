@@ -30,7 +30,7 @@ internal fun clipboardSuggestionFor(
     if (snapshot == null || snapshot.token == dismissedToken) return null
 
     val item = snapshot.items.firstOrNull { item ->
-        item.mimeTypes == setOf(ClipMimeTypes.TEXT_PLAIN) &&
+        ClipMimeTypes.TEXT_PLAIN in item.mimeTypes &&
             (snapshot.isSensitive || !item.text.isNullOrEmpty())
     } ?: return null
 

@@ -27,10 +27,10 @@ import kotlinx.coroutines.withContext
 
 internal class VoiceInputCoordinator(
     private val context: Context,
-    private val editor: ImeEditor,
+    private val editor: KeyboardEditor,
     private val currentSession: () -> Long,
     private val isInputViewVisible: () -> Boolean,
-) {
+) : VoiceSession {
     companion object {
         private const val TAG = "CantoneseIME"
         private const val SAMPLE_RATE = 16000
@@ -51,13 +51,13 @@ internal class VoiceInputCoordinator(
     private var activeDebugTranscript = StringBuffer()
 
     private val _state = MutableStateFlow<KeyboardUiState>(KeyboardUiState.Idle)
-    val state = _state.asStateFlow()
+    override val state = _state.asStateFlow()
     private val _volume = MutableStateFlow(0f)
-    val volume = _volume.asStateFlow()
+    override val volume = _volume.asStateFlow()
 
-    fun onInputViewStarted(session: Long) = ensureModelLoadingStarted(session)
+    override fun onInputViewStarted(session: Long) = ensureModelLoadingStarted(session)
 
-    fun toggle() {
+    override fun toggle() {
         val error = _state.value as? KeyboardUiState.Error
         if (error != null) {
             if (error.canRetryModelDownload) ensureModelLoadingStarted(currentSession())
@@ -75,7 +75,7 @@ internal class VoiceInputCoordinator(
         if (recording) stop(discard = false) else start()
     }
 
-    fun interrupt() {
+    override fun interrupt() {
         val voiceState = _state.value
         if (
             !recording &&
@@ -93,11 +93,11 @@ internal class VoiceInputCoordinator(
         }
     }
 
-    fun stopForHandwriting() = interrupt()
+    override fun stopForHandwriting() = interrupt()
 
-    fun isRecording(): Boolean = recording
+    override fun isRecording(): Boolean = recording
 
-    fun finish(releaseModel: Boolean, session: Long) {
+    override fun finish(releaseModel: Boolean, session: Long) {
         val stopJob = stop(discard = true)
         val jobs = listOfNotNull(
             audioRecordJob,
@@ -121,7 +121,7 @@ internal class VoiceInputCoordinator(
         }
     }
 
-    fun destroy() {
+    override fun destroy() {
         val stopJob = stop(discard = true)
         val jobs = listOfNotNull(audioRecordJob, transcriptionJob, modelLoadingJob, stopJob)
         jobs.forEach(Job::cancel)

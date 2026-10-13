@@ -32,7 +32,7 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 46
+        versionCode = 47
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -98,6 +98,18 @@ android {
 }
 
 androidComponents {
+    onVariants { variant ->
+        // The exact same scenario driver supplies unit assertions and screenshots.
+        (variant as com.android.build.api.variant.HasHostTests).hostTests.values.forEach { hostTest ->
+            hostTest.sources.kotlin?.addStaticSourceDirectory("src/scenarioTest/java")
+        }
+        (variant as com.android.build.api.variant.HasTestSuites).suites.values.forEach { suite ->
+            suite.sources.filterIsInstance<com.android.build.api.variant.TestSuiteSourceSet.HostJar>().forEach { source ->
+                source.kotlin?.addStaticSourceDirectory("src/scenarioTest/java")
+            }
+        }
+    }
+
     beforeVariants(selector().withBuildType("release")) { variantBuilder ->
         (variantBuilder as com.android.build.api.variant.HasHostTestsBuilder)
             .hostTests
@@ -154,4 +166,11 @@ dependencies {
   implementation(libs.androidx.navigation3.ui)
   implementation(libs.androidx.navigation3.runtime)
   implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+}
+
+// Baseline updates are deliberately separate; this gate only validates checked-in images.
+tasks.register("verifyKeyboard") {
+    group = "verification"
+    description = "Verify keyboard event sequences, screenshot baselines, and debug assembly."
+    dependsOn("testDebugUnitTest", "testDebugScreenshotTestDefaultTestSuite", "assembleDebug")
 }

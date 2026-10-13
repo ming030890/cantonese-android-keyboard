@@ -111,6 +111,27 @@ class KeyboardKeyRegistry {
 
     fun mountedKeysForDiagnostics(): List<KeyModel> = mountedKeys
 
+    /** Use drawn letter centers, never the enlarged hit-test bounds or Chinese hint labels. */
+    fun englishTouchEvidence(position: Offset): com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence? {
+        val letters = mountedKeys.filter { key ->
+            val text = key.currentData?.text
+            key.currentData?.kind == KeyboardKeyKind.Text && text?.length == 1 &&
+                text[0].lowercaseChar() in 'a'..'z' && key.geometry.visualBounds.width > 0f
+        }
+        if (letters.size < 26) return null
+        val width = letters.map { it.geometry.visualBounds.width }.sorted()[letters.size / 2]
+        val centers = FloatArray(52) { Float.NaN }
+        // Subtract a common origin before normalization so toolbar height doesn't affect scoring.
+        val origin = Offset(letters.minOf { it.geometry.visualBounds.left }, letters.minOf { it.geometry.visualBounds.top })
+        letters.forEach { key ->
+            val index = (key.currentData!!.text!![0].lowercaseChar() - 'a') * 2
+            val center = key.geometry.visualBounds.center - origin
+            centers[index] = center.x / width; centers[index + 1] = center.y / width
+        }
+        return com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence(
+            (position.x - origin.x) / width, (position.y - origin.y) / width, centers)
+    }
+
     private fun findById(id: String): KeyModel? {
         for (key in allKeys) {
             if (key.id == id) return key

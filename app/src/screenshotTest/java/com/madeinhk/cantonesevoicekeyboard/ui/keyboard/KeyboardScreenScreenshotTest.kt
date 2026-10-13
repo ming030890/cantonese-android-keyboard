@@ -203,6 +203,7 @@ fun KeyboardScreenQuickUppercaseScreenshot() {
 fun KeyboardScreenClipboardPreviewScreenshot() {
     KeyboardScreenScreenshotContent(
         state = KeyboardUiState.Idle,
+        candidates = listOf(HandwritingCandidate("係", 0), HandwritingCandidate("你", 1)),
         clipboard = ClipboardSuggestion(
             token = 1L,
             preview = "voice",

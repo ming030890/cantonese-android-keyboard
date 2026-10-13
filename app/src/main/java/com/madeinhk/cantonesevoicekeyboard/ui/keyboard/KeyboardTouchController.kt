@@ -221,6 +221,9 @@ class KeyboardTouchController(
                 true
             },
         )
+        pointer.pressedKeyInfo?.touchEvidence = if (data.kind == KeyboardKeyKind.Text &&
+            data.text?.singleOrNull()?.lowercaseChar() in 'a'..'z')
+            keyRegistry.englishTouchEvidence(pointer.lastPosition) else null
     }
 
     private fun cancelActiveKey(pointer: KeyboardPointerState) {

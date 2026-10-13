@@ -11,6 +11,7 @@ internal interface QuickCandidateEngine : AutoCloseable {
 
 /** Dictionary lookup, tokenization and ranking belong to the standalone Rust LM crate. */
 internal class NativeQuickEngine private constructor(private var handle: Long) : QuickCandidateEngine {
+    @Synchronized fun englishContextHandle(): Long = handle
     companion object {
         init { System.loadLibrary("cantonese_engine") }
 
