@@ -32,7 +32,7 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 47
+        versionCode = 48
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -154,6 +154,7 @@ dependencies {
 
   // Local tests: jUnit, coroutines, Android runner
   testImplementation(libs.junit)
+  testImplementation("org.json:json:20240303")
   testImplementation(libs.kotlinx.coroutines.test)
 
   // Instrumented tests: jUnit rules and runners
@@ -173,4 +174,12 @@ tasks.register("verifyKeyboard") {
     group = "verification"
     description = "Verify keyboard event sequences, screenshot baselines, and debug assembly."
     dependsOn("testDebugUnitTest", "testDebugScreenshotTestDefaultTestSuite", "assembleDebug")
+}
+
+// Opt-in host JNI integration tests use the same Rust exports as Android.
+tasks.withType<Test>().configureEach {
+    providers.gradleProperty("englishNativeLibrary").orNull?.let {
+        systemProperty("english.native.library", it)
+        systemProperty("java.library.path", File(it).parent)
+    }
 }

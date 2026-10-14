@@ -12,6 +12,7 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardRenderState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +46,8 @@ internal class KeyboardSessionController(
             val suggestions = KeyboardSuggestionCoordinator(service, editor, isVisible) { handwriting.accept() }
             val english = EnglishInputCoordinator(editor,
                 { NativeEnglishEngine.load(service, quick::englishContextHandle) },
-                CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate))
+                CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+                onError = { android.util.Log.e("EnglishInputCoordinator", "English candidate engine failed", it) })
             KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english)
         },
     )
@@ -69,16 +71,21 @@ internal class KeyboardSessionController(
             else -> false
         }
 
-    init { quick.protectEnglish = { autocorrectActive(KeyboardInputMode.Quick) && english?.protectQuick(it) == true } }
-
     val uiState = voice.state
     val volumeLevel = voice.volume
     val handwritingCandidates = handwriting.candidates
     val englishCandidates = english?.candidates ?: MutableStateFlow(emptyList<com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate>())
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val quickCandidates = if (english == null) quick.candidates else combine(quick.candidates, english.candidates) { chinese, words ->
-        if (english.quick && autocorrectActive(KeyboardInputMode.Quick))
-            chinese + words.filter { word -> chinese.none { it.text == word.text } }
-        else chinese
+        val mix = english.quick && english.word == quick.getComposingText() && autocorrectActive(KeyboardInputMode.Quick)
+        Triple(chinese, if (mix) words else emptyList(), quick.getComposingText())
+    }.mapLatest { (chinese, words, code) ->
+        if (words.isEmpty()) chinese else {
+            val pool = (chinese + words).map { it.text }.distinct()
+            val ranked = english.rankCandidates(pool)
+            if (code != quick.getComposingText()) emptyList() else
+                ranked.mapIndexed { i, text -> com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate(text, i) }
+        }
     }.stateIn(english.scope, SharingStarted.Eagerly, emptyList())
     val handwritingRecognizing = handwriting.recognizing
     val handwritingError = handwriting.error
@@ -380,6 +387,8 @@ internal class KeyboardSessionController(
         english?.reset()
         if (_keyboardInputMode.value == KeyboardInputMode.Quick) {
             quick.selectCandidate(text)
+            if (quick.hasActiveInput() && autocorrectActive(KeyboardInputMode.Quick))
+                english?.observeQuick(quick.getComposingText(), null)
         } else {
             handwriting.selectCandidate(text)
         }

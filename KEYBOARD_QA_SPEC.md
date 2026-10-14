@@ -51,14 +51,14 @@ model quality or a requirement that real models return this exact ranking.
 | ID | Given / event sequence | Expected behavior | Status / coverage |
 | --- | --- | --- | --- |
 | QK-01 | Type Quick letters `o`, then `f` | Editor composes `o`, then `of`; no committed letters yet; show candidates for the current code. Lookup receives surrounding text with the composing code removed. | Baseline; `qk01` |
-| QK-02 | Choose a displayed Quick candidate | Commit the chosen Chinese text once, clear composition, then request/show next-word predictions using the updated committed context. | Agreed; `qk02`, next-word screenshot |
+| QK-02 | Choose a displayed Quick candidate | Commit the chosen Chinese text once. Preserve unconsumed keys beyond the decoded twelve-key prefix; otherwise clear composition and request/show next-word predictions using the updated context. | Agreed; `qk02`, next-word screenshot, long-word selection scenario |
 | QK-03 | Choose a displayed next-word prediction | Append that prediction once; remain out of composition; refresh next-word predictions again. | Baseline; `qk03` |
 | QK-04 | Cursor/selection callback while a code is active | Keep composing text and code candidates; do not replace them with idle predictions. | Baseline; `qk04` |
 | QK-05 | Backspace with an active code and previously committed text | Remove one composing letter per press. Preserve committed text until composition is empty; a subsequent Backspace edits committed text. | Baseline; `qk05`; deleting all input alone does not restore clipboard |
 | QK-06 | Rapid code changes while lookup is pending | Only the latest requested code/version/context result may be displayed. Cancelled work must not restore older candidates. | Baseline; `qk06`, existing real-worker cancellation test |
 | QK-07 | Insert a whole English next-word prediction between English words | Add the needed left/right word separators; do not add separators to ordinary Chinese Quick selection. | Baseline; `qk07`, existing coordinator tests |
 | QK-08 | Space, Enter, or switch layout while composing Quick letters | Space/Enter preserve literal letters when autocorrect is disabled or no confident English correction exists. Enabled autocorrect follows AC-01. Layout switches remain literal. Never choose Chinese implicitly at these boundaries. | D-01 amended by D-07; `qk08`, autocorrect scenarios |
-| QK-09 | Compose more than a single two-letter code | Continue phrase lookup. Six Chinese characters remain selectable; following input may commit the resolved six-character phrase. Do not commit purely because a code is long or results are missing. | Current baseline; existing `QuickInputCoordinatorTest` length/cap tests |
+| QK-09 | Compose more than a single two-letter code | Continue phrase lookup. Following input may commit a resolved six-character Chinese phrase only with fresh, strong LM Chinese evidence. Missing, pending or uncertain evidence preserves raw composition and unconsumed suffixes. Dictionary prefix membership does not decide the language. | D-09; `QuickLanguageScenarioTest`, native real-model regression, length/cap tests |
 | QK-10 | Paste, press Record, or enter punctuation while a Quick code is unfinished | Commit literal letters first. Paste inserts copied text once and clears Quick composition, then refreshes predictions. Record transitions to voice; punctuation follows the literal letters. Chinese conversion requires explicit candidate selection at these boundaries. | Rule D-05 derived from confirmed literal policies; `qk10` |
 
 ## Other text input and editor context
@@ -101,7 +101,7 @@ layouts. Emoji uses its own panel rather than this toolbar.
 | --- | --- | --- | --- |
 | TB-01 | Multiple eligible toolbar contents simultaneously | Apply the precedence above, without changing clipboard's session eligibility merely because a status temporarily occupies the slot. | Baseline; complete `tb01` matrix |
 | TB-02 | Handwriting state while another layout is selected | Ignore handwriting candidates, recognizing state, and error on that layout. | Baseline; `tb02` |
-| UX-01 | Too many candidates for toolbar width | Page in original order; arrows consume space only when needed; no omitted or duplicated candidate indices. | Baseline; `ux01`, existing first/middle/last-page screenshots |
+| UX-01 | Too many candidates for toolbar width | Pack measured label widths in ranked order; arrows consume space only when visible; no omitted or duplicated indices. English words and Chinese phrases remain on one line. | `ux01`, measured-width tests, normal/narrow long-word and phrase screenshots |
 | UX-02 | Candidate set shrinks or changes | Clamp/reset the page to a valid page; obsolete candidate keys must not be tappable. | Baseline; existing key-unmount tests; Compose page-reset interaction gap |
 | UX-03 | Text key versus control key, key release/cancel/repeat | Text dispatches once on release; cancel inserts nothing. Delete occurs on down/repeat, not an extra time on up. | Baseline; `ux03`, existing touch/dispatcher tests |
 | UX-04 | Shift/symbol/emoji controls | Change the visible panel/key labels without committing text. Emoji selection commits selected emoji once. | Static preview coverage and existing emoji commit scenario; full Compose interaction gap |
@@ -124,18 +124,20 @@ with fixed English model results; Rust tests verify the actual search and confid
 
 | ID | Sequence / condition | Expected behavior | Coverage |
 |---|---|---|---|
-| AC-01 | Type `teh`, then Space, punctuation, or newline on English/Quick | Compose the word; show literal input plus spelling alternatives; commit `the` and the exact boundary when the current result is confident. Pending/failed searches commit literally. | `boundaryCorrectionAndUndoOnBothLayouts`, `staleLookupAndNativeFailureNeverRewriteText` |
+| AC-01 | Type `teh`, then Space, punctuation, or newline on English/Quick | Compose the word; show literal input plus spelling alternatives; commit `the` and the exact boundary when confident. A pending lookup can correct the untouched committed suffix after completion. Further input, cursor changes, layout/hide, failure, and submitting Enter prevent delayed replacement. | `boundaryCorrectionAndUndoOnBothLayouts`, `pendingBoundaryCorrectsWithUndoButNeverRewritesAfterNewInput`, real JNI timing test |
 | AC-02 | Immediate Backspace after correction | Remove delimiter and restore original composition; recommit without repeating the correction. Guard undo against cursor/selection changes. | boundary and selection scenarios |
-| AC-03 | Type English prefixes in Quick beyond six letters | Protect plausible English from automatic Chinese phrase conversion; preserve conversion for non-English sequences. Chinese candidate order remains intact and selection stays explicit. Exact one/two-root codes remain literal unless tapped. | Quick conversion and selection scenarios |
+| AC-03 | Type English prefixes in Quick beyond six letters | Protect plausible English from automatic Chinese phrase conversion; preserve conversion for non-English sequences. Chinese and English candidates share LM ranking; selection stays explicit. Exact one/two-root codes remain literal unless tapped. | Quick conversion and selection scenarios |
 | AC-04 | Switch to symbols and return, or enter punctuation there | Keep originating English/Quick word ownership. Punctuation resolves the word; digits and identifiers finish literally. | `numberPanelPreservesWordForPunctuationButDigitsStayLiteral` |
 | AC-05 | Paste, Record, emoji, layout switch, keyboard hide | Finish literal composition exactly once and cancel pending English results. | lifecycle scenarios |
 | AC-06 | Password, number, URL/email editor, no-suggestions, disabled layout preference | No English correction. Preferences are independent for English and Quick. | policy and preference scenarios |
 | AC-07 | Tap letters, uppercase, resize, rollover or canceled key | Use drawn letter centers in key-width units. Evidence accompanies dispatched characters only; missing geometry falls back to adjacency. Preserve case; unsupported tokens stay literal. | geometry/input scenarios; touch integration tests |
+| AC-08 | Chinese and English candidates compete in Quick | Shared bilingual LM ranks one combined pool, including Chinese phrases; retain all candidate texts and literal spelling. English can rank before Chinese in English context. | `mixedCandidateBarUsesContextRankingAndBothLanguagesRemainSelectable`, shipped-model JNI test, mixed screenshot |
+| AC-09 | Centre-key mistaps from the user's report | Clear `engkish`, `shoukd`, `chineae`, `candjdates`, `kehboard` typos correct; severe `ebgkisb` offers `english` without automatic replacement. | Rust centre-touch regression, real JNI/controller scenarios on both layouts |
 
 Rust uses the pinned wmkeyboard English seed dictionary, FuzzyBeamSearch penalties,
 and Gaussian TouchModel. A packed trie and reusable search workspace limit mobile
 memory/CPU. Existing bilingual NN context scores rerank only dictionary candidates;
-known words, completions, expensive edits and ambiguous candidates are not silently
+known words, completions, multiple edits and ambiguous candidates are not silently
 replaced. Actual device latency and InputConnection integration require a connected
 Android device; none was connected during this implementation.
 
@@ -151,6 +153,8 @@ Confirmed by the user on 2026-10-13:
 
 - **D-06**: Rich clipboard contents use their plain-text version.
 - **D-07**: Enable conservative English autocorrect on English and Quick, using the wmkeyboard reference in Rust with touch evidence and the existing bilingual NN. Correct at Space/punctuation/Enter; allow Backspace undo. No implicit Chinese selection. Settings-screen redesign is deferred.
+- **D-08 (2026-10-14)**: Show possible English words in the candidate bar and rank Chinese and English together with the shared LM. Fix overly strict centre-tap rejection and lookup timing that skipped clear typo corrections.
+- **D-09 (2026-10-14)**: Continuous Quick conversion must depend on LM evidence for English versus Chinese, not an English dictionary gate or length alone. Preserve uncertain/OOV input. Candidate UI must handle English words and multi-character Chinese phrases.
 
 Derived rule, communicated to the user:
 

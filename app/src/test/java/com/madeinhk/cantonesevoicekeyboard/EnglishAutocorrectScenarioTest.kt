@@ -65,6 +65,8 @@ class EnglishAutocorrectScenarioTest {
         for ((typed, expectedPrefix) in listOf("keyboard" to "", "zzzzzzz" to "中文中文中文")) {
             KeyboardScenario(englishEngine = ScenarioEnglishEngine()).use { s ->
                 s.engine.lookup = { _, code, _, _ -> if (code.length == 6) listOf(QuickCandidate("中文中文中文", 0)) else emptyList() }
+                s.engine.classify = { code, _, _, _ -> if (code == "zzzzzz")
+                    com.madeinhk.cantonesevoicekeyboard.quick.QuickLanguageEvidence(0.001f, 0.999f, 0.0001f, 0.1f) else null }
                 s.start(); s.type(typed)
                 assertEquals(expectedPrefix, s.editor.text)
                 assertEquals(if (expectedPrefix.isEmpty()) typed else "z", s.editor.composing)
@@ -178,9 +180,61 @@ class EnglishAutocorrectScenarioTest {
         KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum, englishEngine = engine,
             scope = CoroutineScope(SupervisorJob() + dispatcher), lookupDispatcher = dispatcher).use { s ->
             s.start(); s.type("teh"); s.press(KeyboardKeyKind.Space); advanceUntilIdle()
-            assertEquals("teh ", s.editor.text); assertTrue(s.snapshot().englishCandidates.isEmpty())
+            assertEquals("the ", s.editor.text); assertTrue(s.snapshot().englishCandidates.isEmpty())
             engine.failure = true; s.type("teh"); advanceUntilIdle(); s.press(KeyboardKeyKind.Space)
-            assertEquals("teh teh ", s.editor.text)
+            assertEquals("the teh ", s.editor.text)
+        }
+    }
+
+    @Test fun pendingBoundaryCorrectsWithUndoButNeverRewritesAfterNewInput() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+            KeyboardScenario(initialMode = mode, englishEngine = ScenarioEnglishEngine(),
+                scope = CoroutineScope(SupervisorJob() + dispatcher), lookupDispatcher = dispatcher).use { s ->
+                s.start(); s.type("teh"); s.press(KeyboardKeyKind.Space)
+                assertEquals("teh ", s.editor.text)
+                advanceUntilIdle(); assertEquals("the ", s.editor.text)
+                s.press(KeyboardKeyKind.Delete); assertEquals("teh", s.editor.composing)
+                s.press(KeyboardKeyKind.Space); advanceUntilIdle(); assertEquals("teh ", s.editor.text)
+            }
+            for (action in listOf("type", "hide", "selection", "selectionReturn", "layout")) {
+                KeyboardScenario(initialMode = mode, englishEngine = ScenarioEnglishEngine(),
+                    scope = CoroutineScope(SupervisorJob() + dispatcher), lookupDispatcher = dispatcher).use { s ->
+                    s.start(); s.type("teh"); s.press(KeyboardKeyKind.Space)
+                    when (action) {
+                        "type" -> s.type("x")
+                        "hide" -> s.hide()
+                        "layout" -> s.mode(KeyboardInputMode.Handwriting)
+                        else -> {
+                            s.editor.selectionOverride = 0 to 0; s.controller.onSelectionChanged(0, 0, -1)
+                            if (action == "selectionReturn") {
+                                s.editor.selectionOverride = 4 to 4; s.controller.onSelectionChanged(4, 4, -1)
+                            }
+                        }
+                    }
+                    advanceUntilIdle()
+                    assertEquals("$mode $action", "teh ", s.editor.text)
+                    if (action == "type") assertEquals("x", s.editor.composing)
+                }
+            }
+        }
+    }
+
+    @Test fun mixedCandidateBarUsesContextRankingAndBothLanguagesRemainSelectable() {
+        for (selected in listOf("the", "你", "teh")) {
+            val engine = ScenarioEnglishEngine().apply {
+                ranker = { left, _, pool ->
+                    assertEquals("I use ", left)
+                    listOf("the", "你", "係", "teh").filter { it in pool }
+                }
+            }
+            KeyboardScenario(initialText = "I use ", englishEngine = engine).use { s ->
+                s.engine.lookup = { _, _, _, _ -> listOf(QuickCandidate("你", 0), QuickCandidate("係", 1)) }
+                s.start(); s.type("teh")
+                assertEquals(listOf("the", "你", "係", "teh"), s.snapshot().quickCandidates.map { it.text })
+                s.choose(selected); assertEquals("I use $selected", s.editor.text)
+                assertEquals("", s.editor.composing)
+            }
         }
     }
 

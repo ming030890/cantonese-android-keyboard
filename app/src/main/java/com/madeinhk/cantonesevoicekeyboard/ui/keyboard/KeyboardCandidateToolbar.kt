@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -11,6 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -93,8 +97,16 @@ internal fun HandwritingCandidateStrip(
     page: Int,
     onPageChanged: (Int) -> Unit,
 ) {
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val candidateStyle = LocalTextStyle.current
+    val widths = candidates.map { candidate ->
+        with(density) { textMeasurer.measure(candidate.text, candidateStyle.copy(fontSize = candidateFontSize(candidate.text))).size.width.toDp() + 16.dp }
+            .coerceAtLeast(62.dp)
+    }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val pages = handwritingCandidatePages(candidates.size, maxWidth)
+        val availableWidth = maxWidth
+        val pages = textCandidatePages(widths, availableWidth)
         val safePage = page.coerceIn(0, pages.lastIndex.coerceAtLeast(0))
         val candidatePage = pages.getOrNull(safePage)
         val firstCandidate = candidatePage?.firstCandidate ?: 0
@@ -136,7 +148,9 @@ internal fun HandwritingCandidateStrip(
                             key = keys.candidates[firstCandidate + slot],
                             keyRegistry = keyRegistry,
                             candidate = candidate,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.width(widths[firstCandidate + slot].coerceAtMost(
+                                (availableWidth - KeyboardUiDefaults.ToolbarIconTouchSize *
+                                    ((if (hasPrevious) 1 else 0) + (if (hasNext) 1 else 0))).coerceAtLeast(1.dp))),
                         )
                     } else {
                         Spacer(
@@ -147,7 +161,7 @@ internal fun HandwritingCandidateStrip(
                     }
                 }
             }
-            CandidatePageArrow(
+            if (hasNext) CandidatePageArrow(
                 key = keys.candidateNext,
                 keyRegistry = keyRegistry,
                 pointsForward = true,
@@ -158,6 +172,33 @@ internal fun HandwritingCandidateStrip(
             )
         }
     }
+}
+
+/** Pack measured labels into pages; reserve only arrows that are actually visible. */
+internal fun textCandidatePages(widths: List<Dp>, availableWidth: Dp): List<HandwritingCandidatePage> {
+    val pages = mutableListOf<HandwritingCandidatePage>()
+    var first = 0
+    while (first < widths.size) {
+        val previous = first > 0
+        val withoutNext = (availableWidth - if (previous) KeyboardUiDefaults.ToolbarIconTouchSize else 0.dp)
+            .coerceAtLeast(1.dp)
+        fun fits(budget: Dp): Int {
+            var used = 0.dp
+            var count = 0
+            for (index in first until widths.size) {
+                val width = widths[index].coerceAtMost(budget) + if (count == 0) 0.dp else 1.dp
+                if (count > 0 && used + width > budget) break
+                used += width; count++
+            }
+            return count.coerceAtLeast(1)
+        }
+        val remaining = widths.size - first
+        val last = fits(withoutNext) == remaining
+        val capacity = if (last) remaining else fits((withoutNext - KeyboardUiDefaults.ToolbarIconTouchSize).coerceAtLeast(1.dp))
+        pages += HandwritingCandidatePage(first, capacity, previous, !last)
+        first += capacity
+    }
+    return pages
 }
 
 internal data class HandwritingCandidatePage(
@@ -279,12 +320,17 @@ private fun ToolbarCandidateVisual(
         Text(
             text = candidate.text,
             color = BrandTheme.colors.keyboardKeyOnSurface,
-            fontSize = 22.sp,
+            fontSize = candidateFontSize(candidate.text),
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         )
     }
 }
+
+private fun candidateFontSize(text: String) = if (text.length > 3 && text.all { it.code < 128 }) 18.sp else 22.sp
 
 @Composable
 internal fun ToolbarIconVisual(

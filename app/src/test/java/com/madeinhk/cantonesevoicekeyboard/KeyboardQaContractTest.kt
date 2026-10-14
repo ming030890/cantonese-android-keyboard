@@ -319,7 +319,8 @@ class KeyboardQaContractTest {
     @Test
     fun ux01_candidatePaginationNeverSkipsOrDuplicatesAnIndexAcrossWidths() {
         for (width in listOf(120, 200, 256, 296, 360)) for (count in 0..100) {
-            val pages = handwritingCandidatePages(count, width.dp)
+            val widths = List(count) { index -> listOf(62, 128, 156, 240)[index % 4].dp }
+            val pages = textCandidatePages(widths, width.dp)
             val indices = pages.flatMap { page ->
                 (page.firstCandidate until minOf(count, page.firstCandidate + page.capacity)).toList()
             }

@@ -2,6 +2,7 @@ package com.madeinhk.cantonesevoicekeyboard.english
 
 import android.content.Context
 import org.json.JSONObject
+import org.json.JSONArray
 
 internal data class EnglishCandidate(val word: String, val score: Double, val editCost: Double,
     val edits: Int, val completedChars: Int)
@@ -13,6 +14,7 @@ data class EnglishTouchEvidence(val x: Float, val y: Float, val centers: FloatAr
 
 internal interface EnglishCandidateEngine {
     fun predict(word: String, centers: FloatArray, points: FloatArray, left: String, right: String): EnglishPrediction
+    fun rankCandidates(left: String, right: String, candidates: List<String>): List<String> = candidates
 }
 
 internal class NativeEnglishEngine private constructor(private val contextHandle: () -> Long) : EnglishCandidateEngine {
@@ -25,6 +27,8 @@ internal class NativeEnglishEngine private constructor(private val contextHandle
         @JvmStatic private external fun nativeLoad(dictionary: ByteArray): Boolean
         @JvmStatic private external fun nativeSearch(word: String, centers: FloatArray, points: FloatArray,
             contextHandle: Long, left: String, right: String): String?
+        @JvmStatic private external fun nativeRankCandidates(contextHandle: Long, left: String, right: String,
+            candidates: Array<String>): String?
     }
 
     override fun predict(word: String, centers: FloatArray, points: FloatArray, left: String, right: String): EnglishPrediction {
@@ -40,5 +44,12 @@ internal class NativeEnglishEngine private constructor(private val contextHandle
             correction = if (json.isNull("correction")) null else json.getString("correction"),
             plausiblePrefix = json.getBoolean("plausiblePrefix"), known = json.getBoolean("known"),
         )
+    }
+
+    override fun rankCandidates(left: String, right: String, candidates: List<String>): List<String> {
+        val order = JSONArray(checkNotNull(nativeRankCandidates(contextHandle(), left, right, candidates.toTypedArray())))
+        val indices = (0 until order.length()).map { order.getInt(it) }
+        check(indices.sorted() == candidates.indices.toList()) { "Invalid native candidate order" }
+        return indices.map(candidates::get)
     }
 }

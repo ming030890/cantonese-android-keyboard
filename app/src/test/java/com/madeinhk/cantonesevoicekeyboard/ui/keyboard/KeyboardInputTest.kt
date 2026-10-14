@@ -182,6 +182,22 @@ class KeyboardInputTest {
         )
     }
 
+    @Test fun candidatePagesUseMeasuredWordAndPhraseWidths() {
+        val widths = listOf(124.dp, 156.dp, 136.dp, 112.dp, 172.dp)
+        val pages = textCandidatePages(widths, 330.dp)
+        assertEquals(2, pages.first().capacity)
+        assertEquals(0, pages.first().firstCandidate)
+        assertTrue(pages.first().hasNext)
+        assertEquals(widths.indices.toList(), pages.flatMap { page ->
+            (page.firstCandidate until page.firstCandidate + page.capacity).toList()
+        })
+        assertEquals(1, textCandidatePages(widths, 220.dp).first().capacity)
+        assertEquals(listOf(HandwritingCandidatePage(0, 2, false, false)),
+            textCandidatePages(listOf(124.dp, 156.dp), 330.dp))
+        assertEquals(listOf(HandwritingCandidatePage(0, 1, false, false)),
+            textCandidatePages(listOf(800.dp), 220.dp))
+    }
+
     @Test
     fun candidateKeysRemovedWhenRecognitionReturnsFewerResults() {
         val registry = KeyboardKeyRegistry()

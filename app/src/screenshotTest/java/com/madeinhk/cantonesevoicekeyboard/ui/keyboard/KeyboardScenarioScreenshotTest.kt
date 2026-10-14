@@ -18,6 +18,24 @@ fun ScenarioEnglishAutocorrectCandidates() = ScenarioScreen(remember { KeyboardS
 fun ScenarioQuickEnglishCandidates() = ScenarioScreen(remember { KeyboardScenarios.quickEnglishCandidates() })
 
 @PreviewTest
+@Preview(name = "Long bilingual candidates", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Preview(name = "Long bilingual candidates narrow", widthDp = 320, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioLongMixedCandidates() = ScenarioScreen(remember { KeyboardScenarios.longMixedCandidates() })
+
+@PreviewTest
+@Preview(name = "Long bilingual candidates second page", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Preview(name = "Long bilingual candidates narrow second page", widthDp = 320, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioLongMixedCandidatesSecondPage() = ScenarioScreen(remember { KeyboardScenarios.longMixedCandidates() }, page = 1)
+
+@PreviewTest
+@Preview(name = "Long English candidates", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Preview(name = "Long English candidates narrow", widthDp = 320, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioLongEnglishCandidates() = ScenarioScreen(remember { KeyboardScenarios.longEnglishCandidates() })
+
+@PreviewTest
 @Preview(name = "Clipboard before typing", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioClipboardInitially() = ScenarioScreen(remember { KeyboardScenarios.clipboardInitially() })
@@ -58,10 +76,11 @@ fun ScenarioHandwritingError() = ScenarioScreen(remember { KeyboardScenarios.han
 fun ScenarioRichClipboard() = ScenarioScreen(remember { KeyboardScenarios.richClipboard() })
 
 @Composable
-private fun ScenarioScreen(state: KeyboardRenderState) {
+private fun ScenarioScreen(state: KeyboardRenderState, page: Int = 0) {
     CantoneseVoiceKeyboardTheme(dynamicColor = false, darkTheme = false) {
         KeyboardScreen(
             renderState = state,
+            initialHandwritingCandidatePage = page,
             onToggleRecording = {}, onDeleteSurroundingText = {}, onCommitText = {},
             onSendSpace = {}, onSendEnter = {}, onOpenSettings = {}, onPasteClipboard = {},
             onHandwritingChanged = { _, _, _, _, _, _ -> },

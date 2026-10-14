@@ -335,10 +335,18 @@ class QuickInputCoordinatorTest {
             val targetBackend = object : QuickCandidateEngine {
                 override fun candidates(version: Int, code: String, left: String, right: String) =
                     listOf(QuickCandidate(if (code == targetCode) "𠮷們手我們手" else "手", 0))
+                override fun languageEvidence(code: String, left: String, right: String, chinese: String) =
+                    QuickLanguageEvidence(0.001f, 0.999f, 0.0001f, 0.1f)
             }
+            var composing = ""
             val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
                 arrayOf(InputConnection::class.java)) { _, method, args ->
-                if (method.name == "commitText") { committed += args!![0].toString(); true } else if (method.returnType == java.lang.Boolean.TYPE) true else null
+                when (method.name) {
+                    "setComposingText" -> { composing = args!![0].toString(); true }
+                    "getTextBeforeCursor" -> composing
+                    "commitText" -> { committed += args!![0].toString(); composing = ""; true }
+                    else -> if (method.returnType == java.lang.Boolean.TYPE) true else null
+                }
             } as InputConnection
             val c = QuickInputCoordinator({ targetBackend }, ImeEditor({ connection }, { null }))
             targetCode.forEach { c.onKey(it.toString()) }
@@ -376,7 +384,7 @@ class QuickInputCoordinatorTest {
     }
 
     @Test
-    fun capResolvesCurrentCodeWhenAsyncCandidatesAreNotReady() = kotlinx.coroutines.test.runTest {
+    fun pendingLanguageDecisionNeverForcesChineseOrBlocksTyping() = kotlinx.coroutines.test.runTest {
         val committed = mutableListOf<String>()
         val backend = object : QuickCandidateEngine {
             override fun candidates(version: Int, code: String, left: String, right: String) =
@@ -390,8 +398,8 @@ class QuickInputCoordinatorTest {
             scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() +
                 kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)))
         "qqqqqqq".forEach { c.onKey(it.toString()) }
-        assertEquals(listOf("手手手手手手"), committed)
-        assertEquals("q", c.getComposingText())
+        assertTrue(committed.isEmpty())
+        assertEquals("qqqqqqq", c.getComposingText())
         testScheduler.runCurrent()
         val result = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
             kotlinx.coroutines.withTimeout(5_000) { c.candidates.first { it.isNotEmpty() } }
