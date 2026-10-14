@@ -209,6 +209,8 @@ internal object KeyboardScenarios {
     }
     fun longEnglishCandidates() = KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum,
         clipboardText = null, englishEngine = longWordEngine()).use { it.start(); it.type("keyboadr"); it.snapshot() }
+    fun missingFinalLetterCandidates() = KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum,
+        clipboardText = null, englishEngine = ScenarioEnglishEngine()).use { it.start(); it.type("keyboar"); it.snapshot() }
     fun englishAutocorrectCandidates() = KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum,
         clipboardText = null, englishEngine = ScenarioEnglishEngine()).use { it.start(); it.type("teh"); it.snapshot() }
     fun quickEnglishCandidates() = KeyboardScenario(clipboardText = null, englishEngine = ScenarioEnglishEngine().apply {
@@ -243,9 +245,11 @@ internal class ScenarioEnglishEngine : com.madeinhk.cantonesevoicekeyboard.engli
     override fun predict(word: String, centers: FloatArray, points: FloatArray, left: String, right: String): com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction {
         requests += Request(word, left, right, centers, points)
         if (failure) error("Native unavailable")
-        val correction = mapOf("teh" to "the", "helllo" to "hello", "aple" to "apple")[word]
+        val correction = mapOf("teh" to "the", "helllo" to "hello", "aple" to "apple", "keyboar" to "keyboard")[word]
         val candidates = correction?.let {
-            listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate(it, 8.0, 0.10536051565782628, 1, 0))
+            listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate(it, 8.0,
+                if (word == "keyboar") 0.0 else 0.10536051565782628,
+                if (word == "keyboar") 0 else 1, if (word == "keyboar") 1 else 0))
         }.orEmpty()
         return com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(candidates, correction,
             word in listOf("key", "keyb", "keybo", "keyboa", "keyboar", "keyboard") || correction != null,

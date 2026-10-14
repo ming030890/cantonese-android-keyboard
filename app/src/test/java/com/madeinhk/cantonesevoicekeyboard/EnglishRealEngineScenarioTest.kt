@@ -91,6 +91,48 @@ class EnglishRealEngineScenarioTest {
         }
     }
 
+    @Test fun reportedChatTyposOfferIntendedWordsWithoutReplacingAmbiguousInput() {
+        val engine = engine()
+        for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+            for ((typed, intended) in listOf("tyoing" to "typing", "srjll" to "still")) {
+                for (select in listOf(false, true)) {
+                    KeyboardScenario(initialMode = mode, englishEngine = engine).use { s ->
+                        s.start(); s.type(typed)
+                        val candidates = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                        assertTrue("$mode $typed: $candidates", candidates.any { it.text == intended })
+                        if (select) s.choose(intended) else s.press(KeyboardKeyKind.Space)
+                        assertEquals("$mode $typed select=$select", if (select) intended else "$typed ", s.editor.text)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test fun wmMissingFinalLetterCorrectsButTwoEditsRequireSelection() {
+        val engine = engine()
+        for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+            for ((typed, intended, auto) in listOf(Triple("keyboar", "keyboard", true),
+                Triple("gwllo", "hello", false))) {
+                for (select in listOf(false, true)) {
+                    KeyboardScenario(initialMode = mode, englishEngine = engine).use { s ->
+                        s.start(); s.type(typed)
+                        val candidates = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                        assertTrue("$mode $typed: $candidates", candidates.any { it.text == intended })
+                        assertEquals(typed, s.editor.composing)
+                        if (select) s.choose(intended) else s.press(KeyboardKeyKind.Space)
+                        assertEquals("$mode $typed select=$select", if (select) intended else
+                            (if (auto) intended else typed) + " ", s.editor.text)
+                        assertEquals("", s.editor.composing)
+                        if (!select && auto) {
+                            s.press(KeyboardKeyKind.Delete)
+                            assertEquals(typed, s.editor.composing)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Test fun shippedBilingualModelRanksEnglishAndChineseInOnePool() {
         quickEngine().use { quick ->
             val engine = engine(quick.englishContextHandle())

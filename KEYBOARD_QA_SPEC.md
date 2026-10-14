@@ -133,12 +133,13 @@ with fixed English model results; Rust tests verify the actual search and confid
 | AC-07 | Tap letters, uppercase, resize, rollover or canceled key | Use drawn letter centers in key-width units. Evidence accompanies dispatched characters only; missing geometry falls back to adjacency. Preserve case; unsupported tokens stay literal. | geometry/input scenarios; touch integration tests |
 | AC-08 | Chinese and English candidates compete in Quick | Shared bilingual LM ranks one combined pool, including Chinese phrases; retain all candidate texts and literal spelling. English can rank before Chinese in English context. | `mixedCandidateBarUsesContextRankingAndBothLanguagesRemainSelectable`, shipped-model JNI test, mixed screenshot |
 | AC-09 | Centre-key mistaps from the user's report | Clear `engkish`, `shoukd`, `chineae`, `candjdates`, `kehboard` typos correct; severe `ebgkisb` offers `english` without automatic replacement. | Rust centre-touch regression, real JNI/controller scenarios on both layouts |
+| AC-10 | WM replacement rules: `keyboar`, `gwllo`, `tyoing` then Space | A single missing final letter can correct with a 4:1 margin and insertion penalty; two-edit and edited/completed suggestions do not compete for replacement. `gwllo` offers `hello` for a tap; ambiguous `tyoing` remains literal. Backspace restores `keyboar`. | Native shape/confidence tests and real JNI/controller scenarios on both layouts |
 
 Rust uses the pinned wmkeyboard English seed dictionary, FuzzyBeamSearch penalties,
 and Gaussian TouchModel. A packed trie and reusable search workspace limit mobile
 memory/CPU. Existing bilingual NN context scores rerank only dictionary candidates;
-known words, completions, multiple edits and ambiguous candidates are not silently
-replaced. Actual device latency and InputConnection integration require a connected
+known words, longer completions, multiple edits and ambiguous candidates are not
+silently replaced. A clean one-letter final completion counts as an insertion. Actual device latency and InputConnection integration require a connected
 Android device; none was connected during this implementation.
 
 ## Product decisions
@@ -154,6 +155,7 @@ Confirmed by the user on 2026-10-13:
 - **D-06**: Rich clipboard contents use their plain-text version.
 - **D-07**: Enable conservative English autocorrect on English and Quick, using the wmkeyboard reference in Rust with touch evidence and the existing bilingual NN. Correct at Space/punctuation/Enter; allow Backspace undo. No implicit Chinese selection. Settings-screen redesign is deferred.
 - **D-08 (2026-10-14)**: Show possible English words in the candidate bar and rank Chinese and English together with the shared LM. Fix overly strict centre-tap rejection and lookup timing that skipped clear typo corrections.
+- **D-10 (2026-10-14)**: Apply WM Keyboard’s ASCII QWERTY automatic replacement shapes and default 4:1 confidence margin, retaining bilingual ranking and explicit multi-edit suggestions.
 - **D-09 (2026-10-14)**: Continuous Quick conversion must depend on LM evidence for English versus Chinese, not an English dictionary gate or length alone. Preserve uncertain/OOV input. Candidate UI must handle English words and multi-character Chinese phrases.
 
 Derived rule, communicated to the user:

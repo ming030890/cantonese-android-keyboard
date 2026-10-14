@@ -7,10 +7,12 @@ to supported spelling candidates through the same native Quick engine. It does
 not load a second NN or require ASR/Play model packs.
 
 Space, punctuation and Enter apply only confident complete-word corrections.
-Centre taps on a mistyped key can correct when a one-edit spelling dominates;
-expensive one-edit fixes require an 8:1 margin over equally close alternatives.
+WM Keyboard’s ASCII QWERTY replacement rules apply: pure one-edit fixes and
+clean completions adding exactly one final letter compete at a 4:1 margin.
+The final-letter completion pays the same insertion penalty as an edit.
+Multi-edit and edited-then-completed suggestions do not compete in this gate.
 Known words, mixed case, identifiers, URLs/email, short/ambiguous input and
-two-edit results remain literal. Suggestions can be tapped explicitly.
+two-edit results remain literal. Longer completions require explicit selection. Suggestions can be tapped explicitly.
 Immediate Backspace restores the original word and removes the delimiter;
 editor actions that submit a field clear undo. Paste, voice input, language
 switching and keyboard closure finish literal input.
@@ -88,3 +90,15 @@ The packed dictionary is 977,692 bytes and the in-memory trie uses 1,303,576 byt
 A warm host search probe measured p95 below 0.2 ms without NN ranking. Phone
 latency and real InputConnection behavior still require device verification;
 no Android device was connected during implementation.
+
+## WM replacement reference
+
+The ASCII correction shapes and default confidence follow `SuggestionEngine.kt`
+retrieved from WM Keyboard main on 2026-10-14:
+https://github.com/wasi-master/wmkeyboard/blob/main/core/prediction/src/main/java/com/wasimaster/wmkeyboard/core/prediction/SuggestionEngine.kt
+
+This ports the spelling replacement gate. WM’s personal lexicon, contact names,
+accents, correction history and adaptive confidence are not implemented here.
+Our existing bilingual LM and broader selectable alternatives remain in use.
+Real JNI/controller tests cover `keyboar` → `keyboard` at Space with undo,
+`gwllo` → `hello` as an explicit suggestion, and ambiguous `tyoing` staying literal.
