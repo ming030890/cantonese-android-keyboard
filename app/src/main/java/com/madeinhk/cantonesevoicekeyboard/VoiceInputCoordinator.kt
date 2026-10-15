@@ -83,7 +83,6 @@ internal class VoiceInputCoordinator(
             voiceState != KeyboardUiState.Transcribing
         ) return
         generation++
-        editor.setComposingText("")
         editor.finishComposingText()
         if (recording || voiceState == KeyboardUiState.Recording) {
             stop(discard = true)
@@ -398,7 +397,10 @@ internal class VoiceInputCoordinator(
             }
             if (activeDebugStore === debugStore) activeDebugStore = null
             withContext(Dispatchers.Main) {
-                if (stoppedGeneration == generation) _state.value = KeyboardUiState.Idle
+                if (stoppedGeneration == generation) {
+                    editor.finishComposingText()
+                    _state.value = KeyboardUiState.Idle
+                }
             }
             transcriptionJob = null
         }.also { transcriptionJob = it }

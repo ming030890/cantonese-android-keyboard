@@ -9,10 +9,14 @@ import android.widget.EditText
 class ImePreviewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val showIme=intent.getBooleanExtra("showIme",true)
+        // Instrumentation can exercise a real InputConnection without a second
+        // IME concurrently finishing or replacing its composing spans.
+        if(!showIme) window.addFlags(android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
         val editor = EditText(this).apply { hint = "Keyboard inset test" }
         setContentView(editor)
         editor.requestFocus()
-        editor.postDelayed({
+        if(showIme) editor.postDelayed({
             getSystemService(InputMethodManager::class.java)
                 .showSoftInput(editor, InputMethodManager.SHOW_IMPLICIT)
         }, 500)

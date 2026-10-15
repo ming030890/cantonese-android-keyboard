@@ -28,7 +28,7 @@ class KeyboardTouchControllerTest {
     }
 
     @Test
-    fun cancelNeverCommitsAndUnmountedKeyDoesNothing() {
+    fun cancelNeverCommitsAndUnmountedKeyIsNeverTargeted() {
         val fixture = Fixture()
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(10), floatArrayOf(40f)))
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_CANCEL, 0, intArrayOf(10), floatArrayOf(40f)))
@@ -36,7 +36,15 @@ class KeyboardTouchControllerTest {
         assertEquals(listOf("down:a", "cancel:a"), fixture.events)
         fixture.registry.unmount(fixture.b)
         fixture.controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(11), floatArrayOf(160f)))
-        assertEquals(listOf("down:a", "cancel:a"), fixture.events)
+        // Active row targets intentionally fill the surface. Removing b
+        // expands a's hit target; it must never dispatch b's stale action.
+        assertEquals(listOf("down:a", "cancel:a", "down:a"), fixture.events)
+        assertFalse(fixture.registry.isMounted(fixture.b))
+        assertFalse(fixture.b.isPressed)
+        fixture.controller.onMotionEvent(event(MotionEvent.ACTION_CANCEL, 0, intArrayOf(11), floatArrayOf(160f)))
+        fixture.registry.unmount(fixture.a)
+        fixture.controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(12), floatArrayOf(160f)))
+        assertEquals(listOf("down:a", "cancel:a", "down:a", "cancel:a"), fixture.events)
     }
 
     @Test

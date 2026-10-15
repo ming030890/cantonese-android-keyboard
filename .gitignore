@@ -79,3 +79,9 @@ __pycache__/
 
 # Generated neural LM export and calibrated fusion bundle staged by deploy.sh
 /app/src/main/assets/language_model/
+
+# Experimental typing model; staged only from a verified export manifest
+/app/src/main/assets/typing/
+
+# Generated expanded dictionary; rebuilt from native source by deploy.sh
+/app/src/main/assets/english/en-v2.bin

@@ -31,6 +31,7 @@ internal class KeyboardSessionController(
             enabledLayouts = { KeyboardSettings.getEnabledLayouts(service) },
             quickVersion = { KeyboardSettings.getQuickVersion(service) },
             autocorrectEnabled = { KeyboardSettings.isAutocorrectEnabled(service, it) },
+            jointDecoderEnabled = { KeyboardSettings.isJointDecoderEnabled(service) },
         ),
         createDependencies = { editor, currentSession, isVisible ->
             val voice = VoiceInputCoordinator(service, editor, currentSession, isVisible)
@@ -45,7 +46,26 @@ internal class KeyboardSessionController(
             )
             val suggestions = KeyboardSuggestionCoordinator(service, editor, isVisible) { handwriting.accept() }
             val english = EnglishInputCoordinator(editor,
-                { NativeEnglishEngine.load(service, quick::englishContextHandle) },
+                {
+                    if (KeyboardSettings.isJointDecoderEnabled(service)) {
+                        val learning=LocalTypingLearning(service) {
+                            KeyboardSettings.isTypingLearningEnabled(service) &&
+                                service.currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING) != EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING &&
+                                englishAllowed(service.currentInputEditorInfo?.inputType)
+                        }
+                        val scorer=NativeEnglishEngine.sharedContextScorer(quick::englishContextHandle)
+                        val policy=kotlin.runCatching {
+                            val manifest=org.json.JSONObject(service.assets.open("typing/manifest.json").bufferedReader().use { it.readText() })
+                            ReplacementPolicy.load(service.assets.open("typing/calibration.json").bufferedReader().use { it.readText() },manifest.getString("sha256"))
+                        }.getOrNull()
+                        val revisionPolicy=kotlin.runCatching {
+                            val manifest=org.json.JSONObject(service.assets.open("typing/manifest.json").bufferedReader().use { it.readText() })
+                            ReplacementPolicy.load(service.assets.open("typing/revision_calibration.json").bufferedReader().use { it.readText() },
+                                manifest.getString("sha256"),scope="context_revision")
+                        }.getOrNull()
+                        NativeEnglishEngine.experimental(service,quick::englishContextHandle,scorer,policy,learning,revisionPolicy)
+                    } else NativeEnglishEngine.load(service, quick::englishContextHandle)
+                },
                 CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
                 onError = { android.util.Log.e("EnglishInputCoordinator", "English candidate engine failed", it) })
             KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english)
@@ -60,9 +80,24 @@ internal class KeyboardSessionController(
     private val handwriting = dependencies.handwriting
     private val suggestions = dependencies.suggestions
     private val english = dependencies.english
+    init { english?.onContextRevised = { refreshPredictions() } }
     private var editorAllowsEnglish = true
     private var textPanel = KeyboardInputMode.Quick
     private var pendingTouch: EnglishTouchEvidence? = null
+    private val boundaryQueue by lazy { english?.let { BoundaryTransactionQueue(it.scope) } }
+    private fun queueEditorAction(action: () -> Unit): Boolean {
+        if (boundaryQueue?.waiting != true) return false
+        val touch=pendingTouch;pendingTouch=null
+        return boundaryQueue!!.enqueue { pendingTouch=touch;action() }
+    }
+    private fun waitForBoundary(action: () -> Unit): Boolean {
+        if (!settings.jointDecoderEnabled() || english?.boundaryPending()!=true) return false
+        return boundaryQueue?.begin({ english.settleBoundary() }, action) == true
+    }
+    private fun flushBoundaryLiteral() {
+        english?.cancelBoundaryCorrection()
+        boundaryQueue?.flushLiteral()
+    }
 
     private fun autocorrectActive(mode: KeyboardInputMode = textPanel): Boolean = english != null && editorAllowsEnglish &&
         when (mode) {
@@ -136,7 +171,9 @@ internal class KeyboardSessionController(
     val handwritingSession = _handwritingSession.asStateFlow()
 
     fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        boundaryQueue?.discard()
         if (restarting) finishEnglishLiteral() else english?.reset()
+        english?.reloadBackend()
         updateEditorPresentation(info)
         advanceSession()
         handwriting.onInputStarted()
@@ -164,6 +201,7 @@ internal class KeyboardSessionController(
     }
 
     fun onFinishInput() {
+        flushBoundaryLiteral()
         finishEnglishLiteral()
         // Commit unfinished literal input while this session still owns the editor.
         quick.accept()
@@ -174,6 +212,7 @@ internal class KeyboardSessionController(
     }
 
     fun onFinishInputView() {
+        flushBoundaryLiteral()
         finishEnglishLiteral()
         // Commit unfinished literal input while this session still owns the editor.
         quick.accept()
@@ -184,6 +223,7 @@ internal class KeyboardSessionController(
     }
 
     fun onWindowHidden() {
+        flushBoundaryLiteral()
         finishEnglishLiteral()
         // Commit unfinished literal input while this session still owns the editor.
         quick.accept()
@@ -209,6 +249,8 @@ internal class KeyboardSessionController(
     }
 
     fun onSelectionChanged(newStart: Int, newEnd: Int, composingEnd: Int) {
+        if (boundaryQueue?.waiting == true && (newStart!=newEnd ||
+                (composingEnd>=0 && newStart!=composingEnd))) boundaryQueue?.discard()
         val wasQuick = english?.quick == true && english.word.isNotEmpty()
         english?.onSelectionChanged(newStart, newEnd, composingEnd)
         if (wasQuick && english?.word.isNullOrEmpty()) quick.completeExternalCommit()
@@ -246,6 +288,7 @@ internal class KeyboardSessionController(
     }
 
     fun destroy() {
+        boundaryQueue?.discard()
         inputViewVisible = false
         advanceSession()
         suggestions.onInputFinished()
@@ -275,6 +318,7 @@ internal class KeyboardSessionController(
     }
 
     fun deleteSurroundingText() {
+        if (queueEditorAction { deleteSurroundingText() }) return
         voice.interrupt()
         suggestions.onUserTyped()
         pendingTouch = null
@@ -293,6 +337,8 @@ internal class KeyboardSessionController(
     }
 
     fun commitText(text: String) {
+        if (queueEditorAction { commitText(text) }) return
+        if (text.length==1 && text[0] in ",.!?;:" && waitForBoundary { commitText(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
         val evidence = pendingTouch.also { pendingTouch = null }
@@ -319,6 +365,7 @@ internal class KeyboardSessionController(
     }
 
     fun onQuickKey(char: String) {
+        if (queueEditorAction { onQuickKey(char) }) return
         voice.interrupt()
         suggestions.onUserTyped()
         quick.onKey(char)
@@ -327,6 +374,7 @@ internal class KeyboardSessionController(
     }
 
     fun sendSpace() {
+        if (queueEditorAction { sendSpace() } || waitForBoundary { sendSpace() }) return
         voice.interrupt()
         suggestions.onUserTyped()
         pendingTouch = null
@@ -339,6 +387,7 @@ internal class KeyboardSessionController(
     }
 
     fun sendEnter() {
+        if (queueEditorAction { sendEnter() } || waitForBoundary { sendEnter() }) return
         voice.interrupt()
         suggestions.onUserTyped()
         pendingTouch = null
@@ -352,6 +401,7 @@ internal class KeyboardSessionController(
     }
 
     fun pasteClipboard() {
+        flushBoundaryLiteral()
         voice.interrupt()
         finishEnglishLiteral()
         // Preserve literal Quick input; Chinese conversion requires explicit candidate selection.
@@ -375,6 +425,7 @@ internal class KeyboardSessionController(
     }
 
     fun selectCandidate(text: String) {
+        if (queueEditorAction { selectCandidate(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
         if (english?.canSelect(text) == true &&
@@ -397,6 +448,7 @@ internal class KeyboardSessionController(
     fun selectHandwritingCandidate(text: String) = selectCandidate(text)
 
     fun selectKeyboardInputMode(mode: KeyboardInputMode) {
+        flushBoundaryLiteral()
         voice.interrupt()
         // Returning from a temporary symbol panel doesn't end the language's word.
         if (mode == _keyboardInputMode.value && mode == textPanel) {
@@ -417,6 +469,7 @@ internal class KeyboardSessionController(
 
     private fun updateEditorPresentation(info: EditorInfo?) {
         editorAllowsEnglish = englishAllowed(info?.inputType)
+        if (!editorAllowsEnglish) TypingDiagnostics.update("editor_disallows_correction")
         _keyboardAction.value = keyboardActionFor(info)
         val targetMode = keyboardInputModeFor(info)
         if (targetMode == KeyboardInputMode.Number || targetMode == KeyboardInputMode.AlphaNum) {

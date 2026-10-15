@@ -193,4 +193,48 @@ class KeyboardSessionScenarioTest {
         assertEquals(listOf("你", "係"), KeyboardScenarios.quickCandidates().quickCandidates.map { it.text })
         assertEquals(listOf("好", "哋"), KeyboardScenarios.nextWordPredictions().quickCandidates.map { it.text })
     }
+
+    @Test
+    fun backspaceAfterVoiceTypingCommitsAndDeletesOnlyLastCharacter() = KeyboardScenario().use { s ->
+        s.start()
+        s.voice.state.value = KeyboardUiState.Recording
+        s.editor.setComposingText("你好呀")
+        assertEquals("你好呀", s.editor.composing)
+        assertEquals("", s.editor.text)
+
+        s.press(KeyboardKeyKind.Delete)
+
+        // Voice typing is interrupted: composing text is committed, and only the last character is deleted
+        assertEquals("", s.editor.composing)
+        assertEquals("你好", s.editor.text)
+        assertEquals(KeyboardUiState.Idle, s.voice.state.value)
+    }
+
+    @Test
+    fun backspaceWhileTranscribingCommitsAndDeletesOnlyLastCharacter() = KeyboardScenario().use { s ->
+        s.start()
+        s.voice.state.value = KeyboardUiState.Transcribing
+        s.editor.setComposingText("早晨呀")
+        assertEquals("早晨呀", s.editor.composing)
+        assertEquals("", s.editor.text)
+
+        s.press(KeyboardKeyKind.Delete)
+
+        assertEquals("", s.editor.composing)
+        assertEquals("早晨", s.editor.text)
+        assertEquals(KeyboardUiState.Idle, s.voice.state.value)
+    }
+
+    @Test
+    fun typingAfterVoiceTypingCommitsAndAppendsCharacter() = KeyboardScenario().use { s ->
+        s.start()
+        s.voice.state.value = KeyboardUiState.Recording
+        s.editor.setComposingText("你好")
+
+        s.controller.commitText("！")
+
+        assertEquals("", s.editor.composing)
+        assertEquals("你好！", s.editor.text)
+        assertEquals(KeyboardUiState.Idle, s.voice.state.value)
+    }
 }

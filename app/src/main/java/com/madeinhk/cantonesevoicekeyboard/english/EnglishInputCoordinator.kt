@@ -27,6 +27,9 @@ internal class EnglishInputCoordinator(
     private var suppress = false
     private var safeStart = true
     private var closed = false
+    var onContextRevised: () -> Unit = {}
+    private val contextWindow = ContextRevisionWindow(editor, { engine }, scope, worker,
+        { !closed && word.isEmpty() }, { undo=null;onContextRevised() })
     var word = ""
         private set
     var quick = false
@@ -37,7 +40,29 @@ internal class EnglishInputCoordinator(
     private val _candidates = MutableStateFlow<List<HandwritingCandidate>>(emptyList())
     val candidates = _candidates.asStateFlow()
 
+    fun reloadBackend() {
+        reset()
+        scope.launch(worker) { (engine as? AutoCloseable)?.close(); engine=null }
+    }
+    fun boundaryPending() = word.isNotEmpty() && resultWord != word && pending != null
+    fun cancelBoundaryCorrection() {
+        if (!boundaryPending()) return
+        pending?.cancel();pending=null;prediction=EnglishPrediction(reason="boundary_cancelled");resultWord=word
+    }
+    suspend fun settleBoundary() {
+        val id=request;val text=word
+        val result=withTimeoutOrNull(40L) { pending?.await() }
+        if(id!=request || text!=word) return
+        if(result!=null) { prediction=result;resultWord=text }
+        else {
+            pending?.cancel();pending=null
+            // A timed-out decoder must not rewrite text after the boundary.
+            resultWord=text;prediction=EnglishPrediction(reason="boundary_timeout")
+        }
+    }
+
     fun type(letter: String, evidence: EnglishTouchEvidence?) {
+        contextWindow.onTyping()
         undo = null
         if (word.isEmpty()) safeStart = safeWordStart(editor.getTextBeforeCursor(256).orEmpty())
         quick = false
@@ -46,6 +71,7 @@ internal class EnglishInputCoordinator(
     }
 
     fun observeQuick(text: String, evidence: EnglishTouchEvidence?) {
+        contextWindow.onTyping()
         undo = null
         if (word.isEmpty()) {
             val preceding = editor.getTextBeforeCursor(text.length + 256).orEmpty().removeSuffix(text)
@@ -127,6 +153,11 @@ internal class EnglishInputCoordinator(
                selected: String? = null): Boolean {
         if (word.isEmpty()) { undo = null; return false }
         val original = word
+        val originalLeft=editor.getTextBeforeCursor(512).orEmpty().removeSuffix(original)
+        val evidence=FloatArray(taps.size*2) { Float.NaN }.also { values ->
+            taps.forEachIndexed { i,t -> t?.let { values[i*2]=it.x;values[i*2+1]=it.y } }
+        }
+        if(selected!=null) engine?.selected(original.lowercase(Locale.ROOT),selected.lowercase(Locale.ROOT),centers,evidence)
         // An apostrophe followed by a boundary is a closing quote, rather than a contraction.
         val quote = if (original.last() in "'’" && apostropheBase?.first == original.dropLast(1)) original.takeLast(1) else ""
         val source = if (quote.isNotEmpty()) apostropheBase!!.second else prediction
@@ -141,12 +172,28 @@ internal class EnglishInputCoordinator(
         if (!editor.getTextBeforeCursor(original.length).orEmpty().endsWith(original)) {
             reset(); return false
         }
-        editor.commitText(replacement + delimiter)
+        val replaceCount=if(selected!=null) source.replacementSpans[selected.lowercase(Locale.ROOT)]?.coerceAtLeast(original.length) ?: original.length
+            else if(replacement!=original) source.replaceBefore.coerceAtLeast(original.length) else original.length
+        var undoOriginal=original
+        if(replaceCount>original.length) {
+            val before=editor.getTextBeforeCursor(replaceCount).orEmpty()
+            val prefix=before.dropLast(original.length)
+            // Only one immediately adjacent ASCII fragment plus its space.
+            if(before.length!=replaceCount || !prefix.endsWith(' ') || prefix.dropLast(1).isEmpty() ||
+                !prefix.dropLast(1).all { it.isAsciiLetter() }) { reset();return false }
+            editor.finishComposingText()
+            if(!editor.replaceTextBeforeCursor(before,replacement+delimiter)) { editor.commitText(delimiter);reset();return true }
+            undoOriginal=before
+        } else editor.commitText(replacement + delimiter)
         val record = if (replacement != original && selected == null && correct)
-            Undo(original, replacement + delimiter, quick, editor.cursorSelection()?.first) else null
+            Undo(undoOriginal, replacement + delimiter, quick, editor.cursorSelection()?.first) else null
         val wasQuick = quick
         val cursor = editor.cursorSelection()?.first
-        reset(cancelLookup = delayed == null); undo = record
+        val mayReconsider=correct && !suppress && !chineseMatch && eligible() && selected==null && delimiter==" "
+        val remember=mayReconsider && currentResult && source.correction==null && replacement==original
+        val originalCenters=centers.copyOf()
+        reset(cancelLookup = delayed == null, preserveContext = mayReconsider); undo = record
+        if(mayReconsider) contextWindow.boundary(original,replacement,delimiter,originalLeft,originalCenters,evidence,remember)
         if (delayed != null) {
             pendingBoundaryCursor = cursor
             val finishedRequest = request
@@ -167,12 +214,15 @@ internal class EnglishInputCoordinator(
     }
 
     fun delete(): Boolean {
+        if(contextWindow.undo()) return true
+        contextWindow.clear()
         undo?.let { record ->
             undo = null
             val selection = editor.cursorSelection()
             if ((selection == null || (selection.first == selection.second &&
                     (record.cursor == null || record.cursor == selection.first))) &&
                 editor.replaceTextBeforeCursor(record.committed, "")) {
+                engine?.rejected(record.original.lowercase(Locale.ROOT),record.committed.trimEnd().lowercase(Locale.ROOT))
                 quick = record.quick; safeStart = true; word = record.original; suppress = true
                 taps.clear(); repeat(word.length) { taps += null }
                 if (!quick) editor.setComposingText(word)
@@ -189,7 +239,8 @@ internal class EnglishInputCoordinator(
         return false
     }
 
-    fun reset(cancelLookup: Boolean = true) {
+    fun reset(cancelLookup: Boolean = true, preserveContext: Boolean = false) {
+        if(!preserveContext) contextWindow.clear()
         if (cancelLookup) pending?.cancel()
         pending = null; ++request; word = ""; taps.clear(); centers = FloatArray(0)
         pendingBoundaryCursor = null
@@ -199,6 +250,7 @@ internal class EnglishInputCoordinator(
     }
 
     fun onSelectionChanged(newStart: Int, newEnd: Int, composingEnd: Int) {
+        if(word.isEmpty()) contextWindow.selectionChanged(newStart,newEnd)
         pendingBoundaryCursor?.let { expected ->
             if (newStart != expected || newEnd != expected) {
                 ++request; pendingBoundaryCursor = null
@@ -216,7 +268,11 @@ internal class EnglishInputCoordinator(
         }
     }
 
-    override fun close() { closed = true; reset(); scope.cancel() }
+    override fun close() {
+        closed=true;reset()
+        // Closing an ONNX session must serialize with in-flight inference.
+        scope.launch(worker) { (engine as? AutoCloseable)?.close() }.invokeOnCompletion { scope.cancel() }
+    }
 }
 
 internal fun Char.isAsciiLetter() = this in 'a'..'z' || this in 'A'..'Z'

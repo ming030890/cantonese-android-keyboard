@@ -134,6 +134,7 @@ with fixed English model results; Rust tests verify the actual search and confid
 | AC-08 | Chinese and English candidates compete in Quick | Shared bilingual LM ranks one combined pool, including Chinese phrases; retain all candidate texts and literal spelling. English can rank before Chinese in English context. | `mixedCandidateBarUsesContextRankingAndBothLanguagesRemainSelectable`, shipped-model JNI test, mixed screenshot |
 | AC-09 | Centre-key mistaps from the user's report | Clear `engkish`, `shoukd`, `chineae`, `candjdates`, `kehboard` typos correct; severe `ebgkisb` offers `english` without automatic replacement. | Rust centre-touch regression, real JNI/controller scenarios on both layouts |
 | AC-10 | WM replacement rules: `keyboar`, `gwllo`, `tyoing` then Space | A single missing final letter can correct with a 4:1 margin and insertion penalty; two-edit and edited/completed suggestions do not compete for replacement. `gwllo` offers `hello` for a tap; ambiguous `tyoing` remains literal. Backspace restores `keyboar`. | Native shape/confidence tests and real JNI/controller scenarios on both layouts |
+| AC-11 | Uncertain word followed by more completed words | Keep literal initially. Reassess at Space using up to three recent untouched English words and their original touch snapshots. Revise only with separately approved context-revision calibration and confidence at least 0.999; otherwise keep literal. Preserve later text; immediate Backspace restores the original suffix and records rejection. Typing, cursor changes, hide/layout/session changes, edits, punctuation, explicit selections and disabled autocorrect invalidate pending writes/history as appropriate. | `ContextRevisionScenarioTest`, uncertain-company screenshot |
 
 Rust uses the pinned wmkeyboard English seed dictionary, FuzzyBeamSearch penalties,
 and Gaussian TouchModel. A packed trie and reusable search workspace limit mobile
@@ -143,6 +144,38 @@ silently replaced. A clean one-letter final completion counts as an insertion. A
 Android device; none was connected during this implementation.
 
 ## Product decisions
+
+Production qualification also protects the debug-only decoder preview: a saved
+preview preference cannot activate it in a release build. The shipping decoder
+must retain correction-at-boundary and Backspace undo on English and Quick;
+`ReleaseDecoderGateScenarioTest` covers restored preference state. Settings
+screenshots include the complete typing card and narrow large-text diagnostics,
+with explicit notice that the current preview offers suggestions only.
+
+**D-10 (2026-10-15):** The user requests keeping uncertain words and revisiting
+them as later context arrives. `ContextRevisionWindow` implements a bounded
+three-word/256-character window and 40 ms asynchronous reassessment at completed
+Space boundaries. It never rewrites an active composition or depends on an old
+cursor alone: the exact suffix, selection, session revision and right text must
+still match. One safe revision is applied per pass, then the retained window is
+cleared. Correction scope is separate from boundary calibration; the loader
+requires `typing/revision_calibration.json` with `correction_scope=context_revision`,
+the exact model hash, `typing-v3-context-revision-nine-features` and approved
+held-out evidence. It measures the original LM contrast and the new contrast:
+the increase must be positive with at least one complete following English
+word. Nonfinite scores abstain. A disabled category's threshold of exactly 1.0
+stays disabled even when a calibrated probability rounds to 1.0. No such qualified artifact
+is currently packaged, so the experimental backend cannot activate retrospective
+corrections yet. Controller scenarios use fixed model outputs to verify mechanics;
+they do not establish model accuracy. `ContextRevisionInputConnectionTest`
+separately verifies correction/undo and weak-confidence preservation through a
+real EditText/InputConnection on the ARM64 emulator, with fixed model outputs.
+Its debug host suppresses the competing system IME via an explicit Intent extra;
+normal preview behavior is unchanged. It does not establish full IME-service
+tap replay or physical-phone latency. `KeyboardTouchControllerTest` verifies
+unmounted keys cannot receive events while retaining intentional row expansion
+for remaining keys. Latest full gate: 178 unit/scenario tests plus screenshot
+verification and debug build; archived emulator checks: nine passed.
 
 Confirmed by the user on 2026-10-13:
 

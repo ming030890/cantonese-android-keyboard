@@ -18,6 +18,11 @@ fun ScenarioMissingFinalLetterCandidates() = ScenarioScreen(remember { KeyboardS
 fun ScenarioEnglishAutocorrectCandidates() = ScenarioScreen(remember { KeyboardScenarios.englishAutocorrectCandidates() })
 
 @PreviewTest
+@Preview(name = "Uncertain company name stays literal", widthDp = 320, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioUncertainCompanyCandidates() = ScenarioScreen(remember { KeyboardScenarios.uncertainCompanyCandidates() })
+
+@PreviewTest
 @Preview(name = "Quick Chinese and English candidates", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioQuickEnglishCandidates() = ScenarioScreen(remember { KeyboardScenarios.quickEnglishCandidates() })

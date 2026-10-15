@@ -20,6 +20,22 @@ object KeyboardSettings {
     const val QUICK_VERSION_5 = 5
     const val DEFAULT_QUICK_VERSION = QUICK_VERSION_3
 
+    // Experimental until held-out quality and on-phone integration gates pass.
+    internal fun previewDecoderEnabled(savedPreview: Boolean, debugBuild: Boolean): Boolean = debugBuild && savedPreview
+
+    fun isJointDecoderEnabled(context: Context): Boolean = previewDecoderEnabled(
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean("joint_decoder_v2", false),
+        BuildConfig.DEBUG,
+    )
+    fun setJointDecoderEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putBoolean("joint_decoder_v2", enabled).apply()
+    }
+    fun isTypingLearningEnabled(context: Context): Boolean = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        .getBoolean("typing_learning_v2", true)
+    fun setTypingLearningEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putBoolean("typing_learning_v2", enabled).apply()
+    }
+
     fun isAutocorrectEnabled(context: Context, layout: String): Boolean =
         layout in setOf(LAYOUT_ENGLISH, LAYOUT_QUICK) && context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean("autocorrect_$layout", true)

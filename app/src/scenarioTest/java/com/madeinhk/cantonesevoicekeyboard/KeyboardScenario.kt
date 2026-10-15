@@ -23,10 +23,11 @@ internal class KeyboardScenario(
     lookupDispatcher: CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
     englishEngine: com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidateEngine? = null,
     quickEngine: QuickCandidateEngine? = null,
+    jointDecoder: Boolean = false,
 ) : AutoCloseable {
     val editor = MemoryKeyboardEditor(initialText)
     val engine = ScenarioQuickEngine()
-    val voice = ScenarioVoice()
+    val voice = ScenarioVoice(editor)
     val handwriting = ScenarioHandwriting(editor)
     val suggestions = ScenarioSuggestions(editor, clipboardText)
     var quickVersion = 3
@@ -41,7 +42,7 @@ internal class KeyboardScenario(
     }
     val controller = KeyboardSessionController(
         editor,
-        KeyboardSessionSettings({ enabledLayouts }, { quickVersion }, { it in autocorrectLayouts }),
+        KeyboardSessionSettings({ enabledLayouts }, { quickVersion }, { it in autocorrectLayouts }, { jointDecoder }),
     ) { _, _, _ -> KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english) }
 
     // The same key receiver handles down/up/cancel in the real screen.
@@ -133,12 +134,16 @@ internal class ScenarioQuickEngine : QuickCandidateEngine {
     }
 }
 
-internal class ScenarioVoice : VoiceSession {
+internal class ScenarioVoice(private val editor: KeyboardEditor? = null) : VoiceSession {
     override val state = MutableStateFlow<KeyboardUiState>(KeyboardUiState.Idle)
     override val volume = MutableStateFlow(0f)
     override fun onInputViewStarted(session: Long) = Unit
     override fun toggle() { state.value = if (isRecording()) KeyboardUiState.Transcribing else KeyboardUiState.Recording }
-    override fun interrupt() { state.value = KeyboardUiState.Idle }
+    override fun interrupt() {
+        if (!isRecording() && state.value != KeyboardUiState.Transcribing) return
+        editor?.finishComposingText()
+        state.value = KeyboardUiState.Idle
+    }
     override fun stopForHandwriting() = interrupt()
     override fun isRecording() = state.value == KeyboardUiState.Recording
     override fun finish(releaseModel: Boolean, session: Long) = interrupt()
@@ -213,6 +218,14 @@ internal object KeyboardScenarios {
         clipboardText = null, englishEngine = ScenarioEnglishEngine()).use { it.start(); it.type("keyboar"); it.snapshot() }
     fun englishAutocorrectCandidates() = KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum,
         clipboardText = null, englishEngine = ScenarioEnglishEngine()).use { it.start(); it.type("teh"); it.snapshot() }
+    fun uncertainCompanyCandidates() = KeyboardScenario(initialText="I work at ",initialMode=KeyboardInputMode.AlphaNum,
+        clipboardText=null,englishEngine=object:com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidateEngine {
+            override fun predict(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=
+                com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                    listOf("Xentara","Centara","Sentara").map {
+                        com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate(it,0.0,0.0,0,0)
+                    })
+        }).use { it.start();it.type("Xentara");it.snapshot() }
     fun quickEnglishCandidates() = KeyboardScenario(clipboardText = null, englishEngine = ScenarioEnglishEngine().apply {
         ranker = { _, _, pool -> listOf("the", "你", "係", "teh").filter { it in pool } }
     }).use {

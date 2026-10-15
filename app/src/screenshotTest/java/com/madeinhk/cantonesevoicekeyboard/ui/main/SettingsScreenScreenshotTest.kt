@@ -1,10 +1,39 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.main
 
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
+
+@PreviewTest
+@Preview(name="Typing settings",widthDp=360,heightDp=680)
+@Composable
+fun TypingSettingsScreenshot() = TypingSettingsPreview(false)
+
+@PreviewTest
+@Preview(name="Typing settings narrow large text diagnostics",widthDp=320,heightDp=1050,fontScale=1.3f)
+@Composable
+fun TypingSettingsDiagnosticsScreenshot() = TypingSettingsPreview(true)
+
+@Composable
+private fun TypingSettingsPreview(diagnostics:Boolean) {
+    CantoneseVoiceKeyboardTheme(darkTheme=true,dynamicColor=false) {
+        Box(Modifier.fillMaxSize().background(Color(0xFF121714)).padding(16.dp)) {
+            TypingSettingsCard(english=true,onEnglish={},quick=true,onQuick={},
+                experimental=false,onExperimental={},learning=true,onLearning={},onClear={},
+                // Fixed fixture version: release bumps should not alter layout baselines.
+                diagnostics=diagnostics,onDiagnostics={},summary="Suggestions ready",onExport={},buildCode=49)
+        }
+    }
+}
 
 @PreviewTest
 @Preview(

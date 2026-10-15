@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavKey
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.english.LocalTypingLearning
+import com.madeinhk.cantonesevoicekeyboard.english.TypingDiagnostics
 
 // Material 3 Dynamic Dark Forest Palette matching reference screenshot
 private val ScreenBackground = Color(0xFF121714)
@@ -65,6 +67,12 @@ fun SettingsScreen(
     var quickVersion by remember {
         mutableIntStateOf(KeyboardSettings.getQuickVersion(context))
     }
+    var englishCorrect by remember { mutableStateOf(KeyboardSettings.isAutocorrectEnabled(context, KeyboardSettings.LAYOUT_ENGLISH)) }
+    var quickCorrect by remember { mutableStateOf(KeyboardSettings.isAutocorrectEnabled(context, KeyboardSettings.LAYOUT_QUICK)) }
+    var jointDecoder by remember { mutableStateOf(KeyboardSettings.isJointDecoderEnabled(context)) }
+    var learning by remember { mutableStateOf(KeyboardSettings.isTypingLearningEnabled(context)) }
+    var diagnostics by remember { mutableStateOf(TypingDiagnostics.enabled) }
+    val diagnosticSummary by TypingDiagnostics.summary.collectAsState()
 
     SettingsScreenContent(
         enabledLayouts = enabledLayouts,
@@ -91,6 +99,24 @@ fun SettingsScreen(
             quickVersion = version
         },
         onBack = onBack,
+        englishAutocorrect=englishCorrect,
+        onEnglishAutocorrectChange={ englishCorrect=it;KeyboardSettings.setAutocorrectEnabled(context,KeyboardSettings.LAYOUT_ENGLISH,it) },
+        quickAutocorrect=quickCorrect,
+        onQuickAutocorrectChange={ quickCorrect=it;KeyboardSettings.setAutocorrectEnabled(context,KeyboardSettings.LAYOUT_QUICK,it) },
+        jointDecoder=jointDecoder,
+        onJointDecoderChange={ jointDecoder=it;KeyboardSettings.setJointDecoderEnabled(context,it) },
+        typingLearning=learning,
+        onTypingLearningChange={ learning=it;KeyboardSettings.setTypingLearningEnabled(context,it) },
+        onClearTypingLearning={ LocalTypingLearning(context) { true }.clear() },
+        diagnostics=diagnostics,
+        onDiagnosticsChange={ diagnostics=it;TypingDiagnostics.enabled=it },
+        diagnosticSummary=diagnosticSummary,
+        onExportDiagnostics={
+            val intent=android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type="text/plain";putExtra(android.content.Intent.EXTRA_TEXT,TypingDiagnostics.export())
+            }
+            context.startActivity(android.content.Intent.createChooser(intent,context.getString(R.string.typing_export)))
+        },
         modifier = modifier
     )
 }
@@ -105,6 +131,13 @@ fun SettingsScreenContent(
     quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
     onQuickVersionChange: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
+    englishAutocorrect:Boolean=true, onEnglishAutocorrectChange:(Boolean)->Unit={},
+    quickAutocorrect:Boolean=true, onQuickAutocorrectChange:(Boolean)->Unit={},
+    jointDecoder:Boolean=false, onJointDecoderChange:(Boolean)->Unit={},
+    typingLearning:Boolean=true, onTypingLearningChange:(Boolean)->Unit={},
+    onClearTypingLearning:()->Unit={},
+    diagnostics:Boolean=false,onDiagnosticsChange:(Boolean)->Unit={},
+    diagnosticSummary:String="Diagnostics disabled",onExportDiagnostics:()->Unit={},
 ) {
     Box(
         modifier = Modifier
@@ -168,7 +201,49 @@ fun SettingsScreenContent(
                 onVersionChange = onQuickVersionChange
             )
 
+            Spacer(modifier=Modifier.height(16.dp))
+            TypingSettingsCard(englishAutocorrect,onEnglishAutocorrectChange,quickAutocorrect,onQuickAutocorrectChange,
+                jointDecoder,onJointDecoderChange,typingLearning,onTypingLearningChange,onClearTypingLearning,
+                diagnostics,onDiagnosticsChange,diagnosticSummary,onExportDiagnostics)
+
             Spacer(modifier = Modifier.height(48.dp))
+        }
+    }
+}
+
+@Composable
+fun TypingSettingsCard(english:Boolean,onEnglish:(Boolean)->Unit,quick:Boolean,onQuick:(Boolean)->Unit,
+    experimental:Boolean,onExperimental:(Boolean)->Unit,learning:Boolean,onLearning:(Boolean)->Unit,
+    onClear:()->Unit,diagnostics:Boolean,onDiagnostics:(Boolean)->Unit,summary:String,onExport:()->Unit,
+    buildCode:Int=com.madeinhk.cantonesevoicekeyboard.BuildConfig.VERSION_CODE) {
+    Card(shape=RoundedCornerShape(20.dp),colors=CardDefaults.cardColors(containerColor=CardBackground),
+        border=BorderStroke(1.dp,CardBorderColor)) {
+        Column(Modifier.padding(20.dp)) {
+            Text(stringResource(R.string.typing_title),color=PrimaryTextColor,fontWeight=FontWeight.Medium)
+            @Composable fun Toggle(label:Int,checked:Boolean,change:(Boolean)->Unit) {
+                Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
+                    Text(stringResource(label),Modifier.weight(1f),color=PrimaryTextColor)
+                    Switch(checked=checked,onCheckedChange=change,colors=SwitchDefaults.colors(
+                        checkedThumbColor=MintOnAccentColor,checkedTrackColor=MintAccentColor,
+                        uncheckedThumbColor=SecondaryTextColor,uncheckedTrackColor=CardBorderColor,
+                        uncheckedBorderColor=PillUnselectedBorder))
+                }
+            }
+            Toggle(R.string.typing_english,english,onEnglish)
+            Toggle(R.string.typing_quick,quick,onQuick)
+            if(com.madeinhk.cantonesevoicekeyboard.BuildConfig.DEBUG) {
+                Toggle(R.string.typing_experimental,experimental,onExperimental)
+                Text(stringResource(R.string.typing_experimental_desc),color=SecondaryTextColor,fontSize=13.sp)
+            }
+            Toggle(R.string.typing_learning,learning,onLearning)
+            Text(stringResource(R.string.typing_learning_desc),color=SecondaryTextColor,fontSize=13.sp)
+            TextButton(onClick=onClear) {Text(stringResource(R.string.typing_clear),color=MintAccentColor)}
+            Toggle(R.string.typing_diagnostics,diagnostics,onDiagnostics)
+            if(diagnostics) {
+                Text("Build $buildCode · $summary",color=SecondaryTextColor,fontSize=13.sp)
+                Text(stringResource(R.string.typing_diagnostics_desc),color=SecondaryTextColor,fontSize=13.sp)
+                TextButton(onClick=onExport) {Text(stringResource(R.string.typing_export),color=MintAccentColor)}
+            }
         }
     }
 }

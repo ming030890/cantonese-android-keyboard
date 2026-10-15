@@ -187,4 +187,15 @@
     <string name="settings_open_onboarding_title">Setup &amp; onboarding guide</string>
     <string name="settings_open_onboarding_desc">Review microphone access, system keyboard activation, and test sandbox</string>
     <string name="settings_at_least_one_layout">At least one keyboard layout must be selected</string>
+    <string name="typing_title">Typing and correction</string>
+    <string name="typing_english">English autocorrect</string>
+    <string name="typing_quick">English autocorrect in Quick</string>
+    <string name="typing_experimental">New decoder preview</string>
+    <string name="typing_experimental_desc">Broader spelling suggestions only. Autocorrect is unavailable in this preview. Reopen the keyboard after changing this.</string>
+    <string name="typing_learning">Learn from my choices</string>
+    <string name="typing_learning_desc">In suggestion preview, remember selected words, rejected corrections and touch adjustments on this device. Private fields are excluded.</string>
+    <string name="typing_clear">Clear learned typing data</string>
+    <string name="typing_diagnostics">Local typing diagnostics</string>
+    <string name="typing_diagnostics_desc">Shows correction status without recording words or touch coordinates. Sharing happens only when you tap Export.</string>
+    <string name="typing_export">Export typing diagnostics</string>
 </resources>

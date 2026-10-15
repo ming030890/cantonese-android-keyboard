@@ -129,6 +129,8 @@ ENGINE_MANIFEST="$QWEN_ASR_DIR/crates/cantonese-ngram/Cargo.toml"
 mkdir -p "$PROJECT_DIR/app/src/main/assets/english"
 CARGO_TARGET_DIR="$ENGINE_TARGET_DIR/host" cargo run --manifest-path "$ENGINE_MANIFEST" --release --bin pack_english -- \
     "$QWEN_ASR_DIR/crates/cantonese-ngram/data/english/en.txt" "$PROJECT_DIR/app/src/main/assets/english/en.bin"
+CARGO_TARGET_DIR="$ENGINE_TARGET_DIR/host" cargo run --manifest-path "$ENGINE_MANIFEST" --release --bin pack_english -- \
+    "$QWEN_ASR_DIR/crates/cantonese-ngram/data/english/en.txt" "$PROJECT_DIR/app/src/main/assets/english/en-v2.bin" --expand
 pushd "${TMPDIR:-/private/tmp}" > /dev/null
 CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$ENGINE_TARGET_DIR" cargo build --manifest-path "$ENGINE_MANIFEST" --target aarch64-linux-android --release --features android --lib
 popd > /dev/null

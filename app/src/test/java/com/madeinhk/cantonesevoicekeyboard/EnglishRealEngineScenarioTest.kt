@@ -66,6 +66,46 @@ class EnglishRealEngineScenarioTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test fun phoneReportWithTouchContextAndRapidKeys() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val registry = registry()
+        quickEngine().use { quick ->
+            for (withLm in listOf(false, true)) {
+                val native = engine(if (withLm) quick.englishContextHandle() else 0L)
+                for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+                    for (rapid in listOf(false, true)) {
+                        for ((left, typed) in listOf("can you " to "tedt", "can you test " to "iy",
+                            "two " to "eduts", "touch " to "podition")) {
+                            KeyboardScenario(initialMode = mode, initialText = left, englishEngine = native,
+                                scope = CoroutineScope(SupervisorJob() + dispatcher), lookupDispatcher = dispatcher).use { s ->
+                                s.start()
+                                typed.forEach { letter ->
+                                    val key = registry.mountedKeysForDiagnostics().single { it.currentData?.text == "$letter" }
+                                    s.pressWithTouch("$letter", registry.englishTouchEvidence(key.geometry.visualBounds.center))
+                                    if (!rapid) advanceUntilIdle()
+                                }
+                                val before = s.snapshot()
+                                s.press(KeyboardKeyKind.Space); advanceUntilIdle()
+                                println("Phone report LM=$withLm $mode rapid=$rapid '$left$typed' -> '${s.editor.text}' candidates=" +
+                                    (if (mode == KeyboardInputMode.Quick) before.quickCandidates else before.englishCandidates))
+                                val expected = if (typed == "podition") "position" else typed
+                                assertEquals("$mode rapid=$rapid LM=$withLm typed=$typed", "$left$expected ", s.editor.text)
+                                if (!rapid) {
+                                    val candidates = if (mode == KeyboardInputMode.Quick) before.quickCandidates else before.englishCandidates
+                                    val offered = when (typed) { "tedt" -> "test"; "iy" -> "it"; "podition" -> "position"; else -> typed }
+                                    assertTrue(candidates.any { it.text == offered })
+                                    if (typed == "eduts") assertFalse("Dictionary coverage gap must remain visible", candidates.any { it.text == "edits" })
+                                }
+                                assertEquals("", s.editor.composing)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Test fun reportedTyposAppearAndClearCentreTapsCorrect() {
         val engine = engine()
         val registry = registry()
