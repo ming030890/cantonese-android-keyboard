@@ -145,6 +145,29 @@ Android device; none was connected during this implementation.
 
 ## Product decisions
 
+**D-11 (2026-10-16):** The user explicitly requests enabling the new autocorrect
+on Play internal testing after version50 left it disabled. Version51 uses the
+explicit `INTERNAL_TYPING_TRIAL=true` release build setting. On first upgrade,
+the new decoder and English/Quick autocorrect turn on; later opt-outs persist.
+The visible "New autocorrect" switch is available in that internal release.
+Ordinary release builds still default to the production qualification gate.
+Internal-trial profiles retain `heldout_approved=false` and
+`production_approved=false`; loading requires explicit trial authorization,
+the exact model and expanded dictionary hashes and the matching raw-sum ranker.
+This is internal-test authorization, not a claim that quality gates passed.
+
+The internal profile loads the own v22 byte-fallback LM for typing. Quick and
+handwriting keep their existing model. Combined model/vocabulary/English/Quick
+candidate resources are21,087,094bytes. New fitted six/nine-feature policies use
+the actual app dictionary; v42 head coefficients are not reused. Existing clear
+boundary corrections remain available when the new classifier abstains. Later
+revisions still require new context evidence, exact editor state and safe undo.
+Real packaged-model checks verify `kbow`→`know` after "could you please let me "
+and `pleade`→`please` after " provide ", plus unfamiliar-name preservation.
+Twelve ARM64 emulator checks include real InputConnection correction and undo,
+upgrade initialization, model/policy loading and touch dispatch. The screenshot
+`InternalTypingSettingsScreenshot` shows all three correction toggles enabled.
+
 Production qualification also protects the debug-only decoder preview: a saved
 preview preference cannot activate it in a release build. The shipping decoder
 must retain correction-at-boundary and Backspace undo on English and Quick;

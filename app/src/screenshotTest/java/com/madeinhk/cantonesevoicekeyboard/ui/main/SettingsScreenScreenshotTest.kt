@@ -23,14 +23,19 @@ fun TypingSettingsScreenshot() = TypingSettingsPreview(false)
 @Composable
 fun TypingSettingsDiagnosticsScreenshot() = TypingSettingsPreview(true)
 
+@PreviewTest
+@Preview(name="Internal autocorrect enabled",widthDp=360,heightDp=820)
 @Composable
-private fun TypingSettingsPreview(diagnostics:Boolean) {
+fun InternalTypingSettingsScreenshot() = TypingSettingsPreview(false,true)
+
+@Composable
+private fun TypingSettingsPreview(diagnostics:Boolean,trial:Boolean=false) {
     CantoneseVoiceKeyboardTheme(darkTheme=true,dynamicColor=false) {
         Box(Modifier.fillMaxSize().background(Color(0xFF121714)).padding(16.dp)) {
             TypingSettingsCard(english=true,onEnglish={},quick=true,onQuick={},
-                experimental=false,onExperimental={},learning=true,onLearning={},onClear={},
+                experimental=trial,onExperimental={},learning=true,onLearning={},onClear={},
                 // Fixed fixture version: release bumps should not alter layout baselines.
-                diagnostics=diagnostics,onDiagnostics={},summary="Suggestions ready",onExport={},buildCode=49)
+                diagnostics=diagnostics,onDiagnostics={},summary="Suggestions ready",onExport={},buildCode=if(trial) 51 else 49,trialBuild=trial)
         }
     }
 }

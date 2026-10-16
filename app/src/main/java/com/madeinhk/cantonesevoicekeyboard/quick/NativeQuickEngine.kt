@@ -22,10 +22,11 @@ internal class NativeQuickEngine private constructor(private var handle: Long) :
     companion object {
         init { System.loadLibrary("cantonese_engine") }
 
-        fun load(context: Context): NativeQuickEngine {
+        fun load(context: Context, modelAsset: String = "language_model/model.cng"): NativeQuickEngine {
             val assets = context.applicationContext.assets
             fun read(path: String) = assets.open(path).use { it.readBytes() }
-            val neural = runCatching { read("language_model/model.cng") }.getOrElse {
+            val neural = runCatching { read(modelAsset) }.getOrElse {
+                if(modelAsset!="language_model/model.cng") throw it
                 Log.w("NativeQuickEngine", "Neural LM unavailable; using count fallback", it)
                 ByteArray(0)
             }

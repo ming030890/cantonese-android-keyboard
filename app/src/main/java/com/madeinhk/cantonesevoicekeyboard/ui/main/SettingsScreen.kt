@@ -215,7 +215,8 @@ fun SettingsScreenContent(
 fun TypingSettingsCard(english:Boolean,onEnglish:(Boolean)->Unit,quick:Boolean,onQuick:(Boolean)->Unit,
     experimental:Boolean,onExperimental:(Boolean)->Unit,learning:Boolean,onLearning:(Boolean)->Unit,
     onClear:()->Unit,diagnostics:Boolean,onDiagnostics:(Boolean)->Unit,summary:String,onExport:()->Unit,
-    buildCode:Int=com.madeinhk.cantonesevoicekeyboard.BuildConfig.VERSION_CODE) {
+    buildCode:Int=com.madeinhk.cantonesevoicekeyboard.BuildConfig.VERSION_CODE,
+    trialBuild:Boolean=com.madeinhk.cantonesevoicekeyboard.BuildConfig.INTERNAL_TYPING_TRIAL) {
     Card(shape=RoundedCornerShape(20.dp),colors=CardDefaults.cardColors(containerColor=CardBackground),
         border=BorderStroke(1.dp,CardBorderColor)) {
         Column(Modifier.padding(20.dp)) {
@@ -231,9 +232,10 @@ fun TypingSettingsCard(english:Boolean,onEnglish:(Boolean)->Unit,quick:Boolean,o
             }
             Toggle(R.string.typing_english,english,onEnglish)
             Toggle(R.string.typing_quick,quick,onQuick)
-            if(com.madeinhk.cantonesevoicekeyboard.BuildConfig.DEBUG) {
-                Toggle(R.string.typing_experimental,experimental,onExperimental)
-                Text(stringResource(R.string.typing_experimental_desc),color=SecondaryTextColor,fontSize=13.sp)
+            if(com.madeinhk.cantonesevoicekeyboard.BuildConfig.DEBUG || trialBuild) {
+                val trial=trialBuild
+                Toggle(if(trial) R.string.typing_trial else R.string.typing_experimental,experimental,onExperimental)
+                Text(stringResource(if(trial) R.string.typing_trial_desc else R.string.typing_experimental_desc),color=SecondaryTextColor,fontSize=13.sp)
             }
             Toggle(R.string.typing_learning,learning,onLearning)
             Text(stringResource(R.string.typing_learning_desc),color=SecondaryTextColor,fontSize=13.sp)

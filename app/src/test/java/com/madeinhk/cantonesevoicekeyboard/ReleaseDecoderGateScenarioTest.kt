@@ -24,5 +24,7 @@ class ReleaseDecoderGateScenarioTest {
         }
         assertTrue(KeyboardSettings.previewDecoderEnabled(savedPreview=true,debugBuild=true))
         assertFalse(KeyboardSettings.previewDecoderEnabled(savedPreview=false,debugBuild=true))
+        assertTrue(KeyboardSettings.previewDecoderEnabled(savedPreview=true,debugBuild=false,internalTrial=true))
+        assertFalse(KeyboardSettings.previewDecoderEnabled(savedPreview=false,debugBuild=false,internalTrial=true))
     }
 }

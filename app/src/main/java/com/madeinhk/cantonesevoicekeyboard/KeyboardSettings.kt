@@ -21,14 +21,29 @@ object KeyboardSettings {
     const val DEFAULT_QUICK_VERSION = QUICK_VERSION_3
 
     // Experimental until held-out quality and on-phone integration gates pass.
-    internal fun previewDecoderEnabled(savedPreview: Boolean, debugBuild: Boolean): Boolean = debugBuild && savedPreview
+    internal fun previewDecoderEnabled(savedPreview: Boolean, debugBuild: Boolean, internalTrial: Boolean = false): Boolean =
+        (debugBuild || internalTrial) && savedPreview
 
-    fun isJointDecoderEnabled(context: Context): Boolean = previewDecoderEnabled(
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean("joint_decoder_v2", false),
+    internal fun initializeInternalTrial(context: Context, enabled:Boolean=BuildConfig.INTERNAL_TYPING_TRIAL) {
+        if(!enabled) return
+        val prefs=context.getSharedPreferences(PREFS_NAME,Context.MODE_PRIVATE)
+        if(!prefs.contains("internal_typing_v51_initialized")) prefs.edit()
+            .putBoolean("joint_decoder_internal_v1",true)
+            .putBoolean("autocorrect_english",true).putBoolean("autocorrect_quick",true)
+            .putBoolean("internal_typing_v51_initialized",true).apply()
+    }
+    fun isJointDecoderEnabled(context: Context): Boolean {
+        initializeInternalTrial(context)
+        return previewDecoderEnabled(
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean(
+            if(BuildConfig.INTERNAL_TYPING_TRIAL) "joint_decoder_internal_v1" else "joint_decoder_v2", BuildConfig.INTERNAL_TYPING_TRIAL),
         BuildConfig.DEBUG,
-    )
+        BuildConfig.INTERNAL_TYPING_TRIAL,
+        )
+    }
     fun setJointDecoderEnabled(context: Context, enabled: Boolean) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putBoolean("joint_decoder_v2", enabled).apply()
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putBoolean(
+            if(BuildConfig.INTERNAL_TYPING_TRIAL) "joint_decoder_internal_v1" else "joint_decoder_v2", enabled).apply()
     }
     fun isTypingLearningEnabled(context: Context): Boolean = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         .getBoolean("typing_learning_v2", true)
@@ -36,9 +51,11 @@ object KeyboardSettings {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putBoolean("typing_learning_v2", enabled).apply()
     }
 
-    fun isAutocorrectEnabled(context: Context, layout: String): Boolean =
-        layout in setOf(LAYOUT_ENGLISH, LAYOUT_QUICK) && context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    fun isAutocorrectEnabled(context: Context, layout: String): Boolean {
+        initializeInternalTrial(context)
+        return layout in setOf(LAYOUT_ENGLISH, LAYOUT_QUICK) && context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean("autocorrect_$layout", true)
+    }
 
     fun setAutocorrectEnabled(context: Context, layout: String, enabled: Boolean) {
         require(layout == LAYOUT_ENGLISH || layout == LAYOUT_QUICK)

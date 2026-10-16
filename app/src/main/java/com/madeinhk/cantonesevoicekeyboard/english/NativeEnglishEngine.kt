@@ -56,13 +56,14 @@ internal class NativeEnglishEngine private constructor(private val contextHandle
         fun experimental(context: Context, contextHandle: () -> Long = { 0L },
                          scorer: ContextScorer? = null, policy: ReplacementPolicy? = null,
                          learning: TypingLearning = TypingLearning.None,
-                         revisionPolicy: ReplacementPolicy? = null): EnglishCandidateEngine {
+                         revisionPolicy: ReplacementPolicy? = null,
+                         preserveBoundaryCorrections:Boolean=false): EnglishCandidateEngine {
             val baseline = load(context, contextHandle)
             check(nativeLoadV2(context.assets.open("english/en-v2.bin").use { it.readBytes() }))
             return JointTypingEngine(baseline, { request, previous ->
                 JSONObject(checkNotNull(nativeDecodeV2(request.word, request.centers, request.points,
                     previous, request.session, request.revision)))
-            }, scorer, policy, learning, revisionPolicy)
+            }, scorer, policy, learning, revisionPolicy,preserveBoundaryCorrections)
         }
     }
 

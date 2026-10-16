@@ -191,6 +191,8 @@
     <string name="typing_english">English autocorrect</string>
     <string name="typing_quick">English autocorrect in Quick</string>
     <string name="typing_experimental">New decoder preview</string>
+    <string name="typing_trial">New autocorrect</string>
+    <string name="typing_trial_desc">Enabled for internal testing, including corrections after following words. Press Space to correct; Backspace undoes a correction. Reopen the keyboard after changing this.</string>
     <string name="typing_experimental_desc">Broader spelling suggestions only. Autocorrect is unavailable in this preview. Reopen the keyboard after changing this.</string>
     <string name="typing_learning">Learn from my choices</string>
     <string name="typing_learning_desc">In suggestion preview, remember selected words, rejected corrections and touch adjustments on this device. Private fields are excluded.</string>

@@ -229,6 +229,9 @@ then
     rm -f "$HANDWRITING_ASSETS/lm_csr.bin"
 fi
 python3 "$PROJECT_DIR/scripts/verify_language_model_assets.py" --project "$PROJECT_DIR"
+if [ "${INTERNAL_TYPING_TRIAL:-false}" = "true" ]; then
+    python3 "$PROJECT_DIR/scripts/stage_internal_typing.py"
+fi
 
 # ---------------------------------------------------------------------------
 # 5. Ensure bundletool is available
@@ -254,7 +257,7 @@ fi
 cd "$PROJECT_DIR"
 if [ "$RELEASE" = "true" ]; then
     echo -e "${COLOR_INFO}[Step 6/7] Building RELEASE App Bundle (.aab) for Play upload...${COLOR_RESET}"
-    ./gradlew :app:verifyKeyboard :app:bundleRelease
+    ./gradlew :app:verifyKeyboard :app:bundleRelease "-PinternalTypingTrial=${INTERNAL_TYPING_TRIAL:-false}"
 else
     echo -e "${COLOR_INFO}[Step 6/7] Building debug App Bundle (.aab)...${COLOR_RESET}"
     ./gradlew :app:verifyKeyboard :app:bundleDebug

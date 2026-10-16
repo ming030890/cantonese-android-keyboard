@@ -79,11 +79,18 @@ internal class ReplacementPolicy private constructor(
             if(replace) "confident_$kind" else "uncertain_$kind")
     }
     companion object {
-        fun load(json: String, modelSha256: String, scope: String = "boundary"): ReplacementPolicy {
+        fun load(json: String, modelSha256: String, scope: String = "boundary",
+                 allowInternalTrial: Boolean = false, dictionarySha256: String? = null): ReplacementPolicy {
             val value=JSONObject(json)
             require(scope in setOf("boundary", "context_revision"))
             require(value.optString("correction_scope", "boundary") == scope)
-            require(value.getInt("schema_version")==1 && value.getBoolean("heldout_approved"))
+            val trial=value.optBoolean("internal_trial",false)
+            require(value.getInt("schema_version")==1 && (value.getBoolean("heldout_approved") || (allowInternalTrial && trial)))
+            if(trial) {
+                require(allowInternalTrial && !value.getBoolean("production_approved"))
+                require(value.getString("ranker_schema")=="native-v2-raw-sum-v1")
+                require(dictionarySha256!=null && value.getString("dictionary_sha256")==dictionarySha256)
+            }
             val contextual=scope=="context_revision"
             require(value.getString("feature_schema")==if(contextual) "typing-v3-context-revision-nine-features" else "typing-v2-six-features")
             fun array(name:String,n:Int)=value.getJSONArray(name).let { a ->
@@ -125,6 +132,7 @@ internal class JointTypingEngine(
     private val scorer: ContextScorer?, private val policy: ReplacementPolicy?,
     private val learning: TypingLearning = TypingLearning.None,
     private val revisionPolicy: ReplacementPolicy? = null,
+    private val preserveBoundaryCorrections: Boolean = false,
 ) : EnglishCandidateEngine, AutoCloseable {
     init {
         require(policy==null || policy.correctionScope=="boundary")
@@ -172,6 +180,22 @@ internal class JointTypingEngine(
         lastResult=result.copy(replacement=safe,reason=if(result.replacement!=null && safe==null) "previously_rejected" else result.reason)
         TypingDiagnostics.update(lastResult!!.reason,points.any { it.isFinite() },scored.size,revision)
         val visible=(listOfNotNull(scored.find { it.literal })+scored).distinctBy { it.text }.take(9)
+        // Internal rollout augments the shipped clear-typo behavior. A new
+        // conservative model must not silently remove existing corrections.
+        if(safe==null && preserveBoundaryCorrections && activePolicy?.correctionScope=="boundary") {
+            val prior=baseline.predict(word,centers,points,left,right)
+            val replacement=prior.correction?.takeUnless { learning.rejected(word,it) }
+            if(replacement!=null) {
+                lastResult=result.copy(reason="existing_boundary_correction",confidence=null)
+                TypingDiagnostics.update("existing_boundary_correction",points.any { it.isFinite() },scored.size,revision)
+                val rankedCandidates=visible.map { EnglishCandidate(it.text,it.score,-it.spatialScore,it.edits,it.completion) }
+                val candidates=(listOfNotNull(rankedCandidates.firstOrNull { it.word==word },
+                    prior.candidates.firstOrNull { it.word==replacement })+rankedCandidates).distinctBy { it.word }
+                return EnglishPrediction(candidates.take(9),replacement,prior.plausiblePrefix,prior.known,
+                    word.length,"existing_boundary_correction",null,
+                    visible.associate { it.text to it.replaceBefore }+(replacement to word.length))
+            }
+        }
         return EnglishPrediction(visible.map { EnglishCandidate(it.text,it.score,-it.spatialScore,it.edits,it.completion) },
             safe?.text,scored.any { !it.literal },scored.find { it.literal }?.lexicalScore?.let { it>0 } ?: false,
             safe?.replaceBefore ?: word.length,lastResult!!.reason,result.confidence,

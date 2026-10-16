@@ -19,6 +19,35 @@ import org.junit.runner.RunWith
 /** Real EditText/InputConnection; fixed model output tests editor mechanics only. */
 @RunWith(AndroidJUnit4::class)
 class ContextRevisionInputConnectionTest {
+    @Test fun actualInternalProfileCorrectsAtSpaceAndUndoRestoresTypedWord() = runBlocking {
+        val context=ApplicationProvider.getApplicationContext<Context>()
+        val engine=withContext(Dispatchers.Default) {InternalTypingProfile.load(context,{0L},TypingLearning.None)}
+        val intent=Intent(context,ImePreviewActivity::class.java).putExtra("showIme",false)
+        ActivityScenario.launch<ImePreviewActivity>(intent).use { activity ->
+            lateinit var field:EditText;lateinit var coordinator:EnglishInputCoordinator
+            val scope=CoroutineScope(SupervisorJob()+Dispatchers.Main.immediate)
+            activity.onActivity {
+                field=checkNotNull(findEditor(it.findViewById(android.R.id.content)))
+                field.setText("could you please let me ");field.requestFocus();field.setSelection(field.length())
+                val info=EditorInfo();val connection=checkNotNull(field.onCreateInputConnection(info))
+                coordinator=EnglishInputCoordinator(ImeEditor({connection},{info}),{engine},scope)
+            }
+            try {
+                for(letter in "kbow") {
+                    withContext(Dispatchers.Main) {coordinator.type(letter.toString(),null)}
+                    delay(20)
+                }
+                withContext(Dispatchers.Main) {
+                    coordinator.settleBoundary();coordinator.finish(" ",correct=true)
+                    assertEquals("could you please let me know ",field.text.toString())
+                    assertTrue(coordinator.delete())
+                    assertEquals("could you please let me kbow",field.text.toString())
+                    assertEquals("kbow",coordinator.word)
+                }
+            } finally {withContext(Dispatchers.Main) {coordinator.close()}}
+        }
+    }
+
     private fun findEditor(view: View): EditText? = when(view) {
         is EditText -> view
         is ViewGroup -> (0 until view.childCount).firstNotNullOfOrNull { findEditor(view.getChildAt(it)) }

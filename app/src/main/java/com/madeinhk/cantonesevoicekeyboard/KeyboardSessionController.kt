@@ -63,7 +63,8 @@ internal class KeyboardSessionController(
                             ReplacementPolicy.load(service.assets.open("typing/revision_calibration.json").bufferedReader().use { it.readText() },
                                 manifest.getString("sha256"),scope="context_revision")
                         }.getOrNull()
-                        NativeEnglishEngine.experimental(service,quick::englishContextHandle,scorer,policy,learning,revisionPolicy)
+                        if(BuildConfig.INTERNAL_TYPING_TRIAL) InternalTypingProfile.load(service,quick::englishContextHandle,learning)
+                        else NativeEnglishEngine.experimental(service,quick::englishContextHandle,scorer,policy,learning,revisionPolicy)
                     } else NativeEnglishEngine.load(service, quick::englishContextHandle)
                 },
                 CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),

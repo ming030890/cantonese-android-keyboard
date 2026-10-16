@@ -68,4 +68,21 @@ class TypingDecoderScenarioTest {
         val artifact=JSONObject().put("schema_version",1).put("heldout_approved",false)
         try { ReplacementPolicy.load(artifact.toString(),"0".repeat(64));fail("Unapproved calibration loaded") } catch(_:IllegalArgumentException) {}
     }
+    @Test fun internalTrialNeedsExplicitAuthorizationAndExactDictionary() {
+        val model="0".repeat(64);val dictionary="1".repeat(64)
+        val artifact=JSONObject().put("schema_version",1).put("heldout_approved",false)
+            .put("production_approved",false).put("internal_trial",true).put("correction_scope","boundary")
+            .put("feature_schema","typing-v2-six-features").put("ranker_schema","native-v2-raw-sum-v1")
+            .put("model_sha256",model).put("dictionary_sha256",dictionary)
+            .put("weights",org.json.JSONArray(List(7){0.0})).put("means",org.json.JSONArray(List(6){0.0}))
+            .put("scales",org.json.JSONArray(List(6){1.0}))
+            .put("thresholds",JSONObject().apply {listOf("spelling","valid_word","short_word","spacing").forEach {put(it,1.0)}})
+        fun refused(allowed:Boolean,hash:String?) {
+            try {ReplacementPolicy.load(artifact.toString(),model,allowInternalTrial=allowed,dictionarySha256=hash);fail("Wrong trial authorization accepted")}
+            catch(_:IllegalArgumentException) {}
+        }
+        refused(false,dictionary);refused(true,null);refused(true,"2".repeat(64))
+        assertEquals("boundary",ReplacementPolicy.load(artifact.toString(),model,allowInternalTrial=true,dictionarySha256=dictionary).correctionScope)
+        artifact.put("production_approved",true);refused(true,dictionary)
+    }
 }

@@ -32,7 +32,7 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 50
+        versionCode = 51
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -57,6 +57,7 @@ android {
 
     buildTypes {
         release {
+            buildConfigField("boolean", "INTERNAL_TYPING_TRIAL", providers.gradleProperty("internalTypingTrial").orElse("false").get())
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "native-lm-rules.pro")
@@ -64,6 +65,7 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
+        debug { buildConfigField("boolean", "INTERNAL_TYPING_TRIAL", "false") }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
