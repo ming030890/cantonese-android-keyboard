@@ -145,6 +145,19 @@ Android device; none was connected during this implementation.
 
 ## Product decisions
 
+**D-12 (2026-10-16):** Correctly typed `typo` was changed to `type`. Exact
+version51 JNI replay attributes it to `existing_boundary_correction`: the
+legacy fallback overrides the new model's abstention because the small seed
+dictionary lacks `typo`. The fix protects validated English root words at both
+the new policy and old fallback, and reports `valid_literal_preserved`/known
+input. Native-only and real InputConnection regressions preserve `typo was `
+while keeping clear corrections and undo. The guard uses pinned SCOWL en_US
+root data shipped with source/notice files, not a word-specific exception or
+a new candidate-frequency table. Compound-only roots and guessed inflections
+are excluded. This fixes overcorrection; `srill`/`lor`/`od` missed corrections
+remain a separate ranking/confidence weakness. Version52 keeps new autocorrect
+enabled for internal testing.
+
 **D-11 (2026-10-16):** The user explicitly requests enabling the new autocorrect
 on Play internal testing after version50 left it disabled. Version51 uses the
 explicit `INTERNAL_TYPING_TRIAL=true` release build setting. On first upgrade,

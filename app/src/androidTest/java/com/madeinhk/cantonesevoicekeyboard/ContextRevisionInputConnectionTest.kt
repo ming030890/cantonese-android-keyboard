@@ -37,13 +37,31 @@ class ContextRevisionInputConnectionTest {
                     withContext(Dispatchers.Main) {coordinator.type(letter.toString(),null)}
                     delay(20)
                 }
+                // This checks editor integration after a real lookup completes.
+                // Bounded timeout/rapid-input behavior has separate scenarios.
+                withTimeout(2000) {
+                    while(withContext(Dispatchers.Main) {coordinator.candidates.value.none {it.text=="know"}}) delay(5)
+                }
                 withContext(Dispatchers.Main) {
                     coordinator.settleBoundary();coordinator.finish(" ",correct=true)
                     assertEquals("could you please let me know ",field.text.toString())
                     assertTrue(coordinator.delete())
                     assertEquals("could you please let me kbow",field.text.toString())
                     assertEquals("kbow",coordinator.word)
+                    coordinator.reset();field.setText("");field.setSelection(0)
                 }
+                for(word in listOf("typo","was")) {
+                    for(letter in word) {
+                        withContext(Dispatchers.Main) {coordinator.type(letter.toString(),null)}
+                        delay(20)
+                    }
+                    withTimeout(2000) {
+                        while(withContext(Dispatchers.Main) {coordinator.candidates.value.size<2}) delay(5)
+                    }
+                    withContext(Dispatchers.Main) {coordinator.settleBoundary();coordinator.finish(" ",correct=true)}
+                }
+                delay(80)
+                withContext(Dispatchers.Main) {assertEquals("typo was ",field.text.toString())}
             } finally {withContext(Dispatchers.Main) {coordinator.close()}}
         }
     }

@@ -133,6 +133,7 @@ internal class JointTypingEngine(
     private val learning: TypingLearning = TypingLearning.None,
     private val revisionPolicy: ReplacementPolicy? = null,
     private val preserveBoundaryCorrections: Boolean = false,
+    private val literalWords: (String)->Boolean = {false},
 ) : EnglishCandidateEngine, AutoCloseable {
     init {
         require(policy==null || policy.correctionScope=="boundary")
@@ -174,15 +175,17 @@ internal class JointTypingEngine(
         else activePolicy.decide(request,scored,exhausted)
         val supported=pool.withIndex().filter { context?.getOrNull(it.index)?.isFinite()==true }
             .map { it.value.text to it.value.replaceBefore }.toSet()
-        val safe=result.replacement?.takeIf { (it.text to it.replaceBefore) in supported &&
+        val protectedLiteral=literalWords(word)
+        val safe=result.replacement?.takeUnless {protectedLiteral}?.takeIf { (it.text to it.replaceBefore) in supported &&
             pool.firstOrNull { h -> h.literal }?.let { literal -> (literal.text to literal.replaceBefore) in supported }==true }
             ?.takeUnless { learning.rejected(word,it.text) }
-        lastResult=result.copy(replacement=safe,reason=if(result.replacement!=null && safe==null) "previously_rejected" else result.reason)
+        lastResult=result.copy(replacement=safe,reason=if(protectedLiteral) "valid_literal_preserved"
+            else if(result.replacement!=null && safe==null) "previously_rejected" else result.reason)
         TypingDiagnostics.update(lastResult!!.reason,points.any { it.isFinite() },scored.size,revision)
         val visible=(listOfNotNull(scored.find { it.literal })+scored).distinctBy { it.text }.take(9)
         // Internal rollout augments the shipped clear-typo behavior. A new
         // conservative model must not silently remove existing corrections.
-        if(safe==null && preserveBoundaryCorrections && activePolicy?.correctionScope=="boundary") {
+        if(safe==null && !protectedLiteral && preserveBoundaryCorrections && activePolicy?.correctionScope=="boundary") {
             val prior=baseline.predict(word,centers,points,left,right)
             val replacement=prior.correction?.takeUnless { learning.rejected(word,it) }
             if(replacement!=null) {
@@ -197,7 +200,7 @@ internal class JointTypingEngine(
             }
         }
         return EnglishPrediction(visible.map { EnglishCandidate(it.text,it.score,-it.spatialScore,it.edits,it.completion) },
-            safe?.text,scored.any { !it.literal },scored.find { it.literal }?.lexicalScore?.let { it>0 } ?: false,
+            safe?.text,scored.any { !it.literal },protectedLiteral || (scored.find { it.literal }?.lexicalScore?.let { it>0 } ?: false),
             safe?.replaceBefore ?: word.length,lastResult!!.reason,result.confidence,
             visible.associate { it.text to it.replaceBefore })
     }

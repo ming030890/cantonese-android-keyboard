@@ -25,11 +25,13 @@ internal interface EnglishCandidateEngine {
 }
 
 internal class NativeEnglishEngine private constructor(private val contextHandle: () -> Long) : EnglishCandidateEngine {
+    private var literalWords: ((String)->Boolean) = {false}
     companion object {
         fun load(context: Context, contextHandle: () -> Long = { 0L }): NativeEnglishEngine {
             System.loadLibrary("cantonese_engine")
             check(nativeLoad(context.assets.open("english/en.bin").use { it.readBytes() }))
-            return NativeEnglishEngine(contextHandle)
+            val lexicon=EnglishLiteralLexicon.load(context)
+            return NativeEnglishEngine(contextHandle).also {it.literalWords=lexicon::contains}
         }
         @JvmStatic private external fun nativeLoad(dictionary: ByteArray): Boolean
         @JvmStatic private external fun nativeSearch(word: String, centers: FloatArray, points: FloatArray,
@@ -63,7 +65,7 @@ internal class NativeEnglishEngine private constructor(private val contextHandle
             return JointTypingEngine(baseline, { request, previous ->
                 JSONObject(checkNotNull(nativeDecodeV2(request.word, request.centers, request.points,
                     previous, request.session, request.revision)))
-            }, scorer, policy, learning, revisionPolicy,preserveBoundaryCorrections)
+            }, scorer, policy, learning, revisionPolicy,preserveBoundaryCorrections,EnglishLiteralLexicon.load(context)::contains)
         }
     }
 
@@ -77,8 +79,9 @@ internal class NativeEnglishEngine private constructor(private val contextHandle
                 EnglishCandidate(item.getString("word"), item.getDouble("score"),
                     item.getDouble("editCost"), item.getInt("edits"), item.getInt("completedChars"))
             },
-            correction = if (json.isNull("correction")) null else json.getString("correction"),
-            plausiblePrefix = json.getBoolean("plausiblePrefix"), known = json.getBoolean("known"),
+            correction = if (literalWords(word) || json.isNull("correction")) null else json.getString("correction"),
+            plausiblePrefix = json.getBoolean("plausiblePrefix"), known = json.getBoolean("known") || literalWords(word),
+            reason=if(literalWords(word)) "valid_literal_preserved" else "legacy",
         )
     }
 

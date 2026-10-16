@@ -13,6 +13,7 @@ for name in ('boundary','context_revision'):
     assert value['model_sha256']==model_hash and value['dictionary_sha256']==dictionary_hash
 resources=[model,root/'app/src/main/assets/language_model/model.cng']
 resources+=list((root/'app/src/main/assets/english').glob('*.bin'))+list((root/'app/src/main/assets/quick').glob('*.bin'))
+resources+=list((root/'app/src/main/assets/english/validity').glob('*'))
 size=sum(p.stat().st_size for p in resources)
 assert size<30_000_000,('LM/vocabulary/candidate resource budget',size)
 out.mkdir(parents=True,exist_ok=True)

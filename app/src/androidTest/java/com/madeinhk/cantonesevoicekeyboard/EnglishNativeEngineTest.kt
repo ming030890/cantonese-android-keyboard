@@ -29,8 +29,9 @@ class EnglishNativeEngineTest {
             val later=engine.reconsider("pleade",floatArrayOf(),floatArrayOf(),""," provide ")
             assertEquals("please",later.correction)
             assertTrue(later.confidence!!>=.999)
-            for(word in listOf("Xentara","Zorvexa","keyboard"))
+            for(word in listOf("Xentara","Zorvexa","keyboard","typo","emoji","metadata","workflow"))
                 assertNull(word,engine.predict(word,floatArrayOf(),floatArrayOf(),"we hired ","").correction)
+            assertNull(engine.reconsider("typo",floatArrayOf(),floatArrayOf(),"and "," was ").correction)
         } finally {(engine as AutoCloseable).close()}
     }
 
@@ -57,7 +58,7 @@ class EnglishNativeEngineTest {
             assertEquals(word, correction, result.correction)
             assertTrue(result.candidates.size <= 8)
         }
-        for (word in listOf("the", "keyboard", "aple")) {
+        for (word in listOf("the", "keyboard", "aple", "typo", "emoji", "metadata", "workflow")) {
             assertNull(engine.predict(word, floatArrayOf(), floatArrayOf(), "", "").correction)
         }
     }
