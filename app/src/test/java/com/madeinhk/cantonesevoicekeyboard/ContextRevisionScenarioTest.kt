@@ -10,6 +10,28 @@ import org.json.JSONObject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ContextRevisionScenarioTest {
+    @Test fun knownWordCanWaitForFourFollowingWordsWhenItsPolicyAllowsReconsideration() = runTest {
+        val dispatcher=StandardTestDispatcher(testScheduler)
+        val engine=object:EnglishCandidateEngine {
+            override val supportsContextRevision=true
+            override fun predict(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=
+                EnglishPrediction(known=true,reconsiderKnown=true)
+            override fun reconsider(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=
+                if(word=="form" && right.trim()=="you again this morning")
+                    EnglishPrediction(correction="from",confidence=.98,requiredConfidence=.975,replaceBefore=4)
+                else EnglishPrediction()
+        }
+        KeyboardScenario(initialText="we heard ",initialMode=KeyboardInputMode.AlphaNum,englishEngine=engine,jointDecoder=true,
+            scope=CoroutineScope(SupervisorJob()+dispatcher),lookupDispatcher=dispatcher).use {s->
+            s.start()
+            for(word in listOf("form","you","again","this")) {s.type(word);s.press(KeyboardKeyKind.Space);advanceUntilIdle()}
+            assertEquals("we heard form you again this ",s.editor.text)
+            s.type("morning");s.press(KeyboardKeyKind.Space);advanceUntilIdle()
+            assertEquals("we heard from you again this morning ",s.editor.text)
+            s.press(KeyboardKeyKind.Delete);advanceUntilIdle()
+            assertEquals("we heard form you again this morning ",s.editor.text)
+        }
+    }
     private class Engine(var confidence: Double=0.9995): EnglishCandidateEngine {
         val requests=mutableListOf<Pair<String,String>>()
         val rejected=mutableListOf<Pair<String,String>>()
@@ -73,8 +95,8 @@ class ContextRevisionScenarioTest {
                 scope=CoroutineScope(SupervisorJob()+dispatcher),lookupDispatcher=dispatcher).use { s ->
                 s.start();s.type("teh");s.press(KeyboardKeyKind.Space);advanceUntilIdle()
                 s.type("meeting");advanceUntilIdle();s.press(KeyboardKeyKind.Space)
-                // Boundary commits synchronously with an already settled lookup;
-                // the revision task has not run on the injected worker yet.
+                // Rapid typing queues behind the bounded revision. Lifecycle
+                // and external-editor changes must still invalidate the edit.
                 when(action) {
                     "type" -> s.type("x")
                     "hide" -> s.hide()
@@ -83,8 +105,32 @@ class ContextRevisionScenarioTest {
                     "prefix" -> s.editor.text=s.editor.text.replace("We saw ","We ate ")
                 }
                 advanceUntilIdle()
-                assertTrue(s.editor.text.contains("teh ") || action=="replace")
+                if(action=="type") {
+                    assertEquals("We saw the meeting ",s.editor.text);assertEquals("x",s.editor.composing)
+                } else assertTrue(s.editor.text.contains("teh ") || action=="replace")
             }
+        }
+    }
+
+    @Test fun rapidMultiwordTypingRetainsOtherPendingTyposAfterAnEarlierRevision() = runTest {
+        val dispatcher=StandardTestDispatcher(testScheduler)
+        val engine=object:EnglishCandidateEngine {
+            override val supportsContextRevision=true
+            override fun predict(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=EnglishPrediction()
+            override fun reconsider(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=when {
+                word=="teh" && "meting " in right -> EnglishPrediction(correction="the",confidence=.9999,replaceBefore=3)
+                word=="meting" && left=="the " && "starts " in right -> EnglishPrediction(correction="meeting",confidence=.9999,replaceBefore=6)
+                else -> EnglishPrediction()
+            }
+        }
+        KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=engine,jointDecoder=true,
+            scope=CoroutineScope(SupervisorJob()+dispatcher),lookupDispatcher=dispatcher).use {s ->
+            s.start()
+            for(word in listOf("teh","meting","starts")) {s.type(word);s.press(KeyboardKeyKind.Space)}
+            advanceUntilIdle()
+            assertEquals("the meeting starts ",s.editor.text);assertEquals("",s.editor.composing)
+            s.press(KeyboardKeyKind.Delete);advanceUntilIdle()
+            assertEquals("the meting starts ",s.editor.text)
         }
     }
 

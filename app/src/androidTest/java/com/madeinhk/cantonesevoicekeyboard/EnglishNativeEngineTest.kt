@@ -28,7 +28,7 @@ class EnglishNativeEngineTest {
             assertEquals("know",boundary.correction)
             val later=engine.reconsider("pleade",floatArrayOf(),floatArrayOf(),""," provide ")
             assertEquals("please",later.correction)
-            assertTrue(later.confidence!!>=.999)
+            assertTrue(later.confidence!!>=later.requiredConfidence)
             for(word in listOf("Xentara","Zorvexa","keyboard","typo","emoji","metadata","workflow"))
                 assertNull(word,engine.predict(word,floatArrayOf(),floatArrayOf(),"we hired ","").correction)
             assertNull(engine.reconsider("typo",floatArrayOf(),floatArrayOf(),"and "," was ").correction)

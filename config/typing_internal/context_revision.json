@@ -1,51 +1,35 @@
 {
-  "weights": [
-    -2.740859842066579,
-    1.6365401367599897,
-    2.931842642529186,
-    -0.7773466875325794,
-    0.4992301353322483,
-    -1.4965450405295015,
-    -0.593014317511777,
-    -1.4330817037438732,
-    0.09903031670959314,
-    0.1378237366167236
-  ],
-  "means": [
-    1.413073855722102,
-    5.319574692738193,
-    1.7308407210336592,
-    4.257996485061511,
-    5.098209336721908,
-    1.6073813708260105,
-    4.0963476090357025,
-    1.0018617276862032,
-    1.3996485061511423
-  ],
-  "scales": [
-    1.828346038951308,
-    4.23234884963832,
-    0.8572109230297487,
-    1.3470831053732373,
-    4.193780335083211,
-    1.0678962765026752,
-    4.535458974552831,
-    2.256905969806181,
-    0.4898260688063646
-  ],
   "schema_version": 1,
+  "internal_trial": true,
   "heldout_approved": false,
   "production_approved": false,
-  "internal_trial": true,
   "correction_scope": "context_revision",
-  "feature_schema": "typing-v3-context-revision-nine-features",
-  "model_sha256": "dbda523ee0ae1ed1027c100e6e1af2972b44e86b71261334d79f788a50f6b675",
-  "dictionary_sha256": "230c95cb6cc7582bc44c7ce293eda18e0ba7e27588cd87d482fa2e3638d570db",
-  "ranker_schema": "native-v2-raw-sum-v1",
-  "thresholds": {
-    "spelling": 0.999,
-    "valid_word": 1.0,
-    "short_word": 1.0,
-    "spacing": 1.0
-  }
+  "ranker_schema": "native-v8-lm-typing-v1",
+  "feature_schema": "typing-v8-simple-evidence",
+  "feature_names": [
+    "score_over_original",
+    "score_over_rival"
+  ],
+  "candidate_scope": "lm_words_plus_literal_v1",
+  "same_policy_for_right_context": true,
+  "model_sha256": "598515666c395ba2260c46c6d1aac774ccac3f5ddc24d7cab92ba3b435986093",
+  "dictionary_sha256": "d8f328209a07909b657f600221506db6e8f1c2848d3b419d6ecfbe1309051c75",
+  "validity_sha256": "2678a569587c202916113dc8408180fa1676c65adadb4b492d67f124cbdd2c7b",
+  "typing_scale": 6.0,
+  "threshold": 0.92,
+  "non_word_threshold": 0.40,
+  "min_margin": 0.0,
+  "weights": [
+    0.0,
+    1.3,
+    0.8
+  ],
+  "means": [
+    3.5,
+    4.0
+  ],
+  "scales": [
+    8.0,
+    6.0
+  ]
 }

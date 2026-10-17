@@ -7,25 +7,30 @@ import java.security.MessageDigest
 /** Explicit internal-test authorization, independent of production qualification. */
 internal object InternalTypingProfile {
     fun load(context: Context, baselineContext: () -> Long, learning: TypingLearning): EnglishCandidateEngine {
-        fun digest(path:String)=context.assets.open(path).use { input ->
-            val hash=MessageDigest.getInstance("SHA-256");val bytes=ByteArray(65536)
-            while(true) {val n=input.read(bytes);if(n<0) break;hash.update(bytes,0,n)}
-            hash.digest().joinToString("") { "%02x".format(it) }
-        }
+        System.loadLibrary("cantonese_engine")
+        return fromAssets({path->context.assets.open(path).use {it.readBytes()}},EnglishLiteralLexicon.assetPath(context),baselineContext,learning)
+    }
+
+    /** Production asset validation and construction, also used by real JNI E2E tests. */
+    fun fromAssets(read:(String)->ByteArray,validityPath:String,baselineContext:()->Long,learning:TypingLearning):EnglishCandidateEngine {
+        fun digest(path:String)=MessageDigest.getInstance("SHA-256").digest(read(path)).joinToString("") {"%02x".format(it)}
         val modelHash=digest("typing/model.cng")
         val dictionaryHash=digest("english/en-v2.bin")
+        val validityHash=digest(validityPath)
         fun policy(path:String,scope:String)=ReplacementPolicy.load(
-            context.assets.open(path).bufferedReader().use { it.readText() },modelHash,scope,
-            allowInternalTrial=true,dictionarySha256=dictionaryHash)
+            read(path).decodeToString(),modelHash,scope,
+            allowInternalTrial=true,dictionarySha256=dictionaryHash,validitySha256=validityHash)
         val boundary=policy("typing/calibration.json","boundary")
         val revision=policy("typing/revision_calibration.json","context_revision")
-        val model=NativeQuickEngine.load(context,"typing/model.cng")
+        val model=NativeQuickEngine.fromAssets(read,"typing/model.cng")
         val shared=NativeEnglishEngine.sharedContextScorer(model::englishContextHandle)
         val scorer=object:ContextScorer {
             override fun scores(left:String,right:String,candidates:List<String>)=shared.scores(left,right,candidates)
+            override fun wordEvidence(left:String,right:String,candidates:List<String>)=shared.wordEvidence(left,right,candidates)
+            override fun knownSequences(candidates:List<String>)=shared.knownSequences(candidates)
             override fun close() {model.close()}
         }
-        return try {NativeEnglishEngine.experimental(context,baselineContext,scorer,boundary,learning,revision,preserveBoundaryCorrections=true)}
+        return try {NativeEnglishEngine.experimentalFromAssets(read,validityPath,baselineContext,scorer,boundary,learning,revision,preserveBoundaryCorrections=true)}
         catch(error:Throwable) {scorer.close();throw error}
     }
 }

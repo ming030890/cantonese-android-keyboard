@@ -1,0 +1,11 @@
+{
+  "name": "contextual-risk-v80",
+  "model": "/Volumes/SSD/cantonese_ngram/experiments/typing-spelling-v75/model.cng",
+  "model_sha256": "598515666c395ba2260c46c6d1aac774ccac3f5ddc24d7cab92ba3b435986093",
+  "dictionary": "/Volumes/SSD/cantonese_ngram/experiments/spelling-vocabulary-v77/en-v2.bin",
+  "dictionary_sha256": "d8f328209a07909b657f600221506db6e8f1c2848d3b419d6ecfbe1309051c75",
+  "validity": "/Volumes/SSD/cantonese_ngram/experiments/spelling-vocabulary-v77/valid_words.txt",
+  "validity_sha256": "2678a569587c202916113dc8408180fa1676c65adadb4b492d67f124cbdd2c7b",
+  "vocabulary_metadata": "/Volumes/SSD/cantonese_ngram/experiments/spelling-vocabulary-v77/vocabulary.json",
+  "vocabulary_metadata_sha256": "e86980d7bf4a6155f3c8a2c1618c34f9ae900a3798d583143dd9c92c8ca0fd33"
+}

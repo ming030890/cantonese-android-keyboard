@@ -92,8 +92,8 @@ internal class KeyboardSessionController(
         return boundaryQueue!!.enqueue { pendingTouch=touch;action() }
     }
     private fun waitForBoundary(action: () -> Unit): Boolean {
-        if (!settings.jointDecoderEnabled() || english?.boundaryPending()!=true) return false
-        return boundaryQueue?.begin({ english.settleBoundary() }, action) == true
+        if (!settings.jointDecoderEnabled() || english?.needsBoundaryTransaction()!=true) return false
+        return boundaryQueue?.begin({ english.settleBoundary() }, action,{english.settleContextRevision()}) == true
     }
     private fun flushBoundaryLiteral() {
         english?.cancelBoundaryCorrection()

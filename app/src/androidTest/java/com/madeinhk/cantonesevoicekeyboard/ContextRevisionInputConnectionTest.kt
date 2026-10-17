@@ -11,6 +11,8 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.madeinhk.cantonesevoicekeyboard.english.*
+import com.madeinhk.cantonesevoicekeyboard.quick.NativeQuickEngine
+import com.madeinhk.cantonesevoicekeyboard.quick.QuickInputCoordinator
 import kotlinx.coroutines.*
 import org.junit.Assert.*
 import org.junit.Test
@@ -19,6 +21,34 @@ import org.junit.runner.RunWith
 /** Real EditText/InputConnection; fixed model output tests editor mechanics only. */
 @RunWith(AndroidJUnit4::class)
 class ContextRevisionInputConnectionTest {
+    @Test fun packagedCantonesePhraseReachesARealInputConnection() = runBlocking {
+        val context=ApplicationProvider.getApplicationContext<Context>()
+        val model=withContext(Dispatchers.Default) {NativeQuickEngine.load(context)}
+        val intent=Intent(context,ImePreviewActivity::class.java).putExtra("showIme",false)
+        ActivityScenario.launch<ImePreviewActivity>(intent).use {activity->
+            lateinit var field:EditText;lateinit var coordinator:QuickInputCoordinator
+            val scope=CoroutineScope(SupervisorJob()+Dispatchers.Main.immediate)
+            activity.onActivity {
+                field=checkNotNull(findEditor(it.findViewById(android.R.id.content)))
+                field.setText("");field.requestFocus();field.setSelection(0)
+                val info=EditorInfo();val connection=checkNotNull(field.onCreateInputConnection(info))
+                coordinator=QuickInputCoordinator({model},ImeEditor({connection},{info}),scope=scope)
+            }
+            try {
+                withContext(Dispatchers.Main) {"hirdgiovoe".forEach {coordinator.onKey(it.toString())}}
+                withTimeout(5000) {
+                    while(withContext(Dispatchers.Main) {coordinator.candidates.value.none {it.text=="我哋去食飯"}}) delay(5)
+                }
+                withContext(Dispatchers.Main) {
+                    assertEquals("hirdgiovoe",field.text.toString())
+                    coordinator.selectCandidate("我哋去食飯")
+                    assertEquals("我哋去食飯",field.text.toString())
+                    assertEquals(-1,BaseInputConnection.getComposingSpanStart(field.text))
+                    assertEquals(field.length(),field.selectionStart)
+                }
+            } finally {withContext(Dispatchers.Main) {coordinator.close()}}
+        }
+    }
     @Test fun actualInternalProfileCorrectsAtSpaceAndUndoRestoresTypedWord() = runBlocking {
         val context=ApplicationProvider.getApplicationContext<Context>()
         val engine=withContext(Dispatchers.Default) {InternalTypingProfile.load(context,{0L},TypingLearning.None)}

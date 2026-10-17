@@ -12,6 +12,23 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EnglishAutocorrectScenarioTest {
+    @Test fun contextualProfileCanCorrectShortEnglishDespiteAnOverlappingChineseQuickCode() {
+        for(confident in listOf(false,true)) for(selectChinese in listOf(false,true)) {
+            val engine=object:EnglishCandidateEngine {
+                override val allowsQuickCodeCorrections=true
+                override fun predict(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=EnglishPrediction(
+                    candidates=listOf(EnglishCandidate("it",1.0,1.0,1,0)),correction=if(word=="jt" && confident) "it" else null,
+                    confidence=if(confident) .99 else .5,replaceBefore=word.length)
+            }
+            KeyboardScenario(initialText="please test ",englishEngine=engine).use {s->
+                s.engine.lookup={_,_,_,_->listOf(com.madeinhk.cantonesevoicekeyboard.quick.QuickCandidate("乙",0))}
+                s.start();s.type("jt")
+                assertTrue(s.snapshot().quickCandidates.any {it.text=="乙"})
+                if(selectChinese) s.choose("乙") else s.press(KeyboardKeyKind.Space)
+                assertEquals("please test "+if(selectChinese) "乙" else if(confident) "it " else "jt ",s.editor.text)
+            }
+        }
+    }
     @Test fun boundaryCorrectionAndUndoOnBothLayouts() {
         for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
             for (boundary in listOf(" ", ".", "。", "\n")) {

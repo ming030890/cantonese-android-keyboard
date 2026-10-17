@@ -65,7 +65,9 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
-        debug { buildConfigField("boolean", "INTERNAL_TYPING_TRIAL", "false") }
+        debug {
+            buildConfigField("boolean", "INTERNAL_TYPING_TRIAL", providers.gradleProperty("internalTypingTrial").orElse("false").get())
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -180,6 +182,7 @@ tasks.register("verifyKeyboard") {
 
 // Opt-in host JNI integration tests use the same Rust exports as Android.
 tasks.withType<Test>().configureEach {
+    providers.gradleProperty("bilingualAssets").orNull?.let {systemProperty("bilingual.assets",it)}
     providers.gradleProperty("englishNativeLibrary").orNull?.let {
         systemProperty("english.native.library", it)
         systemProperty("java.library.path", File(it).parent)

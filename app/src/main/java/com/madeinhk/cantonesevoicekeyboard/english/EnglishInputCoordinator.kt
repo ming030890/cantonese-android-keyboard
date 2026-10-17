@@ -45,6 +45,8 @@ internal class EnglishInputCoordinator(
         scope.launch(worker) { (engine as? AutoCloseable)?.close(); engine=null }
     }
     fun boundaryPending() = word.isNotEmpty() && resultWord != word && pending != null
+    fun needsBoundaryTransaction()=boundaryPending() || (word.isNotEmpty() && engine?.supportsContextRevision==true)
+    suspend fun settleContextRevision()=contextWindow.settle()
     fun cancelBoundaryCorrection() {
         if (!boundaryPending()) return
         pending?.cancel();pending=null;prediction=EnglishPrediction(reason="boundary_cancelled");resultWord=word
@@ -115,7 +117,7 @@ internal class EnglishInputCoordinator(
         val lookup = scope.async(worker) {
             runCatching {
                 if (engine == null) engine = loader()
-                engine?.predict(text.lowercase(Locale.ROOT).replace('’', '\''), geometry, points, left, right)
+                engine?.predictObserved(text, geometry, points, left, right)
             }.onFailure(onError).getOrNull()
         }
         pending = lookup
@@ -162,10 +164,11 @@ internal class EnglishInputCoordinator(
         val quote = if (original.last() in "'’" && apostropheBase?.first == original.dropLast(1)) original.takeLast(1) else ""
         val source = if (quote.isNotEmpty()) apostropheBase!!.second else prediction
         val currentResult = if (quote.isNotEmpty()) true else resultWord == word
-        val replacement = selected ?: if (correct && !suppress && !chineseMatch && eligible() && currentResult)
+        val allowEnglishDecision=!chineseMatch || engine?.allowsQuickCodeCorrections==true
+        val replacement = selected ?: if (correct && !suppress && allowEnglishDecision && eligible() && currentResult)
             source.correction?.let { caseWord(it, original) + quote } ?: original else original
         val delayed = pending?.takeIf {
-            correct && !suppress && !chineseMatch && eligible() && !currentResult &&
+            correct && !suppress && allowEnglishDecision && eligible() && !currentResult &&
                 selected == null && delimiter.isNotEmpty()
         }
         // Only replace composition still immediately before this cursor.
@@ -189,8 +192,8 @@ internal class EnglishInputCoordinator(
             Undo(undoOriginal, replacement + delimiter, quick, editor.cursorSelection()?.first) else null
         val wasQuick = quick
         val cursor = editor.cursorSelection()?.first
-        val mayReconsider=correct && !suppress && !chineseMatch && eligible() && selected==null && delimiter==" "
-        val remember=mayReconsider && currentResult && source.correction==null && replacement==original
+        val mayReconsider=correct && !suppress && allowEnglishDecision && eligible() && selected==null && delimiter==" "
+        val remember=mayReconsider && currentResult && (!source.known || source.reconsiderKnown) && source.correction==null && replacement==original
         val originalCenters=centers.copyOf()
         reset(cancelLookup = delayed == null, preserveContext = mayReconsider); undo = record
         if(mayReconsider) contextWindow.boundary(original,replacement,delimiter,originalLeft,originalCenters,evidence,remember)

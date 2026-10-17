@@ -85,3 +85,5 @@ __pycache__/
 
 # Generated expanded dictionary; rebuilt from native source by deploy.sh
 /app/src/main/assets/english/en-v2.bin
+/app/src/main/assets/english/validity/valid_words.txt
+/app/src/main/assets/english/validity/compiled_vocabulary.json

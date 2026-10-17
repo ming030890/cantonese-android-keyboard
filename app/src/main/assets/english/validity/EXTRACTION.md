@@ -4,13 +4,21 @@ The three upstream files are copied without modification from the pinned
 LibreOffice dictionary revision in `provenance.json`. The complete dictionary
 copyright, permissions and component notices are in `README_en_US.txt`.
 
-Our modified use is root-only input validation in `EnglishLiteralLexicon.kt`:
-discard the numeric header and affix flags, exclude compound-only (`c`) roots,
-case-fold ASCII English words with optional apostrophes, and store a set.
-Inflected forms are not guessed. No frequencies are assigned and these roots
-are never added to correction candidates or used to train the LM.
+`scripts/build_english_vocabulary.py` applies only the source's explicit affix
+flags, strip/add rules and conditions. It excludes compound-only roots and
+excludes NOSUGGEST forms from candidate generation. Uppercase acronyms retain
+their original case. Letter-name inflections are excluded; the ordinary words
+`a` and `i` retain their source affixes. Endings are never guessed.
 
-A recognized input stays unchanged in both the new model decision and the old
-boundary fallback. This prevents a sparse suggestion dictionary from treating
-valid words such as `typo` as misspellings. It is not a complete English-word
-validator or a solution for unknown names and missed corrections.
+The generated `valid_words.txt` supplies spelling evidence to
+`EnglishLiteralLexicon.kt`; `compiled_vocabulary.json` binds the builder, pinned
+sources, TRAIN counts and compiled dictionary hashes. These forms also supply
+the separately packed correction-candidate vocabulary. Observed frequencies come
+from canonical TRAIN-only English counts, with floor1 for otherwise valid forms.
+The dictionary is not LM training text and no Chinese conversion is performed.
+
+The contextual internal policy treats recognized words as evidence rather than
+a categorical veto: strong contextual decisions can correct real-word typos.
+Older policies retain their preservation behavior. The conservative legacy path
+still preserves recognized words. This is not a complete word validator or an
+unknown-name detector; clean-word and unfamiliar-name evaluation remains required.

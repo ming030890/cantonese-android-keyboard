@@ -19,4 +19,19 @@ class EnglishLiteralLexiconTest {
         assertFalse(lexicon.contains("compound"));assertFalse(lexicon.contains("example/SM"))
         assertFalse(lexicon.contains("examples")) // No guessed inflection in the root-only guard.
     }
+    @Test fun compiledFormsAreExplicitAndMalformedSourcesFailClosed() {
+        val lexicon=EnglishLiteralLexicon.fromWordsReader("fix\nfixed\nfixing\niterate\n".reader())
+        assertTrue(lexicon.contains("Fixed"));assertTrue(lexicon.contains("iterate"));assertFalse(lexicon.contains("fized"))
+        for(source in listOf("","fix/DS\n","fixed\nmade-up\n")) {
+            try {EnglishLiteralLexicon.fromWordsReader(source.reader());fail("Malformed forms accepted")}
+            catch(_:IllegalArgumentException) {}
+        }
+    }
+    @Test fun uppercaseAcronymsDoNotProtectUnrelatedLowercaseMistaps() {
+        for(lexicon in listOf(EnglishLiteralLexicon.fromReader("3\nKS\nis\nName\n".reader()),
+            EnglishLiteralLexicon.fromWordsReader("KS\nis\nname\n".reader()))) {
+            assertTrue(lexicon.contains("KS"));assertFalse(lexicon.contains("ks"))
+            assertTrue(lexicon.contains("Is"));assertTrue(lexicon.contains("Name"))
+        }
+    }
 }

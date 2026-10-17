@@ -30,9 +30,17 @@ internal class NativeQuickEngine private constructor(private var handle: Long) :
                 Log.w("NativeQuickEngine", "Neural LM unavailable; using count fallback", it)
                 ByteArray(0)
             }
-            val handle = nativeCreate(read("quick/quick3.bin"), read("quick/quick5.bin"), neural,
-                runCatching { read("handwriting/lm_csr.bin") }.getOrElse { ByteArray(0) },
-                read("handwriting/labels.txt"))
+            return fromBytes(read("quick/quick3.bin"),read("quick/quick5.bin"),neural,
+                runCatching {read("handwriting/lm_csr.bin")}.getOrElse {ByteArray(0)},read("handwriting/labels.txt"))
+        }
+
+        /** Same JNI constructor for packaged assets and host integration checks. */
+        fun fromAssets(read:(String)->ByteArray,modelAsset:String="language_model/model.cng")=
+            fromBytes(read("quick/quick3.bin"),read("quick/quick5.bin"),read(modelAsset),
+                runCatching {read("handwriting/lm_csr.bin")}.getOrElse {ByteArray(0)},read("handwriting/labels.txt"))
+
+        private fun fromBytes(three:ByteArray,five:ByteArray,neural:ByteArray,counts:ByteArray,labels:ByteArray):NativeQuickEngine {
+            val handle=nativeCreate(three,five,neural,counts,labels)
             check(handle != 0L) { "Could not create Quick engine" }
             return NativeQuickEngine(handle)
         }

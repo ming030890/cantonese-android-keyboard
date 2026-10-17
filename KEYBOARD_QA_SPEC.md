@@ -117,6 +117,15 @@ layouts. Emoji uses its own panel rather than this toolbar.
 
 ## English autocorrect
 
+2026-10-16 internal contextual update: short/familiar words are eligible under
+fitted finite thresholds; dictionary membership is evidence, not a veto. The
+separate Quick one/two-letter Chinese-code overlap veto is bypassed only for this
+profile's approved English decision; uncertain input stays literal and Chinese
+selection stays explicit. Retrospective history extends to four following words
+and uses the profile's confidence requirement, preserving new-evidence/editor/Undo
+guards. See `AUTOCORRECT_RUNTIME_V80.md`; the reported whole sentences still fail.
+Earlier rollout-specific descriptions below remain historical where they differ.
+
 Implemented under the user-approved 2026-10-13 plan; independent English and Quick
 preferences default on. Existing legacy scenarios without an English backend verify
 literal fallback. `EnglishAutocorrectScenarioTest` exercises the production controller
@@ -241,11 +250,52 @@ boundary, not newly introduced language-intent inference.
 
 ## Execution and acceptance
 
+2026-10-16 phone-report follow-up: `typo` preservation is fixed locally in52;
+the52 Play upload was canceled at the user's request and internal remains51.
+`srill a lor od type` remains a failing accuracy regression. The new optional
+word-evidence policy/API corrects the byte-mean comparison mechanism and can
+evaluate short/legacy-valid words without a categorical WM membership veto,
+but no newly fitted profile is enabled: independent calibration still rejects
+the variants. `WordEvidencePolicyTest` checks mechanism/binding/failure safety;
+`InternalTypingRealEngineTest` proves the actual native byte-mean versus whole-
+word score discrepancy. These tests are not a claim that the complete phone
+sentence is corrected. No candidate layout/baseline changes are intended.
+
+Continued repair: rapid queued keys now allow a bounded retrospective decision
+to finish; revising one word rebases other pending typos. Scenario tests verify
+multiple later corrections and Undo. Native V4 preserves neighboring-key priors
+at center taps, checked through actual host JNI. Word-evidence abstention cannot
+fall through to the legacy automatic replacement path.192 tests, screenshots and
+debug build pass via the full gate. These are source/mechanism fixes; the current
+staged profile is unchanged and user-sentence accuracy is not yet fixed. English
+model coverage training and independent confidence calibration remain ongoing.
+
 New acceptance tests live in `KeyboardQaContractTest.kt`; names start with the IDs above.
+
+Deadline isolation (v77): `AutocorrectDeadlineScenarioTest` holds the model answer
+constant and verifies10ms versus60ms worker delay, immediate versus paused Space,
+later-context cutoff and no stale rewrite of new input. Both40ms application caps
+can discard a valid answer. Actual staged JNI diagnostics separately expose8ms
+native search exhaustion on reported examples. Uncapped experimental replays still
+fail the typo sentences on confidence/ranking; passing these mechanism tests is not
+an accuracy fix or phone-speed measurement.195 unit/scenario tests, screenshots
+and debug build pass. No model/profile staged or Play upload; detailed report is
+`../dataset/keyboard-lm/AUTOCORRECT_ROOT_CAUSE_V77.md`.
+
 Existing scenario/coordinator/touch tests supply the coverage explicitly named in the tables.
 A matrix test reports the failing combination in its assertion message.
 
 Run `./gradlew :app:verifyKeyboard`: unit contracts, all screenshot comparisons, debug build.
+
+`BilingualPipelineE2eTest` now loads the staged internal profile through the same
+asset factories as production (no reflection-created engines or fitted constants
+in the test). The real key receiver/controller/native engines produce43 asserted
+English, Cantonese and mixed-output cases, including touches, rapid typing,
+selection and undo. A separate14-case user-sentence report remains failing.
+`scripts/verify_bilingual_pipeline.py` builds JNI, enables the trial build flag,
+checks exact resources and the30MB limit, and returns a failing acceptance status
+for those misses. See `BILINGUAL_PIPELINE.md` for command and host/Android scope.
+
 Create intentional new baselines separately, inspect them, then run validation. Pending
 product decisions and integration gaps remain visible even when this command is green.
 Do not update a reference image merely to make a failure pass.
