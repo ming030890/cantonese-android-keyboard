@@ -151,6 +151,24 @@ class KeyboardSessionScenarioTest {
     }
 
     @Test
+    fun emojiSearchStaysLocalThenSelectionCommitsOneWholeVariant() = KeyboardScenario().use { s ->
+        s.start()
+        var search = EmojiSearchState().open().type("thumbs ").type("up")
+        assertEquals("", s.editor.text)
+        assertEquals("", s.editor.composing)
+        assertNotNull(s.snapshot().clipboard)
+        search = search.delete().type("p")
+        assertEquals("thumbs up", search.query)
+        // The picker calls this same host callback only when a result is selected.
+        s.controller.commitText("👍🏽")
+        assertEquals("👍🏽", s.editor.text)
+        assertEquals(listOf("👍🏽"), s.editor.commits)
+        assertNull(s.snapshot().clipboard)
+        assertEquals("", s.editor.composing)
+        assertEquals(EmojiSearchState(), search.close())
+    }
+
+    @Test
     fun predictionsUseCommittedContextAndBothSidesOfCursor() = KeyboardScenario(initialText = "我想", clipboardText = null).use { s ->
         s.editor.right = "呀"
         s.engine.predict = { left, right, _ ->

@@ -413,7 +413,12 @@ fun KeyboardScreen(
                                     bottom = bounds.bottom - keyboardSurfaceOriginInRoot.y
                                 )
                             },
-                        onEmojiPicked = onEmojiPicked
+                        onEmojiPicked = onEmojiPicked,
+                        onBackToKeyboard = {
+                            activePanel = inputMode.toPanel()
+                            onVisiblePanelChanged(inputMode)
+                        },
+                        onDelete = onDeleteSurroundingText,
                     )
                 }
                 KeyboardPanel.Number -> {
@@ -509,7 +514,7 @@ fun KeyboardScreen(
                     commaValue = ",".toSymbolCommitValue(symbolVariant),
                     periodValue = ".".toSymbolCommitValue(symbolVariant)
                 )
-            } else {
+            } else if (activePanel != KeyboardPanel.Emoji) {
                 // Bottom Functional Keys Row (Space, Delete, Enter, Switch)
                 Row(
                     modifier = Modifier

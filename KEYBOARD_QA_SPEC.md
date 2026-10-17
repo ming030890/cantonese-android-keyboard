@@ -299,3 +299,28 @@ for those misses. See `BILINGUAL_PIPELINE.md` for command and host/Android scope
 Create intentional new baselines separately, inspect them, then run validation. Pending
 product decisions and integration gaps remain visible even when this command is green.
 Do not update a reference image merely to make a failure pass.
+
+
+## Emoji picker (2026-10-17)
+
+The picker uses the production Compose UI in previews as well as the IME. It shows
+an eight-column scrolling grid, mint selected-category/emoji pills, nine categories,
+recent selections and long-press variants. The offline index contains 1,790 base
+emoji and 2,982 complete sequences from AndroidX 1.6.0 with CLDR 48 English names
+and keywords. Existing AndroidX recent history is retained.
+
+Search opens local typing keys; typing, deleting and clearing a query must never
+edit the host field or dismiss clipboard availability. Choosing a result commits
+one complete Unicode sequence through the normal emoji callback. ABC returns to
+the originating text layout; the picker Delete control edits the host only outside
+search. `EmojiCatalogTest` covers coverage/search/variants/query editing;
+`emojiSearchStaysLocalThenSelectionCommitsOneWholeVariant` uses the production
+controller and fake editor. `EmojiPickerInteractionTest` exercises touch routing,
+query isolation, result selection and long-press variants on Android. Screenshots
+cover full/compact light browsing, dark browsing, search at two widths and no results.
+
+Verification: 223 unit/scenario tests and both emoji Android interaction tests pass.
+All seven emoji screenshots pass after visual inspection, including dark search.
+The full gate also reports 22 non-emoji screenshot mismatches in Quick and Settings;
+those unrelated baselines were preserved. Emulator interactions exercise the production
+screen, but are not a Play Asset Delivery deployment or a physical-phone IME inset check.
