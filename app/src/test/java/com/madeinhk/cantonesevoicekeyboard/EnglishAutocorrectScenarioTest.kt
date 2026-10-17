@@ -157,12 +157,14 @@ class EnglishAutocorrectScenarioTest {
 
     @Test fun editorPolicyAndIndependentPreferences() {
         for (type in listOf(InputType.TYPE_CLASS_NUMBER,
+            InputType.TYPE_CLASS_PHONE,
             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD,
             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI,
-            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)) {
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)) {
             assertFalse(englishAllowed(type))
         }
+        assertTrue(englishAllowed(InputType.TYPE_NULL))
+        assertTrue(englishAllowed(InputType.TYPE_CLASS_TEXT))
         for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
             KeyboardScenario(initialMode = mode, englishEngine = ScenarioEnglishEngine()).use { s ->
                 s.autocorrectLayouts = if (mode == KeyboardInputMode.AlphaNum) setOf(KeyboardSettings.LAYOUT_QUICK) else setOf(KeyboardSettings.LAYOUT_ENGLISH)

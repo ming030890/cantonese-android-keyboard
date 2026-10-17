@@ -293,8 +293,8 @@ internal fun caseWord(word: String, typed: String): String = when {
 }
 internal fun englishAllowed(inputType: Int?): Boolean {
     inputType ?: return true
-    if (inputType and InputType.TYPE_MASK_CLASS != InputType.TYPE_CLASS_TEXT) return false
-    if (inputType and InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS != 0) return false
+    val cls = inputType and InputType.TYPE_MASK_CLASS
+    if (cls != InputType.TYPE_CLASS_TEXT && cls != InputType.TYPE_NULL) return false
     return inputType and InputType.TYPE_MASK_VARIATION !in setOf(
         InputType.TYPE_TEXT_VARIATION_PASSWORD, InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
         InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD, InputType.TYPE_TEXT_VARIATION_URI,
