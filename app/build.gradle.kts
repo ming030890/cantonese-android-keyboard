@@ -182,8 +182,12 @@ tasks.register("verifyKeyboard") {
 
 // Opt-in host JNI integration tests use the same Rust exports as Android.
 tasks.withType<Test>().configureEach {
-    providers.gradleProperty("bilingualAssets").orNull?.let {systemProperty("bilingual.assets",it)}
+    providers.gradleProperty("bilingualAssets").orNull?.let {
+        inputs.dir(File(it)).withPropertyName("bilingualAssetsDir")
+        systemProperty("bilingual.assets", it)
+    }
     providers.gradleProperty("englishNativeLibrary").orNull?.let {
+        inputs.file(File(it)).withPropertyName("englishNativeLib")
         systemProperty("english.native.library", it)
         systemProperty("java.library.path", File(it).parent)
     }

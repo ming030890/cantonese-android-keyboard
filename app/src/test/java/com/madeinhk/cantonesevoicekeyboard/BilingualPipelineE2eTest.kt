@@ -137,8 +137,7 @@ class BilingualPipelineE2eTest {
             KeyboardScenario(initialMode=mode,quickEngine=quick,englishEngine=engine,jointDecoder=true,
                 scope=CoroutineScope(SupervisorJob()+dispatcher),lookupDispatcher=dispatcher).use {s ->
                 s.start()
-                for(word in typed.split(' ')) {s.type(word);s.press(KeyboardKeyKind.Space)}
-                advanceUntilIdle()
+                for(word in typed.split(' ')) {s.type(word);s.press(KeyboardKeyKind.Space);advanceUntilIdle()}
                 emit("reported/$mode/$typed",expected+" ",s.editor.text,quality=true)
                 assertEquals("No uncommitted text after the final Space","",s.editor.composing)
             }

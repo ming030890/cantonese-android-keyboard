@@ -60,7 +60,7 @@ internal class ContextRevisionWindow(
                     }.getOrNull()
                 } } ?: continue
                 val correction=result.correction ?: continue
-                if(!result.requiredConfidence.isFinite() || result.requiredConfidence !in .5..1.0 || result.requiredConfidence==1.0 ||
+                if(!result.requiredConfidence.isFinite() || result.requiredConfidence !in .1..1.0 || result.requiredConfidence==1.0 ||
                     result.confidence?.let { it.isFinite() && it>=result.requiredConfidence }!=true ||
                     correction.isEmpty() || correction.any { !it.isAsciiLetter() && it!='\'' } ||
                     result.replaceBefore>w.original.length) continue

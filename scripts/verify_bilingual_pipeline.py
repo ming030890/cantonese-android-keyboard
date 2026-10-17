@@ -70,7 +70,7 @@ def main():
         run(['cargo','build','--manifest-path',str(ENGINE/'Cargo.toml'),'--release','--lib','--features','android'],'native-build',ENGINE)
         native=ENGINE/'target/release'/('libcantonese_engine.dylib' if platform.system()=='Darwin' else 'libcantonese_engine.so')
         report['native']=dict(path=str(native),sha256=sha(native))
-        run(['./gradlew',':app:testDebugUnitTest','--tests',CLASS,'-PenglishNativeLibrary='+str(native),
+        run(['./gradlew',':app:testDebugUnitTest','--rerun-tasks','--tests',CLASS,'-PenglishNativeLibrary='+str(native),
             '-PbilingualAssets='+str(a.assets),'-PinternalTypingTrial=true','--console=plain'],'e2e',ROOT)
         capture_junit()
         report['assets_unchanged']=before==resources(a.assets)
