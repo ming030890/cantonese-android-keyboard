@@ -309,18 +309,35 @@ recent selections and long-press variants. The offline index contains 1,790 base
 emoji and 2,982 complete sequences from AndroidX 1.6.0 with CLDR 48 English names
 and keywords. Existing AndroidX recent history is retained.
 
-Search opens local typing keys; typing, deleting and clearing a query must never
-edit the host field or dismiss clipboard availability. Choosing a result commits
-one complete Unicode sequence through the normal emoji callback. ABC returns to
-the originating text layout; the picker Delete control edits the host only outside
-search. `EmojiCatalogTest` covers coverage/search/variants/query editing;
-`emojiSearchStaysLocalThenSelectionCommitsOneWholeVariant` uses the production
-controller and fake editor. `EmojiPickerInteractionTest` exercises touch routing,
-query isolation, result selection and long-press variants on Android. Screenshots
-cover full/compact light browsing, dark browsing, search at two widths and no results.
+Search places its query/results panel above the existing `AlphaNumPanel` and
+`AlphaNumBottomRow`. It uses the same touch dispatcher, key geometry, haptics,
+Shift, delete/repeat, English symbols and key popups as normal English typing.
+`EmojiSearchInputReceiver` redirects those events to the local query; text,
+Space, Delete and Done must never edit the host field or dismiss clipboard
+availability. Choosing a result commits one complete Unicode sequence through
+the normal emoji callback. Done or the emoji key returns to browsing; the header
+back control closes search. The standard layout-switch control exits search.
 
-Verification: 223 unit/scenario tests and both emoji Android interaction tests pass.
-All seven emoji screenshots pass after visual inspection, including dark search.
-The full gate also reports 22 non-emoji screenshot mismatches in Quick and Settings;
-those unrelated baselines were preserved. Emulator interactions exercise the production
-screen, but are not a Play Asset Delivery deployment or a physical-phone IME inset check.
+Browsing height is 480 dp (previously 369 dp), allowing roughly seven rows on
+an uninset preview. Search height is 497 dp: the 176 dp results panel replaces
+the normal 48 dp toolbar above the unchanged English key rows. System-owned
+navigation/caption/cutout insets remain reserved inside the surface.
+
+`EmojiCatalogTest` covers coverage/search/variants/query editing. The production
+scenario receiver verifies search typing, Space, cancellation, held Delete,
+Done, subsequent host typing, and whole-variant insertion. Android interaction
+tests exercise actual English keys, symbols, query isolation and variants.
+Screenshots cover tall/compact browsing, dark browsing and full English search
+in both themes, including narrow and empty-result layouts.
+
+Verification of the reused English keyboard: 224 unit/scenario tests pass, along
+with three emulator interaction tests and all seven emoji screenshots. The
+interaction test measures the normal and search English keys and confirms equal
+width/height, then exercises Shift and held Delete without editing the host.
+The actual IME service was opened with a focused `EditText` on the ARM64 emulator:
+browsing shows six full rows with system insets; search shows results above the
+normal English rows; both clear the navigation controls. Tapping `heart` into
+search leaves the host field empty. This was a temporary UI integration install,
+not a model-delivery deployment. The full gate still reports 15 existing Quick
+punctuation screenshot mismatches from separate pending edits; their baselines
+remain unchanged. The connected physical phone was not used or modified.

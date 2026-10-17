@@ -314,8 +314,8 @@ fun QuickBottomRow(
     currentMode: KeyboardInputMode,
     modeSwitchLabel: String = "?123",
     modeSwitchTarget: String = "number.chinese",
-    commaValue: String = ",",
-    periodValue: String = ".",
+    commaValue: String = "，",
+    periodValue: String = "。",
 ) {
     val keyboardColors = BrandTheme.colors
     val keyboardTypography = BrandTheme.typography

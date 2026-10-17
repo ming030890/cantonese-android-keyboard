@@ -117,8 +117,12 @@ internal class KeyboardSessionController(
         Triple(chinese, if (mix) words else emptyList(), quick.getComposingText())
     }.mapLatest { (chinese, words, code) ->
         if (words.isEmpty()) chinese else {
-            val pool = (chinese + words).map { it.text }.distinct()
-            val ranked = english.rankCandidates(pool)
+            val topCount = 8
+            val topChinese = chinese.take(topCount)
+            val pool = (topChinese + words).map { it.text }.distinct()
+            val rankedTop = english.rankCandidates(pool)
+            val tail = chinese.drop(topCount).filter { it.text !in rankedTop }
+            val ranked = rankedTop + tail.map { it.text }
             if (code != quick.getComposingText()) emptyList() else
                 ranked.mapIndexed { i, text -> com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate(text, i) }
         }
@@ -339,7 +343,7 @@ internal class KeyboardSessionController(
 
     fun commitText(text: String) {
         if (queueEditorAction { commitText(text) }) return
-        if (text.length==1 && text[0] in ",.!?;:" && waitForBoundary { commitText(text) }) return
+        if (text.length == 1 && (text[0] in ",.!?;:" || text[0] in "，。！？；：") && waitForBoundary { commitText(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
         val evidence = pendingTouch.also { pendingTouch = null }
@@ -355,13 +359,29 @@ internal class KeyboardSessionController(
             english?.observeQuick(quick.getComposingText(), null)
             return
         }
-        val punctuation = text.length == 1 && !text[0].isLetterOrDigit() && text[0] !in "_@/'’-"
-        if (punctuation && finishEnglishBoundary(text)) { refreshPredictions(); return }
+        val isBoundaryPunctuation = text.length == 1 && !text[0].isLetterOrDigit() && text[0] !in "_@/'’-"
+        if (isBoundaryPunctuation && finishEnglishBoundary(text)) {
+            refreshPredictions()
+            return
+        }
         // Digits/identifiers are literal; don't correct a preceding partial token.
         finishEnglishLiteral()
-        if (quick.hasActiveInput()) quick.accept()
+        val isQuickComposing = quick.hasActiveInput()
+        if (isQuickComposing) quick.accept()
         handwriting.accept()
-        editor.commitText(text)
+        val textToCommit = if (text.length == 1 && SmartPunctuation.isPunctuation(text[0])) {
+            val textBefore = editor.getTextBeforeCursor(64)
+            val chineseContext = SmartPunctuation.isChineseContext(
+                textBeforeCursor = textBefore,
+                currentMode = _keyboardInputMode.value,
+                isComposingQuick = isQuickComposing,
+                isComposingEnglish = false,
+            )
+            SmartPunctuation.toSmartPunctuation(text, chineseContext, textBefore)
+        } else {
+            text
+        }
+        editor.commitText(textToCommit)
         refreshPredictions()
     }
 

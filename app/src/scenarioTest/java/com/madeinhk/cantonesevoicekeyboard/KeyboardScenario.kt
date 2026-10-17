@@ -46,7 +46,8 @@ internal class KeyboardScenario(
     ) { _, _, _ -> KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english) }
 
     // The same key receiver handles down/up/cancel in the real screen.
-    private val receiver = KeyboardScreenInputReceiver().apply {
+    var emojiSearch = EmojiSearchState()
+    private val editorReceiver = KeyboardScreenInputReceiver().apply {
         onTouchEvidence = controller::onTouchEvidence
         onInterruptVoice = controller::interruptVoiceInput
         onCommitText = { text ->
@@ -59,6 +60,8 @@ internal class KeyboardScenario(
         onPasteClipboard = controller::pasteClipboard
         onToggleRecording = controller::toggleRecording
     }
+
+    private val receiver = EmojiSearchInputReceiver(editorReceiver, { emojiSearch }, { emojiSearch = it })
 
     init { controller.selectKeyboardInputMode(initialMode) }
     fun start() { controller.onStartInput(null, false); controller.onStartInputView(null) }
@@ -77,6 +80,7 @@ internal class KeyboardScenario(
         receiver.onKeyDown(data)
         receiver.onKeyUp(data, evidence)
     }
+    fun keyRepeat(kind: KeyboardKeyKind) = receiver.onKeyRepeat(KeyData("scenario", kind))
     fun keyCancel(kind: KeyboardKeyKind, text: String? = null) = receiver.onKeyCancel(KeyData("scenario", kind, text))
     fun cancel(kind: KeyboardKeyKind) {
         keyDown(kind)
