@@ -10,6 +10,11 @@ object KeyboardUiDefaults {
     // 369 dp is approximately 969 px at 420 dpi, matching Gboard on a 1080 px Pixel display.
     const val KeyboardSurfaceHeightDp = 369
 
+    const val EmojiSurfaceHeightDp = 480
+    const val EmojiSearchPanelHeightDp = 176
+    // Add results above the normal four key rows, replacing the ordinary toolbar.
+    const val EmojiSearchSurfaceHeightDp = KeyboardSurfaceHeightDp + EmojiSearchPanelHeightDp - 48
+
     val RowHeight = 57.dp
     val KeyboardHorizontalPadding = 4.dp
     val HorizontalKeyInset = 2.dp

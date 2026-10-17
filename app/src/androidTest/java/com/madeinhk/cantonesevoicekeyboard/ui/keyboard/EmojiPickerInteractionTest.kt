@@ -34,6 +34,13 @@ class EmojiPickerInteractionTest {
         compose.onNodeWithText("Search emoji").performTouchInput { click() }
         "heart".forEach { letter -> compose.onNodeWithText(letter.toString()).performTouchInput { click() } }
         compose.onNodeWithText("heart").assertExists()
+        compose.onNodeWithText("?123").performTouchInput { click() }
+        compose.onNodeWithText("1").performTouchInput { click() }
+        compose.onNodeWithText("heart1").assertExists()
+        compose.onNodeWithText("ABC").performTouchInput { click() }
+        // Standard keyboard delete (not a separate search control).
+        compose.onNodeWithContentDescription("alpha.delete").performTouchInput { click() }
+        compose.onNodeWithText("heart").assertExists()
         compose.runOnIdle { assertTrue(editorInput.isEmpty()); assertTrue(picked.isEmpty()); assertEquals(0, deletes) }
         compose.onNodeWithContentDescription("red heart").performTouchInput { click() }
         compose.runOnIdle { assertEquals(listOf("❤️"), picked); assertTrue(editorInput.isEmpty()) }
@@ -50,16 +57,53 @@ class EmojiPickerInteractionTest {
         val picked = mutableListOf<String>()
         compose.setContent {
             CantoneseVoiceKeyboardTheme(darkTheme = false) {
-                EmojiPickerPanel(onEmojiPicked = { picked += it })
+                KeyboardScreen(
+                    renderState = KeyboardRenderState(inputMode = KeyboardInputMode.Quick),
+                    initialEmojiPanel = true,
+                    onEmojiPicked = { picked += it }, onCommitText = {},
+                    onDeleteSurroundingText = {}, onToggleRecording = {},
+                    onSendSpace = {}, onSendEnter = {}, onOpenSettings = {}, onPasteClipboard = {},
+                    onHandwritingChanged = { _, _, _, _, _, _ -> }, onHandwritingCandidateSelected = {},
+                )
             }
         }
         compose.waitUntil(10_000) { compose.onAllNodesWithContentDescription("grinning face").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("Search emoji").performClick()
-        "thumb".forEach { letter -> compose.onNodeWithText(letter.toString()).performClick() }
+        "thumb".forEach { letter -> compose.onNodeWithText(letter.toString()).performTouchInput { click() } }
         compose.onNodeWithContentDescription("thumbs up").performTouchInput { longClick() }
         compose.onNodeWithText("Choose a variant").assertExists()
         compose.onNodeWithText("👍🏽").performTouchInput { click() }
         compose.runOnIdle { assertEquals(listOf("👍🏽"), picked) }
         compose.onNodeWithText("Choose a variant").assertDoesNotExist()
     }
+    @Test fun searchKeepsNormalEnglishKeyGeometryShiftAndDeleteRepeat() {
+        val editorInput = mutableListOf<String>()
+        var deletes = 0
+        compose.setContent {
+            CantoneseVoiceKeyboardTheme(darkTheme = false) {
+                KeyboardScreen(
+                    renderState = KeyboardRenderState(inputMode = KeyboardInputMode.AlphaNum),
+                    onEmojiPicked = {}, onCommitText = { editorInput += it },
+                    onDeleteSurroundingText = { deletes++ }, onToggleRecording = {},
+                    onSendSpace = { editorInput += " " }, onSendEnter = { editorInput += "\n" },
+                    onOpenSettings = {}, onPasteClipboard = {},
+                    onHandwritingChanged = { _, _, _, _, _, _ -> }, onHandwritingCandidateSelected = {},
+                )
+            }
+        }
+        val normalBounds = compose.onNodeWithContentDescription("q").fetchSemanticsNode().boundsInRoot
+        compose.onNodeWithContentDescription("text.bottom.emoji").performTouchInput { click() }
+        compose.onNodeWithText("Search emoji").performTouchInput { click() }
+        val searchBounds = compose.onNodeWithContentDescription("q").fetchSemanticsNode().boundsInRoot
+        assertEquals(normalBounds.height, searchBounds.height, 0.5f)
+        assertEquals(normalBounds.width, searchBounds.width, 0.5f)
+        compose.onNodeWithContentDescription("alpha.shift").performTouchInput { click() }
+        compose.onNodeWithText("H").performTouchInput { click() }
+        compose.onNodeWithContentDescription("alpha.delete").performTouchInput { longClick() }
+        compose.onNodeWithText("Search emoji").assertExists()
+        compose.onNodeWithContentDescription("text.bottom.enter").performTouchInput { click() }
+        compose.onNodeWithContentDescription("Clear search").assertDoesNotExist()
+        compose.runOnIdle { assertTrue(editorInput.isEmpty()); assertEquals(0, deletes) }
+    }
+
 }

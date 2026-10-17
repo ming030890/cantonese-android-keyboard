@@ -35,6 +35,9 @@ android {
         versionCode = 54
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters += listOf("arm64-v8a")
+        }
     }
 
     // The Qwen ASR model is delivered as FIVE fast-follow Play Asset Delivery
@@ -78,6 +81,21 @@ android {
       aidl = false
       buildConfig = true
       shaders = false
+    }
+
+    val internalTypingTrial = providers.gradleProperty("internalTypingTrial").orElse("false").get() == "true"
+    androidResources {
+        val ignores = mutableListOf(
+            "!.svn", "!.git", "!.ds_store", "!*.scc", ".*", "<dir>_*",
+            "!CVS", "!thumbs.db", "!picasa.ini", "!*~",
+            "*.md", "*.aff", "en_US.dic", "README_en_US.txt",
+            "compiled_vocabulary.json", "provenance.json",
+            "revision.txt", "*LICENSE.txt", "LICENSE",
+        )
+        if (!internalTypingTrial) {
+            ignores.add("typing")
+        }
+        ignoreAssetsPattern = ignores.joinToString(":")
     }
 
     packaging {
@@ -148,8 +166,6 @@ dependencies {
   implementation(libs.androidx.compose.ui)
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.compose.material3)
-  implementation(libs.androidx.emoji2)
-  implementation(libs.androidx.emoji2.emojipicker)
   // Tooling
   debugImplementation(libs.androidx.compose.ui.tooling)
   // Instrumented tests
@@ -170,7 +186,6 @@ dependencies {
   // Navigation
   implementation(libs.androidx.navigation3.ui)
   implementation(libs.androidx.navigation3.runtime)
-  implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 }
 
 // Baseline updates are deliberately separate; this gate only validates checked-in images.

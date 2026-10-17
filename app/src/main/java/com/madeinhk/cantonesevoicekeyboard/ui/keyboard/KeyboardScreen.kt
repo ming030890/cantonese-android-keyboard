@@ -62,6 +62,7 @@ fun KeyboardScreen(
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     onInterruptVoice: () -> Unit = {},
     initialEmojiPanel: Boolean = false,
+    initialEmojiSearch: String? = null,
     initialUppercase: Boolean = false,
     initialShowMoreSymbols: Boolean = false,
     initialHandwritingCandidatePage: Int = 0,
@@ -113,6 +114,7 @@ fun KeyboardScreen(
         onKeyboardInputModeSelected = onKeyboardInputModeSelected,
         onInterruptVoice = onInterruptVoice,
         initialEmojiPanel = initialEmojiPanel,
+        initialEmojiSearch = initialEmojiSearch,
         initialUppercase = initialUppercase,
         initialShowMoreSymbols = initialShowMoreSymbols,
         initialHandwritingCandidatePage = initialHandwritingCandidatePage,
@@ -143,6 +145,7 @@ fun KeyboardScreen(
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     onInterruptVoice: () -> Unit = {},
     initialEmojiPanel: Boolean = false,
+    initialEmojiSearch: String? = null,
     initialUppercase: Boolean = false,
     initialShowMoreSymbols: Boolean = false,
     initialHandwritingCandidatePage: Int = 0,
@@ -163,6 +166,11 @@ fun KeyboardScreen(
     var activePanel by remember(inputMode, initialEmojiPanel) {
         mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
     }
+    var emojiSearch by remember(inputMode, initialEmojiSearch) {
+        mutableStateOf(EmojiSearchState(initialEmojiSearch != null, initialEmojiSearch.orEmpty()))
+    }
+    var searchSymbols by remember { mutableStateOf(false) }
+    val emojiSearchActive = activePanel == KeyboardPanel.Emoji && emojiSearch.active
     var previousPanelBeforeNumber by remember(inputMode) {
         mutableStateOf(inputMode.toPanel())
     }
@@ -217,14 +225,17 @@ fun KeyboardScreen(
         null
     }
     val inputReceiver = remember { KeyboardScreenInputReceiver() }
-    val inputDispatcher = remember(inputReceiver) {
-        CoroutineKeyboardInputDispatcher(inputReceiver)
+    val searchReceiver = remember(inputReceiver) {
+        EmojiSearchInputReceiver(inputReceiver, { emojiSearch }, { emojiSearch = it })
     }
-    val touchController = remember(keyRegistry, inputDispatcher, inputReceiver) {
+    val inputDispatcher = remember(searchReceiver) {
+        CoroutineKeyboardInputDispatcher(searchReceiver)
+    }
+    val touchController = remember(keyRegistry, inputDispatcher, searchReceiver) {
         KeyboardTouchController(
             keyRegistry = keyRegistry,
             inputDispatcher = inputDispatcher,
-            inputReceiver = inputReceiver
+            inputReceiver = searchReceiver
         )
     }
     val hostView = LocalView.current
@@ -247,10 +258,15 @@ fun KeyboardScreen(
         inputReceiver.onCandidateNext = {
             candidatePage++
         }
-        inputReceiver.onOpenEmoji = { onVisiblePanelChanged(null); activePanel = KeyboardPanel.Emoji }
+        inputReceiver.onOpenEmoji = { emojiSearch = emojiSearch.close(); searchSymbols = false; onVisiblePanelChanged(null); activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
-        inputReceiver.onModeSwitch = { target ->
+        inputReceiver.onModeSwitch = modeSwitch@{ target ->
+            if (emojiSearchActive && target in listOf("number.english", "alpha")) {
+                searchSymbols = target == "number.english"
+                return@modeSwitch
+            }
+            emojiSearch = emojiSearch.close()
             when (target) {
                 "number.chinese" -> {
                     previousPanelBeforeNumber = activePanel
@@ -279,8 +295,8 @@ fun KeyboardScreen(
     DisposableEffect(touchController) {
         onDispose { touchController.dispose() }
     }
-    val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum
-    val isTextPanel = activePanel == KeyboardPanel.AlphaNum ||
+    val isAlphaPanel = activePanel == KeyboardPanel.AlphaNum || (emojiSearchActive && !searchSymbols)
+    val isTextPanel = emojiSearchActive || activePanel == KeyboardPanel.AlphaNum ||
         activePanel == KeyboardPanel.Number ||
         activePanel == KeyboardPanel.Quick
     // Android exposes the IME dismiss/switch controls as a caption bar.
@@ -289,7 +305,11 @@ fun KeyboardScreen(
         .union(WindowInsets.captionBar)
         .union(WindowInsets.displayCutout)
         .asPaddingValues()
-    val keyboardHeight = KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp
+    val keyboardHeight = when {
+        emojiSearchActive -> KeyboardUiDefaults.EmojiSearchSurfaceHeightDp.dp
+        activePanel == KeyboardPanel.Emoji -> KeyboardUiDefaults.EmojiSurfaceHeightDp.dp
+        else -> KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp
+    }
     val isWritingPanel = isTextPanel || activePanel == KeyboardPanel.Handwriting
     val keyboardTopPadding =
         if (isWritingPanel) KeyboardUiDefaults.WritingTopPadding else 12.dp
@@ -356,8 +376,8 @@ fun KeyboardScreen(
             - systemPadding.calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)
             - systemPadding.calculateRightPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)
         // Share the safe area below the toolbar equally across all four rows.
-        val textRowHeight = (maxHeight - keyboardTopPadding -
-            keyboardBottomPadding - KeyboardUiDefaults.ToolbarHeight) / 4
+        val textRowHeight = (maxHeight - keyboardTopPadding - keyboardBottomPadding -
+            if (emojiSearchActive) KeyboardUiDefaults.EmojiSearchPanelHeightDp.dp else KeyboardUiDefaults.ToolbarHeight) / 4
         val standardKeyTouchWidth =
             availableWidth / KeyboardUiDefaults.StandardRowUnits
         Box(
@@ -403,7 +423,7 @@ fun KeyboardScreen(
                     EmojiPickerPanel(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
+                            .then(if (emojiSearchActive) Modifier.height(KeyboardUiDefaults.EmojiSearchPanelHeightDp.dp) else Modifier.weight(1f))
                             .onGloballyPositioned { coordinates ->
                                 val bounds = coordinates.boundsInRoot()
                                 emojiPickerBoundsInSurface = Rect(
@@ -419,7 +439,25 @@ fun KeyboardScreen(
                             onVisiblePanelChanged(inputMode)
                         },
                         onDelete = onDeleteSurroundingText,
+                        search = emojiSearch,
+                        onSearchChanged = { next ->
+                            if (next.active && !emojiSearch.active) searchSymbols = false
+                            emojiSearch = next
+                        },
                     )
+                    if (emojiSearchActive) {
+                        if (searchSymbols) NumberPanel(
+                            rowHeight = textRowHeight,
+                            modifier = Modifier.fillMaxWidth().height(textRowHeight * 3),
+                            variant = SymbolVariant.English, keyRegistry = keyRegistry,
+                            showMoreSymbols = showMoreSymbols, standardKeyTouchWidth = standardKeyTouchWidth,
+                        ) else AlphaNumPanel(
+                            rowHeight = textRowHeight,
+                            modifier = Modifier.fillMaxWidth().height(textRowHeight * 3),
+                            keyRegistry = keyRegistry, isUppercase = isUppercase,
+                            standardKeyTouchWidth = standardKeyTouchWidth,
+                        )
+                    }
                 }
                 KeyboardPanel.Number -> {
                     NumberPanel(
@@ -481,38 +519,38 @@ fun KeyboardScreen(
                     currentMode = KeyboardInputMode.Quick,
                     modeSwitchLabel = "?123",
                     modeSwitchTarget = "number.chinese",
-                    commaValue = ",",
-                    periodValue = ".",
+                    commaValue = "，",
+                    periodValue = "。",
                 )
             } else if (isAlphaPanel) {
                 AlphaNumBottomRow(
                     rowHeight = textRowHeight,
-                    action = action,
+                    action = if (emojiSearchActive) KeyboardAction.Done else action,
                     keyRegistry = keyRegistry,
                     modeSwitchLabel = "?123",
                     modeSwitchTarget = "number.english",
                     commaValue = ",",
                     periodValue = "."
                 )
-            } else if (activePanel == KeyboardPanel.Number) {
-                val backTarget = when (previousPanelBeforeNumber) {
+            } else if (activePanel == KeyboardPanel.Number || (emojiSearchActive && searchSymbols)) {
+                val backTarget = if (emojiSearchActive) "alpha" else when (previousPanelBeforeNumber) {
                     KeyboardPanel.Quick -> "quick"
                     KeyboardPanel.Handwriting -> "handwriting"
                     else -> "alpha"
                 }
-                val backLabel = when (previousPanelBeforeNumber) {
+                val backLabel = if (emojiSearchActive) "ABC" else when (previousPanelBeforeNumber) {
                     KeyboardPanel.Quick -> "速"
                     KeyboardPanel.Handwriting -> "手寫"
                     else -> "ABC"
                 }
                 AlphaNumBottomRow(
                     rowHeight = textRowHeight,
-                    action = action,
+                    action = if (emojiSearchActive) KeyboardAction.Done else action,
                     keyRegistry = keyRegistry,
                     modeSwitchLabel = backLabel,
                     modeSwitchTarget = backTarget,
-                    commaValue = ",".toSymbolCommitValue(symbolVariant),
-                    periodValue = ".".toSymbolCommitValue(symbolVariant)
+                    commaValue = ",".toSymbolCommitValue(if (emojiSearchActive) SymbolVariant.English else symbolVariant),
+                    periodValue = ".".toSymbolCommitValue(if (emojiSearchActive) SymbolVariant.English else symbolVariant)
                 )
             } else if (activePanel != KeyboardPanel.Emoji) {
                 // Bottom Functional Keys Row (Space, Delete, Enter, Switch)

@@ -4,7 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material3.Icon
 import androidx.compose.ui.res.painterResource
-import androidx.emoji2.emojipicker.R as EmojiR
+import com.madeinhk.cantonesevoicekeyboard.R
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,16 +47,16 @@ private val emojiCategories = listOf(
     "activity" to "⚽", "objects" to "♧", "symbols" to "♡", "flags" to "⚑",
 )
 private val categoryIcons = listOf(
-    EmojiR.drawable.quantum_gm_ic_access_time_filled_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_emotions_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_people_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_nature_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_food_beverage_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_transportation_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_events_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_objects_vd_theme_24,
-    EmojiR.drawable.gm_filled_emoji_symbols_vd_theme_24,
-    EmojiR.drawable.gm_filled_flag_vd_theme_24,
+    R.drawable.quantum_gm_ic_access_time_filled_vd_theme_24,
+    R.drawable.gm_filled_emoji_emotions_vd_theme_24,
+    R.drawable.gm_filled_emoji_people_vd_theme_24,
+    R.drawable.gm_filled_emoji_nature_vd_theme_24,
+    R.drawable.gm_filled_emoji_food_beverage_vd_theme_24,
+    R.drawable.gm_filled_emoji_transportation_vd_theme_24,
+    R.drawable.gm_filled_emoji_events_vd_theme_24,
+    R.drawable.gm_filled_emoji_objects_vd_theme_24,
+    R.drawable.gm_filled_emoji_symbols_vd_theme_24,
+    R.drawable.gm_filled_flag_vd_theme_24,
 )
 private val categoryNames = listOf(
     "Recent emoji", "Smileys and emotions", "People", "Animals and nature", "Food and drink",
@@ -64,13 +64,13 @@ private val categoryNames = listOf(
 )
 
 @Composable
-fun EmojiPickerPanel(
+internal fun EmojiPickerPanel(
     modifier: Modifier = Modifier,
     onEmojiPicked: (String) -> Unit,
     onBackToKeyboard: () -> Unit = {},
     onDelete: () -> Unit = {},
-    // Also used by previews to render exactly the production search UI.
-    initialSearch: String? = null,
+    search: EmojiSearchState = EmojiSearchState(),
+    onSearchChanged: (EmojiSearchState) -> Unit = {},
 ) {
     val context = LocalContext.current
     val preview = LocalInspectionMode.current
@@ -97,7 +97,6 @@ fun EmojiPickerPanel(
             .orEmpty().split(',').filter(String::isNotEmpty).distinct().take(64))
     }
     var category by remember { mutableStateOf("emotions") }
-    var search by remember { mutableStateOf(EmojiSearchState(initialSearch != null, initialSearch.orEmpty())) }
     var variantEntry by remember { mutableStateOf<EmojiEntry?>(null) }
     val gridState = rememberLazyGridState()
     val focusRequester = remember { FocusRequester() }
@@ -128,7 +127,7 @@ fun EmojiPickerPanel(
     if (LocalOnBackPressedDispatcherOwner.current != null) BackHandler {
         when {
             variantEntry != null -> variantEntry = null
-            search.active -> search = search.close()
+            search.active -> onSearchChanged(search.close())
             else -> onBackToKeyboard()
         }
     }
@@ -137,23 +136,23 @@ fun EmojiPickerPanel(
 
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth().height(42.dp), verticalAlignment = Alignment.CenterVertically) {
-            EmojiControl("‹", "Back to keyboard", Modifier.width(42.dp), foreground) {
-                if (search.active) search = search.close() else onBackToKeyboard()
+            EmojiControl("‹", if (search.active) "Close search" else "Back to keyboard", Modifier.width(42.dp), foreground) {
+                if (search.active) onSearchChanged(search.close()) else onBackToKeyboard()
             }
             Row(
                 Modifier.weight(1f).height(36.dp).clip(RoundedCornerShape(22.dp))
-                    .background(control).clickable { search = search.open() }
+                    .background(control).clickable { onSearchChanged(search.open()) }
                     .focusRequester(focusRequester)
                     .onPreviewKeyEvent { event ->
                         if (!search.active || event.type != KeyEventType.KeyDown) false
                         else when (event.key) {
-                            Key.Backspace -> { search = search.delete(); true }
-                            Key.Escape -> { search = search.close(); true }
+                            Key.Backspace -> { onSearchChanged(search.delete()); true }
+                            Key.Escape -> { onSearchChanged(search.close()); true }
                             Key.Enter -> { true }
                             else -> {
                                 val code = event.utf16CodePoint
                                 if (code >= 32 && !event.isCtrlPressed && !event.isMetaPressed) {
-                                    search = search.type(String(Character.toChars(code))); true
+                                    onSearchChanged(search.type(String(Character.toChars(code)))); true
                                 } else false
                             }
                         }
@@ -167,7 +166,7 @@ fun EmojiPickerPanel(
                 if (search.active) Text("│", color = selectionText)
             }
             if (search.active) EmojiControl("×", "Clear search", Modifier.width(42.dp), foreground) {
-                search = search.clear()
+                onSearchChanged(search.clear())
             }
         }
         if (!search.active) {
@@ -216,34 +215,10 @@ fun EmojiPickerPanel(
                 }
             }
         }
-        if (search.active) {
-            Column(Modifier.fillMaxWidth().padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                listOf("qwertyuiop", "asdfghjkl", "zxcvbnm").forEach { letters ->
-                    Row(Modifier.fillMaxWidth().height(34.dp).padding(horizontal = if (letters.length == 9) 12.dp else 0.dp),
-                        horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                        letters.forEach { letter ->
-                            Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(5.dp))
-                                .background(BrandTheme.colors.keyboardKeySurface)
-                                .clickable { search = search.type(letter.toString()) }, contentAlignment = Alignment.Center) {
-                                Text(letter.toString(), color = foreground, fontSize = 18.sp)
-                            }
-                        }
-                        if (letters.length == 7) EmojiControl("⌫", "Delete search character", Modifier.weight(1.4f), foreground) {
-                            search = search.delete()
-                        }
-                    }
-                }
-            }
-        }
-        Row(Modifier.fillMaxWidth().height(42.dp), verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            EmojiControl("ABC", "Back to keyboard", Modifier.width(60.dp), foreground, onBackToKeyboard)
-            if (search.active) {
-                EmojiControl("space", "Search space", Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(control), foreground) {
-                    search = search.type(" ")
-                }
-                EmojiControl("Done", "Close search", Modifier.width(60.dp), selectionText) { search = search.close() }
-            } else {
+        if (!search.active) {
+            Row(Modifier.fillMaxWidth().height(42.dp), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                EmojiControl("ABC", "Back to keyboard", Modifier.width(60.dp), foreground, onBackToKeyboard)
                 Box(Modifier.width(64.dp).height(36.dp).clip(RoundedCornerShape(22.dp)).background(selection), contentAlignment = Alignment.Center) {
                     SmileIcon(modifier = Modifier.size(24.dp), color = selectionText)
                 }
