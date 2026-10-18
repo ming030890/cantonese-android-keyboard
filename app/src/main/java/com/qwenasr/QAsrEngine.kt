@@ -2,6 +2,8 @@ package com.qwenasr
 
 import android.os.SystemClock
 import android.util.Log
+import com.madeinhk.cantonesevoicekeyboard.BuildConfig
+import com.madeinhk.cantonesevoicekeyboard.VoiceLatencyTrace
 import java.nio.ByteBuffer
 
 open class QAsrEngine {
@@ -14,6 +16,11 @@ open class QAsrEngine {
 
     companion object {
         private const val TAG = "QAsrEngine"
+
+        internal fun configureLatencyDiagnostics(): Boolean =
+            nativeConfigureDiagnostics(BuildConfig.DEBUG)
+
+        @JvmStatic private external fun nativeConfigureDiagnostics(debugApp: Boolean): Boolean
 
         init {
             try {
@@ -35,6 +42,7 @@ open class QAsrEngine {
      */
     open fun loadModel(modelDir: String, nThreads: Int): Boolean {
         synchronized(this) {
+            VoiceLatencyTrace.configure(configureLatencyDiagnostics())
             if (nativeHandle != 0L) {
                 Log.w(TAG, "Model already loaded. Freeing existing handle first.")
                 free()

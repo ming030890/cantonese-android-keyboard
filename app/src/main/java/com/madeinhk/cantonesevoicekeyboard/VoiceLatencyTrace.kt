@@ -30,7 +30,10 @@ internal object VoiceClock {
 
 /** Monotonic wall times; callback receipt and editor insertion are separate milestones. */
 internal class VoiceLatencyTrace(private val replay: Boolean) {
-    private val start = VoiceClock.nanoTime()
+    // Replay explicitly opts host tests into metric collection; log output still
+    // requires the debug APK and native adb-property gate.
+    private val collect = BuildConfig.DEBUG && (replay || enabled)
+    private val start = if (collect) VoiceClock.nanoTime() else 0L
     private val milestones = linkedMapOf<String, Double>()
     private val milestoneUptimes = linkedMapOf<String, Double>()
     private var bytes = 0L
@@ -43,8 +46,14 @@ internal class VoiceLatencyTrace(private val replay: Boolean) {
     private var thermalStatus = -1
 
     companion object {
+        @Volatile private var enabled = false
+
+        internal fun configure(requested: Boolean) {
+            enabled = BuildConfig.DEBUG && requested
+        }
+
         fun event(name: String, vararg fields: Pair<String, Any>) {
-            if (!BuildConfig.DEBUG) return
+            if (!enabled) return
             val data = JSONObject().put("event", name)
                 .put("uptime_ms", VoiceClock.nanoTime() / 1e6)
             fields.forEach { (key, value) -> data.put(key, value) }
@@ -57,6 +66,7 @@ internal class VoiceLatencyTrace(private val replay: Boolean) {
     }
 
     @Synchronized fun mark(name: String, vararg fields: Pair<String, Any>) {
+        if (!collect) return
         val now = VoiceClock.nanoTime()
         val elapsed = (now - start) / 1e6
         val uptime = now / 1e6
@@ -66,6 +76,7 @@ internal class VoiceLatencyTrace(private val replay: Boolean) {
     }
 
     @Synchronized fun audio(count: Int, pushAt: Long, accepted: Int) {
+        if (!collect) return
         if (bytes == 0L) mark("first_audio")
         bytes += count
         if (accepted != 1) rejected++
@@ -73,6 +84,7 @@ internal class VoiceLatencyTrace(private val replay: Boolean) {
     }
 
     @Synchronized fun editor(text: String, callbackAt: Long) {
+        if (!collect) return
         val now = VoiceClock.nanoTime()
         maxDispatchMs = maxOf(maxDispatchMs, (now - callbackAt) / 1e6)
         updates++
@@ -83,6 +95,7 @@ internal class VoiceLatencyTrace(private val replay: Boolean) {
     }
 
     @Synchronized fun recordContext(context: Context) {
+        if (!collect) return
         try {
             val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val batteryIntent = context.registerReceiver(null, filter)
@@ -103,6 +116,7 @@ internal class VoiceLatencyTrace(private val replay: Boolean) {
     }
 
     @Synchronized fun summary(): JSONObject {
+        if (!collect) return JSONObject()
         val obj = JSONObject(milestones.toMap())
             .put("replay", replay)
             .put("audio_ms", bytes / 32.0)

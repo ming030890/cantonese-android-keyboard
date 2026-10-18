@@ -40,8 +40,18 @@ def main():
     parser.add_argument('--runs', type=int, default=2, help='first query plus warm repeats (1–10)')
     parser.add_argument('--restart-delays', type=str, default=None, help='comma-separated restart delays in ms, e.g. "0,50,200"')
     parser.add_argument('--keep-running', action='store_true', help='skip process force-stop')
+    parser.add_argument('--cold-cache', action='store_true', help='request eviction of this test app model file cache before loading; verify actual reads/residency')
+    parser.add_argument('--prepare-lead-ms', type=int, default=0, help='wait after model readiness before simulating mic tap (0–30000 ms)')
+    parser.add_argument('--idle-only', action='store_true', help='open the actual keyboard without tapping mic and report resident model memory')
+    parser.add_argument('--no-trace', action='store_true', help='disable detailed Kotlin/native diagnostics to check overhead and logging guards')
     parser.add_argument('--output', type=Path, default=Path('build/voice-benchmark'))
     args = parser.parse_args()
+    if args.no_trace and args.cold_cache:
+        parser.error("Cold-cache control requires debug tracing")
+    if not 0 <= args.prepare_lead_ms <= 30000:
+        parser.error("--prepare-lead-ms must be between 0 and 30000")
+    if args.keep_running and args.cold_cache:
+        parser.error("Controlled cache comparisons require a fresh process")
     adb = ['adb'] + (['-s', args.serial] if args.serial else [])
     def command(*parts, **kwargs):
         return subprocess.run(adb + list(parts), check=True, **kwargs)
@@ -66,18 +76,15 @@ def main():
     selected = command('shell', 'settings', 'get', 'secure', 'default_input_method', capture_output=True, text=True).stdout.strip()
     target_ime = package + '/' + NAMESPACE + '.CantoneseInputMethodService'
     previous_trace = command('shell', 'getprop', 'debug.qwen_asr.latency', capture_output=True, text=True).stdout.strip()
+    previous_cold_cache = command('shell', 'getprop', 'debug.qwen_asr.cold_cache', capture_output=True, text=True).stdout.strip()
     metadata = {
         'package': package, 'wav': str(args.wav.resolve()),
         'wav_sha256': hashlib.sha256(args.wav.read_bytes()).hexdigest(),
         'process_restarted': not args.keep_running,
+        'detailed_tracing': not args.no_trace,
+        'prepare_lead_ms': args.prepare_lead_ms,
+        'cold_cache_override': '1' if args.cold_cache else previous_cold_cache,
         'audio_ms': len(pcm) / 32,
-        'bounded_prefetch_override': command('shell', 'getprop', 'debug.qwen_asr.bounded_prefetch', capture_output=True, text=True).stdout.strip(),
-        'matvec_override': command('shell', 'getprop', 'debug.qwen_asr.matmul_m1', capture_output=True, text=True).stdout.strip(),
-        'defer_stop_override': command('shell', 'getprop', 'debug.qwen_asr.defer_stop', capture_output=True, text=True).stdout.strip(),
-        'threads_override': command('shell', 'getprop', 'debug.qwen_asr.threads', capture_output=True, text=True).stdout.strip(),
-        'worker_pin_override': command('shell', 'getprop', 'debug.qwen_asr.worker_pin', capture_output=True, text=True).stdout.strip(),
-        'chunk_ms_override': command('shell', 'getprop', 'debug.qwen_asr.chunk_ms', capture_output=True, text=True).stdout.strip(),
-        'backlog_ms_override': command('shell', 'getprop', 'debug.qwen_asr.backlog_ms', capture_output=True, text=True).stdout.strip(),
         'device': command('shell', 'getprop', 'ro.product.model', capture_output=True, text=True).stdout.strip(),
         'local_native_sha256': hashlib.sha256((Path(__file__).resolve().parents[1] / 'app/src/main/jniLibs/arm64-v8a/libqwen_asr.so').read_bytes()).hexdigest(),
         'device_context': query_device_context(command),
@@ -90,23 +97,31 @@ def main():
     log_stream = (args.output / 'logcat.txt').open('w')
     logger = subprocess.Popen(adb + ['logcat', '-v', 'threadtime', '-T', since, 'VoiceLatency:I', 'VoiceNative:I', 'QAsrEngine:I', 'CantoneseIME:I', 'ModelAssetPack:I', '*:S'], stdout=log_stream, stderr=subprocess.PIPE)
     try:
+        if args.cold_cache:
+            command('shell', 'setprop', 'debug.qwen_asr.cold_cache', '1')
         if not args.keep_running:
             command('shell', 'am', 'force-stop', package, stdout=subprocess.DEVNULL)
         command('shell', 'ime', 'enable', target_ime, stdout=subprocess.DEVNULL)
         command('shell', 'ime', 'set', target_ime, stdout=subprocess.DEVNULL)
-        command('shell', 'setprop', 'debug.qwen_asr.latency', '1')
+        command('shell', 'setprop', 'debug.qwen_asr.latency', '0' if args.no_trace else '1')
         command('shell', 'run-as', package, 'mkdir', '-p', 'files/voice-benchmark')
         command('shell', 'run-as', package, 'rm', '-f', 'files/voice-benchmark/result.json')
         command('shell', 'run-as', package, 'sh', '-c', '"cat > files/voice-benchmark/input.pcm"', input=pcm)
         command('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP', stdout=subprocess.DEVNULL)
 
         start_cmd = ['shell', 'am', 'start', '-W', '-n', package + '/' + NAMESPACE + '.VoiceBenchmarkActivity']
+        if args.idle_only:
+            start_cmd += ['--ez', 'idle_only', 'true']
+        if args.prepare_lead_ms:
+            start_cmd += ['--ei', 'prepare_lead_ms', str(args.prepare_lead_ms)]
         if args.restart_delays is not None:
             start_cmd += ['--es', 'restart_delays', args.restart_delays]
             expected_queries = len(args.restart_delays.split(',')) * 2
         else:
             start_cmd += ['--ei', 'runs', str(args.runs)]
             expected_queries = args.runs
+        if args.idle_only:
+            expected_queries = 0
         command(*start_cmd, stdout=subprocess.DEVNULL)
 
         deadline = time.monotonic() + 240 * min(max(expected_queries, 1), 20)
@@ -134,6 +149,8 @@ def main():
                 command('shell', 'ime', 'set', selected, stdout=subprocess.DEVNULL)
             finally:
                 command('shell', 'setprop', 'debug.qwen_asr.latency', previous_trace or '0')
+                if args.cold_cache:
+                    command('shell', 'setprop', 'debug.qwen_asr.cold_cache', previous_cold_cache or '0')
 
     metadata['device_context_after'] = query_device_context(command)
     (args.output / 'metadata.json').write_text(json.dumps(metadata, indent=2) + '\n')
@@ -175,6 +192,8 @@ def main():
             continue
         fields = dict(re.findall(r'(\w+)=([^\s]+)', line))
         ev = fields.get('event')
+        if ev in ('resources', 'prefetch_advice', 'cache_control', 'preview_cancelled'):
+            report.setdefault('diagnostic_events', []).append(fields)
         if ev == 'session_created':
             current_session = {
                 'session_id': int(fields.get('session_id', len(sessions) + 1)),
@@ -194,9 +213,16 @@ def main():
 
         if not sessions:
             continue
-        session = sessions[-1]
+        session_id = int(fields.get('session_id', 0))
+        session = next((item for item in sessions if item['session_id'] == session_id), sessions[-1])
 
-        if ev == 'worker_ready':
+        if ev == 'resources' and session_id == 0:
+            continue
+        if ev == 'resources':
+            resource = {key: fields[key] for key in ('stage', 'scope', 'valid', 'wall_ms', 'cpu_ms',
+                        'minor_faults', 'major_faults', 'read_bytes') if key in fields}
+            session.setdefault('resources', []).append(resource)
+        elif ev == 'worker_ready':
             session['worker_ready_wall_ms'] = float(fields.get('wall_ms', 0))
         elif ev == 'decoder_preload':
             session['decoder_preload_ms'] = float(fields.get('ms', 0))
@@ -247,7 +273,7 @@ def main():
 
     report['native_trace_complete'] = (
         len(sessions) == expected_queries and all(s.get('finish_seen') for s in sessions)
-    )
+    ) if not args.no_trace else None
 
     if report['native_trace_complete']:
         if 'restart_trials' in report:

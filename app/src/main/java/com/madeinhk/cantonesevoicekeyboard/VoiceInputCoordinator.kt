@@ -65,6 +65,13 @@ internal class VoiceInputCoordinator(
         var engineJob: Job? = null
     }
 
+    internal suspend fun awaitModelForBenchmark() {
+        check(BuildConfig.DEBUG)
+        ensureModelLoadingStarted(currentSession())
+        modelLoadingJob?.join()
+        check(modelLoaded) { "ASR model is not ready: ${_state.value}" }
+    }
+
     internal suspend fun replayForBenchmark(pcm: ByteArray): JSONObject {
         check(BuildConfig.DEBUG)
         val requestedAt = VoiceClock.nanoTime()
@@ -372,6 +379,11 @@ internal class VoiceInputCoordinator(
         if (recording || !modelLoaded) return
         val activeEngine = getOrCreateEngine()
 
+        // Refresh once per recording so restoring the adb flag also disables logs
+        // in a debug process left running after a benchmark.
+        VoiceLatencyTrace.configure(runCatching {
+            QAsrEngine.configureLatencyDiagnostics()
+        }.getOrDefault(false))
         val trace = VoiceLatencyTrace(replayPcm != null).also { latency = it }
         trace.mark("capture_start")
 

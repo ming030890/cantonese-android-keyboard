@@ -1,6 +1,7 @@
 package com.madeinhk.cantonesevoicekeyboard
 
 import android.app.Activity
+import com.qwenasr.QAsrEngine
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.WindowManager
@@ -17,8 +18,32 @@ import org.json.JSONObject
 class VoiceBenchmarkActivity : Activity() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val resultFile by lazy { File(filesDir, "voice-benchmark/result.json") }
+    private fun memorySnapshot(): JSONObject {
+        val result = JSONObject()
+        try {
+            File("/proc/self/smaps_rollup").forEachLine { line ->
+                val key = line.substringBefore(':')
+                if (key in setOf("Rss", "Pss", "Pss_Anon", "Private_Dirty")) {
+                    result.put(key + "_kb", line.substringAfter(':').trim().substringBefore(' ').toLong())
+                }
+            }
+            var model = false
+            var mappedRss = 0L
+            var mappedSize = 0L
+            val header = Regex("^[0-9a-f]+-[0-9a-f]+\\s")
+            File("/proc/self/smaps").forEachLine { line ->
+                if (header.containsMatchIn(line)) model = line.contains(".safetensors")
+                else if (model && line.startsWith("Rss:")) mappedRss += line.substringAfter(':').trim().substringBefore(' ').toLong()
+                else if (model && line.startsWith("Size:")) mappedSize += line.substringAfter(':').trim().substringBefore(' ').toLong()
+            }
+            result.put("model_file_rss_kb", mappedRss).put("model_mapped_kb", mappedSize)
+        } catch (error: Exception) { result.put("error", error.toString()) }
+        return result
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        VoiceLatencyTrace.configure(QAsrEngine.configureLatencyDiagnostics())
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val editor = EditText(this).apply {
@@ -73,8 +98,16 @@ class VoiceBenchmarkActivity : Activity() {
                     else -> null
                 }
 
+                val prepareLeadMs = intent.getIntExtra("prepare_lead_ms", 0).coerceIn(0, 30_000)
+                if (prepareLeadMs > 0) {
+                    voice.awaitModelForBenchmark()
+                    delay(prepareLeadMs.toLong())
+                }
                 val results = JSONArray()
-                if (restartDelays != null) {
+                val idleOnly = intent.getBooleanExtra("idle_only", false)
+                if (idleOnly) {
+                    voice.awaitModelForBenchmark()
+                } else if (restartDelays != null) {
                     // Restart benchmark mode: test overlapping start at specified delays
                     for ((index, delayMs) in restartDelays.withIndex()) {
                         val initialTextLength = editor.length()
@@ -108,8 +141,11 @@ class VoiceBenchmarkActivity : Activity() {
                 resultFile.writeText(JSONObject()
                     .put("status", "ok")
                     .put(if (restartDelays != null) "restart_trials" else "runs", results)
+                    .put("idle_only", idleOnly)
+                    .put("memory", memorySnapshot())
                     .put("package", packageName)
                     .put("packaged_native_sha256", nativeHash)
+                    .put("prepare_lead_ms", prepareLeadMs)
                     .put("process_start_to_activity_ms", requestAt / 1e6 - android.os.Process.getStartElapsedRealtime())
                     .put("store_debug_audio", DebugAudioSettings.isStoreDebugAudioEnabled(this@VoiceBenchmarkActivity))
                     .toString(2))

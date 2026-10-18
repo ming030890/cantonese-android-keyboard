@@ -47,6 +47,21 @@ settings and model packs. It preserves the installed app and its data. The
 benchmark entry activity is absent from release manifests; injection additionally
 checks `BuildConfig.DEBUG`.
 
+## Cache and memory measurements
+
+The experimental staged and keyboard-start prefetch policies were removed after
+Pixel 9 testing failed to establish a latency improvement. There is one loading
+path: lazy model mapping, encoder prefetch at mic start, and the existing
+asynchronous packed-decoder prefetch. No full-model warming occurs on keyboard open.
+See [the acceptance decision](VOICE_LATENCY_DECISION.md) for measurements.
+
+The debug runner supports `--idle-only` to measure model/whole-app RSS without a
+mic tap, `--cold-cache` to request model-file cache eviction, and
+`--prepare-lead-ms 3000` to measure a delay between readiness and mic tap.
+There is no preparation-mode switch. Cache eviction is advisory; verify storage
+reads and `prefetch_advice` residency/success counters. Cache eviction requires
+tracing and cannot be combined with `--no-trace`.
+
 ## Output
 
 `build/voice-benchmark/` contains `result.json`, `metadata.json`, and `logcat.txt`. Logcat is captured live so a busy device cannot overwrite
@@ -63,8 +78,33 @@ start position, which includes its configured lookback padding; it is not a
 manually annotated acoustic onset.
 
 `VoiceLatency` JSON log lines use device monotonic time. Native `VoiceNative`
-lines are enabled by `debug.qwen_asr.latency=1` (the script restores its previous
-value). They report VAD initialization, decoder prefetch, audio position,
+lines require **both a debug APK (`BuildConfig.DEBUG`) and
+`debug.qwen_asr.latency=1`** (the script restores its previous value).
+The optimized Rust library receives the APK build flag through JNI; setting the
+property cannot enable detailed traces in a release APK. Kotlin log output uses
+the same gate, refreshed at each recording. Normal sessions skip detailed metric
+collection. Explicit test replay still collects the result JSON without log output
+when `--no-trace` is supplied. Ordinary operational/error logs are unchanged.
+
+`resources` events additionally report checked `getrusage` deltas for encoder
+prefetch, decoder prefetch, the complete native worker, finalization, and streaming
+VAD initialization, tokenizer/prompt setup, mel/encoder, embedding/prefill
+preparation, prefill and decode stages.
+`capture_total` starts before the first encoder-prefetch JNI call and covers
+encoder/decoder prefetch and worker join through prompt cleanup. `session_total` uses process-wide counters from before encoder prefetch through
+worker/prefetch join and prompt cleanup. The coordinator's earlier separate
+`preloadEncoder()` call is outside that native-session window. It includes short
+audio calls and other
+app threads, but excludes the earlier model load. Its `/proc/self/io` `read_bytes`
+delta measures storage reads charged to the process, not fault duration.
+Process, worker and stage scopes overlap: do not sum them. Missing counters are
+marked invalid or omitted, rather than reported as zero.
+
+For a control run without detailed tracing, append `--no-trace`; the app still
+checks complete audio, editor output and native-library identity. Native-stage
+metrics are intentionally absent in this mode.
+
+Detailed trace events report VAD initialization, decoder prefetch, audio position,
 queue residence, backlog, deferred inference, mel/encoder/prefill/decode time,
 speech start/end and explicit finalization. They exclude transcript text.
 Kernel counters break down packed matrix multiplication, output head, attention,
@@ -76,26 +116,11 @@ be added to them.
 The retained production path uses the original one ASR thread, applies the existing
 performance-core policy to the serial worker, uses the single-row decode kernel,
 prefetch the packed decoder weights, and defer replaceable previews after Stop.
-For controlled A/B experiments, `adb shell setprop debug.qwen_asr.NAME VALUE`
-supports these overrides:
-
-| NAME | VALUE |
-| --- | --- |
-| `worker_pin` | `0` disables explicit JNI worker affinity |
-| `matmul_m1` | `0` uses the previous multirow kernel for single-token decode |
-| `bounded_prefetch` | `0` uses the previous whole-shard prefetch hints |
-| `defer_stop` | `0` permits intermediate preview decoding after Stop |
-| `threads` | `1` through `4`, active only while latency tracing is enabled |
-| `chunk_ms` | Inference audio chunk size, `200` through `1200`; current source default `400` |
-| `backlog_ms` | Queued-audio threshold for deferring previews; current source default `800` |
-
-An empty property uses production defaults. Restart the app after changing these.
-The experimental preview-abort path and fastest-core preference were removed at
-the user's request. The two-thread production change was also reverted; thread
-overrides remain diagnostic controls only. Historical results using those settings
-are not measurements of the cleaned source. See [retained changes](VOICE_LATENCY_KEPT_CHANGES.md).
-The runner records all override strings in `metadata.json`; it does not silently
-apply or clear them. Clear experimental overrides before measuring defaults.
+There are no runtime optimization switches for prefetch policy, preview cancellation,
+worker placement, thread count, kernel selection or chunk/backlog tuning. The only
+adb properties consumed by this integration are the explicit debug diagnostics
+and test-only cache-eviction controls. Previous experiment settings in historical
+reports are not supported by the retained build.
 See [baseline measurements](VOICE_LATENCY_RESULTS.md) and [the fix report](VOICE_LATENCY_FIX.md).
 
 A process restart measures cold process/model state. Android's filesystem page

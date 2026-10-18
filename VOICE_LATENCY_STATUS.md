@@ -1,5 +1,24 @@
 # Voice latency: status, testing, and next work
 
+Current handoff: [acceptance decision, retained path and reproducible Pixel 9 tests](VOICE_LATENCY_DECISION.md).
+The staged-prefetch experiment was removed. The retained Stop fix reduces the
+slow preview-before-finalization cases; first-text speed is not claimed improved.
+
+**Superseded by [the acceptance decision](VOICE_LATENCY_DECISION.md).** Staged
+loading and preparation-mode switches have been removed. The measurements below
+are historical and do not describe the retained loading policy.
+
+Current policy: [speech-triggered staged loading](VOICE_STAGED_LOADING.md).
+Keyboard-start full-model warming was replaced after the memory trade-off was
+reviewed and tested on the user's Pixel 9. Measurements below retain their original
+configuration unless explicitly identified as current.
+
+2026-10-18 follow-up: controlled tests confirmed a substantial cold-paging cost,
+verified successful `MADV_POPULATE_READ`, and added preparation before recording.
+See [mmap validation and retained preparation](VOICE_MMAP_VALIDATION.md) for the
+current implementation, reproducible controls and results. Earlier measurements
+below retain their original configuration.
+
 Updated: 2026-10-17. This is a handoff for the current working-tree implementation;
 the changes have not been published to Play.
 
@@ -13,6 +32,10 @@ an 800 ms backlog threshold, asynchronous decoder prefetch and serialized
 per-recording engine ownership. The measurements below retain their original
 configuration. See [the 2026-10-18 Pixel 9 validation](VOICE_LATENCY_IDEAS_VALIDATION.md)
 for current-code experiments and the status of the five proposed optimizations.
+
+2026-10-18 diagnostics update: detailed Kotlin/native traces now require a debug APK
+and explicit `debug.qwen_asr.latency=1`. Full-session process counters, storage
+reads and thread-stage faults are available. See [page-fault measurement and next work](VOICE_PAGE_FAULTS.md).
 
 ## Status quo
 
