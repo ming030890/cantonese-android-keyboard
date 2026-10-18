@@ -69,6 +69,10 @@ android {
             }
         }
         debug {
+            // Side-by-side diagnostics when the installed Play app has a different signing key.
+            if (providers.gradleProperty("voiceBenchmark").orElse("false").get().toBoolean()) {
+                applicationIdSuffix = ".voicebenchmark"
+            }
             buildConfigField("boolean", "INTERNAL_TYPING_TRIAL", providers.gradleProperty("internalTypingTrial").orElse("false").get())
         }
     }
