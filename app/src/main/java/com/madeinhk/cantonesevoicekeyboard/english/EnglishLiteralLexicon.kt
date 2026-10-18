@@ -20,9 +20,25 @@ internal class EnglishLiteralLexicon private constructor(private val words:Set<S
         }.also {cached=it}
 
         fun fromWordsReader(reader:Reader):EnglishLiteralLexicon {
-            val words=reader.buffered().readLines()
-            require(words.isNotEmpty() && words.all {it.matches(Regex("[A-Za-z]+(?:'[A-Za-z]+)*"))})
-            return spellings(words)
+            val words=HashSet<String>()
+            val acronyms=HashSet<String>()
+            reader.buffered().forEachLine { word ->
+                require(validSpelling(word))
+                if(word.length>1 && word==word.uppercase(Locale.ROOT)) acronyms.add(word)
+                else words.add(word.lowercase(Locale.ROOT))
+            }
+            require(words.isNotEmpty() || acronyms.isNotEmpty())
+            return EnglishLiteralLexicon(words,acronyms)
+        }
+        // Same grammar as [A-Za-z]+(?:'[A-Za-z]+)*, without compiling a regex per entry.
+        private fun validSpelling(word:String):Boolean {
+            var previousLetter=false
+            for(char in word) {
+                if(char in 'a'..'z' || char in 'A'..'Z') previousLetter=true
+                else if(char=='\'' && previousLetter) previousLetter=false
+                else return false
+            }
+            return previousLetter
         }
         private fun spellings(values:List<String>):EnglishLiteralLexicon {
             val (acronyms,ordinary)=values.partition {it.length>1 && it==it.uppercase(Locale.ROOT)}

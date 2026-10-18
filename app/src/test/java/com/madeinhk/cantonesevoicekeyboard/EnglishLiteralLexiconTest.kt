@@ -34,4 +34,13 @@ class EnglishLiteralLexiconTest {
             assertTrue(lexicon.contains("Is"));assertTrue(lexicon.contains("Name"))
         }
     }
+    @Test fun compiledSpellingValidationPreservesApostrophesAndRejectsMalformedEntries() {
+        val lexicon=EnglishLiteralLexicon.fromWordsReader("don't\nO'Brien\nrock'n'roll\nNASA\n".reader())
+        for(word in listOf("DON'T","o'brien","Rock'n'roll","NASA")) assertTrue(word,lexicon.contains(word))
+        assertFalse(lexicon.contains("nasa"))
+        for(word in listOf("'word","word'","wo''rd","123","café","two words","a-b","a’b","")) {
+            try {EnglishLiteralLexicon.fromWordsReader("valid\n$word\n".reader());fail("Accepted: $word")}
+            catch(_:IllegalArgumentException) {}
+        }
+    }
 }
