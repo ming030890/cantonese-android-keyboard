@@ -93,7 +93,7 @@ fun KeyboardScreenSearchActionScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.EmojiSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenEmojiPanelScreenshot() {
@@ -495,7 +495,7 @@ fun KeyboardScreenCompactNumberScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 360,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.EmojiSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenCompactEmojiScreenshot() {

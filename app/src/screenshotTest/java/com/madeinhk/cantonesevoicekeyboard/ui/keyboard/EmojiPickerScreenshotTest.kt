@@ -12,32 +12,36 @@ import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
-@Preview(name = "Emoji search results", widthDp = 412, heightDp = 345)
-@Preview(name = "Emoji search narrow", widthDp = 320, heightDp = 300)
+@Preview(name = "Emoji search results", widthDp = 412, heightDp = KeyboardUiDefaults.EmojiSearchSurfaceHeightDp)
+@Preview(name = "Emoji search narrow", widthDp = 320, heightDp = KeyboardUiDefaults.EmojiSearchSurfaceHeightDp)
 @Composable
 fun EmojiSearchScreenshot() = EmojiSearchPreview("heart")
 
 @PreviewTest
-@Preview(name = "Emoji search empty results", widthDp = 412, heightDp = 345)
+@Preview(name = "Emoji search empty results", widthDp = 412, heightDp = KeyboardUiDefaults.EmojiSearchSurfaceHeightDp)
 @Composable
 fun EmojiNoResultsScreenshot() = EmojiSearchPreview("qwerty")
 
 @PreviewTest
-@Preview(name = "Emoji picker dark", widthDp = 412, heightDp = 345)
+@Preview(name = "Emoji picker dark", widthDp = 412, heightDp = KeyboardUiDefaults.EmojiSurfaceHeightDp)
 @Composable
 fun EmojiDarkScreenshot() = EmojiSearchPreview(null, dark = true)
 
 @Composable
 private fun EmojiSearchPreview(query: String?, dark: Boolean = false) {
     CantoneseVoiceKeyboardTheme(darkTheme = dark) {
-        EmojiPickerPanel(
-            modifier = Modifier.fillMaxSize().background(BrandTheme.colors.keyboardBackground).padding(4.dp),
-            onEmojiPicked = {}, initialSearch = query,
+        KeyboardScreen(
+            renderState = KeyboardRenderState(inputMode = KeyboardInputMode.AlphaNum),
+            initialEmojiPanel = true, initialEmojiSearch = query,
+            onEmojiPicked = {}, onCommitText = {}, onDeleteSurroundingText = {},
+            onToggleRecording = {}, onSendSpace = {}, onSendEnter = {},
+            onOpenSettings = {}, onPasteClipboard = {},
+            onHandwritingChanged = { _, _, _, _, _, _ -> }, onHandwritingCandidateSelected = {},
         )
     }
 }
 
 @PreviewTest
-@Preview(name = "Emoji search dark", widthDp = 412, heightDp = 345)
+@Preview(name = "Emoji search dark", widthDp = 412, heightDp = KeyboardUiDefaults.EmojiSearchSurfaceHeightDp)
 @Composable
 fun EmojiDarkSearchScreenshot() = EmojiSearchPreview("heart", dark = true)
