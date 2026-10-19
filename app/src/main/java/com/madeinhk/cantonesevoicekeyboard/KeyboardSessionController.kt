@@ -51,7 +51,7 @@ internal class KeyboardSessionController(
                 },
                 CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
                 onError = { android.util.Log.e("EnglishInputCoordinator", "English candidate engine failed", it) },
-                completionOnly = true)
+                sharedSuggestions = true)
             KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english)
         },
     )
@@ -75,7 +75,7 @@ internal class KeyboardSessionController(
         return boundaryQueue!!.enqueue { pendingTouch=touch;action() }
     }
     private fun waitForBoundary(action: () -> Unit): Boolean {
-        if (!settings.jointDecoderEnabled() || english?.needsBoundaryTransaction()!=true) return false
+        if ((!settings.jointDecoderEnabled() && english?.sharedSuggestions!=true) || english?.needsBoundaryTransaction()!=true) return false
         return boundaryQueue?.begin({ english.settleBoundary() }, action,{english.settleContextRevision()}) == true
     }
     private fun flushBoundaryLiteral() {

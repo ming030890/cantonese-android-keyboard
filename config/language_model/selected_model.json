@@ -24,8 +24,19 @@
   "count_table_packaged": false,
   "experimental": true,
   "production_approved": false,
-  "selection": "User requested one shared Cantonese/English/handwriting LM; English is explicit prefix completion only",
+  "selection": "One shared Cantonese/English/handwriting LM; English spelling candidates come from its existing vocabulary and are contextually ranked by the same LM",
   "qualification": "V2 improves contextual accuracy but fails English-prefix and mixed quantization retention guards",
   "native_verification": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/native-verification.json",
-  "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/previous-assets"
+  "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/previous-assets",
+  "english_policy": {
+    "candidate_source": "TRAIN-attested English model vocabulary",
+    "max_edits": 2,
+    "edit_penalty": 2,
+    "auto_margin": 4,
+    "auto_min_lm_probability": 0.0001,
+    "preserve_known_spellings": true,
+    "backspace_undo": true,
+    "auto_max_edits": 1,
+    "auto_start_margin": 6
+  }
 }

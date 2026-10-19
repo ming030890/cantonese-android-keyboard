@@ -12,18 +12,24 @@
   "packages": [
     {
       "passed": true,
-      "package": "app/build/outputs/apk/debug/app-debug.apk",
+      "package": "app/build/outputs/bundle/release/app-release.aab",
       "checked_sha256": {
-        "assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
-        "assets/language_model/handwriting_fusion.json": "9b7cf13af65933432461298a4e6ba35f632c6eb114ca5509ae67089edcc82aba",
-        "assets/handwriting/model.safetensors": "b6916eacca94eeeaafd6d3c4b957e218a5681b55e8374f98d9109bfefa98af26",
-        "assets/handwriting/labels.txt": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
-        "assets/quick/quick3.bin": "8409d39a69bef3850225778078fa99c0b36b3734411df3e30c3241660643ac6c",
-        "assets/quick/quick5.bin": "2542fc0106b862dd86335edad1c14efcdf2c54815edaa1b207b3ad3892099b12",
-        "lib/arm64-v8a/libcantonese_engine.so": "2b5e225df1b8d73c9135d5ef08f13410f19b3eaa398be890e6d1fd5368352094",
-        "lib/arm64-v8a/libqwen_asr.so": "82cd01ce642b09e5826a939cce3eeef6080facba353e14954664390e824f3675"
+        "base/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+        "base/assets/language_model/handwriting_fusion.json": "9b7cf13af65933432461298a4e6ba35f632c6eb114ca5509ae67089edcc82aba",
+        "base/assets/handwriting/model.safetensors": "b6916eacca94eeeaafd6d3c4b957e218a5681b55e8374f98d9109bfefa98af26",
+        "base/assets/handwriting/labels.txt": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
+        "base/assets/quick/quick3.bin": "8409d39a69bef3850225778078fa99c0b36b3734411df3e30c3241660643ac6c",
+        "base/assets/quick/quick5.bin": "2542fc0106b862dd86335edad1c14efcdf2c54815edaa1b207b3ad3892099b12",
+        "base/lib/arm64-v8a/libcantonese_engine.so": "25ed50650c57cad8003b8112fe9b19957579000bf90c3dd05fa2c50a1e450bfa",
+        "base/lib/arm64-v8a/libqwen_asr.so": "82cd01ce642b09e5826a939cce3eeef6080facba353e14954664390e824f3675"
       },
-      "asset_packs": []
+      "asset_packs": [
+        "model_pack_a",
+        "model_pack_b",
+        "model_pack_c",
+        "model_pack_d",
+        "model_pack_e"
+      ]
     }
   ]
 }

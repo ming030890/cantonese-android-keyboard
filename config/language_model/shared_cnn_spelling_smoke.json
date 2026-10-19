@@ -1,0 +1,350 @@
+{
+  "cache_edit_max_difference": 0.0,
+  "english_next_words": [
+    {
+      "score": 8.50963306427002,
+      "token": "that",
+      "token_id": 21043
+    },
+    {
+      "score": 7.347545623779297,
+      "token": "it",
+      "token_id": 21053
+    },
+    {
+      "score": 7.265057563781738,
+      "token": "to",
+      "token_id": 21040
+    },
+    {
+      "score": 7.252839088439941,
+      "token": "the",
+      "token_id": 21037
+    },
+    {
+      "score": 6.976891040802002,
+      "token": "you",
+      "token_id": 21056
+    },
+    {
+      "score": 6.66470193862915,
+      "token": "he",
+      "token_id": 21091
+    },
+    {
+      "score": 6.632890701293945,
+      "token": "this",
+      "token_id": 21060
+    },
+    {
+      "score": 6.5769124031066895,
+      "token": "she",
+      "token_id": 21214
+    }
+  ],
+  "passed": true,
+  "prefix_candidates": [
+    {
+      "score": 1.6465110778808594,
+      "token": "hello",
+      "token_id": 35367
+    },
+    {
+      "score": 0.3962095379829407,
+      "token": "help",
+      "token_id": 21129
+    },
+    {
+      "score": -0.1062629222869873,
+      "token": "Helen",
+      "token_id": 30222
+    },
+    {
+      "score": -0.3206685185432434,
+      "token": "Hello",
+      "token_id": 25055
+    },
+    {
+      "score": -1.3130238056182861,
+      "token": "helping",
+      "token_id": 22646
+    },
+    {
+      "score": -1.3988853693008423,
+      "token": "helped",
+      "token_id": 22566
+    },
+    {
+      "score": -1.7330800294876099,
+      "token": "helps",
+      "token_id": 21713
+    },
+    {
+      "score": -1.8152821063995361,
+      "token": "helpful",
+      "token_id": 22862
+    }
+  ],
+  "spelling_cases": [
+    {
+      "elapsed_ms": 1.9598749999999998,
+      "left": "how are ",
+      "result": {
+        "candidates": [
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -2.3905811309814453,
+            "word": "you"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -17.327312469482422,
+            "word": "IU"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -18.537670135498047,
+            "word": "viu"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -19.10376739501953,
+            "word": "yuu"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -19.284988403320312,
+            "word": "Liu"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -19.82611083984375,
+            "word": "Yu"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -20.29250717163086,
+            "word": "Yi"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -20.841686248779297,
+            "word": "Yin"
+          }
+        ],
+        "correction": "you",
+        "known": false
+      },
+      "typed": "yiu"
+    },
+    {
+      "elapsed_ms": 2.822083,
+      "left": "the screen is ",
+      "result": {
+        "candidates": [
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -8.826383590698242,
+            "word": "broken"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -11.541156768798828,
+            "word": "driven"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -14.08067512512207,
+            "word": "brief"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -14.816314697265625,
+            "word": "brake"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -15.551321983337402,
+            "word": "broke"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -15.679400444030762,
+            "word": "risen"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -16.38626480102539,
+            "word": "Brian"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -16.500490188598633,
+            "word": "bike"
+          }
+        ],
+        "correction": null,
+        "known": false
+      },
+      "typed": "briken"
+    },
+    {
+      "elapsed_ms": 2.5106669999999998,
+      "left": "I said ",
+      "result": {
+        "candidates": [
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -10.898774147033691,
+            "word": "hello"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -17.182682037353516,
+            "word": "hell"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -20.02044105529785,
+            "word": "cello"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -23.205764770507812,
+            "word": "Heller"
+          }
+        ],
+        "correction": "hello",
+        "known": false
+      },
+      "typed": "helllo"
+    },
+    {
+      "elapsed_ms": 2.97325,
+      "left": "I use a ",
+      "result": {
+        "candidates": [
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -10.496052742004395,
+            "word": "keyboard"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -12.351018905639648,
+            "word": "keyword"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -15.587759971618652,
+            "word": "keywords"
+          },
+          {
+            "completedChars": 0,
+            "edits": 2,
+            "score": -18.28426742553711,
+            "word": "keyboards"
+          }
+        ],
+        "correction": null,
+        "known": false
+      },
+      "typed": "keybord"
+    },
+    {
+      "elapsed_ms": 1.635917,
+      "left": "I read ",
+      "result": {
+        "candidates": [
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -3.725581169128418,
+            "word": "the"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -10.683042526245117,
+            "word": "ten"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -14.32797622680664,
+            "word": "tech"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -14.357555389404297,
+            "word": "th"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -14.851617813110352,
+            "word": "tea"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -15.059762001037598,
+            "word": "Ted"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -15.551103591918945,
+            "word": "tee"
+          },
+          {
+            "completedChars": 0,
+            "edits": 1,
+            "score": -16.322242736816406,
+            "word": "Te"
+          }
+        ],
+        "correction": "the",
+        "known": false
+      },
+      "typed": "teh"
+    }
+  ],
+  "weights_shared": true,
+  "scope": "Curated actual-model host spelling smoke checks; not a representative accuracy benchmark or phone latency",
+  "policy": {
+    "candidate_source": "TRAIN-attested English model vocabulary",
+    "max_edits": 2,
+    "edit_penalty": 2,
+    "auto_margin": 4,
+    "auto_min_lm_probability": 0.0001,
+    "preserve_known_spellings": true,
+    "backspace_undo": true,
+    "auto_max_edits": 1,
+    "auto_start_margin": 6
+  }
+}

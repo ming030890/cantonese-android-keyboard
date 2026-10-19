@@ -1,6 +1,8 @@
 package com.madeinhk.cantonesevoicekeyboard
 
 import com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine
+import com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate
+import com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction
 import com.madeinhk.cantonesevoicekeyboard.quick.NativeQuickEngine
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.*
 import org.junit.Assert.*
@@ -12,9 +14,12 @@ class SharedLmEnglishScenarioTest {
     private fun fake() = SharedLmEnglishEngine({ 7L }, { handle, _, _ ->
         assertEquals(7L, handle)
         listOf("hello", "help", "the")
-    }, { _, _, _, words -> words })
+    }, { _, _, _, words -> words }, { _,_,typed ->
+        EnglishPrediction(candidates=listOf("hello","help","the").filter {it.startsWith(typed,true)}
+            .map {EnglishCandidate(it,0.0,0.0,0,(it.length-typed.length).coerceAtLeast(0))})
+    })
 
-    @Test fun literalTyposSurviveEveryBoundaryInBothLayouts() {
+    @Test fun uncertainSpellingsSurviveEveryBoundaryInBothLayouts() {
         for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
             for (boundary in listOf(" ", ".", "\n")) {
                 KeyboardScenario(initialMode=mode, englishEngine=fake()).use { s ->
@@ -34,13 +39,12 @@ class SharedLmEnglishScenarioTest {
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    @Test fun rapidBoundaryCommitsLiterallyBeforeTheEngineLoads() = kotlinx.coroutines.test.runTest {
+    @Test fun pendingUncertainLookupCommitsLiterallyWithoutLateRewrite() = kotlinx.coroutines.test.runTest {
         val dispatcher=kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
         KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=fake(),jointDecoder=true,
             scope=kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob()+dispatcher),
             lookupDispatcher=dispatcher).use { s ->
             s.start();s.type("teh");s.press(KeyboardKeyKind.Space)
-            assertEquals("teh ",s.editor.text)
             testScheduler.advanceUntilIdle()
             assertEquals("teh ",s.editor.text)
         }
@@ -66,6 +70,52 @@ class SharedLmEnglishScenarioTest {
             s.choose("hello")
             assertEquals("I said hello",s.editor.text)
             assertEquals("",s.editor.composing)
+        }
+    }
+
+    private fun correcting() = SharedLmEnglishEngine({1L},{_,_,_->emptyList()},
+        {_,_,_,words->words}, {_,_,typed->
+            EnglishPrediction(candidates=listOf(EnglishCandidate("you",-1.0,2.0,1,0)),
+                correction=if(typed=="yiu") "you" else null,reason="shared_lm_spelling")
+        })
+
+    @Test fun sharedSpellingSuggestionsCorrectOnSpaceAndUndoInBothLayouts() {
+        for(mode in listOf(KeyboardInputMode.AlphaNum,KeyboardInputMode.Quick)) {
+            KeyboardScenario(initialText="how are ",initialMode=mode,englishEngine=correcting()).use {s->
+                s.engine.lookup={_,_,_,_->emptyList()}
+                s.start();s.type("yiu")
+                val words=if(mode==KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                assertTrue(words.any {it.text=="you"})
+                assertEquals(KeyboardToolbarContent.Candidates,s.snapshot().toolbar())
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("how are you ",s.editor.text)
+                s.press(KeyboardKeyKind.Delete)
+                assertEquals("how are ",s.editor.text)
+                assertEquals("yiu",s.editor.composing)
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("how are yiu ",s.editor.text)
+            }
+        }
+    }
+
+    @Test fun spellingAlternativeCanAlsoBeSelectedExplicitly() {
+        KeyboardScenario(initialText="how are ",initialMode=KeyboardInputMode.AlphaNum,englishEngine=correcting()).use {s->
+            s.start();s.type("yiu");s.choose("you")
+            assertEquals("how are you",s.editor.text)
+            assertEquals("",s.editor.composing)
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun pendingSharedCorrectionFinishesBeforeFollowingKeys() = kotlinx.coroutines.test.runTest {
+        val dispatcher=kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
+        KeyboardScenario(initialText="how are ",initialMode=KeyboardInputMode.AlphaNum,englishEngine=correcting(),
+            scope=kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob()+dispatcher),
+            lookupDispatcher=dispatcher).use {s->
+            s.start();s.type("yiu");s.press(KeyboardKeyKind.Space);s.type("today")
+            testScheduler.advanceUntilIdle()
+            assertEquals("how are you ",s.editor.text)
+            assertEquals("today",s.editor.composing)
         }
     }
 
@@ -100,16 +150,22 @@ class SharedLmEnglishScenarioTest {
         System.load(requireNotNull(library))
         NativeQuickEngine.fromAssets(read={File("src/main/assets/$it").readBytes()}).use { quick ->
             val english=SharedLmEnglishEngine(quick::englishContextHandle)
+            for(word in listOf("wastg","bokeh","Alstom","Xentara")) {
+                assertNull("Unexpected automatic correction: $word",english.predict(word,floatArrayOf(),floatArrayOf(),"","").correction)
+            }
+            val correction=english.predict("yiu",floatArrayOf(),floatArrayOf(),"how are ","")
+            assertTrue(correction.candidates.any {it.word.equals("you",true)})
+            assertEquals("you",correction.correction?.lowercase())
             val result=english.predict("hel",floatArrayOf(),floatArrayOf(),"I said ","")
             assertFalse(result.candidates.isEmpty())
-            assertTrue(result.candidates.all {it.word.startsWith("hel",true)})
+            assertTrue(result.candidates.any {it.word.equals("hello",true)})
             assertNull(result.correction)
-            assertFalse(english.supportsAutomaticCorrection)
+            assertTrue(english.supportsAutomaticCorrection)
             assertFalse(quick.candidates(3,"a","我","").isEmpty())
             assertEquals(setOf("hello","你好"),english.rankCandidates("我想講 ","",listOf("hello","你好")).toSet())
             KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=english).use { s ->
-                s.start();s.type("teh");s.press(KeyboardKeyKind.Space)
-                assertEquals("teh ",s.editor.text)
+                s.start();s.type("keyboard");s.press(KeyboardKeyKind.Space)
+                assertEquals("keyboard ",s.editor.text)
             }
         }
     }

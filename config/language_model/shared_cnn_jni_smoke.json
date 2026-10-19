@@ -1,14 +1,17 @@
 {
   "passed": true,
-  "tests": 6,
+  "tests": 9,
   "skipped": 0,
   "checks": [
-    "literalTyposSurviveEveryBoundaryInBothLayouts",
+    "pendingSharedCorrectionFinishesBeforeFollowingKeys",
+    "uncertainSpellingsSurviveEveryBoundaryInBothLayouts",
     "prefixSuggestionsRequireExplicitSelection",
-    "rapidBoundaryCommitsLiterallyBeforeTheEngineLoads",
+    "spellingAlternativeCanAlsoBeSelectedExplicitly",
     "actualHandwritingRecognizerAcceptsTheSharedCnnAndFusion",
+    "pendingUncertainLookupCommitsLiterallyWithoutLateRewrite",
     "actualSharedNativeModelCompletesEnglishAndRanksQuick",
-    "nextWordSelectionUsesTheSharedEngineWithoutComposition"
+    "nextWordSelectionUsesTheSharedEngineWithoutComposition",
+    "sharedSpellingSuggestionsCorrectOnSpaceAndUndoInBothLayouts"
   ],
   "scope": "Host JNI with actual packaged shared CNN, Quick dictionaries, visual handwriting model and fusion; not phone validation"
 }

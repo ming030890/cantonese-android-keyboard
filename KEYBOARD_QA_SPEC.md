@@ -343,9 +343,10 @@ punctuation screenshot mismatches from separate pending edits; their baselines
 remain unchanged. The connected physical phone was not used or modified.
 
 
-### D-18 (2026-10-19): One shared LM, explicit English completion
+### D-18 (2026-10-19): Version56 completion-only behavior (superseded by D-19)
 
-User decision: English uses the same V2 CNN as Cantonese. This supersedes D-07/D-08
+Version56 used the same V2 CNN for English and Cantonese, with completion only.
+The user subsequently clarified D-19. This implementation superseded D-07/D-08
 and later automatic spelling-correction policies for the active shared-model path.
 English shows literal input plus prefix completions; Space, punctuation and Enter
 commit the typed spelling unchanged. Selecting a suggestion inserts that suggestion.
@@ -361,3 +362,23 @@ only; cursor edits rebuild its context. Host verification does not establish pho
 latency or handwriting recognition quality. SharedLmEnglishScenarioTest exercises
 literal boundary commits and manual completion via the production controller;
 ScenarioSharedLmEnglishCompletion renders the same behavior with a fake LM.
+
+
+### D-19 (2026-10-19): Shared-LM spelling suggestions and automatic correction
+
+User clarified that one LM should generate and rank spelling alternatives, with
+both explicit selection and automatic correction on Space. This supersedes D-18's
+completion-only behavior. Generate bounded insertion/deletion/substitution/adjacent-
+swap neighbors from TRAIN-attested English tokens already embedded in the shared
+model. Rank those and prefix completions by contextual LM log probability minus
+2 per spelling edit. Keep literal input as a selectable candidate. Apply only an
+unknown spelling's best one-edit whole-word correction with a score margin >=4
+(>=6 without left context) and LM
+probability >=0.0001; preserve known vocabulary spellings. These are experimental
+heuristics, not fitted confidence probabilities. The existing boundary transaction
+waits up to40ms and commits literally on timeout, with no stale post-boundary rewrite.
+Backspace restores the original spelling; the next Space preserves that undo.
+Quick's short Chinese code protection remains. No external English dictionary,
+second model, spelling head, or old correction calibration is loaded. Vocabulary
+coverage limits correction: words absent from the shared English token set cannot
+be proposed by this generator.

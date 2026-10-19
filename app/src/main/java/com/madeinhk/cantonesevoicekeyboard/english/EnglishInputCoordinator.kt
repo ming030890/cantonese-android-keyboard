@@ -15,7 +15,7 @@ internal class EnglishInputCoordinator(
     val scope: CoroutineScope,
     private val worker: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
     private val onError: (Throwable) -> Unit = {},
-    private val completionOnly: Boolean = false,
+    val sharedSuggestions: Boolean = false,
 ) : AutoCloseable {
     private var engine: EnglishCandidateEngine? = null
     private var request = 0L
@@ -46,7 +46,7 @@ internal class EnglishInputCoordinator(
         scope.launch(worker) { (engine as? AutoCloseable)?.close(); engine=null }
     }
     fun boundaryPending() = word.isNotEmpty() && resultWord != word && pending != null
-    fun needsBoundaryTransaction()=!completionOnly && engine?.supportsAutomaticCorrection!=false &&
+    fun needsBoundaryTransaction()=engine?.supportsAutomaticCorrection!=false &&
         (boundaryPending() || (word.isNotEmpty() && engine?.supportsContextRevision==true))
     suspend fun settleContextRevision()=contextWindow.settle()
     fun cancelBoundaryCorrection() {
@@ -152,7 +152,7 @@ internal class EnglishInputCoordinator(
             word.drop(1) == word.drop(1).lowercase(Locale.ROOT))
 
     fun refreshNextWords() {
-        if (!completionOnly || word.isNotEmpty() || closed) return
+        if (!sharedSuggestions || word.isNotEmpty() || closed) return
         pending?.cancel(); val id=++request
         val left=editor.getTextBeforeCursor(512).orEmpty()
         val right=editor.getTextAfterCursor(256).orEmpty()
@@ -180,7 +180,7 @@ internal class EnglishInputCoordinator(
             }
             undo = null; return false
         }
-        val allowCorrection = correct && !completionOnly && engine?.supportsAutomaticCorrection != false
+        val allowCorrection = correct && engine?.supportsAutomaticCorrection != false
         val original = word
         val originalLeft=editor.getTextBeforeCursor(512).orEmpty().removeSuffix(original)
         val evidence=FloatArray(taps.size*2) { Float.NaN }.also { values ->

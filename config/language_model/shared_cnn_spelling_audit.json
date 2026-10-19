@@ -1,0 +1,94 @@
+{
+  "scope": "Development-only synthetic single-edit smoke audit on English finalist words; no fresh held-out qualification. Unchanged corpus words may themselves contain typos.",
+  "synthetic_cases": 5946,
+  "target_in_top8": 0.9900773629330643,
+  "automatic_rate": 0.32559704002690887,
+  "automatic_precision": 0.9943181818181818,
+  "automatic_applied": 1936,
+  "automatic_correct": 1925,
+  "unchanged_corpus_words": 6481,
+  "corpus_words_automatically_changed": 0,
+  "example_wrong_automatic_corrections": [
+    {
+      "typed": "waxs",
+      "target": "waxes",
+      "correction": "was",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "tme",
+      "target": "time",
+      "correction": "the",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "fith",
+      "target": "faith",
+      "correction": "with",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "producrs",
+      "target": "producers",
+      "correction": "products",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "paol",
+      "target": "Paolo",
+      "correction": "Paul",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "decideu",
+      "target": "decides",
+      "correction": "decided",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "informatios",
+      "target": "Informatics",
+      "correction": "Information",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "opne",
+      "target": "Open",
+      "correction": "One",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "thoe",
+      "target": "those",
+      "correction": "the",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "environmens",
+      "target": "environments",
+      "correction": "environment",
+      "source": "fineweb_edu"
+    },
+    {
+      "typed": "ays",
+      "target": "says",
+      "correction": "as",
+      "source": "fineweb_edu"
+    }
+  ],
+  "example_corpus_word_changes": [],
+  "seconds": 33.47345604095608,
+  "policy": {
+    "candidate_source": "TRAIN-attested English model vocabulary",
+    "max_edits": 2,
+    "edit_penalty": 2,
+    "auto_margin": 4,
+    "auto_min_lm_probability": 0.0001,
+    "preserve_known_spellings": true,
+    "backspace_undo": true,
+    "auto_max_edits": 1,
+    "auto_start_margin": 6
+  },
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "probe_sha256": "e6e4424228233d633d4a0f32b58359ef1a2202c65552658d84ea009444ae8117"
+}

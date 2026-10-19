@@ -6,9 +6,16 @@ language priors. The model includes its exact canonical vocabulary and a list
 of TRAIN-attested English output token IDs. It does not require an English
 spelling dictionary or a second English LM.
 
-English shows prefix completion and next-word suggestions. Typing `teh` followed
-by Space commits `teh `; choosing a candidate inserts that candidate. There is
-no automatic spelling replacement in the active shared-model path.
+English shows prefix completions, next-word suggestions and spelling alternatives.
+Spelling candidates come from the model's existing TRAIN-attested English tokens,
+using bounded insertion/deletion/substitution/adjacent-swap edits. The same LM ranks
+them with an edit penalty. Users may select a suggestion or accept a clear spelling
+correction on Space; Backspace restores the original. Known vocabulary spellings
+and uncertain alternatives are preserved. No old dictionary/model is restored.
+The experimental gates allow only one-edit automatic corrections, require a score
+margin of4 (6 without left context) and raw LM probability >=0.0001;
+these are heuristics, not fitted confidence probabilities. Words missing from the
+model's English token set cannot be proposed by this generator.
 
 The packed model is 12,675,264 bytes, SHA-256
 `915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322`.
@@ -46,10 +53,19 @@ legacy fixtures, but the production loader constructs only `SharedLmEnglishEngin
 old spelling resources are neither staged nor packaged.
 
 Integration verification (2026-10-19): `:app:verifyKeyboard` passed unit/scenario,
-64 screenshot, and debug assembly checks. Six focused shared-model tests passed
+64 screenshot, and debug assembly checks. Nine focused shared-model tests passed
 with actual host JNI enabled, including handwriting initialization, language context
 and a stroke inference smoke check (`shared_cnn_jni_smoke.json`). That smoke check
 establishes the native path works; it does not establish handwriting quality.
 The APK resource verifier confirmed the shared-model checksum, current native
 library checksums and absence of all `assets/english/` and `assets/typing/` entries
 (`shared_cnn_package_verification.json`). No device installation was performed.
+
+
+Version57 spelling audit: 5,946 synthetic single-edit cases from development English
+words, with the intended word in the top8 in99.01%. Automatic correction applied to
+1,936 cases (32.56%);1,925 were correct (99.43% of applied corrections). None of6,481
+unchanged corpus words was altered. Gates were tightened using these development
+checks; this is not independent held-out qualification or a calibrated confidence.
+See `shared_cnn_spelling_audit.json`; replay with `scripts/evaluate_shared_spelling.py`.
+The same shared weights/vocabulary and original V2 quality limitations remain.
