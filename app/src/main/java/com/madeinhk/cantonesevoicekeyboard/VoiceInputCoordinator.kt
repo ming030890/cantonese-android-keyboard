@@ -61,6 +61,7 @@ internal class VoiceInputCoordinator(
         val stopDeferred: CompletableDeferred<Boolean>,
         val recorderStopped: CompletableDeferred<Unit>,
     ) {
+        @Volatile var discarded = false
         var audioJob: Job? = null
         var engineJob: Job? = null
     }
@@ -106,7 +107,6 @@ internal class VoiceInputCoordinator(
         pcm2: ByteArray,
         delayMs: Long,
     ): JSONObject {
-        check(BuildConfig.DEBUG)
         val requestedAt = VoiceClock.nanoTime()
         check(!recording && activeSession?.engineJob?.isActive != true)
         require(pcm1.isNotEmpty() && pcm1.size % 2 == 0)
@@ -221,6 +221,7 @@ internal class VoiceInputCoordinator(
     override fun interrupt() {
         val voiceState = _state.value
         val session = activeSession
+        if (session?.discarded == true) return
         if (
             !recording &&
             session?.engineJob?.isActive != true &&
@@ -228,6 +229,7 @@ internal class VoiceInputCoordinator(
             voiceState != KeyboardUiState.Transcribing
         ) return
         generation++
+        session?.discarded = true
         editor.finishComposingText()
         if (recording || voiceState == KeyboardUiState.Recording) {
             stop(discard = true)
@@ -236,6 +238,8 @@ internal class VoiceInputCoordinator(
             _volume.value = 0f
             _state.value = KeyboardUiState.Idle
         }
+        _volume.value = 0f
+        _state.value = KeyboardUiState.Idle
     }
 
     override fun stopForHandwriting() = interrupt()
@@ -487,7 +491,7 @@ internal class VoiceInputCoordinator(
                         val rms = if (samplesRead > 0) {
                             Math.sqrt(sumSquare / samplesRead)
                         } else 0.0
-                        if (activeSession === session) {
+                        if (activeSession === session && !session.discarded) {
                             _volume.value = (rms * 3.0).toFloat().coerceIn(0f, 1f)
                         }
                     } else if (bytesRead < 0) break
@@ -515,7 +519,7 @@ internal class VoiceInputCoordinator(
                 trace.mark("engine_available")
 
                 // If discarded before engine acquired, skip execution
-                if (stopDeferred.isCompleted && stopDeferred.await()) {
+                if (session.discarded || (stopDeferred.isCompleted && stopDeferred.await())) {
                     trace.mark("native_stop_return", "discarded_early" to true)
                     debugStore?.closeAndDelete()
                     trace.mark("engine_lock_released")
@@ -528,20 +532,20 @@ internal class VoiceInputCoordinator(
 
                 val listener = object : QAsrEngine.VadListener {
                     override fun onTranscriptDelta(textDelta: String) {
-                        if (stopDeferred.isCompleted && stopDeferred.getCompleted()) return
+                        if (session.discarded) return
                         debugTranscript.append(textDelta)
                         trace.mark("stable_delta", "chars" to textDelta.length)
                     }
 
                     override fun onHypothesisChanged(text: String) {
-                        if (stopDeferred.isCompleted && stopDeferred.getCompleted()) return
+                        if (session.discarded) return
                         val callbackAt = VoiceClock.nanoTime()
                         trace.mark("hypothesis_callback", "chars" to text.length)
                         scope.launch {
                             if (
                                 isInputViewVisible() &&
                                 sessionEditorId == currentSession() &&
-                                !(stopDeferred.isCompleted && stopDeferred.getCompleted())
+                                !session.discarded
                             ) {
                                 editor.setComposingText(text)
                                 trace.editor(text, callbackAt)
@@ -558,7 +562,7 @@ internal class VoiceInputCoordinator(
                             if (
                                 isInputViewVisible() &&
                                 sessionEditorId == currentSession() &&
-                                !(stopDeferred.isCompleted && stopDeferred.getCompleted())
+                                !session.discarded
                             ) {
                                 editor.finishComposingText()
                             }
@@ -570,7 +574,7 @@ internal class VoiceInputCoordinator(
                             if (
                                 isInputViewVisible() &&
                                 sessionEditorId == currentSession() &&
-                                !(stopDeferred.isCompleted && stopDeferred.getCompleted())
+                                !session.discarded
                             ) {
                                 editor.setComposingText("")
                                 editor.finishComposingText()
@@ -603,7 +607,7 @@ internal class VoiceInputCoordinator(
                 }
 
                 // Audio input feed completed; await stop decision
-                val discard = stopDeferred.await()
+                val discard = stopDeferred.await() || session.discarded
                 trace.mark("native_stop_call", "discard" to discard)
                 activeEngine.stopVadSession(finalize = !discard)
                 trace.mark("native_stop_return")
@@ -617,7 +621,7 @@ internal class VoiceInputCoordinator(
                 }
 
                 withContext(Dispatchers.Main) {
-                    if (!discard && isInputViewVisible() && sessionEditorId == currentSession()) {
+                    if (!discard && !session.discarded && isInputViewVisible() && sessionEditorId == currentSession()) {
                         editor.finishComposingText()
                         trace.mark("last_editor_update")
                     }
@@ -634,6 +638,7 @@ internal class VoiceInputCoordinator(
 
     private fun stop(discard: Boolean): Job? {
         val session = activeSession ?: return null
+        if (discard) session.discarded = true
         if (!recording && session.engineJob?.isActive != true) return null
         val trace = session.trace
         trace.mark("stop_requested", "discard" to discard)

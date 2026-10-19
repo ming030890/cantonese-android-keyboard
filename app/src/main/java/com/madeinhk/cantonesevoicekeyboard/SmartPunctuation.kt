@@ -33,7 +33,8 @@ internal object SmartPunctuation {
         isComposingEnglish: Boolean = false,
     ): Boolean {
         if (isComposingEnglish) return false
-        if (isComposingQuick) return true
+        // Unselected Quick codes are still literal Latin letters at a boundary.
+        if (isComposingQuick) return false
         if (textBeforeCursor.isNullOrEmpty()) {
             return currentMode == KeyboardInputMode.Quick || currentMode == KeyboardInputMode.Handwriting
         }

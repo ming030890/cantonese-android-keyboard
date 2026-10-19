@@ -41,7 +41,7 @@ class EnglishAutocorrectScenarioTest {
                         "\n" -> s.press(KeyboardKeyKind.Enter)
                         else -> s.type(boundary)
                     }
-                    assertEquals("$mode $boundary", "the$boundary", s.editor.text)
+                    assertEquals("$mode $boundary", "the${SmartPunctuation.toAscii(boundary)}", s.editor.text)
                     assertEquals("", s.editor.composing)
                     s.press(KeyboardKeyKind.Delete)
                     assertEquals("", s.editor.text)

@@ -24,10 +24,12 @@ internal class KeyboardScenario(
     englishEngine: com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidateEngine? = null,
     quickEngine: QuickCandidateEngine? = null,
     jointDecoder: Boolean = false,
+    voiceFactory: ((KeyboardEditor) -> VoiceSession)? = null,
 ) : AutoCloseable {
     val editor = MemoryKeyboardEditor(initialText)
     val engine = ScenarioQuickEngine()
     val voice = ScenarioVoice(editor)
+    private val sessionVoice = voiceFactory?.invoke(editor) ?: voice
     val handwriting = ScenarioHandwriting(editor)
     val suggestions = ScenarioSuggestions(editor, clipboardText)
     var quickVersion = 3
@@ -44,7 +46,7 @@ internal class KeyboardScenario(
     val controller = KeyboardSessionController(
         editor,
         KeyboardSessionSettings({ enabledLayouts }, { quickVersion }, { it in autocorrectLayouts }, { jointDecoder }),
-    ) { _, _, _ -> KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english) }
+    ) { _, _, _ -> KeyboardSessionDependencies(sessionVoice, quick, handwriting, suggestions, english) }
 
     // The same key receiver handles down/up/cancel in the real screen.
     var emojiSearch = EmojiSearchState()
@@ -101,7 +103,7 @@ internal class MemoryKeyboardEditor(var text: String = "", var right: String = "
     override fun commitText(text: String) { this.text += text; composing = ""; commits += text }
     override fun getTextBeforeCursor(length: Int) = (text + composing).takeLast(length)
     override fun getTextAfterCursor(length: Int) = right.take(length)
-    override fun deleteSelectionOrPreviousCharacter() { text = text.dropLast(1) }
+    override fun deleteSelectionOrPreviousCharacter() { text = text.dropLast(previousCharacterLength(text)) }
     var selectionOverride: Pair<Int, Int>? = null
     override fun cursorSelection() = selectionOverride ?: ((text.length + composing.length) to (text.length + composing.length))
     var actionEnter = false
@@ -253,10 +255,27 @@ internal object KeyboardScenarios {
         it.engine.lookup = { _, _, _, _ -> listOf(QuickCandidate("你", 0), QuickCandidate("係", 1)) }
         it.start(); it.type("teh"); it.snapshot()
     }
+    fun twoLetterQuickCandidates() = KeyboardScenario(initialText = "I use ", clipboardText = null,
+        englishEngine = ScenarioEnglishEngine().apply {
+            ranker = { _, _, pool -> pool.sortedBy { text -> if (text.all { it.code < 128 }) 0 else 1 } }
+        }).use {
+        it.engine.lookup = { _, _, _, _ ->
+            listOf("標", "杯", "禁", "紮", "焚", "杰", "棕", "楝", "柬").mapIndexed { i, text -> QuickCandidate(text, i) }
+        }
+        it.start(); it.type("df"); it.snapshot()
+    }
     fun clipboardInitially() = KeyboardScenario().use { it.start(); it.snapshot() }
     fun clipboardAfterTyping() = KeyboardScenario().use { it.start(); it.type("o"); it.snapshot() }
     fun quickCandidates() = KeyboardScenario(clipboardText = null).use { it.start(); it.type("of"); it.snapshot() }
     fun nextWordPredictions() = KeyboardScenario().use { it.start(); it.type("of"); it.choose("你"); it.snapshot() }
+    fun afterEmojiBackspace() = KeyboardScenario(initialText = "你", clipboardText = null).use {
+        it.start(); it.press(KeyboardKeyKind.Text, "👍🏽"); it.press(KeyboardKeyKind.Delete); it.snapshot()
+    }
+    fun typingInterruptsVoice() = KeyboardScenario(clipboardText = null, englishEngine = ScenarioEnglishEngine()).use {
+        it.start(); it.editor.setComposingText("語音輸入")
+        it.voice.state.value = KeyboardUiState.Recording
+        it.type("df"); it.snapshot()
+    }
     fun richClipboard() = KeyboardScenario().use {
         it.start(); it.copy("plain version", mimeTypes = setOf(ClipMimeTypes.TEXT_PLAIN, "text/html")); it.snapshot()
     }

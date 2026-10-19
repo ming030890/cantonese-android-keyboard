@@ -95,7 +95,7 @@ class SmartPunctuationTest {
         assertFalse(SmartPunctuation.isChineseContext("test@example.com", KeyboardInputMode.Quick))
 
         // Overrides by composition states
-        assertTrue(SmartPunctuation.isChineseContext("of", KeyboardInputMode.Quick, isComposingQuick = true))
+        assertFalse(SmartPunctuation.isChineseContext("of", KeyboardInputMode.Quick, isComposingQuick = true))
         assertFalse(SmartPunctuation.isChineseContext("你好", KeyboardInputMode.Quick, isComposingEnglish = true))
     }
 

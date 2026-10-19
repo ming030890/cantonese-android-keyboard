@@ -80,6 +80,7 @@ class CantoneseInputMethodService :
                         handwritingSession = controller.handwritingSession,
                         quickCandidates = controller.quickCandidates,
                         englishCandidates = controller.englishCandidates,
+                        chinesePunctuation = controller.chinesePunctuation,
                         onTouchEvidence = controller::onTouchEvidence,
                         onVisiblePanelChanged = controller::onVisiblePanelChanged,
                         onQuickKey = controller::onQuickKey,

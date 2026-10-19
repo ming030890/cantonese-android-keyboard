@@ -5,6 +5,10 @@ import com.qwenasr.QAsrEngine
 import java.lang.reflect.Proxy
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CompletableDeferred
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -66,13 +70,17 @@ class VoiceRestartScenarioTest {
 
     private class FakeAsrEngine(
         private val finalizeDurationMs: Long = 100L,
+        private val stopGate: CountDownLatch? = null,
     ) : QAsrEngine() {
+        val started = CompletableDeferred<Unit>()
+        val stopping = CompletableDeferred<Unit>()
         val activeSessions = AtomicInteger(0)
         var maxConcurrentSessions = 0
         var totalSessionsStarted = 0
         var totalSessionsStopped = 0
         var totalPcmBytesPushed = 0L
-        @Volatile private var currentListener: VadListener? = null
+        @Volatile var currentListener: VadListener? = null
+            private set
 
         override fun startVadSession(listener: VadListener, saveAudioDir: String?): Boolean {
             val count = activeSessions.incrementAndGet()
@@ -81,6 +89,7 @@ class VoiceRestartScenarioTest {
                 totalSessionsStarted++
                 currentListener = listener
             }
+            started.complete(Unit)
             return true
         }
 
@@ -98,6 +107,8 @@ class VoiceRestartScenarioTest {
 
         override fun stopVadSession(finalize: Boolean) {
             val listener = currentListener
+            stopping.complete(Unit)
+            check(stopGate?.await(5, TimeUnit.SECONDS) != false) { "Timed out waiting for test release" }
             if (finalize && listener != null) {
                 // Simulate realistic native worker finalization pass
                 if (finalizeDurationMs > 0) {
@@ -124,6 +135,44 @@ class VoiceRestartScenarioTest {
         override fun setLanguage(language: String): Boolean = true
         override fun setChineseVariant(variant: String): Boolean = true
         override fun free() {}
+    }
+
+    @Test fun typingInterruptsRecordingAndFinalizationAndRejectsLateCallbacks() = runTest {
+        for (finalizing in listOf(false, true)) {
+            val stopGate = CountDownLatch(1)
+            val fake = FakeAsrEngine(finalizeDurationMs = 0, stopGate = stopGate)
+            lateinit var voice: VoiceInputCoordinator
+            KeyboardScenario(englishEngine = ScenarioEnglishEngine(), voiceFactory = { editor ->
+                VoiceInputCoordinator(editor = editor, currentSession = { 1L }, isInputViewVisible = { true }).also {
+                    voice = it; it.engineOverride = fake; it.setModelLoadedForTest(true)
+                }
+            }).use { s ->
+                try {
+                    s.start(); voice.startForTest(ByteArray(4096))
+                    fake.started.await()
+                    val listener = checkNotNull(fake.currentListener)
+                    if (finalizing) { voice.stopForTest(); fake.stopping.await() }
+                    listener.onHypothesisChanged("你好")
+                    assertEquals("你好", s.editor.composing)
+                    s.keyDown(KeyboardKeyKind.Text, "x")
+                    assertEquals(KeyboardUiState.Idle, s.snapshot().voice)
+                    assertFalse(voice.isRecording())
+                    assertEquals(0f, voice.volume.value)
+                    s.keyUp(KeyboardKeyKind.Text, "x")
+                    listener.onHypothesisChanged("stale")
+                    listener.onTranscriptComplete(); listener.onTranscriptError()
+                    s.type("y")
+                    assertEquals("你好", s.editor.text)
+                    assertEquals("xy", s.editor.composing)
+                    assertEquals(KeyboardUiState.Idle, s.snapshot().voice)
+                    assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                    stopGate.countDown()
+                    voice.stopForTest(discard = true)?.join()
+                    assertEquals("你好", s.editor.text)
+                    assertEquals("xy", s.editor.composing)
+                } finally { stopGate.countDown() }
+            }
+        }
     }
 
     @Test

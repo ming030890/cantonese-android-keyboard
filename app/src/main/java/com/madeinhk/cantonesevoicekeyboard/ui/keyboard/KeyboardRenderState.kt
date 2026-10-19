@@ -16,6 +16,7 @@ data class KeyboardRenderState(
     val handwritingBusy: Boolean = false,
     val handwritingError: String? = null,
     val handwritingSession: Long = 0L,
+    val chinesePunctuation: Boolean? = null,
 ) {
     internal fun toolbar(mode: KeyboardInputMode = inputMode, hasAutofill: Boolean = false): KeyboardToolbarContent =
         keyboardToolbarContent(

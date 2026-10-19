@@ -44,6 +44,7 @@ fun KeyboardScreen(
     handwritingSession: StateFlow<Long>,
     quickCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow<List<HandwritingCandidate>>(emptyList()),
     englishCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow(emptyList()),
+    chinesePunctuation: StateFlow<Boolean?> = MutableStateFlow(null),
     onQuickKey: (String) -> Unit = {},
     onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
     onVisiblePanelChanged: (KeyboardInputMode?) -> Unit = {},
@@ -81,6 +82,7 @@ fun KeyboardScreen(
     val handwritingSession by handwritingSession.collectAsState()
     val quickCandidates by quickCandidates.collectAsState()
     val englishCandidates by englishCandidates.collectAsState()
+    val chinesePunctuation by chinesePunctuation.collectAsState()
     KeyboardScreen(
         renderState = KeyboardRenderState(
             voice = voice,
@@ -94,6 +96,7 @@ fun KeyboardScreen(
             handwritingSession = handwritingSession,
             quickCandidates = quickCandidates,
             englishCandidates = englishCandidates,
+            chinesePunctuation = chinesePunctuation,
         ),
         autofillView = autofillView,
         onQuickKey = onQuickKey,
@@ -202,6 +205,9 @@ fun KeyboardScreen(
     var isUppercase by remember(activePanel, initialUppercase) {
         mutableStateOf(initialUppercase)
     }
+    val punctuationVariant = renderState.chinesePunctuation?.let {
+        if (it) SymbolVariant.Chinese else SymbolVariant.English
+    } ?: symbolVariant
     var showMoreSymbols by remember(activePanel, initialShowMoreSymbols) {
         mutableStateOf(initialShowMoreSymbols)
     }
@@ -449,7 +455,7 @@ fun KeyboardScreen(
                         if (searchSymbols) NumberPanel(
                             rowHeight = textRowHeight,
                             modifier = Modifier.fillMaxWidth().height(textRowHeight * 3),
-                            variant = SymbolVariant.English, keyRegistry = keyRegistry,
+                            variant = if (emojiSearchActive) SymbolVariant.English else punctuationVariant, keyRegistry = keyRegistry,
                             showMoreSymbols = showMoreSymbols, standardKeyTouchWidth = standardKeyTouchWidth,
                         ) else AlphaNumPanel(
                             rowHeight = textRowHeight,
@@ -465,7 +471,7 @@ fun KeyboardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(textRowHeight * 3),
-                        variant = symbolVariant,
+                        variant = punctuationVariant,
                         keyRegistry = keyRegistry,
                         showMoreSymbols = showMoreSymbols,
                         standardKeyTouchWidth = standardKeyTouchWidth,
@@ -519,8 +525,8 @@ fun KeyboardScreen(
                     currentMode = KeyboardInputMode.Quick,
                     modeSwitchLabel = "?123",
                     modeSwitchTarget = "number.chinese",
-                    commaValue = "，",
-                    periodValue = "。",
+                    commaValue = if (renderState.chinesePunctuation != false) "，" else ",",
+                    periodValue = if (renderState.chinesePunctuation != false) "。" else ".",
                 )
             } else if (isAlphaPanel) {
                 AlphaNumBottomRow(
@@ -529,8 +535,8 @@ fun KeyboardScreen(
                     keyRegistry = keyRegistry,
                     modeSwitchLabel = "?123",
                     modeSwitchTarget = "number.english",
-                    commaValue = ",",
-                    periodValue = "."
+                    commaValue = if (renderState.chinesePunctuation == true && !emojiSearchActive) "，" else ",",
+                    periodValue = if (renderState.chinesePunctuation == true && !emojiSearchActive) "。" else "."
                 )
             } else if (activePanel == KeyboardPanel.Number || (emojiSearchActive && searchSymbols)) {
                 val backTarget = if (emojiSearchActive) "alpha" else when (previousPanelBeforeNumber) {
@@ -549,8 +555,8 @@ fun KeyboardScreen(
                     keyRegistry = keyRegistry,
                     modeSwitchLabel = backLabel,
                     modeSwitchTarget = backTarget,
-                    commaValue = ",".toSymbolCommitValue(if (emojiSearchActive) SymbolVariant.English else symbolVariant),
-                    periodValue = ".".toSymbolCommitValue(if (emojiSearchActive) SymbolVariant.English else symbolVariant)
+                    commaValue = ",".toSymbolCommitValue(if (emojiSearchActive) SymbolVariant.English else punctuationVariant),
+                    periodValue = ".".toSymbolCommitValue(if (emojiSearchActive) SymbolVariant.English else punctuationVariant)
                 )
             } else if (activePanel != KeyboardPanel.Emoji) {
                 // Bottom Functional Keys Row (Space, Delete, Enter, Switch)

@@ -92,6 +92,23 @@ internal class KeyboardSessionController(
 
     val uiState = voice.state
     val volumeLevel = voice.volume
+    private val _chinesePunctuation = MutableStateFlow(true)
+    val chinesePunctuation = _chinesePunctuation.asStateFlow()
+
+    private fun refreshPunctuation() {
+        _chinesePunctuation.value = SmartPunctuation.isChineseContext(
+            editor.getTextBeforeCursor(64), _keyboardInputMode.value,
+            isComposingQuick = quick.hasActiveInput(),
+            isComposingEnglish = english?.word?.isNotEmpty() == true,
+        )
+    }
+
+    private fun resolvePunctuation(text: String): String {
+        refreshPunctuation()
+        return if (text.length == 1 && SmartPunctuation.isPunctuation(text[0]))
+            SmartPunctuation.toSmartPunctuation(text, _chinesePunctuation.value, editor.getTextBeforeCursor(64))
+        else text
+    }
     val handwritingCandidates = handwriting.candidates
     val englishCandidates = english?.candidates ?: MutableStateFlow(emptyList<com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate>())
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -99,7 +116,11 @@ internal class KeyboardSessionController(
         val mix = english.quick && english.word == quick.getComposingText() && autocorrectActive(KeyboardInputMode.Quick)
         Triple(chinese, if (mix) words else emptyList(), quick.getComposingText())
     }.mapLatest { (chinese, words, code) ->
-        if (words.isEmpty()) chinese else {
+        if (words.isEmpty()) chinese else if (code.length == 2 && chinese.isNotEmpty()) {
+            // A complete Quick code keeps every Chinese match ahead of English
+            // suggestions, even when the surrounding text is English.
+            (chinese + words).distinctBy { it.text }.mapIndexed { i, candidate -> candidate.copy(rank = i) }
+        } else {
             val topCount = 8
             val topChinese = chinese.take(topCount)
             val pool = (topChinese + words).map { it.text }.distinct()
@@ -128,6 +149,7 @@ internal class KeyboardSessionController(
         handwritingCandidates = handwritingCandidates.value,
         quickCandidates = quickCandidates.value,
         englishCandidates = englishCandidates.value,
+        chinesePunctuation = chinesePunctuation.value,
         handwritingBusy = handwritingRecognizing.value,
         handwritingError = handwritingError.value,
         handwritingSession = handwritingSession.value,
@@ -223,6 +245,7 @@ internal class KeyboardSessionController(
     }
 
     private fun refreshPredictions() {
+        refreshPunctuation()
         if (!inputViewVisible) return
         when (_keyboardInputMode.value) {
             KeyboardInputMode.AlphaNum -> if(autocorrectActive()) english?.refreshNextWords()
@@ -323,6 +346,7 @@ internal class KeyboardSessionController(
             editor.deleteSelectionOrPreviousCharacter()
             refreshPredictions()
         }
+        refreshPunctuation()
     }
 
     fun commitText(text: String) {
@@ -335,36 +359,26 @@ internal class KeyboardSessionController(
             text.length == 1 && (text[0].isAsciiLetter() || (text[0] in "'’" && !english!!.word.isEmpty()))) {
             handwriting.accept()
             english!!.type(text, evidence)
+            refreshPunctuation()
             return
         }
         if (text.length == 1 && text[0] in "'’" && textPanel == KeyboardInputMode.Quick &&
             autocorrectActive() && quick.hasActiveInput()) {
             quick.restoreComposingText(quick.getComposingText() + text)
             english?.observeQuick(quick.getComposingText(), null)
+            refreshPunctuation()
             return
         }
         val isBoundaryPunctuation = text.length == 1 && !text[0].isLetterOrDigit() && text[0] !in "_@/'’-"
-        if (isBoundaryPunctuation && finishEnglishBoundary(text)) {
+        val textToCommit = resolvePunctuation(text)
+        if (isBoundaryPunctuation && finishEnglishBoundary(textToCommit)) {
             refreshPredictions()
             return
         }
         // Digits/identifiers are literal; don't correct a preceding partial token.
         finishEnglishLiteral()
-        val isQuickComposing = quick.hasActiveInput()
-        if (isQuickComposing) quick.accept()
+        if (quick.hasActiveInput()) quick.accept()
         handwriting.accept()
-        val textToCommit = if (text.length == 1 && SmartPunctuation.isPunctuation(text[0])) {
-            val textBefore = editor.getTextBeforeCursor(64)
-            val chineseContext = SmartPunctuation.isChineseContext(
-                textBeforeCursor = textBefore,
-                currentMode = _keyboardInputMode.value,
-                isComposingQuick = isQuickComposing,
-                isComposingEnglish = false,
-            )
-            SmartPunctuation.toSmartPunctuation(text, chineseContext, textBefore)
-        } else {
-            text
-        }
         editor.commitText(textToCommit)
         refreshPredictions()
     }
@@ -376,6 +390,7 @@ internal class KeyboardSessionController(
         quick.onKey(char)
         val evidence = pendingTouch.also { pendingTouch = null }
         if (autocorrectActive(KeyboardInputMode.Quick)) english?.observeQuick(quick.getComposingText(), evidence)
+        refreshPunctuation()
     }
 
     fun sendSpace() {
@@ -386,6 +401,7 @@ internal class KeyboardSessionController(
         if (finishEnglishBoundary(" ")) { refreshPredictions(); return }
         if (quick.hasActiveInput()) {
             quick.onSpace()
+            refreshPunctuation()
         } else {
             commitText(" ")
         }
@@ -449,6 +465,7 @@ internal class KeyboardSessionController(
         } else {
             handwriting.selectCandidate(text)
         }
+        refreshPunctuation()
     }
 
     fun selectHandwritingCandidate(text: String) = selectCandidate(text)

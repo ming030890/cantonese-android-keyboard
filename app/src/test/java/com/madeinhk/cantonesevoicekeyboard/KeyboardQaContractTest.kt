@@ -522,11 +522,31 @@ class KeyboardQaContractTest {
                 s.start()
                 s.type("of")
                 if (record) s.press(KeyboardKeyKind.Record) else s.type("。")
-                assertEquals(if (record) "of" else "of。", s.editor.text)
+                assertEquals(if (record) "of" else "of.", s.editor.text)
                 assertEquals("", s.editor.composing)
                 assertEquals("", s.quick.getComposingText())
                 assertFalse(s.editor.commits.contains("你"))
                 if (record) assertEquals(KeyboardUiState.Recording, s.snapshot().voice)
+            }
+        }
+    }
+
+    @Test fun ed05_backspaceDeletesOneEmojiPerPressAcrossLayouts() {
+        for (mode in listOf(KeyboardInputMode.Quick, KeyboardInputMode.AlphaNum, KeyboardInputMode.Handwriting)) {
+            KeyboardScenario(initialText = "你", initialMode = mode).use { s ->
+                s.start()
+                listOf("😀", "👍🏽", "👨‍👩‍👧‍👦").forEach { s.press(KeyboardKeyKind.Text, it) }
+                assertEquals("你😀👍🏽👨‍👩‍👧‍👦", s.editor.text)
+                for (expected in listOf("你😀👍🏽", "你😀", "你")) {
+                    s.press(KeyboardKeyKind.Delete)
+                    assertEquals(expected, s.editor.text)
+                    assertEquals("", s.editor.composing)
+                    assertEquals(if (mode == KeyboardInputMode.Quick) KeyboardToolbarContent.Candidates
+                        else KeyboardToolbarContent.Empty, s.snapshot().toolbar())
+                    if (mode == KeyboardInputMode.Quick) assertEquals(
+                        if (expected == "你") listOf("好", "哋") else listOf("我", "你"),
+                        s.snapshot().quickCandidates.map { it.text })
+                }
             }
         }
     }

@@ -9,6 +9,27 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class QuickLanguageScenarioTest {
+    @Test fun twoLetterQuickCodeKeepsChineseBeforeEnglishInEnglishContext() {
+        for (code in listOf("df", "DF", "of")) {
+            for (selected in listOf("標", code)) {
+                KeyboardScenario(initialText = "I use ", englishEngine = ScenarioEnglishEngine().apply {
+                    ranker = { _, _, pool -> pool.sortedBy { if (it.all { char -> char.code < 128 }) 0 else 1 } }
+                }).use { s ->
+                    val matches = listOf("標", "杯", "禁", "紮", "焚", "杰", "棕", "楝", "柬")
+                    s.engine.lookup = { _, _, _, _ -> matches.mapIndexed { i, text -> QuickCandidate(text, i) } }
+                    s.start(); s.type(code)
+                    assertEquals(code, s.editor.composing)
+                    assertEquals("I use ", s.editor.text)
+                    assertEquals(matches + code, s.snapshot().quickCandidates.map { it.text })
+                    assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                    s.choose(selected)
+                    assertEquals("I use $selected", s.editor.text)
+                    assertEquals("", s.editor.composing)
+                }
+            }
+        }
+    }
+
     private val chinese = QuickLanguageEvidence(0.001f, 0.999f, 0.0001f, 0.1f)
     private val english = QuickLanguageEvidence(0.99f, 0.01f, 0.1f, 0.001f)
     private val uncertain = QuickLanguageEvidence(0.45f, 0.55f, 0.03f, 0.04f)

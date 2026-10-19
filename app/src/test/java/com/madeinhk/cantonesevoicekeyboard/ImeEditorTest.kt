@@ -2,6 +2,8 @@ package com.madeinhk.cantonesevoicekeyboard
 
 import android.text.InputType
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
+import java.lang.reflect.Proxy
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -9,6 +11,54 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ImeEditorTest {
+    @Test fun backspaceDeletesWholeEmojiAndPreservesSurroundingText() {
+        for (character in listOf("😀", "👍🏽", "👨‍👩‍👧‍👦", "🇭🇰", "❤️", "1️⃣", "e\u0301", "你", "a")) {
+            var left = "before$character"
+            val right = "after"
+            val deletions = mutableListOf<Pair<Int, Int>>()
+            val input = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+                arrayOf(InputConnection::class.java)) { _, method, args ->
+                when (method.name) {
+                    "getSelectedText" -> null
+                    "getTextBeforeCursor" -> left.takeLast(args!![0] as Int)
+                    "getTextAfterCursor" -> right
+                    "deleteSurroundingText" -> {
+                        val before = args!![0] as Int
+                        deletions += before to (args[1] as Int)
+                        left = left.dropLast(before)
+                        true
+                    }
+                    else -> error("Unexpected InputConnection call: ${method.name}")
+                }
+            } as InputConnection
+            val editor = ImeEditor({ input }, { null })
+            editor.deleteSelectionOrPreviousCharacter()
+            assertEquals(character, "before", left)
+            assertEquals(listOf(character.length to 0), deletions)
+            assertEquals("after", editor.getTextAfterCursor(10))
+        }
+    }
+
+    @Test fun backspaceReplacesSelectionWithoutDeletingAdjacentText() {
+        val commits = mutableListOf<String>()
+        val input = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+            arrayOf(InputConnection::class.java)) { _, method, args ->
+            when (method.name) {
+                "getSelectedText" -> "😀hello"
+                "commitText" -> { commits += args!![0].toString(); true }
+                else -> error("Unexpected InputConnection call: ${method.name}")
+            }
+        } as InputConnection
+        ImeEditor({ input }, { null }).deleteSelectionOrPreviousCharacter()
+        assertEquals(listOf(""), commits)
+    }
+
+    @Test fun previousCharacterLengthHandlesEmptyTextAndAdjacentEmoji() {
+        assertEquals(0, previousCharacterLength(""))
+        assertEquals("👍🏽".length, previousCharacterLength("😀👍🏽"))
+        assertEquals("🇭🇰".length, previousCharacterLength("🇬🇧🇭🇰"))
+    }
+
     @Test
     fun customActionTakesPrecedence() {
         assertEquals(

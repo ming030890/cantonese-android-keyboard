@@ -32,7 +32,7 @@ internal object VoiceClock {
 internal class VoiceLatencyTrace(private val replay: Boolean) {
     // Replay explicitly opts host tests into metric collection; log output still
     // requires the debug APK and native adb-property gate.
-    private val collect = BuildConfig.DEBUG && (replay || enabled)
+    private val collect = replay || enabled
     private val start = if (collect) VoiceClock.nanoTime() else 0L
     private val milestones = linkedMapOf<String, Double>()
     private val milestoneUptimes = linkedMapOf<String, Double>()
@@ -49,7 +49,7 @@ internal class VoiceLatencyTrace(private val replay: Boolean) {
         @Volatile private var enabled = false
 
         internal fun configure(requested: Boolean) {
-            enabled = BuildConfig.DEBUG && requested
+            enabled = requested
         }
 
         fun event(name: String, vararg fields: Pair<String, Any>) {

@@ -34,7 +34,8 @@ internal class ImeEditor(
             if (shouldDeleteSelection(getSelectedText(0))) {
                 commitText("", 1)
             } else {
-                deleteSurroundingText(1, 0)
+                val before = getTextBeforeCursor(1024, 0)
+                deleteSurroundingText(before?.let(::previousCharacterLength) ?: 1, 0)
             }
         }
     }
@@ -87,6 +88,16 @@ internal fun resolveEnterCommand(actionId: Int, imeOptions: Int?): EditorEnterCo
 
 internal fun shouldDeleteSelection(selectedText: CharSequence?): Boolean =
     !selectedText.isNullOrEmpty()
+
+private val graphemePattern = java.util.regex.Pattern.compile("\\X")
+
+/** InputConnection lengths count UTF-16 units; one visible character may span many. */
+internal fun previousCharacterLength(beforeCursor: CharSequence): Int {
+    val matcher = graphemePattern.matcher(beforeCursor)
+    var start = beforeCursor.length
+    while (matcher.find()) start = matcher.start()
+    return beforeCursor.length - start
+}
 
 internal fun keyboardActionFor(editorInfo: EditorInfo?): KeyboardAction =
     when (editorInfo?.let { standardImeAction(it.imeOptions) } ?: EditorInfo.IME_ACTION_NONE) {

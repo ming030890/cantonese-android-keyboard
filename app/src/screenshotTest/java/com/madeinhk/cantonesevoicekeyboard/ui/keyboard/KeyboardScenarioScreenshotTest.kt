@@ -38,6 +38,11 @@ fun ScenarioUncertainCompanyCandidates() = ScenarioScreen(remember { KeyboardSce
 fun ScenarioQuickEnglishCandidates() = ScenarioScreen(remember { KeyboardScenarios.quickEnglishCandidates() })
 
 @PreviewTest
+@Preview(name = "Two letter Quick code Chinese first", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioTwoLetterQuickCandidates() = ScenarioScreen(remember { KeyboardScenarios.twoLetterQuickCandidates() })
+
+@PreviewTest
 @Preview(name = "Long bilingual candidates", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Preview(name = "Long bilingual candidates narrow", widthDp = 320, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
@@ -74,6 +79,16 @@ fun ScenarioQuickCandidates() = ScenarioScreen(remember { KeyboardScenarios.quic
 @Preview(name = "Next word after selection", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioNextWordPredictions() = ScenarioScreen(remember { KeyboardScenarios.nextWordPredictions() })
+
+@PreviewTest
+@Preview(name = "Predictions after emoji backspace", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioAfterEmojiBackspace() = ScenarioScreen(remember { KeyboardScenarios.afterEmojiBackspace() })
+
+@PreviewTest
+@Preview(name = "Typing interrupts voice and shows ASCII punctuation", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioTypingInterruptsVoice() = ScenarioScreen(remember { KeyboardScenarios.typingInterruptsVoice() })
 
 @PreviewTest
 @Preview(name = "Clipboard restored by new copy", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
