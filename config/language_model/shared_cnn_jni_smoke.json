@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "tests": 6,
+  "skipped": 0,
+  "checks": [
+    "literalTyposSurviveEveryBoundaryInBothLayouts",
+    "prefixSuggestionsRequireExplicitSelection",
+    "rapidBoundaryCommitsLiterallyBeforeTheEngineLoads",
+    "actualHandwritingRecognizerAcceptsTheSharedCnnAndFusion",
+    "actualSharedNativeModelCompletesEnglishAndRanksQuick",
+    "nextWordSelectionUsesTheSharedEngineWithoutComposition"
+  ],
+  "scope": "Host JNI with actual packaged shared CNN, Quick dictionaries, visual handwriting model and fusion; not phone validation"
+}

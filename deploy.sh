@@ -126,11 +126,6 @@ echo -e "${COLOR_INFO}Compiling unified Cantonese engine (handwriting + Quick + 
 NATIVE_LM_LINKER="${NATIVE_LM_LINKER:-/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android32-clang}"
 ENGINE_TARGET_DIR="${ENGINE_TARGET_DIR:-/private/tmp/cantonese-engine-android-target}"
 ENGINE_MANIFEST="$QWEN_ASR_DIR/crates/cantonese-ngram/Cargo.toml"
-mkdir -p "$PROJECT_DIR/app/src/main/assets/english"
-CARGO_TARGET_DIR="$ENGINE_TARGET_DIR/host" cargo run --manifest-path "$ENGINE_MANIFEST" --release --bin pack_english -- \
-    "$QWEN_ASR_DIR/crates/cantonese-ngram/data/english/en.txt" "$PROJECT_DIR/app/src/main/assets/english/en.bin"
-CARGO_TARGET_DIR="$ENGINE_TARGET_DIR/host" cargo run --manifest-path "$ENGINE_MANIFEST" --release --bin pack_english -- \
-    "$QWEN_ASR_DIR/crates/cantonese-ngram/data/english/en.txt" "$PROJECT_DIR/app/src/main/assets/english/en-v2.bin" --expand
 pushd "${TMPDIR:-/private/tmp}" > /dev/null
 CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$ENGINE_TARGET_DIR" cargo build --manifest-path "$ENGINE_MANIFEST" --target aarch64-linux-android --release --features android --lib
 popd > /dev/null
@@ -139,24 +134,10 @@ rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libstust_handwriting_inferenc
 rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libcantonese_ngram.so"
 cp "$ENGINE_TARGET_DIR/aarch64-linux-android/release/libcantonese_engine.so" "$ENGINE_SO_DEST"
 echo -e "${COLOR_SUCCESS}Unified Cantonese engine compiled and placed in jniLibs!${COLOR_RESET}"
-LM_SOURCE="${LM_SOURCE:-/Volumes/SSD/cantonese_ngram/experiments/count-coverage-repair-v14-support/audit-overall-final/model.cng}"
+# The selected shared model and fusion are staged together after native parity checks.
+# Deployment only verifies them; it must never restore legacy English/spelling assets.
 LM_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/model.cng"
-if [ -f "$LM_SOURCE" ]; then
-    mkdir -p "$(dirname "$LM_ASSET")"
-    cp "$LM_SOURCE" "$LM_ASSET"
-elif [ ! -f "$LM_ASSET" ]; then
-    echo "Missing Rust LM export: $LM_SOURCE" >&2
-    exit 1
-fi
-
-HWR_FUSION_SOURCE="${HWR_FUSION_SOURCE:-$PROJECT_DIR/config/language_model/handwriting_fusion_v14.json}"
-HWR_FUSION_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/handwriting_fusion.json"
-if [ -f "$HWR_FUSION_SOURCE" ]; then
-    cp "$HWR_FUSION_SOURCE" "$HWR_FUSION_ASSET"
-elif [ ! -f "$HWR_FUSION_ASSET" ]; then
-    echo "Missing handwriting fusion calibration: $HWR_FUSION_SOURCE" >&2
-    exit 1
-fi
+python3 "$PROJECT_DIR/scripts/verify_language_model_assets.py" --project "$PROJECT_DIR"
 
 # ---------------------------------------------------------------------------
 # 3. Stage the ASR model into the Play Asset Delivery packs
@@ -215,23 +196,9 @@ fi
 mkdir -p "$HANDWRITING_ASSETS"
 cp "$HANDWRITING_SOURCE_DIR/model.safetensors" "$HANDWRITING_ASSETS/model.safetensors"
 cp "$HANDWRITING_SOURCE_DIR/labels.txt" "$HANDWRITING_ASSETS/labels.txt"
-if [ -f "$HANDWRITING_SOURCE_DIR/lm_csr.bin" ]; then
-    cp "$HANDWRITING_SOURCE_DIR/lm_csr.bin" "$HANDWRITING_ASSETS/lm_csr.bin"
-fi
+rm -f "$HANDWRITING_ASSETS/lm_csr.bin"
 echo -e "${COLOR_SUCCESS}Handwriting model assets staged.${COLOR_RESET}"
-if python3 - "$LM_ASSET" <<'PY'
-import json,struct,sys
-with open(sys.argv[1],'rb') as f:
-    magic=f.read(4);size=struct.unpack('<I',f.read(4))[0];metadata=json.loads(f.read(size))
-sys.exit(0 if magic==b'CNG1' and metadata.get('neural_short_contexts') else 1)
-PY
-then
-    rm -f "$HANDWRITING_ASSETS/lm_csr.bin"
-fi
 python3 "$PROJECT_DIR/scripts/verify_language_model_assets.py" --project "$PROJECT_DIR"
-if [ "${INTERNAL_TYPING_TRIAL:-false}" = "true" ]; then
-    python3 "$PROJECT_DIR/scripts/stage_internal_typing.py"
-fi
 
 # ---------------------------------------------------------------------------
 # 5. Ensure bundletool is available

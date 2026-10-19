@@ -11,6 +11,8 @@ def sha(path):
 def verify(project):
     assets=project/'app/src/main/assets';model=assets/'language_model/model.cng'
     with model.open('rb') as stream:
+        if stream.read(8)==b'KBCNN01\0':return verify_shared(project)
+    with model.open('rb') as stream:
         header=stream.read(8)
         if len(header)!=8 or header[:4] not in (b'CNG1',b'CNG2'):raise ValueError('Unsupported model format')
         size=struct.unpack('<I',header[4:])[0]
@@ -47,6 +49,32 @@ def verify(project):
         result['parent_share']=metadata['parent_share']
     return result
 
+def verify_shared(project):
+    assets=project/'app/src/main/assets';model=assets/'language_model/model.cng'
+    raw=model.read_bytes();n=struct.unpack('<I',raw[8:12])[0]
+    if n>len(raw)-12:raise ValueError('Truncated CNN metadata')
+    meta=json.loads(raw[12:12+n]);selected=json.loads((project/'config/language_model/selected_model.json').read_text())
+    if meta['format']!='KBCNN_INT8_V1' or meta['tokenizer']!='hybrid-word-first-utf8-v2':raise ValueError('Incorrect shared tokenizer')
+    if len(meta['tokens'])!=meta['vocab_size']:raise ValueError('CNN vocabulary mismatch')
+    if selected['model_sha256']!=sha(model) or selected['model_bytes']!=len(raw):raise ValueError('Selected CNN mismatch')
+    if selected['config']!={k:meta[k] for k in selected['config']}:raise ValueError('Selected CNN configuration mismatch')
+    for old in ('typing','english','handwriting/lm_csr.bin'):
+        if (assets/old).exists():raise ValueError('Obsolete spelling/count asset remains: '+old)
+    fusion_path=assets/'language_model/handwriting_fusion.json';fusion=json.loads(fusion_path.read_text())
+    if selected['fusion_sha256']!=sha(fusion_path) or fusion['neural_model_sha256']!=sha(model):raise ValueError('CNN fusion mismatch')
+    if fusion['version']!=1 or fusion['weights']['unigram'] or fusion['weights']['bigram']:raise ValueError('CNN must not use count priors')
+    if any(not math.isfinite(v) or v<0 or v>16 for v in fusion['weights'].values()):raise ValueError('Invalid CNN fusion weight')
+    for key,file in [('handwriting_model_sha256','model.safetensors'),('labels_sha256','labels.txt')]:
+        if fusion['inputs'][key]!=sha(assets/'handwriting'/file):raise ValueError('Handwriting input changed')
+    if fusion['inputs']['counts_sha256']!=hashlib.sha256(b'').hexdigest():raise ValueError('Count table must be absent')
+    paths=['language_model/model.cng','language_model/handwriting_fusion.json','quick/quick3.bin','quick/quick5.bin','handwriting/labels.txt']
+    total=sum((assets/p).stat().st_size for p in paths)
+    if total>=30_000_000:raise ValueError('Shared prediction resources exceed30MB')
+    if not selected['experimental'] or selected['production_approved']:raise ValueError('V2 has not passed production qualification')
+    return dict(passed=True,format=meta['format'],model_sha256=sha(model),bytes=len(raw),
+                prediction_resource_bytes=total,one_shared_lm=True,english_spelling_assets=False,
+                right_context_tokens=0,experimental=True,production_approved=False)
+
 def verify_package(project, package):
     bundle=package.suffix=='.aab'
     if package.suffix not in {'.apk','.aab'}:raise ValueError('Expected APK or AAB')
@@ -65,6 +93,10 @@ def verify_package(project, package):
         if actual!=sha(source):raise ValueError('Packaged file mismatch: '+entry)
         checked[entry]=actual
     with zipfile.ZipFile(package) as archive:
+        with (assets/'language_model/model.cng').open('rb') as stream:shared=stream.read(8)==b'KBCNN01\0'
+        if shared:
+            obsolete=[n for n in archive.namelist() if n.startswith((prefix+'assets/typing/',prefix+'assets/english/'))]
+            if obsolete:raise ValueError('Obsolete English/spelling assets packaged')
         count_asset=assets/'handwriting/lm_csr.bin'
         if count_asset.exists():files.append('handwriting/lm_csr.bin')
         elif prefix+'assets/handwriting/lm_csr.bin' in archive.namelist():raise ValueError('Obsolete count table packaged')

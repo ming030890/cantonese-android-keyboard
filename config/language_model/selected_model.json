@@ -1,24 +1,31 @@
 {
-  "model_source": "/Volumes/SSD/cantonese_ngram/experiments/count-coverage-repair-v14-support/audit-overall-final/model.cng",
-  "model_sha256": "e650467f9f2ba35aefc478f8fa93f9e3151af04f10e6b673f8dba5c94126581c",
-  "model_bytes": 5860722,
+  "format": "KBCNN_INT8_V1",
+  "model_source": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/shared_keyboard.cnn",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "model_bytes": 12675264,
   "config": {
-    "vocab_size": 34081,
-    "left": 8,
-    "right": 4,
-    "embedding": 128,
-    "hidden": 256,
-    "activation": "relu",
-    "residual_blocks": 2,
-    "layer_norm": true,
-    "ffn_hidden": 512
+    "vocab_size": 65536,
+    "embed_dim": 128,
+    "hidden_dim": 384,
+    "ffn_dim": 768,
+    "dilations": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "context_tokens": 32,
+    "right_context_tokens": 0
   },
-  "fusion_source": "config/language_model/handwriting_fusion_v14.json",
-  "fusion_sha256": "1ad601a6b5051bd30e71c1efdad48379b12157ab175c7bc059e58de33f500efb",
+  "fusion_source": "config/language_model/handwriting_fusion_cnn_v2.json",
+  "fusion_sha256": "9b7cf13af65933432461298a4e6ba35f632c6eb114ca5509ae67089edcc82aba",
   "neural_short_contexts": true,
   "count_table_packaged": false,
-  "selection": "User selected the new best overall model. Count coverage repaired; automatic early stopping at 29000 support-phase steps selects 24000. Same embedding128/residual256/two-block/FFN512 architecture; full count, text, Quick, handwriting, unigram and Rust runtime gates pass.",
-  "evaluation_report": "LANGUAGE_MODEL_COUNT_REPAIR_V14.md",
-  "native_commit": "b1b50c55056a601cba58de5df083c46e1687a2f6",
-  "native_repository": "QwenASR"
+  "experimental": true,
+  "production_approved": false,
+  "selection": "User requested one shared Cantonese/English/handwriting LM; English is explicit prefix completion only",
+  "qualification": "V2 improves contextual accuracy but fails English-prefix and mixed quantization retention guards",
+  "native_verification": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/native-verification.json",
+  "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/previous-assets"
 }

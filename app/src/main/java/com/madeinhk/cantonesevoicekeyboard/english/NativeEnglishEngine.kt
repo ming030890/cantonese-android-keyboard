@@ -17,6 +17,8 @@ internal data class EnglishPrediction(val candidates: List<EnglishCandidate> = e
 data class EnglishTouchEvidence(val x: Float, val y: Float, val centers: FloatArray)
 
 internal interface EnglishCandidateEngine {
+    val supportsAutomaticCorrection: Boolean get() = true
+    fun nextWords(left: String, right: String): List<String> = emptyList()
     fun predict(word: String, centers: FloatArray, points: FloatArray, left: String, right: String): EnglishPrediction
     /** Keep observed casing available to real engines, while existing engines receive canonical words. */
     fun predictObserved(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=

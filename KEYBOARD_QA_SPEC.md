@@ -341,3 +341,23 @@ search leaves the host field empty. This was a temporary UI integration install,
 not a model-delivery deployment. The full gate still reports 15 existing Quick
 punctuation screenshot mismatches from separate pending edits; their baselines
 remain unchanged. The connected physical phone was not used or modified.
+
+
+### D-18 (2026-10-19): One shared LM, explicit English completion
+
+User decision: English uses the same V2 CNN as Cantonese. This supersedes D-07/D-08
+and later automatic spelling-correction policies for the active shared-model path.
+English shows literal input plus prefix completions; Space, punctuation and Enter
+commit the typed spelling unchanged. Selecting a suggestion inserts that suggestion.
+Quick Chinese/English ranking and next-word prediction use the shared LM. Keep Quick
+code dictionaries and the handwriting visual recognizer: these map keys/strokes to
+candidates and are not separate language models. Remove packaged English spelling,
+validity and calibration assets. Settings expose suggestion toggles only.
+
+V2 integration is experimental: English-prefix baseline retention and mixed-prefix
+INT8 retention guards failed. Handwriting fusion uses an explicit initial neural
+weight of 1.0 and needs development calibration. The causal model uses left context
+only; cursor edits rebuild its context. Host verification does not establish phone
+latency or handwriting recognition quality. SharedLmEnglishScenarioTest exercises
+literal boundary commits and manual completion via the production controller;
+ScenarioSharedLmEnglishCompletion renders the same behavior with a fake LM.

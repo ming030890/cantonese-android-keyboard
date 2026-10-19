@@ -19,12 +19,12 @@ import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 fun TypingSettingsScreenshot() = TypingSettingsPreview(false)
 
 @PreviewTest
-@Preview(name="Typing settings narrow large text diagnostics",widthDp=320,heightDp=1050,fontScale=1.3f)
+@Preview(name="Typing suggestions narrow large text",widthDp=320,heightDp=1050,fontScale=1.3f)
 @Composable
 fun TypingSettingsDiagnosticsScreenshot() = TypingSettingsPreview(true)
 
 @PreviewTest
-@Preview(name="Internal autocorrect enabled",widthDp=360,heightDp=820)
+@Preview(name="Typing suggestions disabled",widthDp=360,heightDp=820)
 @Composable
 fun InternalTypingSettingsScreenshot() = TypingSettingsPreview(false,true)
 
@@ -32,10 +32,7 @@ fun InternalTypingSettingsScreenshot() = TypingSettingsPreview(false,true)
 private fun TypingSettingsPreview(diagnostics:Boolean,trial:Boolean=false) {
     CantoneseVoiceKeyboardTheme(darkTheme=true,dynamicColor=false) {
         Box(Modifier.fillMaxSize().background(Color(0xFF121714)).padding(16.dp)) {
-            TypingSettingsCard(english=true,onEnglish={},quick=true,onQuick={},
-                experimental=trial,onExperimental={},learning=true,onLearning={},onClear={},
-                // Fixed fixture version: release bumps should not alter layout baselines.
-                diagnostics=diagnostics,onDiagnostics={},summary="Suggestions ready",onExport={},buildCode=if(trial) 51 else 49,trialBuild=trial)
+            TypingSettingsCard(english=!trial,onEnglish={},quick=!trial,onQuick={})
         }
     }
 }

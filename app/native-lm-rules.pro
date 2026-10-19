@@ -1,3 +1,3 @@
 -keep class com.madeinhk.cantonesevoicekeyboard.quick.NativeQuickEngine { *; }
--keep class com.madeinhk.cantonesevoicekeyboard.english.NativeEnglishEngine { *; }
+-keep class com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine { *; }
 -keep class com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognizer { native <methods>; }

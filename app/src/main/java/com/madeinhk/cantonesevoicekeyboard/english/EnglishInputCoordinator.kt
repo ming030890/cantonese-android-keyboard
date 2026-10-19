@@ -15,6 +15,7 @@ internal class EnglishInputCoordinator(
     val scope: CoroutineScope,
     private val worker: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
     private val onError: (Throwable) -> Unit = {},
+    private val completionOnly: Boolean = false,
 ) : AutoCloseable {
     private var engine: EnglishCandidateEngine? = null
     private var request = 0L
@@ -45,7 +46,8 @@ internal class EnglishInputCoordinator(
         scope.launch(worker) { (engine as? AutoCloseable)?.close(); engine=null }
     }
     fun boundaryPending() = word.isNotEmpty() && resultWord != word && pending != null
-    fun needsBoundaryTransaction()=boundaryPending() || (word.isNotEmpty() && engine?.supportsContextRevision==true)
+    fun needsBoundaryTransaction()=!completionOnly && engine?.supportsAutomaticCorrection!=false &&
+        (boundaryPending() || (word.isNotEmpty() && engine?.supportsContextRevision==true))
     suspend fun settleContextRevision()=contextWindow.settle()
     fun cancelBoundaryCorrection() {
         if (!boundaryPending()) return
@@ -149,11 +151,36 @@ internal class EnglishInputCoordinator(
         (word == word.lowercase(Locale.ROOT) || word == word.uppercase(Locale.ROOT) ||
             word.drop(1) == word.drop(1).lowercase(Locale.ROOT))
 
+    fun refreshNextWords() {
+        if (!completionOnly || word.isNotEmpty() || closed) return
+        pending?.cancel(); val id=++request
+        val left=editor.getTextBeforeCursor(512).orEmpty()
+        val right=editor.getTextAfterCursor(256).orEmpty()
+        scope.launch {
+            val words=withContext(worker) {
+                runCatching {
+                    if(engine==null) engine=loader()
+                    engine?.nextWords(left,right).orEmpty()
+                }.onFailure(onError).getOrDefault(emptyList())
+            }
+            if(!closed && id==request && word.isEmpty())
+                _candidates.value=words.take(8).mapIndexed { i,text -> HandwritingCandidate(text,i) }
+        }
+    }
+
     fun canSelect(text: String) = _candidates.value.any { it.text == text }
 
     fun finish(delimiter: String = "", correct: Boolean = false, chineseMatch: Boolean = false,
                selected: String? = null): Boolean {
-        if (word.isEmpty()) { undo = null; return false }
+        if (word.isEmpty()) {
+            if(selected!=null && canSelect(selected)) {
+                val left=editor.getTextBeforeCursor(1).orEmpty()
+                editor.commitText((if(left.lastOrNull()?.isLetterOrDigit()==true) " " else "")+selected)
+                reset();return true
+            }
+            undo = null; return false
+        }
+        val allowCorrection = correct && !completionOnly && engine?.supportsAutomaticCorrection != false
         val original = word
         val originalLeft=editor.getTextBeforeCursor(512).orEmpty().removeSuffix(original)
         val evidence=FloatArray(taps.size*2) { Float.NaN }.also { values ->
@@ -165,10 +192,10 @@ internal class EnglishInputCoordinator(
         val source = if (quote.isNotEmpty()) apostropheBase!!.second else prediction
         val currentResult = if (quote.isNotEmpty()) true else resultWord == word
         val allowEnglishDecision=!chineseMatch || engine?.allowsQuickCodeCorrections==true
-        val replacement = selected ?: if (correct && !suppress && allowEnglishDecision && eligible() && currentResult)
+        val replacement = selected ?: if (allowCorrection && !suppress && allowEnglishDecision && eligible() && currentResult)
             source.correction?.let { caseWord(it, original) + quote } ?: original else original
         val delayed = pending?.takeIf {
-            correct && !suppress && allowEnglishDecision && eligible() && !currentResult &&
+            allowCorrection && !suppress && allowEnglishDecision && eligible() && !currentResult &&
                 selected == null && delimiter.isNotEmpty()
         }
         // Only replace composition still immediately before this cursor.
@@ -188,11 +215,11 @@ internal class EnglishInputCoordinator(
             if(!editor.replaceTextBeforeCursor(before,replacement+delimiter)) { editor.commitText(delimiter);reset();return true }
             undoOriginal=before
         } else editor.commitText(replacement + delimiter)
-        val record = if (replacement != original && selected == null && correct)
+        val record = if (replacement != original && selected == null && allowCorrection)
             Undo(undoOriginal, replacement + delimiter, quick, editor.cursorSelection()?.first) else null
         val wasQuick = quick
         val cursor = editor.cursorSelection()?.first
-        val mayReconsider=correct && !suppress && allowEnglishDecision && eligible() && selected==null && delimiter==" "
+        val mayReconsider=allowCorrection && !suppress && allowEnglishDecision && eligible() && selected==null && delimiter==" "
         val remember=mayReconsider && currentResult && (!source.known || source.reconsiderKnown) && source.correction==null && replacement==original
         val originalCenters=centers.copyOf()
         reset(cancelLookup = delayed == null, preserveContext = mayReconsider); undo = record

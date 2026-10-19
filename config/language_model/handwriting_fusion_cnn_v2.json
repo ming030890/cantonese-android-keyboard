@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "weights": {
+    "unigram": 0,
+    "bigram": 0,
+    "neural": 1.0
+  },
+  "neural_model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "calibrated": false,
+  "internal_trial": true,
+  "selection": "Explicit initial fusion weight for shared-CNN integration; not a fitted calibration",
+  "inputs": {
+    "handwriting_model_sha256": "b6916eacca94eeeaafd6d3c4b957e218a5681b55e8374f98d9109bfefa98af26",
+    "labels_sha256": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
+    "counts_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

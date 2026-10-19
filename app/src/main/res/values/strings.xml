@@ -187,9 +187,10 @@
     <string name="settings_open_onboarding_title">Setup &amp; onboarding guide</string>
     <string name="settings_open_onboarding_desc">Review microphone access, system keyboard activation, and test sandbox</string>
     <string name="settings_at_least_one_layout">At least one keyboard layout must be selected</string>
-    <string name="typing_title">Typing and correction</string>
-    <string name="typing_english">English autocorrect</string>
-    <string name="typing_quick">English autocorrect in Quick</string>
+    <string name="typing_completion_desc">Select a suggestion to insert it. Typed text is never automatically replaced.</string>
+    <string name="typing_title">Typing suggestions</string>
+    <string name="typing_english">English suggestions</string>
+    <string name="typing_quick">English suggestions in Quick</string>
     <string name="typing_experimental">New decoder preview</string>
     <string name="typing_trial">New autocorrect</string>
     <string name="typing_trial_desc">Enabled for internal testing, including corrections after following words. Press Space to correct; Backspace undoes a correction. Reopen the keyboard after changing this.</string>

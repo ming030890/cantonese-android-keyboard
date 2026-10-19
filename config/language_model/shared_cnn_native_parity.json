@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "contexts": 70,
+  "max_abs_log_probability_difference": 0.00028275154969747973,
+  "top3_exact_agreement": 1.0,
+  "canonical_tokenizer_parity": true,
+  "host_full_distribution_ms": {
+    "p50": 2.427,
+    "p95": 9.583499999999999
+  },
+  "elapsed_seconds": 0.893758833874017,
+  "limitation": "Host native inference, not physical-phone latency; full distribution requests include cold/rebuilt context"
+}

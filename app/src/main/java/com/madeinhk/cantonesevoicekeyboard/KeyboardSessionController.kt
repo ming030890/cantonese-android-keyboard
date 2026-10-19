@@ -47,28 +47,11 @@ internal class KeyboardSessionController(
             val suggestions = KeyboardSuggestionCoordinator(service, editor, isVisible) { handwriting.accept() }
             val english = EnglishInputCoordinator(editor,
                 {
-                    if (KeyboardSettings.isJointDecoderEnabled(service)) {
-                        val learning=LocalTypingLearning(service) {
-                            KeyboardSettings.isTypingLearningEnabled(service) &&
-                                service.currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING) != EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING &&
-                                englishAllowed(service.currentInputEditorInfo?.inputType)
-                        }
-                        val scorer=NativeEnglishEngine.sharedContextScorer(quick::englishContextHandle)
-                        val policy=kotlin.runCatching {
-                            val manifest=org.json.JSONObject(service.assets.open("typing/manifest.json").bufferedReader().use { it.readText() })
-                            ReplacementPolicy.load(service.assets.open("typing/calibration.json").bufferedReader().use { it.readText() },manifest.getString("sha256"))
-                        }.getOrNull()
-                        val revisionPolicy=kotlin.runCatching {
-                            val manifest=org.json.JSONObject(service.assets.open("typing/manifest.json").bufferedReader().use { it.readText() })
-                            ReplacementPolicy.load(service.assets.open("typing/revision_calibration.json").bufferedReader().use { it.readText() },
-                                manifest.getString("sha256"),scope="context_revision")
-                        }.getOrNull()
-                        if(BuildConfig.INTERNAL_TYPING_TRIAL) InternalTypingProfile.load(service,quick::englishContextHandle,learning)
-                        else NativeEnglishEngine.experimental(service,quick::englishContextHandle,scorer,policy,learning,revisionPolicy)
-                    } else NativeEnglishEngine.load(service, quick::englishContextHandle)
+                    SharedLmEnglishEngine(quick::englishContextHandle)
                 },
                 CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
-                onError = { android.util.Log.e("EnglishInputCoordinator", "English candidate engine failed", it) })
+                onError = { android.util.Log.e("EnglishInputCoordinator", "English candidate engine failed", it) },
+                completionOnly = true)
             KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english)
         },
     )
@@ -242,6 +225,7 @@ internal class KeyboardSessionController(
     private fun refreshPredictions() {
         if (!inputViewVisible) return
         when (_keyboardInputMode.value) {
+            KeyboardInputMode.AlphaNum -> if(autocorrectActive()) english?.refreshNextWords()
             KeyboardInputMode.Quick -> quick.refreshPredictions()
             KeyboardInputMode.Handwriting -> handwriting.refreshPredictions()
             else -> {}
@@ -454,6 +438,7 @@ internal class KeyboardSessionController(
             val wasQuick = english.quick
             english.finish(selected = text)
             if (wasQuick) quick.completeExternalCommit()
+            refreshPredictions()
             return
         }
         english?.reset()

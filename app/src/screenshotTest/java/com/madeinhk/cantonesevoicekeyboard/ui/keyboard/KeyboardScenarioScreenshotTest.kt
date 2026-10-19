@@ -8,6 +8,11 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
+@Preview(name = "Shared LM English completion", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioSharedLmEnglishCompletion() = ScenarioScreen(remember { KeyboardScenarios.sharedLmEnglishCompletion() })
+
+@PreviewTest
 @Preview(name = "Missing final letter candidates", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioMissingFinalLetterCandidates() = ScenarioScreen(remember { KeyboardScenarios.missingFinalLetterCandidates() })
