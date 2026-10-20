@@ -156,6 +156,11 @@ class SharedLmEnglishScenarioTest {
             val correction=english.predict("yiu",floatArrayOf(),floatArrayOf(),"how are ","")
             assertTrue(correction.candidates.any {it.word.equals("you",true)})
             assertEquals("you",correction.correction?.lowercase())
+            assertEquals("barely",english.predict("varely",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
+            assertEquals("english",english.predict("engloaj",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
+            assertEquals("the",english.predict("thr",floatArrayOf(),floatArrayOf(),"see all ","").correction?.lowercase())
+            assertEquals("rubbish",english.predict("rjbbish",floatArrayOf(),floatArrayOf(),"see all ","").correction?.lowercase())
+            assertEquals("trigger",english.predict("troggee",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
             val result=english.predict("hel",floatArrayOf(),floatArrayOf(),"I said ","")
             assertFalse(result.candidates.isEmpty())
             assertTrue(result.candidates.any {it.word.equals("hello",true)})
@@ -170,6 +175,8 @@ class SharedLmEnglishScenarioTest {
             KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=english).use { s ->
                 s.start();s.type("keyboard");s.press(KeyboardKeyKind.Space)
                 assertEquals("keyboard ",s.editor.text)
+                s.type("varely");s.press(KeyboardKeyKind.Space)
+                assertEquals("keyboard barely ",s.editor.text)
             }
             KeyboardScenario(initialMode=KeyboardInputMode.Quick,quickEngine=quick,englishEngine=english).use { s ->
                 s.start();s.type("df")
