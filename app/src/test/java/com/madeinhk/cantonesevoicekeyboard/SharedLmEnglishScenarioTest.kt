@@ -162,10 +162,20 @@ class SharedLmEnglishScenarioTest {
             assertNull(result.correction)
             assertTrue(english.supportsAutomaticCorrection)
             assertFalse(quick.candidates(3,"a","我","").isEmpty())
+            val dfCandidates = quick.candidates(3, "df", "", "")
+            assertTrue("Expected >128 candidates for df but got ${dfCandidates.size}", dfCandidates.size > 128)
+            val ofCandidates = quick.candidates(3, "of", "", "")
+            assertTrue("Expected >128 candidates for of but got ${ofCandidates.size}", ofCandidates.size > 128)
             assertEquals(setOf("hello","你好"),english.rankCandidates("我想講 ","",listOf("hello","你好")).toSet())
             KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=english).use { s ->
                 s.start();s.type("keyboard");s.press(KeyboardKeyKind.Space)
                 assertEquals("keyboard ",s.editor.text)
+            }
+            KeyboardScenario(initialMode=KeyboardInputMode.Quick,quickEngine=quick,englishEngine=english).use { s ->
+                s.start();s.type("df")
+                val candidates = s.snapshot().quickCandidates
+                assertTrue("Expected non-empty candidates for df", candidates.isNotEmpty())
+                assertTrue("Expected Chinese candidates for df", candidates.any { c -> c.text.any { it.code in 0x4e00..0x9fff } })
             }
         }
     }
