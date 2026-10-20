@@ -72,7 +72,6 @@ internal data class KeyboardSessionSettings(
     val enabledLayouts: () -> Set<String>,
     val quickVersion: () -> Int,
     val autocorrectEnabled: (String) -> Boolean = { true },
-    val jointDecoderEnabled: () -> Boolean = { false },
 )
 
 internal data class KeyboardSessionDependencies(

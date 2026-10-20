@@ -10,5 +10,5 @@ case "$(uname -s)" in
 esac
 CARGO_TARGET_DIR="$HOST_TARGET" cargo build --manifest-path "$ENGINE_DIR/Cargo.toml" --release --features android --lib
 cd "$PROJECT_DIR"
-./gradlew :app:testDebugUnitTest --tests '*English*' \
+./gradlew :app:testDebugUnitTest --tests '*SharedLmEnglishScenarioTest' \
   "-PenglishNativeLibrary=$HOST_TARGET/release/$LIBRARY" --console=plain

@@ -1,0 +1,521 @@
+{
+  "seed": "english-iteration-20261020-v1",
+  "scope": "Prompt/document-disjoint for this iteration; historical development exposure possible",
+  "binding": {
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "probe": "d7a596915e77fce8901fd125a8c3dfbefb566ef9feb224a1406264445182cd22",
+    "requests": "71a0e37cc225319a4d8a780592a16a16406e34d60989f84a66c52ada39e2143b"
+  },
+  "intake": {
+    "source_events": 489414,
+    "excluded_unsupported_tokens": 34849,
+    "unused_prompt_partition_events": 92778,
+    "excluded_ambiguous_current_suffix": 7477,
+    "selected_events": 6000,
+    "selected_source_preservation": 6000,
+    "prompt_groups": 1205
+  },
+  "case_counts": {
+    "evaluation": 2500,
+    "train": 7095,
+    "selection": 2405
+  },
+  "ranking_trials": [
+    {
+      "completion_cost": 0.0,
+      "mobile": {
+        "train": {
+          "cases": 7095,
+          "top1": 2201,
+          "top8": 2509,
+          "mrr": 2323.4107142857138,
+          "typos": 3374,
+          "applied": 2023,
+          "correct": 1535,
+          "false_changes": 86,
+          "preservation": 3721,
+          "wrong": 488,
+          "precision": 0.7587740978744439,
+          "recall": 0.45494961470065204,
+          "false_change_rate": 0.023112066648750335,
+          "top8_rate": 0.3536293164200141,
+          "mrr_rate": 0.3274715594483036
+        },
+        "selection": {
+          "cases": 2405,
+          "top1": 721,
+          "top8": 825,
+          "mrr": 763.7178571428573,
+          "typos": 1125,
+          "applied": 705,
+          "correct": 529,
+          "false_changes": 35,
+          "preservation": 1280,
+          "wrong": 176,
+          "precision": 0.750354609929078,
+          "recall": 0.4702222222222222,
+          "false_change_rate": 0.02734375,
+          "top8_rate": 0.34303534303534305,
+          "mrr_rate": 0.3175542025542026
+        }
+      },
+      "prefix": {
+        "train": {
+          "cases": 609,
+          "top1": 262,
+          "top8": 414,
+          "mrr": 316.15476190476176,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6798029556650246,
+          "mrr_rate": 0.5191375400735004
+        },
+        "selection": {
+          "cases": 185,
+          "top1": 86,
+          "top8": 127,
+          "mrr": 99.7011904761905,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6864864864864865,
+          "mrr_rate": 0.5389253539253541
+        }
+      }
+    },
+    {
+      "completion_cost": 0.1,
+      "mobile": {
+        "train": {
+          "cases": 7095,
+          "top1": 2202,
+          "top8": 2509,
+          "mrr": 2323.972619047618,
+          "typos": 3374,
+          "applied": 2025,
+          "correct": 1535,
+          "false_changes": 86,
+          "preservation": 3721,
+          "wrong": 490,
+          "precision": 0.7580246913580246,
+          "recall": 0.45494961470065204,
+          "false_change_rate": 0.023112066648750335,
+          "top8_rate": 0.3536293164200141,
+          "mrr_rate": 0.3275507567368031
+        },
+        "selection": {
+          "cases": 2405,
+          "top1": 720,
+          "top8": 825,
+          "mrr": 763.4011904761907,
+          "typos": 1125,
+          "applied": 706,
+          "correct": 530,
+          "false_changes": 35,
+          "preservation": 1280,
+          "wrong": 176,
+          "precision": 0.7507082152974505,
+          "recall": 0.4711111111111111,
+          "false_change_rate": 0.02734375,
+          "top8_rate": 0.34303534303534305,
+          "mrr_rate": 0.3174225324225325
+        }
+      },
+      "prefix": {
+        "train": {
+          "cases": 609,
+          "top1": 264,
+          "top8": 415,
+          "mrr": 316.14523809523797,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6814449917898193,
+          "mrr_rate": 0.5191219016342167
+        },
+        "selection": {
+          "cases": 185,
+          "top1": 85,
+          "top8": 127,
+          "mrr": 99.2761904761905,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6864864864864865,
+          "mrr_rate": 0.5366280566280567
+        }
+      }
+    },
+    {
+      "completion_cost": 0.25,
+      "mobile": {
+        "train": {
+          "cases": 7095,
+          "top1": 2195,
+          "top8": 2508,
+          "mrr": 2320.6380952380946,
+          "typos": 3374,
+          "applied": 2031,
+          "correct": 1535,
+          "false_changes": 87,
+          "preservation": 3721,
+          "wrong": 496,
+          "precision": 0.7557853274249139,
+          "recall": 0.45494961470065204,
+          "false_change_rate": 0.023380811609782316,
+          "top8_rate": 0.35348837209302325,
+          "mrr_rate": 0.3270807745226349
+        },
+        "selection": {
+          "cases": 2405,
+          "top1": 721,
+          "top8": 825,
+          "mrr": 764.2011904761907,
+          "typos": 1125,
+          "applied": 708,
+          "correct": 530,
+          "false_changes": 35,
+          "preservation": 1280,
+          "wrong": 178,
+          "precision": 0.748587570621469,
+          "recall": 0.4711111111111111,
+          "false_change_rate": 0.02734375,
+          "top8_rate": 0.34303534303534305,
+          "mrr_rate": 0.31775517275517284
+        }
+      },
+      "prefix": {
+        "train": {
+          "cases": 609,
+          "top1": 269,
+          "top8": 411,
+          "mrr": 317.45476190476177,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6748768472906403,
+          "mrr_rate": 0.5212721870357336
+        },
+        "selection": {
+          "cases": 185,
+          "top1": 85,
+          "top8": 127,
+          "mrr": 98.12738095238095,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6864864864864865,
+          "mrr_rate": 0.5304182754182754
+        }
+      }
+    },
+    {
+      "completion_cost": 0.5,
+      "mobile": {
+        "train": {
+          "cases": 7095,
+          "top1": 2192,
+          "top8": 2506,
+          "mrr": 2316.469047619047,
+          "typos": 3374,
+          "applied": 2033,
+          "correct": 1535,
+          "false_changes": 87,
+          "preservation": 3721,
+          "wrong": 498,
+          "precision": 0.7550418101328087,
+          "recall": 0.45494961470065204,
+          "false_change_rate": 0.023380811609782316,
+          "top8_rate": 0.3532064834390416,
+          "mrr_rate": 0.3264931709117755
+        },
+        "selection": {
+          "cases": 2405,
+          "top1": 720,
+          "top8": 825,
+          "mrr": 763.0511904761905,
+          "typos": 1125,
+          "applied": 710,
+          "correct": 530,
+          "false_changes": 35,
+          "preservation": 1280,
+          "wrong": 180,
+          "precision": 0.7464788732394366,
+          "recall": 0.4711111111111111,
+          "false_change_rate": 0.02734375,
+          "top8_rate": 0.34303534303534305,
+          "mrr_rate": 0.3172770022770023
+        }
+      },
+      "prefix": {
+        "train": {
+          "cases": 609,
+          "top1": 263,
+          "top8": 404,
+          "mrr": 311.3309523809522,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6633825944170771,
+          "mrr_rate": 0.5112166705762763
+        },
+        "selection": {
+          "cases": 185,
+          "top1": 82,
+          "top8": 122,
+          "mrr": 95.01666666666665,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6594594594594595,
+          "mrr_rate": 0.5136036036036036
+        }
+      }
+    },
+    {
+      "completion_cost": 1.0,
+      "mobile": {
+        "train": {
+          "cases": 7095,
+          "top1": 2177,
+          "top8": 2498,
+          "mrr": 2303.134523809522,
+          "typos": 3374,
+          "applied": 2042,
+          "correct": 1535,
+          "false_changes": 87,
+          "preservation": 3721,
+          "wrong": 507,
+          "precision": 0.7517140058765915,
+          "recall": 0.45494961470065204,
+          "false_change_rate": 0.023380811609782316,
+          "top8_rate": 0.35207892882311487,
+          "mrr_rate": 0.32461374542769866
+        },
+        "selection": {
+          "cases": 2405,
+          "top1": 712,
+          "top8": 823,
+          "mrr": 756.8023809523812,
+          "typos": 1125,
+          "applied": 714,
+          "correct": 530,
+          "false_changes": 35,
+          "preservation": 1280,
+          "wrong": 184,
+          "precision": 0.742296918767507,
+          "recall": 0.4711111111111111,
+          "false_change_rate": 0.02734375,
+          "top8_rate": 0.3422037422037422,
+          "mrr_rate": 0.3146787446787448
+        }
+      },
+      "prefix": {
+        "train": {
+          "cases": 609,
+          "top1": 221,
+          "top8": 387,
+          "mrr": 279.29523809523806,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6354679802955665,
+          "mrr_rate": 0.4586128704355305
+        },
+        "selection": {
+          "cases": 185,
+          "top1": 70,
+          "top8": 115,
+          "mrr": 87.28095238095237,
+          "precision": 0.0,
+          "recall": 0.0,
+          "false_change_rate": 0.0,
+          "top8_rate": 0.6216216216216216,
+          "mrr_rate": 0.4717889317889317
+        }
+      }
+    }
+  ],
+  "selected_completion_cost": 0.0,
+  "baseline_mobile": {
+    "train": {
+      "cases": 7095,
+      "top1": 2192,
+      "top8": 2506,
+      "mrr": 2316.469047619047,
+      "typos": 3374,
+      "applied": 2033,
+      "correct": 1535,
+      "false_changes": 87,
+      "preservation": 3721,
+      "wrong": 498,
+      "precision": 0.7550418101328087,
+      "recall": 0.45494961470065204,
+      "false_change_rate": 0.023380811609782316,
+      "top8_rate": 0.3532064834390416,
+      "mrr_rate": 0.3264931709117755
+    },
+    "selection": {
+      "cases": 2405,
+      "top1": 720,
+      "top8": 825,
+      "mrr": 763.0511904761905,
+      "typos": 1125,
+      "applied": 710,
+      "correct": 530,
+      "false_changes": 35,
+      "preservation": 1280,
+      "wrong": 180,
+      "precision": 0.7464788732394366,
+      "recall": 0.4711111111111111,
+      "false_change_rate": 0.02734375,
+      "top8_rate": 0.34303534303534305,
+      "mrr_rate": 0.3172770022770023
+    },
+    "evaluation": {
+      "cases": 2500,
+      "top1": 750,
+      "top8": 856,
+      "mrr": 792.7666666666668,
+      "typos": 1169,
+      "applied": 706,
+      "correct": 514,
+      "false_changes": 42,
+      "wrong": 192,
+      "preservation": 1331,
+      "precision": 0.7280453257790368,
+      "recall": 0.43969204448246363,
+      "false_change_rate": 0.03155522163786627,
+      "top8_rate": 0.3424,
+      "mrr_rate": 0.3171066666666667
+    }
+  },
+  "candidate_mobile": {
+    "train": {
+      "cases": 7095,
+      "top1": 2201,
+      "top8": 2509,
+      "mrr": 2323.4107142857138,
+      "typos": 3374,
+      "applied": 2023,
+      "correct": 1535,
+      "false_changes": 86,
+      "preservation": 3721,
+      "wrong": 488,
+      "precision": 0.7587740978744439,
+      "recall": 0.45494961470065204,
+      "false_change_rate": 0.023112066648750335,
+      "top8_rate": 0.3536293164200141,
+      "mrr_rate": 0.3274715594483036
+    },
+    "selection": {
+      "cases": 2405,
+      "top1": 721,
+      "top8": 825,
+      "mrr": 763.7178571428573,
+      "typos": 1125,
+      "applied": 705,
+      "correct": 529,
+      "false_changes": 35,
+      "preservation": 1280,
+      "wrong": 176,
+      "precision": 0.750354609929078,
+      "recall": 0.4702222222222222,
+      "false_change_rate": 0.02734375,
+      "top8_rate": 0.34303534303534305,
+      "mrr_rate": 0.3175542025542026
+    },
+    "evaluation": {
+      "cases": 2500,
+      "top1": 748,
+      "top8": 856,
+      "mrr": 791.575,
+      "typos": 1169,
+      "applied": 703,
+      "correct": 512,
+      "false_changes": 42,
+      "wrong": 191,
+      "preservation": 1331,
+      "precision": 0.7283072546230441,
+      "recall": 0.43798118049615054,
+      "false_change_rate": 0.03155522163786627,
+      "top8_rate": 0.3424,
+      "mrr_rate": 0.31663
+    }
+  },
+  "baseline_prefix": {
+    "train": {
+      "cases": 609,
+      "top1": 263,
+      "top8": 404,
+      "mrr": 311.3309523809522,
+      "precision": 0.0,
+      "recall": 0.0,
+      "false_change_rate": 0.0,
+      "top8_rate": 0.6633825944170771,
+      "mrr_rate": 0.5112166705762763
+    },
+    "selection": {
+      "cases": 185,
+      "top1": 82,
+      "top8": 122,
+      "mrr": 95.01666666666665,
+      "precision": 0.0,
+      "recall": 0.0,
+      "false_change_rate": 0.0,
+      "top8_rate": 0.6594594594594595,
+      "mrr_rate": 0.5136036036036036
+    },
+    "evaluation": {
+      "cases": 192,
+      "top1": 81,
+      "top8": 139,
+      "mrr": 100.75476190476188,
+      "precision": 0.0,
+      "recall": 0.0,
+      "false_change_rate": 0.0,
+      "top8_rate": 0.7239583333333334,
+      "mrr_rate": 0.5247643849206348
+    }
+  },
+  "candidate_prefix": {
+    "train": {
+      "cases": 609,
+      "top1": 262,
+      "top8": 414,
+      "mrr": 316.15476190476176,
+      "precision": 0.0,
+      "recall": 0.0,
+      "false_change_rate": 0.0,
+      "top8_rate": 0.6798029556650246,
+      "mrr_rate": 0.5191375400735004
+    },
+    "selection": {
+      "cases": 185,
+      "top1": 86,
+      "top8": 127,
+      "mrr": 99.7011904761905,
+      "precision": 0.0,
+      "recall": 0.0,
+      "false_change_rate": 0.0,
+      "top8_rate": 0.6864864864864865,
+      "mrr_rate": 0.5389253539253541
+    },
+    "evaluation": {
+      "cases": 192,
+      "top1": 89,
+      "top8": 148,
+      "mrr": 109.49523809523802,
+      "precision": 0.0,
+      "recall": 0.0,
+      "false_change_rate": 0.0,
+      "top8_rate": 0.7708333333333334,
+      "mrr_rate": 0.570287698412698
+    }
+  },
+  "selected_gate": null,
+  "gates_passing_train": 0,
+  "gates_passing_selection": 0,
+  "gate_qualified": false
+}

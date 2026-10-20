@@ -1,0 +1,41 @@
+{
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "policy_sha256": "b831c97a70c941a045d0fa58367042cadd64eac22e136472676a0cc1a3084a04",
+  "probe_sha256": "2e8c589d94d0babb4167e1b4b3c5b9dbf590f0e43fbf1b9a0506ae481bb05031",
+  "cases": 9728,
+  "decision_mismatches": [],
+  "evaluation": {
+    "cases": 2042,
+    "top1": 573,
+    "top8": 648,
+    "mrr": 603.0333333333333,
+    "typos": 744,
+    "preservation": 1298,
+    "applied": 236,
+    "correct": 224,
+    "false_changes": 5,
+    "wrong": 12,
+    "precision": 0.9491525423728814,
+    "recall": 0.3010752688172043,
+    "false_change_rate": 0.003852080123266564,
+    "top8_rate": 0.31733594515181196,
+    "mrr_rate": 0.295315050603983
+  },
+  "baseline_evaluation": {
+    "cases": 2042,
+    "top1": 573,
+    "top8": 648,
+    "mrr": 603.0333333333333,
+    "typos": 744,
+    "applied": 511,
+    "correct": 399,
+    "false_changes": 41,
+    "wrong": 112,
+    "preservation": 1298,
+    "precision": 0.7808219178082192,
+    "recall": 0.5362903225806451,
+    "false_change_rate": 0.031587057010785825,
+    "top8_rate": 0.31733594515181196,
+    "mrr_rate": 0.295315050603983
+  }
+}

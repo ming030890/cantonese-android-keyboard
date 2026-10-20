@@ -1,0 +1,131 @@
+{
+  "scope": "Development only; canonical context tokens reconstructed with whitespace; not an independent held-out test",
+  "input_sha256": {
+    "/Volumes/SSD/cantonese_ngram/data/shared-multilingual-v1-stage/eval/finalist_suite.jsonl": "6907e44417dd234223c261dbd66cdd347d2c15446d401183e2fa44ba435c46ab",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "/private/tmp/keyboard-pipeline-audit-native/release/ngram_probe": "d7a596915e77fce8901fd125a8c3dfbefb566ef9feb224a1406264445182cd22",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/audit_prediction_context.py": "870320a8e786a702a10b421fb438c1a18c9a2805961ca331753e520b3db56ae5"
+  },
+  "metrics": {
+    "english_prefix_english": {
+      "context": {
+        "cases": 150,
+        "top1": 76,
+        "top3": 104,
+        "top8": 123,
+        "mrr": 92.29642857142856,
+        "top1_rate": 0.5066666666666667,
+        "top3_rate": 0.6933333333333334,
+        "top8_rate": 0.82,
+        "mrr_rate": 0.6153095238095238
+      },
+      "empty_context": {
+        "cases": 150,
+        "top1": 19,
+        "top3": 59,
+        "top8": 86,
+        "mrr": 40.4357142857143,
+        "top1_rate": 0.12666666666666668,
+        "top3_rate": 0.3933333333333333,
+        "top8_rate": 0.5733333333333334,
+        "mrr_rate": 0.26957142857142863
+      }
+    },
+    "english_prefix_mixed": {
+      "context": {
+        "cases": 150,
+        "top1": 30,
+        "top3": 35,
+        "top8": 58,
+        "mrr": 36.4404761904762,
+        "top1_rate": 0.2,
+        "top3_rate": 0.23333333333333334,
+        "top8_rate": 0.38666666666666666,
+        "mrr_rate": 0.24293650793650798
+      },
+      "empty_context": {
+        "cases": 150,
+        "top1": 2,
+        "top3": 11,
+        "top8": 33,
+        "mrr": 10.238095238095235,
+        "top1_rate": 0.013333333333333334,
+        "top3_rate": 0.07333333333333333,
+        "top8_rate": 0.22,
+        "mrr_rate": 0.06825396825396823
+      }
+    },
+    "shared_next_cantonese": {
+      "context": {
+        "cases": 150,
+        "top1": 7,
+        "top3": 19,
+        "top8": 27,
+        "mrr": 13.717857142857142,
+        "top1_rate": 0.04666666666666667,
+        "top3_rate": 0.12666666666666668,
+        "top8_rate": 0.18,
+        "mrr_rate": 0.09145238095238094
+      },
+      "empty_context": {
+        "cases": 150,
+        "top1": 4,
+        "top3": 6,
+        "top8": 8,
+        "mrr": 5.208333333333333,
+        "top1_rate": 0.02666666666666667,
+        "top3_rate": 0.04,
+        "top8_rate": 0.05333333333333334,
+        "mrr_rate": 0.03472222222222222
+      }
+    },
+    "shared_next_english": {
+      "context": {
+        "cases": 150,
+        "top1": 30,
+        "top3": 38,
+        "top8": 56,
+        "mrr": 36.40714285714286,
+        "top1_rate": 0.2,
+        "top3_rate": 0.25333333333333335,
+        "top8_rate": 0.37333333333333335,
+        "mrr_rate": 0.24271428571428572
+      },
+      "empty_context": {
+        "cases": 150,
+        "top1": 0,
+        "top3": 0,
+        "top8": 0,
+        "mrr": 0.0,
+        "top1_rate": 0.0,
+        "top3_rate": 0.0,
+        "top8_rate": 0.0,
+        "mrr_rate": 0.0
+      }
+    },
+    "shared_next_mixed": {
+      "context": {
+        "cases": 150,
+        "top1": 6,
+        "top3": 17,
+        "top8": 24,
+        "mrr": 12.383333333333331,
+        "top1_rate": 0.04,
+        "top3_rate": 0.11333333333333333,
+        "top8_rate": 0.16,
+        "mrr_rate": 0.08255555555555553
+      },
+      "empty_context": {
+        "cases": 150,
+        "top1": 2,
+        "top3": 9,
+        "top8": 11,
+        "mrr": 5.166666666666666,
+        "top1_rate": 0.013333333333333334,
+        "top3_rate": 0.06,
+        "top8_rate": 0.07333333333333333,
+        "mrr_rate": 0.03444444444444444
+      }
+    }
+  }
+}

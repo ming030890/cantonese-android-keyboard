@@ -224,7 +224,7 @@ fi
 cd "$PROJECT_DIR"
 if [ "$RELEASE" = "true" ]; then
     echo -e "${COLOR_INFO}[Step 6/7] Building RELEASE App Bundle (.aab) for Play upload...${COLOR_RESET}"
-    ./gradlew :app:verifyKeyboard :app:bundleRelease "-PinternalTypingTrial=${INTERNAL_TYPING_TRIAL:-false}"
+    ./gradlew :app:verifyKeyboard :app:bundleRelease
 else
     echo -e "${COLOR_INFO}[Step 6/7] Building debug App Bundle (.aab)...${COLOR_RESET}"
     ./gradlew :app:verifyKeyboard :app:bundleDebug

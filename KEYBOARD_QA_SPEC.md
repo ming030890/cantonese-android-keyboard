@@ -61,6 +61,7 @@ model quality or a requirement that real models return this exact ranking.
 | QK-09 | Compose more than a single two-letter code | Continue phrase lookup. Following input may commit a resolved six-character Chinese phrase only with fresh, strong LM Chinese evidence. Missing, pending or uncertain evidence preserves raw composition and unconsumed suffixes. Dictionary prefix membership does not decide the language. | D-09; `QuickLanguageScenarioTest`, native real-model regression, length/cap tests |
 | QK-10 | Paste, press Record, or enter punctuation while a Quick code is unfinished | Commit literal letters first. Paste inserts copied text once and clears Quick composition, then refreshes predictions. Record transitions to voice; punctuation follows the literal letters. Chinese conversion requires explicit candidate selection at these boundaries. | Rule D-05 derived from confirmed literal policies; `qk10` |
 | QK-11 | Type a complete two-letter Quick code such as `df`, including in English context | Keep all Chinese code matches in their Quick ranking ahead of English suggestions. Retain literal English for explicit selection. Longer input continues bilingual ranking. | Agreed 2026-10-19; `twoLetterQuickCodeKeepsChineseBeforeEnglishInEnglishContext`, two-letter scenario screenshot |
+| QK-12 | Type a short Quick code while full/English ranking is pending | Show a selectable preview using one model distribution for known characters, followed by rare matches in dictionary order. Full sequence ranking then refines the order. Display Chinese results without waiting for mixed ranking; two-letter codes never request mixed ranking. Cancelled previews/results must not restore an old code. | Agreed latency fix 2026-10-20; `shortCodePreviewIsSelectableBeforeFullRankingAndRejectsLateResults`, `chineseCandidatesAppearWhileEnglishWorkerIsStillPending`; final candidate screenshots unchanged |
 
 ## Other text input and editor context
 
@@ -136,13 +137,13 @@ with fixed English model results; Rust tests verify the actual search and confid
 
 | ID | Sequence / condition | Expected behavior | Coverage |
 |---|---|---|---|
-| AC-01 | Type `teh`, then Space, punctuation, or newline on English/Quick | Compose the word; show literal input plus spelling alternatives; commit `the` and the exact boundary when confident. A pending lookup can correct the untouched committed suffix after completion. Further input, cursor changes, layout/hide, failure, and submitting Enter prevent delayed replacement. | `boundaryCorrectionAndUndoOnBothLayouts`, `pendingBoundaryCorrectsWithUndoButNeverRewritesAfterNewInput`, real JNI timing test |
+| AC-01 | Type `teh`, then Space, punctuation, or newline on English/Quick | Compose the word; show literal input plus spelling alternatives; commit `the` and the exact boundary when confident. A pending lookup resolves through the bounded boundary queue; subsequent typing waits in order. Cursor changes, layout/hide, failure, timeout, and submitting Enter prevent delayed replacement. | `boundaryCorrectionAndUndoOnBothLayouts`, `pendingBoundaryQueuesNewInputAndSupportsUndo`, real JNI timing test |
 | AC-02 | Immediate Backspace after correction | Remove delimiter and restore original composition; recommit without repeating the correction. Guard undo against cursor/selection changes. | boundary and selection scenarios |
 | AC-03 | Type English prefixes in Quick beyond six letters | Protect plausible English from automatic Chinese phrase conversion; preserve conversion for non-English sequences. Chinese and English candidates share LM ranking; selection stays explicit. Exact one/two-root codes remain literal unless tapped. | Quick conversion and selection scenarios |
 | AC-04 | Switch to symbols and return, or enter punctuation there | Keep originating English/Quick word ownership. Punctuation resolves the word; digits and identifiers finish literally. | `numberPanelPreservesWordForPunctuationButDigitsStayLiteral` |
 | AC-05 | Paste, Record, emoji, layout switch, keyboard hide | Finish literal composition exactly once and cancel pending English results. | lifecycle scenarios |
 | AC-06 | Password, number, URL/email editor, no-suggestions, disabled layout preference | No English correction. Preferences are independent for English and Quick. | policy and preference scenarios |
-| AC-07 | Tap letters, uppercase, resize, rollover or canceled key | Use drawn letter centers in key-width units. Evidence accompanies dispatched characters only; missing geometry falls back to adjacency. Preserve case; unsupported tokens stay literal. | geometry/input scenarios; touch integration tests |
+| AC-07 | Tap letters, uppercase, resize, rollover or canceled key | Capture drawn letter centers in key-width units with dispatched characters only. Preserve case; unsupported tokens stay literal. The active shared engine currently ignores captured touch evidence and uses fixed QWERTY costs; touch-aware legacy tests do not establish live touch scoring. | geometry/input scenarios; active touch integration gap |
 | AC-08 | Chinese and English candidates compete in Quick | Complete two-letter codes follow QK-11. For longer input, shared bilingual LM ranks one combined pool, including Chinese phrases; retain all candidate texts and literal spelling. English can rank before Chinese in English context. | `mixedCandidateBarUsesContextRankingAndBothLanguagesRemainSelectable`, shipped-model JNI test, mixed screenshot |
 | AC-09 | Centre-key mistaps from the user's report | Clear `engkish`, `shoukd`, `chineae`, `candjdates`, `kehboard` typos correct; severe `ebgkisb` offers `english` without automatic replacement. | Rust centre-touch regression, real JNI/controller scenarios on both layouts |
 | AC-10 | WM replacement rules: `keyboar`, `gwllo`, `tyoing` then Space | A single missing final letter can correct with a 4:1 margin and insertion penalty; two-edit and edited/completed suggestions do not compete for replacement. `gwllo` offers `hello` for a tap; ambiguous `tyoing` remains literal. Backspace restores `keyboar`. | Native shape/confidence tests and real JNI/controller scenarios on both layouts |
@@ -385,3 +386,43 @@ Quick's short Chinese code protection remains. No external English dictionary,
 second model, spelling head, or old correction calibration is loaded. Vocabulary
 coverage limits correction: words absent from the shared English token set cannot
 be proposed by this generator.
+
+### D-20 (2026-10-20): Data-fitted acceptance selected by F₀.₅
+
+The user selected F₀.₅ as the primary correction metric and requested accepting
+improvements; there is no separate 95% precision cutoff. This supersedes D-19's
+numeric edit/margin/probability rules and the earlier precision-focused rule.
+The shared native engine uses `english_acceptance.json`. On the fixed aligned
+mobile development evaluation F₀.₅ improves from 0.71557 to 0.76364: 336 correct
+replacements and 28 wrong ones versus 399 correct and 112 wrong originally.
+Precision is 92.31%, recall 45.16%. The earlier conservative rule scored 0.66351.
+An uncertain `varely` remains literal on Space and still offers `barely` for
+selection. `teh` still corrects, and Backspace undo remains available. Prefix
+completion no longer pays a spelling-error cost. These changes do not qualify
+the full experimental LM for production.
+
+`SharedLmEnglishScenarioTest` checks the real native decisions and controller
+sequence. `ScenarioUncertainSharedLmSpelling` renders the literal and explicit
+alternative with a fake native response. Captured touch coordinates still do not
+enter this engine's scorer. See `ENGLISH_TYPING_ITERATION.md` for the touch-model
+experiment, remaining constants and evaluation limits.
+
+### D-21 (2026-10-20): Original-word evidence in fitted acceptance
+
+The current rule replaces D-20's blanket known-word preservation with a fitted
+comparison of original-word and proposed-replacement evidence. It reuses the
+existing LM distribution and adds no model pass or separate dictionary. Six
+fitted features include original score, score difference, known-word status and
+an apostrophe indicator alongside winner score and runner margin. Prefix expansion
+remains explicit. A known original without literal evidence is preserved.
+
+The frozen evaluation improves F₀.₅ from 0.76364 to 0.79167: 361 correct and
+23 wrong replacements, with five unwanted changes to preservation controls.
+`hou` after “let me know if” can correct to `you`; immediate Backspace restores
+`hou` and the next Space respects undo. `don't` after “I” stays literal. This
+does not establish contraction generation coverage: the LM has no apostrophe
+word tokens. Actual touch coordinates remain unused by the active scorer.
+
+`SharedLmEnglishScenarioTest` covers real JNI/controller behavior on both layouts;
+`ScenarioSharedLmKnownWordCorrection` renders the same state with fake model data.
+See `LITERAL_ACCEPTANCE_ITERATION.md` for selection, evaluation and host latency.

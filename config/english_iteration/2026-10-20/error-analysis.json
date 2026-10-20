@@ -1,0 +1,156 @@
+{
+  "scope": "Frozen development evaluation; diagnostic attribution only, no policy fitting or promotion",
+  "source_sha256": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/analyze_autocorrect_errors.py": "871c7f0b652ca1b2bb3c1c858ab7ad4f1db5cd2b6f99aaa28d46b16d519a3bd7",
+    "build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "build/english-iteration-2026-10-20/native-cache.json": "c4cf55303800beb689dc2b9caa73ba54c1de9528dfa3846e5ce8d5213a4887b6",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_acceptance.json": "e495e47fd8002cc6d59f33de335ee78d751eaae1c1b93c2a623f135a19d90141",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/audit_candidate_pipeline.py": "d0822e0187c52e0addfd0916e23a1a2f5d5dd04ed5181c24abaf644a5eec41b1",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/align_mobile_targets.py": "3240a34c9cd46eab5ce4c9036ab928e499e67f7f833c003da511b71c8aeb5bb4",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/iterate_english_policy.py": "f5ad493abdc219fa3fd2ed9ccffd6e5e557ce6c282baf83f751e85a45f3ec63c",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/verify_english_acceptance.py": "3bab3b7263394ab28f729e72a744dff980f1fb9f6a82bddc7039964a36a1ac96"
+  },
+  "evaluation": {
+    "cases": 2042,
+    "top1": 573,
+    "top8": 648,
+    "mrr": 603.0333333333333,
+    "typos": 744,
+    "applied": 364,
+    "correct": 336,
+    "false_changes": 9,
+    "preservation": 1298,
+    "wrong": 28,
+    "f05": 0.7636363636363637,
+    "precision": 0.9230769230769231,
+    "recall": 0.45161290322580644,
+    "false_change_rate": 0.006933744221879815,
+    "top8_rate": 0.31733594515181196,
+    "mrr_rate": 0.295315050603983
+  },
+  "counts": {
+    "cases": 2042,
+    "typos": 744,
+    "unknown_input": 668,
+    "target_in_pool": 659,
+    "target_in_top8": 648,
+    "target_top1": 573,
+    "correct": 336,
+    "missed": 408,
+    "ranking_misses": 86,
+    "controls": 1298,
+    "known_control": 1235,
+    "acceptance_misses": 237,
+    "wrong_on_typo": 19,
+    "known_typo": 139,
+    "generation_misses": 85,
+    "wrong_on_control": 9
+  },
+  "generation_reasons": {
+    "outside_length_dependent_edit_radius": 40,
+    "length_difference_greater_than_one": 11,
+    "target_word_absent_from_generation_vocabulary": 30,
+    "multiword_split_proposal_restriction": 4
+  },
+  "ranking_reasons": {
+    "cost_overrides_better_lm_evidence": 25,
+    "lm_and_cost_both_favor_wrong_winner_or_tie": 44,
+    "lm_overrides_better_edit_cost": 17
+  },
+  "acceptance_reasons": {
+    "learned_acceptance_threshold": 98,
+    "known_word_preservation": 108,
+    "observed_word_too_short": 6,
+    "automatic_completion_disabled": 24,
+    "candidate_word_too_short": 1
+  },
+  "wrong_replacement_reasons": {
+    "target_present_ranked_below_wrong_winner": 10,
+    "target_absent": 9,
+    "clean_control_changed": 9
+  },
+  "overlapping_blockers": {
+    "ranking": {
+      "known_word_veto_also_applies": 13,
+      "wrong_replacement_applied": 10
+    },
+    "acceptance": {
+      "known_word_veto_also_applies": 108,
+      "wrong_replacement_applied": 0
+    },
+    "generation": {
+      "known_word_veto_also_applies": 18,
+      "wrong_replacement_applied": 9
+    }
+  },
+  "ranking_ablations": {
+    "current": {
+      "top1_on_covered_typos": 573,
+      "top1_on_singleword_gold_and_current_winner": 565
+    },
+    "lm_only": {
+      "top1_on_covered_typos": 409,
+      "top1_on_singleword_gold_and_current_winner": 400
+    },
+    "uniform_two_per_edit": {
+      "top1_on_covered_typos": 510,
+      "top1_on_singleword_gold_and_current_winner": 501
+    },
+    "cost_only": {
+      "top1_on_covered_typos": 287,
+      "top1_on_singleword_gold_and_current_winner": 279
+    }
+  },
+  "acceptance_ablations": {
+    "without_known_word_veto": {
+      "cases": 2042,
+      "top1": 573,
+      "top8": 648,
+      "mrr": 603.0333333333333,
+      "typos": 744,
+      "applied": 540,
+      "correct": 374,
+      "false_changes": 145,
+      "preservation": 1298,
+      "wrong": 166,
+      "f05": 0.6439393939393939,
+      "precision": 0.6925925925925925,
+      "recall": 0.5026881720430108,
+      "false_change_rate": 0.11171032357473036,
+      "top8_rate": 0.31733594515181196,
+      "mrr_rate": 0.295315050603983
+    },
+    "without_learned_threshold": {
+      "cases": 2042,
+      "top1": 573,
+      "top8": 648,
+      "mrr": 603.0333333333333,
+      "typos": 744,
+      "applied": 606,
+      "correct": 434,
+      "false_changes": 52,
+      "wrong": 172,
+      "preservation": 1298,
+      "f05": 0.6849747474747475,
+      "precision": 0.7161716171617162,
+      "recall": 0.5833333333333334,
+      "false_change_rate": 0.040061633281972264,
+      "top8_rate": 0.31733594515181196,
+      "mrr_rate": 0.295315050603983
+    }
+  },
+  "max_cached_candidates": 1001,
+  "extra_diagnostics": {
+    "ranking_winner_is_completion": 16,
+    "missing_contraction_targets": 17,
+    "clean_controls_losing_apostrophe": 5
+  },
+  "limits": [
+    "Stage attribution is earliest failure, not proof of a single causal defect.",
+    "Ranking ablations retain the same pool and do not refit acceptance; not deployable F0.5 comparisons.",
+    "Split LM evidence uses the production heuristic, not a normalized phrase probability.",
+    "No recorded tap positions or phone latency in this Aalto cohort."
+  ]
+}

@@ -1,5 +1,9 @@
 # Cantonese Voice Keyboard
 
+For candidate/autocorrect changes, read `TYPING_EVALUATION.md` first. It records
+the frozen evaluation cohort, current baseline, and the user's acceptance metrics:
+latency and F₀.₅. Accept F₀.₅ improvements without a separate 95% precision cutoff.
+
 ## Repository scope
 
 This repository contains the Android IME and its packaging/deployment flow. The native ASR implementation is maintained in the sibling repository:

@@ -71,7 +71,7 @@ fi
 
 # 3. Build release AAB
 echo -e "${COLOR_INFO}[Step 2/4] Building signed release App Bundle (.aab)...${COLOR_RESET}"
-INTERNAL_TYPING_TRIAL="${INTERNAL_TYPING_TRIAL:-true}" ./deploy.sh --release
+./deploy.sh --release
 
 AAB_PATH="$PROJECT_DIR/app/build/outputs/bundle/release/app-release.aab"
 if [ ! -f "$AAB_PATH" ]; then

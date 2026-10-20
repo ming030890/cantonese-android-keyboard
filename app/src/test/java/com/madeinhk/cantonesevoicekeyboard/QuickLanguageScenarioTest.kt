@@ -9,6 +9,76 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class QuickLanguageScenarioTest {
+    @Test fun shortCodePreviewIsSelectableBeforeFullRankingAndRejectsLateResults() = runTest {
+        for (selectEarly in listOf(false, true)) {
+            val queue = ArrayDeque<Runnable>()
+            val worker = object : CoroutineDispatcher() {
+                override fun dispatch(context: kotlin.coroutines.CoroutineContext, block: Runnable) { queue.addLast(block) }
+            }
+            var previews = 0
+            val engine = object : QuickCandidateEngine {
+                override fun previewCandidates(version: Int, code: String, left: String, right: String): List<QuickCandidate> {
+                    previews++
+                    assertEquals("df", code); assertEquals("I use ", left)
+                    return listOf(QuickCandidate("標", 0), QuickCandidate("杯", 1))
+                }
+                override fun candidates(version: Int, code: String, left: String, right: String) =
+                    listOf(QuickCandidate("杯", 0), QuickCandidate("標", 1))
+            }
+            KeyboardScenario(initialText = "I use ", clipboardText = null,
+                scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler)),
+                lookupDispatcher = worker, quickEngine = engine).use { s ->
+                s.start(); s.type("df"); runCurrent()
+                while (previews == 0) { queue.removeFirst().run(); runCurrent() }
+                assertEquals(listOf("標", "杯"), s.snapshot().quickCandidates.map { it.text })
+                assertEquals("df", s.editor.composing)
+                assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                if (selectEarly) s.choose("標")
+                while (queue.isNotEmpty()) { queue.removeFirst().run(); runCurrent() }
+                if (selectEarly) {
+                    assertEquals("I use 標", s.editor.text)
+                    assertEquals("", s.editor.composing)
+                    assertTrue(s.snapshot().quickCandidates.isEmpty())
+                } else {
+                    assertEquals(listOf("杯", "標"), s.snapshot().quickCandidates.map { it.text })
+                    assertEquals("I use ", s.editor.text)
+                    assertEquals("df", s.editor.composing)
+                }
+            }
+        }
+    }
+
+    @Test fun chineseCandidatesAppearWhileEnglishWorkerIsStillPending() = runTest {
+        for (code in listOf("df", "d", "dfg")) {
+            val dispatcher = StandardTestDispatcher(testScheduler)
+            val englishScheduler = TestCoroutineScheduler()
+            var ranks = 0
+            KeyboardScenario(initialText = "I use ", clipboardText = null,
+                scope = CoroutineScope(SupervisorJob() + dispatcher), lookupDispatcher = dispatcher,
+                englishDispatcher = StandardTestDispatcher(englishScheduler),
+                englishEngine = ScenarioEnglishEngine().apply { ranker = { _, _, pool -> ranks++; pool.reversed() } }
+            ).use { s ->
+                val matches = listOf("標", "杯", "禁")
+                s.engine.lookup = { _, _, _, _ -> matches.mapIndexed { i, text -> QuickCandidate(text, i) } }
+                s.start(); s.type(code); runCurrent()
+                assertEquals("I use ", s.editor.text)
+                assertEquals(code, s.editor.composing)
+                assertEquals(matches, s.snapshot().quickCandidates.take(3).map { it.text })
+                assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                assertEquals(0, ranks)
+                englishScheduler.runCurrent(); runCurrent()
+                englishScheduler.runCurrent(); runCurrent()
+                if (code.length == 2) {
+                    assertEquals(0, ranks)
+                    assertEquals(matches + code, s.snapshot().quickCandidates.map { it.text })
+                } else assertTrue(ranks > 0)
+                s.choose("標")
+                assertEquals("I use 標", s.editor.text)
+                assertEquals("", s.editor.composing)
+            }
+        }
+    }
+
     @Test fun twoLetterQuickCodeKeepsChineseBeforeEnglishInEnglishContext() {
         for (code in listOf("df", "DF", "of")) {
             for (selected in listOf("標", code)) {

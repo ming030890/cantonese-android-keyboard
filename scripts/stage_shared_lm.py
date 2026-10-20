@@ -46,7 +46,11 @@ def stage(project,source,verification,backup):
         fusion_source=str(fusion_source.relative_to(project)),fusion_sha256=sha(fusion_source),
         neural_short_contexts=True,count_table_packaged=False,experimental=True,production_approved=False,
         selection='User requested one shared Cantonese/English/handwriting LM; English spelling candidates and completion use the same model vocabulary',
-        english_policy=dict(candidate_source='TRAIN-attested English model vocabulary',max_edits=2,edit_penalty=2,auto_max_edits=1,auto_margin=4,auto_start_margin=6,auto_min_lm_probability=0.0001,preserve_known_spellings=True,backspace_undo=True),
+        english_policy=dict(candidate_source='TRAIN-attested English model vocabulary',
+            implementation='../QwenASR/crates/cantonese-ngram/src/cnn.rs::english_suggestions',
+            parameter_source='Native implementation; model staging does not configure correction thresholds',
+            known_word_policy='Defined by the native fitted acceptance artifact',
+            backspace_undo=True,production_qualified=False),
         qualification='V2 improves contextual accuracy but fails English-prefix and mixed quantization retention guards',
         native_verification=str(verification),old_assets_backup=str(backup))
     (project/'config/language_model/selected_model.json').write_text(json.dumps(selection,indent=2)+'\n')

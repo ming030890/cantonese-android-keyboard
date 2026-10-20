@@ -32,7 +32,7 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 62
+        versionCode = 63
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -60,7 +60,6 @@ android {
 
     buildTypes {
         release {
-            buildConfigField("boolean", "INTERNAL_TYPING_TRIAL", providers.gradleProperty("internalTypingTrial").orElse("false").get())
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "native-lm-rules.pro")
@@ -73,7 +72,6 @@ android {
             if (providers.gradleProperty("voiceBenchmark").orElse("false").get().toBoolean()) {
                 applicationIdSuffix = ".voicebenchmark"
             }
-            buildConfigField("boolean", "INTERNAL_TYPING_TRIAL", providers.gradleProperty("internalTypingTrial").orElse("false").get())
         }
     }
     compileOptions {
@@ -87,7 +85,6 @@ android {
       shaders = false
     }
 
-    val internalTypingTrial = providers.gradleProperty("internalTypingTrial").orElse("false").get() == "true"
     androidResources {
         val ignores = mutableListOf(
             "!.svn", "!.git", "!.ds_store", "!*.scc", ".*", "<dir>_*",
@@ -96,9 +93,7 @@ android {
             "compiled_vocabulary.json", "provenance.json",
             "revision.txt", "*LICENSE.txt", "LICENSE",
         )
-        if (!internalTypingTrial) {
-            ignores.add("typing")
-        }
+        ignores.add("typing")
         ignoreAssetsPattern = ignores.joinToString(":")
     }
 

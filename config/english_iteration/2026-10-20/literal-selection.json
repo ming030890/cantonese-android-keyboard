@@ -1,0 +1,574 @@
+{
+  "primary_metric": "f0.5",
+  "fit_rows": 2644,
+  "trials": [
+    {
+      "model": {
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          0.04912023460410557
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051233,
+          0.21611903469278962
+        ],
+        "weights": [
+          1.6741748114827313,
+          0.9567260323445012,
+          1.4115753344374966,
+          -1.1583761490573692
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "observed_apostrophe"
+        ],
+        "threshold": 0.7861662204109442,
+        "regularization": 0.001,
+        "preserve_known_words": true,
+        "calibration_f05": 0.8157099697885196,
+        "fit_rows": 1364
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 341,
+        "correct": 320,
+        "false_changes": 2,
+        "wrong": 21,
+        "f05": 0.7751937984496124,
+        "precision": 0.9384164222873901,
+        "recall": 0.45714285714285713,
+        "false_change_rate": 0.0016012810248198558,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          0.04912023460410557
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051233,
+          0.21611903469278962
+        ],
+        "weights": [
+          1.593846000792564,
+          0.8893185457592595,
+          1.210510175412127,
+          -0.8862491174735725
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "observed_apostrophe"
+        ],
+        "threshold": 0.7619403503210953,
+        "regularization": 0.01,
+        "preserve_known_words": true,
+        "calibration_f05": 0.8147321428571429,
+        "fit_rows": 1364
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 350,
+        "correct": 327,
+        "false_changes": 2,
+        "wrong": 23,
+        "f05": 0.7785714285714286,
+        "precision": 0.9342857142857143,
+        "recall": 0.46714285714285714,
+        "false_change_rate": 0.0016012810248198558,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          0.04912023460410557
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051233,
+          0.21611903469278962
+        ],
+        "weights": [
+          1.2877049607255364,
+          0.5748059234188769,
+          0.6227073510057034,
+          -0.4355483182169281
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "observed_apostrophe"
+        ],
+        "threshold": 0.7422595188120866,
+        "regularization": 0.1,
+        "preserve_known_words": true,
+        "calibration_f05": 0.8147321428571429,
+        "fit_rows": 1364
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 350,
+        "correct": 326,
+        "false_changes": 2,
+        "wrong": 24,
+        "f05": 0.7761904761904762,
+        "precision": 0.9314285714285714,
+        "recall": 0.4657142857142857,
+        "false_change_rate": 0.0016012810248198558,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -11.28628955937009,
+          4.357691940489407,
+          0.48411497730711045,
+          -2.0631983523650175
+        ],
+        "scales": [
+          5.072642533967047,
+          4.412846750218541,
+          0.49974760234947235,
+          4.316465172724486
+        ],
+        "weights": [
+          -1.2594226367238774,
+          0.9965276903327883,
+          1.1859034700320672,
+          -1.7091091062557433,
+          1.395861036917995
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "known_word",
+          "score_over_literal"
+        ],
+        "threshold": 0.7611833698890571,
+        "regularization": 0.001,
+        "preserve_known_words": false,
+        "calibration_f05": 0.81973293768546,
+        "fit_rows": 2644
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "applied": 381,
+        "correct": 353,
+        "false_changes": 8,
+        "preservation": 1249,
+        "wrong": 28,
+        "f05": 0.7936151079136691,
+        "precision": 0.926509186351706,
+        "recall": 0.5042857142857143,
+        "false_change_rate": 0.006405124099279423,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -11.28628955937009,
+          4.357691940489407,
+          0.48411497730711045,
+          -2.0631983523650175
+        ],
+        "scales": [
+          5.072642533967047,
+          4.412846750218541,
+          0.49974760234947235,
+          4.316465172724486
+        ],
+        "weights": [
+          -1.0623192449519983,
+          0.8448881658267021,
+          1.0169734312448775,
+          -1.4720153178494366,
+          1.1386711817635462
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "known_word",
+          "score_over_literal"
+        ],
+        "threshold": 0.7178966738605479,
+        "regularization": 0.01,
+        "preserve_known_words": false,
+        "calibration_f05": 0.8211143695014663,
+        "fit_rows": 2644
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "applied": 382,
+        "correct": 352,
+        "false_changes": 9,
+        "preservation": 1249,
+        "wrong": 30,
+        "f05": 0.7899461400359067,
+        "precision": 0.9214659685863874,
+        "recall": 0.5028571428571429,
+        "false_change_rate": 0.007205764611689352,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -11.28628955937009,
+          4.357691940489407,
+          0.48411497730711045,
+          -2.0631983523650175
+        ],
+        "scales": [
+          5.072642533967047,
+          4.412846750218541,
+          0.49974760234947235,
+          4.316465172724486
+        ],
+        "weights": [
+          -0.5811288283630925,
+          0.43862700962473644,
+          0.6026293220175555,
+          -0.826577936800302,
+          0.5366243740684384
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "known_word",
+          "score_over_literal"
+        ],
+        "threshold": 0.6228352747057181,
+        "regularization": 0.1,
+        "preserve_known_words": false,
+        "calibration_f05": 0.8198529411764706,
+        "fit_rows": 2644
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "applied": 377,
+        "correct": 349,
+        "false_changes": 9,
+        "preservation": 1249,
+        "wrong": 28,
+        "f05": 0.7903079710144928,
+        "precision": 0.9257294429708223,
+        "recall": 0.49857142857142855,
+        "false_change_rate": 0.007205764611689352,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -11.28628955937009,
+          4.357691940489407,
+          0.48411497730711045,
+          -3.7384042691174506,
+          -2.0631983523650175,
+          0.025340393343419063
+        ],
+        "scales": [
+          5.072642533967047,
+          4.412846750218541,
+          0.49974760234947235,
+          4.7001117923935025,
+          4.316465172724486,
+          0.15715679370813043
+        ],
+        "weights": [
+          -1.289236195548159,
+          0.8496028515979095,
+          1.2779955113660044,
+          -1.573809087973068,
+          0.1592541404707128,
+          1.5521424284628493,
+          -0.7789172433796652
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "known_word",
+          "literal_score",
+          "score_over_literal",
+          "observed_apostrophe"
+        ],
+        "threshold": 0.7535520633370497,
+        "regularization": 0.001,
+        "preserve_known_words": false,
+        "calibration_f05": 0.826271186440678,
+        "fit_rows": 2644
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "applied": 389,
+        "correct": 363,
+        "false_changes": 4,
+        "preservation": 1249,
+        "wrong": 26,
+        "f05": 0.8045212765957447,
+        "precision": 0.9331619537275064,
+        "recall": 0.5185714285714286,
+        "false_change_rate": 0.0032025620496397116,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -11.28628955937009,
+          4.357691940489407,
+          0.48411497730711045,
+          -3.7384042691174506,
+          -2.0631983523650175,
+          0.025340393343419063
+        ],
+        "scales": [
+          5.072642533967047,
+          4.412846750218541,
+          0.49974760234947235,
+          4.7001117923935025,
+          4.316465172724486,
+          0.15715679370813043
+        ],
+        "weights": [
+          -1.0951472642559488,
+          0.7386408254740486,
+          1.0590089140832053,
+          -1.3191669908217043,
+          0.22416588197591272,
+          1.2741485961515893,
+          -0.6147316055192678
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "known_word",
+          "literal_score",
+          "score_over_literal",
+          "observed_apostrophe"
+        ],
+        "threshold": 0.7530137207172216,
+        "regularization": 0.01,
+        "preserve_known_words": false,
+        "calibration_f05": 0.8247041420118343,
+        "fit_rows": 2644
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "applied": 371,
+        "correct": 350,
+        "false_changes": 3,
+        "preservation": 1249,
+        "wrong": 21,
+        "f05": 0.8012820512820513,
+        "precision": 0.9433962264150944,
+        "recall": 0.5,
+        "false_change_rate": 0.0024019215372297837,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "means": [
+          -11.28628955937009,
+          4.357691940489407,
+          0.48411497730711045,
+          -3.7384042691174506,
+          -2.0631983523650175,
+          0.025340393343419063
+        ],
+        "scales": [
+          5.072642533967047,
+          4.412846750218541,
+          0.49974760234947235,
+          4.7001117923935025,
+          4.316465172724486,
+          0.15715679370813043
+        ],
+        "weights": [
+          -0.6092699983719992,
+          0.4054810935613793,
+          0.5827909888913506,
+          -0.699503711451876,
+          0.29833933467216744,
+          0.5927954993503789,
+          -0.2841566845003106
+        ],
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "known_word",
+          "literal_score",
+          "score_over_literal",
+          "observed_apostrophe"
+        ],
+        "threshold": 0.6569382535548808,
+        "regularization": 0.1,
+        "preserve_known_words": false,
+        "calibration_f05": 0.8196107784431138,
+        "fit_rows": 2644
+      },
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "applied": 357,
+        "correct": 336,
+        "false_changes": 2,
+        "preservation": 1249,
+        "wrong": 21,
+        "f05": 0.7894736842105263,
+        "precision": 0.9411764705882353,
+        "recall": 0.48,
+        "false_change_rate": 0.0016012810248198558,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    }
+  ],
+  "champion": {
+    "model": {
+      "means": [
+        -11.28628955937009,
+        4.357691940489407,
+        0.48411497730711045,
+        -3.7384042691174506,
+        -2.0631983523650175,
+        0.025340393343419063
+      ],
+      "scales": [
+        5.072642533967047,
+        4.412846750218541,
+        0.49974760234947235,
+        4.7001117923935025,
+        4.316465172724486,
+        0.15715679370813043
+      ],
+      "weights": [
+        -1.289236195548159,
+        0.8496028515979095,
+        1.2779955113660044,
+        -1.573809087973068,
+        0.1592541404707128,
+        1.5521424284628493,
+        -0.7789172433796652
+      ],
+      "features": [
+        "winner_score",
+        "runner_margin",
+        "known_word",
+        "literal_score",
+        "score_over_literal",
+        "observed_apostrophe"
+      ],
+      "threshold": 0.7535520633370497,
+      "regularization": 0.001,
+      "preserve_known_words": false,
+      "calibration_f05": 0.826271186440678,
+      "fit_rows": 2644
+    },
+    "selection": {
+      "cases": 1949,
+      "top1": 527,
+      "top8": 599,
+      "mrr": 556.5261904761903,
+      "typos": 700,
+      "applied": 389,
+      "correct": 363,
+      "false_changes": 4,
+      "preservation": 1249,
+      "wrong": 26,
+      "f05": 0.8045212765957447,
+      "precision": 0.9331619537275064,
+      "recall": 0.5185714285714286,
+      "false_change_rate": 0.0032025620496397116,
+      "top8_rate": 0.3073370959466393,
+      "mrr_rate": 0.28554447946443834
+    }
+  },
+  "baseline_selection": {
+    "cases": 1949,
+    "top1": 527,
+    "top8": 599,
+    "mrr": 556.5261904761903,
+    "typos": 700,
+    "preservation": 1249,
+    "applied": 356,
+    "correct": 327,
+    "false_changes": 7,
+    "wrong": 29,
+    "f05": 0.769774011299435,
+    "precision": 0.9185393258426966,
+    "recall": 0.46714285714285714,
+    "false_change_rate": 0.005604483586869495,
+    "top8_rate": 0.3073370959466393,
+    "mrr_rate": 0.28554447946443834
+  },
+  "scope": "Fixed developmental prompt groups; TRAIN fit/calibration, selection only; historical exposure",
+  "source_sha256": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/iterate_literal_acceptance.py": "5d8217478752689afe20cf3fd7d276f782db412d170118e7de7b1bb93b0ea226",
+    "build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "build/english-iteration-2026-10-20/native-cache.json": "c4cf55303800beb689dc2b9caa73ba54c1de9528dfa3846e5ce8d5213a4887b6",
+    "build/english-iteration-2026-10-20/literal-scores.json": "89d1f4ed1b0ca3df9b7523dc981a65cab0770f56318f048f7f096015deed0ed1",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_acceptance.json": "e495e47fd8002cc6d59f33de335ee78d751eaae1c1b93c2a623f135a19d90141"
+  }
+}

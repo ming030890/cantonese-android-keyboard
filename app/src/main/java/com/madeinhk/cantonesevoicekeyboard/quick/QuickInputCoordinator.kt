@@ -191,7 +191,16 @@ internal class QuickInputCoordinator(
             candidatesForCode = code
             return
         }
+        val previewLookup = if (code.length in 1..2) candidateLookup(code, version, preview = true) else null
         pending = scope.launch {
+            if (previewLookup != null) {
+                val preview = withContext(lookupDispatcher) { previewLookup() }
+                if (!closed && requestId == id && composingText == code && currentVersion == version && preview.candidates.isNotEmpty()) {
+                    _candidates.value = preview.candidates
+                    candidateCodeLength = preview.codeLength
+                    candidatesForCode = code
+                }
+            }
             val result = withContext(lookupDispatcher) { lookup() }
             if (!closed && requestId == id && composingText == code && currentVersion == version) {
                 _candidates.value = result.candidates
@@ -204,7 +213,7 @@ internal class QuickInputCoordinator(
 
     private data class LookupResult(val candidates: List<QuickCandidate>, val evidence: QuickLanguageEvidence?, val codeLength: Int)
 
-    private fun candidateLookup(code: String, version: Int): () -> LookupResult {
+    private fun candidateLookup(code: String, version: Int, preview: Boolean = false): () -> LookupResult {
         // InputConnection includes the composing code before the cursor.
         val before = editor.getTextBeforeCursor(512).orEmpty()
         val left = before.removeSuffix(code)
@@ -213,7 +222,8 @@ internal class QuickInputCoordinator(
         return {
             runCatching {
                 backend()?.let {
-                    val words = if (code.isEmpty()) it.predictions(left, right, PREDICTION_LIMIT)
+                    val words = if (preview) it.previewCandidates(version, lookupCode, left, right)
+                        else if (code.isEmpty()) it.predictions(left, right, PREDICTION_LIMIT)
                         else it.candidates(version, lookupCode, left, right)
                     val top = words.firstOrNull()?.text
                     val evidence = if (top != null && lookupCode.length >= MAX_COMPOSING_CHARACTERS &&

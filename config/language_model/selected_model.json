@@ -30,13 +30,15 @@
   "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/previous-assets",
   "english_policy": {
     "candidate_source": "TRAIN-attested English model vocabulary",
-    "max_edits": 2,
-    "edit_penalty": 2,
-    "auto_margin": 4,
-    "auto_min_lm_probability": 0.0001,
-    "preserve_known_spellings": true,
+    "implementation": "../QwenASR/crates/cantonese-ngram/src/cnn.rs::english_suggestions",
+    "parameter_source": "Native fitted six-feature english_acceptance.json; candidate edit costs remain heuristic",
     "backspace_undo": true,
-    "auto_max_edits": 1,
-    "auto_start_margin": 6
+    "qualification_report": "config/english_iteration/2026-10-20/literal-native-verification.json",
+    "production_qualified": false,
+    "acceptance_source": "../QwenASR/crates/cantonese-ngram/src/english_acceptance.json",
+    "acceptance_sha256": "d97608cbbbd36bc257858760c3e70ed38269efae9efb9c16e0a236fe73947ffd",
+    "touch_evidence_used": false,
+    "primary_metric": "f0.5",
+    "known_word_policy": "Learned original-word versus replacement evidence"
   }
 }

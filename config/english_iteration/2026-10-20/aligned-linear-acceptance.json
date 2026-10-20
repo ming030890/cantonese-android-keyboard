@@ -1,0 +1,925 @@
+{
+  "scope": "Linear fit/cutoff/selection on separate prompt groups; source has historical development exposure",
+  "input_sha256": {
+    "build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "build/english-iteration-2026-10-20/native-cache.json": "c4cf55303800beb689dc2b9caa73ba54c1de9528dfa3846e5ce8d5213a4887b6",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/fit_english_acceptance.py": "f45e50094625ceeb26a1a95880608b7b00fe8768e398a4c5cd4c041ba28dc2b6",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/align_mobile_targets.py": "3240a34c9cd46eab5ce4c9036ab928e499e67f7f833c003da511b71c8aeb5bb4"
+  },
+  "alignment": {
+    "excluded_ambiguous_or_unmatched_reference": 2272,
+    "retained": 9728,
+    "multiword_targets": 86
+  },
+  "fit_rows": 1364,
+  "fit_groups": 503,
+  "calibration_cases": 1154,
+  "trials": [
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.6060100777482609,
+          1.0518345900537627,
+          1.173847074835433
+        ],
+        "regularization": 0.001,
+        "threshold": 0.7550372799935821,
+        "calibration_precision_target": 0.97
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 344,
+        "correct": 316,
+        "false_changes": 7,
+        "wrong": 28,
+        "precision": 0.9186046511627907,
+        "recall": 0.4514285714285714,
+        "false_change_rate": 0.005604483586869495,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.6060100777482609,
+          1.0518345900537627,
+          1.173847074835433
+        ],
+        "regularization": 0.001,
+        "threshold": 0.7941246581770869,
+        "calibration_precision_target": 0.98
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 326,
+        "correct": 307,
+        "false_changes": 5,
+        "wrong": 19,
+        "precision": 0.941717791411043,
+        "recall": 0.43857142857142856,
+        "false_change_rate": 0.0040032025620496394,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.6060100777482609,
+          1.0518345900537627,
+          1.173847074835433
+        ],
+        "regularization": 0.001,
+        "threshold": 0.875287849930855,
+        "calibration_precision_target": 0.99
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 253,
+        "correct": 241,
+        "false_changes": 4,
+        "wrong": 12,
+        "precision": 0.9525691699604744,
+        "recall": 0.3442857142857143,
+        "false_change_rate": 0.0032025620496397116,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.546266883498369,
+          0.9784573489703149,
+          1.0775561703764058
+        ],
+        "regularization": 0.01,
+        "threshold": 0.7610739927989528,
+        "calibration_precision_target": 0.97
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 339,
+        "correct": 314,
+        "false_changes": 5,
+        "wrong": 25,
+        "precision": 0.9262536873156342,
+        "recall": 0.44857142857142857,
+        "false_change_rate": 0.0040032025620496394,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.546266883498369,
+          0.9784573489703149,
+          1.0775561703764058
+        ],
+        "regularization": 0.01,
+        "threshold": 0.7878906918982215,
+        "calibration_precision_target": 0.98
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 327,
+        "correct": 308,
+        "false_changes": 5,
+        "wrong": 19,
+        "precision": 0.9418960244648318,
+        "recall": 0.44,
+        "false_change_rate": 0.0040032025620496394,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.546266883498369,
+          0.9784573489703149,
+          1.0775561703764058
+        ],
+        "regularization": 0.01,
+        "threshold": 0.8640848784777375,
+        "calibration_precision_target": 0.99
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 259,
+        "correct": 246,
+        "false_changes": 4,
+        "wrong": 13,
+        "precision": 0.9498069498069498,
+        "recall": 0.3514285714285714,
+        "false_change_rate": 0.0032025620496397116,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.2760394761939382,
+          0.6239666268405312,
+          0.6305344035134209
+        ],
+        "regularization": 0.1,
+        "threshold": 0.7362864759885426,
+        "calibration_precision_target": 0.97
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 340,
+        "correct": 316,
+        "false_changes": 5,
+        "wrong": 24,
+        "precision": 0.9294117647058824,
+        "recall": 0.4514285714285714,
+        "false_change_rate": 0.0040032025620496394,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.2760394761939382,
+          0.6239666268405312,
+          0.6305344035134209
+        ],
+        "regularization": 0.1,
+        "threshold": 0.7597831293526851,
+        "calibration_precision_target": 0.98
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 327,
+        "correct": 307,
+        "false_changes": 5,
+        "wrong": 20,
+        "precision": 0.9388379204892966,
+        "recall": 0.43857142857142856,
+        "false_change_rate": 0.0040032025620496394,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.2760394761939382,
+          0.6239666268405312,
+          0.6305344035134209
+        ],
+        "regularization": 0.1,
+        "threshold": 0.8106667345766673,
+        "calibration_precision_target": 0.99
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 259,
+        "correct": 246,
+        "false_changes": 4,
+        "wrong": 13,
+        "precision": 0.9498069498069498,
+        "recall": 0.3514285714285714,
+        "false_change_rate": 0.0032025620496397116,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.6278956155526594,
+          1.5061223951199982,
+          0.9069501010716039,
+          0.222959535086415,
+          0.6938483076647749
+        ],
+        "regularization": 0.001,
+        "threshold": 0.7886297228556576,
+        "calibration_precision_target": 0.97
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 337,
+        "correct": 316,
+        "false_changes": 6,
+        "wrong": 21,
+        "precision": 0.9376854599406528,
+        "recall": 0.4514285714285714,
+        "false_change_rate": 0.004803843074459567,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.6278956155526594,
+          1.5061223951199982,
+          0.9069501010716039,
+          0.222959535086415,
+          0.6938483076647749
+        ],
+        "regularization": 0.001,
+        "threshold": 0.793699773534366,
+        "calibration_precision_target": 0.98
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 332,
+        "correct": 312,
+        "false_changes": 5,
+        "wrong": 20,
+        "precision": 0.9397590361445783,
+        "recall": 0.44571428571428573,
+        "false_change_rate": 0.0040032025620496394,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.6278956155526594,
+          1.5061223951199982,
+          0.9069501010716039,
+          0.222959535086415,
+          0.6938483076647749
+        ],
+        "regularization": 0.001,
+        "threshold": 0.9840660505870514,
+        "calibration_precision_target": 0.99
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 45,
+        "correct": 44,
+        "false_changes": 1,
+        "wrong": 1,
+        "precision": 0.9777777777777777,
+        "recall": 0.06285714285714286,
+        "false_change_rate": 0.0008006405124099279,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.5649222226877977,
+          1.345323515022489,
+          0.8533418206546016,
+          0.1607763830379977,
+          0.6067702604327505
+        ],
+        "regularization": 0.01,
+        "threshold": 0.7733529122831679,
+        "calibration_precision_target": 0.97
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 342,
+        "correct": 320,
+        "false_changes": 6,
+        "wrong": 22,
+        "precision": 0.935672514619883,
+        "recall": 0.45714285714285713,
+        "false_change_rate": 0.004803843074459567,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.5649222226877977,
+          1.345323515022489,
+          0.8533418206546016,
+          0.1607763830379977,
+          0.6067702604327505
+        ],
+        "regularization": 0.01,
+        "threshold": 0.7841971236139212,
+        "calibration_precision_target": 0.98
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 336,
+        "correct": 316,
+        "false_changes": 6,
+        "wrong": 20,
+        "precision": 0.9404761904761905,
+        "recall": 0.4514285714285714,
+        "false_change_rate": 0.004803843074459567,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.5649222226877977,
+          1.345323515022489,
+          0.8533418206546016,
+          0.1607763830379977,
+          0.6067702604327505
+        ],
+        "regularization": 0.01,
+        "threshold": 0.9769415102930106,
+        "calibration_precision_target": 0.99
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 53,
+        "correct": 52,
+        "false_changes": 1,
+        "wrong": 1,
+        "precision": 0.9811320754716981,
+        "recall": 0.07428571428571429,
+        "false_change_rate": 0.0008006405124099279,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.2849296114998103,
+          0.6819416569638838,
+          0.5647166146466349,
+          -0.06588701306809051,
+          0.25747100983898397
+        ],
+        "regularization": 0.1,
+        "threshold": 0.7599412193584598,
+        "calibration_precision_target": 0.97
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 323,
+        "correct": 305,
+        "false_changes": 6,
+        "wrong": 18,
+        "precision": 0.9442724458204335,
+        "recall": 0.4357142857142857,
+        "false_change_rate": 0.004803843074459567,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.2849296114998103,
+          0.6819416569638838,
+          0.5647166146466349,
+          -0.06588701306809051,
+          0.25747100983898397
+        ],
+        "regularization": 0.1,
+        "threshold": 0.7654128673279464,
+        "calibration_precision_target": 0.98
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 320,
+        "correct": 303,
+        "false_changes": 6,
+        "wrong": 17,
+        "precision": 0.946875,
+        "recall": 0.4328571428571429,
+        "false_change_rate": 0.004803843074459567,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin",
+          "edits",
+          "observed_length"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746,
+          1.345307917888563,
+          5.6950146627565985
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234,
+          0.5720519034667113,
+          2.157494966524092
+        ],
+        "weights": [
+          1.2849296114998103,
+          0.6819416569638838,
+          0.5647166146466349,
+          -0.06588701306809051,
+          0.25747100983898397
+        ],
+        "regularization": 0.1,
+        "threshold": 0.9150634001374853,
+        "calibration_precision_target": 0.99
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 80,
+        "correct": 78,
+        "false_changes": 1,
+        "wrong": 2,
+        "precision": 0.975,
+        "recall": 0.11142857142857143,
+        "false_change_rate": 0.0008006405124099279,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    }
+  ],
+  "champion": {
+    "model": {
+      "features": [
+        "winner_score",
+        "runner_margin"
+      ],
+      "means": [
+        -10.631607231506504,
+        6.314342624630746
+      ],
+      "scales": [
+        5.2767124542021,
+        4.830294184051234
+      ],
+      "weights": [
+        1.6060100777482609,
+        1.0518345900537627,
+        1.173847074835433
+      ],
+      "regularization": 0.001,
+      "threshold": 0.875287849930855,
+      "calibration_precision_target": 0.99
+    },
+    "cutoff_found": true,
+    "selection": {
+      "cases": 1949,
+      "top1": 527,
+      "top8": 599,
+      "mrr": 556.5261904761903,
+      "typos": 700,
+      "preservation": 1249,
+      "applied": 253,
+      "correct": 241,
+      "false_changes": 4,
+      "wrong": 12,
+      "precision": 0.9525691699604744,
+      "recall": 0.3442857142857143,
+      "false_change_rate": 0.0032025620496397116,
+      "top8_rate": 0.3073370959466393,
+      "mrr_rate": 0.28554447946443834
+    }
+  },
+  "qualified": false,
+  "evaluation": {
+    "cases": 2042,
+    "top1": 573,
+    "top8": 648,
+    "mrr": 603.0333333333333,
+    "typos": 744,
+    "preservation": 1298,
+    "applied": 236,
+    "correct": 224,
+    "false_changes": 5,
+    "wrong": 12,
+    "precision": 0.9491525423728814,
+    "recall": 0.3010752688172043,
+    "false_change_rate": 0.003852080123266564,
+    "top8_rate": 0.31733594515181196,
+    "mrr_rate": 0.295315050603983
+  },
+  "baseline_evaluation": {
+    "cases": 2042,
+    "top1": 573,
+    "top8": 648,
+    "mrr": 603.0333333333333,
+    "typos": 744,
+    "applied": 511,
+    "correct": 399,
+    "false_changes": 41,
+    "wrong": 112,
+    "preservation": 1298,
+    "precision": 0.7808219178082192,
+    "recall": 0.5362903225806451,
+    "false_change_rate": 0.031587057010785825,
+    "top8_rate": 0.31733594515181196,
+    "mrr_rate": 0.295315050603983
+  }
+}

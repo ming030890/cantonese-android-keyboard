@@ -10,6 +10,7 @@ internal data class QuickLanguageEvidence(val englishProbability: Float, val chi
 }
 
 internal interface QuickCandidateEngine : AutoCloseable {
+    fun previewCandidates(version: Int, code: String, left: String, right: String): List<QuickCandidate> = emptyList()
     fun candidates(version: Int, code: String, left: String, right: String): List<QuickCandidate>
     fun predictions(left: String, right: String, limit: Int): List<QuickCandidate> = emptyList()
     fun languageEvidence(code: String, left: String, right: String, chinese: String): QuickLanguageEvidence? = null
@@ -48,7 +49,7 @@ internal class NativeQuickEngine private constructor(private var handle: Long) :
         @JvmStatic private external fun nativeCreate(three: ByteArray, five: ByteArray,
             neural: ByteArray, counts: ByteArray, labels: ByteArray): Long
         @JvmStatic private external fun nativeCandidates(handle: Long, version: Int,
-            code: String, left: String, right: String): Array<String>?
+            code: String, left: String, right: String, preview: Boolean): Array<String>?
         @JvmStatic private external fun nativePredictions(handle: Long, left: String, right: String, limit: Int): Array<String>?
         @JvmStatic private external fun nativeDestroy(handle: Long)
         @JvmStatic private external fun nativeLanguageEvidence(handle: Long, code: String, left: String,
@@ -57,7 +58,12 @@ internal class NativeQuickEngine private constructor(private var handle: Long) :
 
     @Synchronized override fun candidates(version: Int, code: String, left: String, right: String): List<QuickCandidate> {
         check(handle != 0L) { "Quick engine closed" }
-        return nativeCandidates(handle, version, code, left, right).orEmpty().mapIndexed { i, text -> QuickCandidate(text, i) }
+        return nativeCandidates(handle, version, code, left, right, false).orEmpty().mapIndexed { i, text -> QuickCandidate(text, i) }
+    }
+
+    @Synchronized override fun previewCandidates(version: Int, code: String, left: String, right: String): List<QuickCandidate> {
+        check(handle != 0L) { "Quick engine closed" }
+        return nativeCandidates(handle, version, code, left, right, true).orEmpty().mapIndexed { i, text -> QuickCandidate(text, i) }
     }
 
     @Synchronized override fun predictions(left: String, right: String, limit: Int): List<QuickCandidate> {

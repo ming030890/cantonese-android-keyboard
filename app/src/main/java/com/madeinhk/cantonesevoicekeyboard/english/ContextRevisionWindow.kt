@@ -31,6 +31,9 @@ internal class ContextRevisionWindow(
 
     fun boundary(original: String, committed: String, delimiter: String, left: String,
                  centers: FloatArray, points: FloatArray, remember: Boolean) {
+        // The shared causal model has no revision policy. Do not retain words,
+        // read editor history, or queue work that can only return null.
+        if (engine()?.supportsContextRevision != true) { clear(); return }
         onTyping()
         // No crossing sentence/lifecycle boundaries or rewriting explicit selections.
         if(delimiter!=" " || committed.any { !it.isAsciiLetter() && it !in "'’" }) { clear();return }

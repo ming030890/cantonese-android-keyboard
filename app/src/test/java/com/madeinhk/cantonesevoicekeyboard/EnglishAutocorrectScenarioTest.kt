@@ -205,13 +205,14 @@ class EnglishAutocorrectScenarioTest {
         }
     }
 
-    @Test fun pendingBoundaryCorrectsWithUndoButNeverRewritesAfterNewInput() = runTest {
+    @Test fun pendingBoundaryQueuesNewInputAndSupportsUndo() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
             KeyboardScenario(initialMode = mode, englishEngine = ScenarioEnglishEngine(),
                 scope = CoroutineScope(SupervisorJob() + dispatcher), lookupDispatcher = dispatcher).use { s ->
                 s.start(); s.type("teh"); s.press(KeyboardKeyKind.Space)
-                assertEquals("teh ", s.editor.text)
+                assertEquals("", s.editor.text)
+                assertEquals("teh", s.editor.composing)
                 advanceUntilIdle(); assertEquals("the ", s.editor.text)
                 s.press(KeyboardKeyKind.Delete); assertEquals("teh", s.editor.composing)
                 s.press(KeyboardKeyKind.Space); advanceUntilIdle(); assertEquals("teh ", s.editor.text)
@@ -232,7 +233,7 @@ class EnglishAutocorrectScenarioTest {
                         }
                     }
                     advanceUntilIdle()
-                    assertEquals("$mode $action", "teh ", s.editor.text)
+                    assertEquals("$mode $action", if (action == "type") "the " else "teh ", s.editor.text)
                     if (action == "type") assertEquals("x", s.editor.composing)
                 }
             }

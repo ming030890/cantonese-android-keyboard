@@ -1,0 +1,610 @@
+{
+  "scope": "Frozen development diagnostic; no fresh held-out or phone-latency claim; policies were not fit",
+  "source": "https://zenodo.org/records/12528163",
+  "seed": "occam-pipeline-20261020-v1",
+  "input_sha256": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "/private/tmp/keyboard-pipeline-audit-native/release/ngram_probe": "d7a596915e77fce8901fd125a8c3dfbefb566ef9feb224a1406264445182cd22",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/audit_candidate_pipeline.py": "2f5028f7e392db3fb792dc80bad2659fba1c47b66a9f82e1f056c3fea78f37c6",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/ac_words_en.csv": "bbfff38259647e652f350c0c6821029c958adafbe245ece60e888953bcb01cc2",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Volumes/SSD/cantonese_ngram/experiments/keyboard-eval-v13-final/development.jsonl": "4be66cacb51c25880373e07ffe77bf37f721dffd4395a04cd0b7600b61cea9af",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/quick/quick3.bin": "8409d39a69bef3850225778078fa99c0b36b3734411df3e30c3241660643ac6c",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/quick/quick5.bin": "2542fc0106b862dd86335edad1c14efcdf2c54815edaa1b207b3ad3892099b12",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/config/language_model/selected_model.json": "477ec61c591355306e960e75d368598e15f96fe9844fe2cdc5ce8ecc3a5cf806",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/cnn.rs": "33a0cac0837d573082588881c21e364be122af8e102f7ab9cb3a6f691b39a66b",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/cnn_spelling.rs": "b842dd241850a69481c0821400177bd2aac7f1c9ee4aac5f04707828a65ede87"
+  },
+  "mobile_intake": {
+    "source_events": 489414,
+    "excluded_unsupported_tokens": 34849,
+    "unused_prompt_partition_events": 92778,
+    "excluded_ambiguous_current_suffix": 7477,
+    "selected_events": 1500,
+    "selected_source_preservation": 1500,
+    "prompt_groups": 1074
+  },
+  "spelling": {
+    "current": {
+      "all": {
+        "cases": 3000,
+        "typos": 1424,
+        "target_in_top8": 1053,
+        "applied": 840,
+        "correct": 633,
+        "false_preservation_changes": 47,
+        "preservation": 1576,
+        "wrong": 207,
+        "precision": 0.7535714285714286,
+        "typo_recall": 0.44452247191011235,
+        "preservation_change_rate": 0.02982233502538071
+      },
+      "recorded_typo": {
+        "cases": 1424,
+        "typos": 1424,
+        "target_in_top8": 1053,
+        "applied": 793,
+        "correct": 633,
+        "false_preservation_changes": 0,
+        "wrong": 160,
+        "precision": 0.798234552332913,
+        "typo_recall": 0.44452247191011235,
+        "preservation_change_rate": null
+      },
+      "recorded_preservation": {
+        "cases": 76,
+        "preservation": 76,
+        "target_in_top8": 0,
+        "applied": 2,
+        "wrong": 2,
+        "false_preservation_changes": 2,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.02631578947368421
+      },
+      "source_preservation": {
+        "cases": 1500,
+        "preservation": 1500,
+        "target_in_top8": 0,
+        "applied": 45,
+        "wrong": 45,
+        "false_preservation_changes": 45,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.03
+      }
+    },
+    "without_split_rules": {
+      "all": {
+        "cases": 3000,
+        "typos": 1424,
+        "target_in_top8": 1053,
+        "applied": 822,
+        "correct": 639,
+        "false_preservation_changes": 44,
+        "preservation": 1576,
+        "wrong": 183,
+        "precision": 0.7773722627737226,
+        "typo_recall": 0.4487359550561798,
+        "preservation_change_rate": 0.027918781725888325
+      },
+      "recorded_typo": {
+        "cases": 1424,
+        "typos": 1424,
+        "target_in_top8": 1053,
+        "applied": 778,
+        "correct": 639,
+        "false_preservation_changes": 0,
+        "wrong": 139,
+        "precision": 0.8213367609254498,
+        "typo_recall": 0.4487359550561798,
+        "preservation_change_rate": null
+      },
+      "recorded_preservation": {
+        "cases": 76,
+        "preservation": 76,
+        "target_in_top8": 0,
+        "applied": 1,
+        "wrong": 1,
+        "false_preservation_changes": 1,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.013157894736842105
+      },
+      "source_preservation": {
+        "cases": 1500,
+        "preservation": 1500,
+        "target_in_top8": 0,
+        "applied": 43,
+        "wrong": 43,
+        "false_preservation_changes": 43,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.028666666666666667
+      }
+    },
+    "without_known_word_veto": {
+      "all": {
+        "cases": 3000,
+        "typos": 1424,
+        "target_in_top8": 1053,
+        "applied": 1475,
+        "correct": 702,
+        "false_preservation_changes": 548,
+        "preservation": 1576,
+        "wrong": 773,
+        "precision": 0.4759322033898305,
+        "typo_recall": 0.49297752808988765,
+        "preservation_change_rate": 0.3477157360406091
+      },
+      "recorded_typo": {
+        "cases": 1424,
+        "typos": 1424,
+        "target_in_top8": 1053,
+        "applied": 927,
+        "correct": 702,
+        "false_preservation_changes": 0,
+        "wrong": 225,
+        "precision": 0.7572815533980582,
+        "typo_recall": 0.49297752808988765,
+        "preservation_change_rate": null
+      },
+      "recorded_preservation": {
+        "cases": 76,
+        "preservation": 76,
+        "target_in_top8": 0,
+        "applied": 28,
+        "wrong": 28,
+        "false_preservation_changes": 28,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.3684210526315789
+      },
+      "source_preservation": {
+        "cases": 1500,
+        "preservation": 1500,
+        "target_in_top8": 0,
+        "applied": 520,
+        "wrong": 520,
+        "false_preservation_changes": 520,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.3466666666666667
+      }
+    },
+    "uniform_edit_cost": {
+      "all": {
+        "cases": 3000,
+        "typos": 1424,
+        "target_in_top8": 1031,
+        "applied": 698,
+        "correct": 565,
+        "false_preservation_changes": 29,
+        "preservation": 1576,
+        "wrong": 133,
+        "precision": 0.8094555873925502,
+        "typo_recall": 0.3967696629213483,
+        "preservation_change_rate": 0.018401015228426396
+      },
+      "recorded_typo": {
+        "cases": 1424,
+        "typos": 1424,
+        "target_in_top8": 1031,
+        "applied": 669,
+        "correct": 565,
+        "false_preservation_changes": 0,
+        "wrong": 104,
+        "precision": 0.8445440956651719,
+        "typo_recall": 0.3967696629213483,
+        "preservation_change_rate": null
+      },
+      "recorded_preservation": {
+        "cases": 76,
+        "preservation": 76,
+        "target_in_top8": 0,
+        "applied": 1,
+        "wrong": 1,
+        "false_preservation_changes": 1,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.013157894736842105
+      },
+      "source_preservation": {
+        "cases": 1500,
+        "preservation": 1500,
+        "target_in_top8": 0,
+        "applied": 28,
+        "wrong": 28,
+        "false_preservation_changes": 28,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.018666666666666668
+      }
+    },
+    "without_lm": {
+      "all": {
+        "cases": 3000,
+        "typos": 1424,
+        "target_in_top8": 711,
+        "applied": 330,
+        "correct": 247,
+        "false_preservation_changes": 33,
+        "preservation": 1576,
+        "wrong": 83,
+        "precision": 0.7484848484848485,
+        "typo_recall": 0.17345505617977527,
+        "preservation_change_rate": 0.020939086294416244
+      },
+      "recorded_typo": {
+        "cases": 1424,
+        "typos": 1424,
+        "target_in_top8": 711,
+        "applied": 297,
+        "correct": 247,
+        "false_preservation_changes": 0,
+        "wrong": 50,
+        "precision": 0.8316498316498316,
+        "typo_recall": 0.17345505617977527,
+        "preservation_change_rate": null
+      },
+      "recorded_preservation": {
+        "cases": 76,
+        "preservation": 76,
+        "target_in_top8": 0,
+        "precision": null,
+        "typo_recall": null,
+        "preservation_change_rate": 0.0
+      },
+      "source_preservation": {
+        "cases": 1500,
+        "preservation": 1500,
+        "target_in_top8": 0,
+        "applied": 33,
+        "wrong": 33,
+        "false_preservation_changes": 33,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.022
+      }
+    },
+    "simple_one_edit_margin": {
+      "all": {
+        "cases": 3000,
+        "typos": 1424,
+        "target_in_top8": 1031,
+        "preservation": 1576,
+        "applied": 221,
+        "correct": 204,
+        "false_preservation_changes": 7,
+        "wrong": 17,
+        "precision": 0.9230769230769231,
+        "typo_recall": 0.14325842696629212,
+        "preservation_change_rate": 0.004441624365482234
+      },
+      "recorded_typo": {
+        "cases": 1424,
+        "typos": 1424,
+        "target_in_top8": 1031,
+        "applied": 214,
+        "correct": 204,
+        "false_preservation_changes": 0,
+        "wrong": 10,
+        "precision": 0.9532710280373832,
+        "typo_recall": 0.14325842696629212,
+        "preservation_change_rate": null
+      },
+      "recorded_preservation": {
+        "cases": 76,
+        "preservation": 76,
+        "target_in_top8": 0,
+        "precision": null,
+        "typo_recall": null,
+        "preservation_change_rate": 0.0
+      },
+      "source_preservation": {
+        "cases": 1500,
+        "preservation": 1500,
+        "target_in_top8": 0,
+        "applied": 7,
+        "wrong": 7,
+        "false_preservation_changes": 7,
+        "precision": 0.0,
+        "typo_recall": null,
+        "preservation_change_rate": 0.004666666666666667
+      }
+    }
+  },
+  "quick": {
+    "dictionary_only": {
+      "all": {
+        "cases": 500,
+        "top1": 291,
+        "top3": 405,
+        "top8": 469,
+        "mrr": 356.9673278675201,
+        "top1_rate": 0.582,
+        "top3_rate": 0.81,
+        "top8_rate": 0.938,
+        "mrr_rate": 0.7139346557350402
+      },
+      "commoncrawl": {
+        "cases": 100,
+        "top1": 54,
+        "top3": 80,
+        "top8": 95,
+        "mrr": 68.93541732070722,
+        "top1_rate": 0.54,
+        "top3_rate": 0.8,
+        "top8_rate": 0.95,
+        "mrr_rate": 0.6893541732070722
+      },
+      "quick3": {
+        "cases": 223,
+        "top1": 125,
+        "top3": 178,
+        "top8": 208,
+        "mrr": 156.18711854981117,
+        "top1_rate": 0.5605381165919282,
+        "top3_rate": 0.7982062780269058,
+        "top8_rate": 0.9327354260089686,
+        "mrr_rate": 0.700390666142651
+      },
+      "quick5": {
+        "cases": 277,
+        "top1": 166,
+        "top3": 227,
+        "top8": 261,
+        "mrr": 200.7802093177092,
+        "top1_rate": 0.5992779783393501,
+        "top3_rate": 0.8194945848375451,
+        "top8_rate": 0.9422382671480144,
+        "mrr_rate": 0.7248383007859538
+      },
+      "commonvoice": {
+        "cases": 100,
+        "top1": 66,
+        "top3": 91,
+        "top8": 97,
+        "mrr": 79.15747863247863,
+        "top1_rate": 0.66,
+        "top3_rate": 0.91,
+        "top8_rate": 0.97,
+        "mrr_rate": 0.7915747863247863
+      },
+      "lihkg": {
+        "cases": 100,
+        "top1": 64,
+        "top3": 84,
+        "top8": 94,
+        "mrr": 75.21866883116883,
+        "top1_rate": 0.64,
+        "top3_rate": 0.84,
+        "top8_rate": 0.94,
+        "mrr_rate": 0.7521866883116882
+      },
+      "openrice": {
+        "cases": 100,
+        "top1": 58,
+        "top3": 86,
+        "top8": 99,
+        "mrr": 72.55043290043291,
+        "top1_rate": 0.58,
+        "top3_rate": 0.86,
+        "top8_rate": 0.99,
+        "mrr_rate": 0.725504329004329
+      },
+      "wiki": {
+        "cases": 100,
+        "top1": 49,
+        "top3": 64,
+        "top8": 84,
+        "mrr": 61.10533018273294,
+        "top1_rate": 0.49,
+        "top3_rate": 0.64,
+        "top8_rate": 0.84,
+        "mrr_rate": 0.6110533018273294
+      }
+    },
+    "preview": {
+      "all": {
+        "cases": 500,
+        "top1": 386,
+        "top3": 448,
+        "top8": 477,
+        "mrr": 421.385775263947,
+        "top1_rate": 0.772,
+        "top3_rate": 0.896,
+        "top8_rate": 0.954,
+        "mrr_rate": 0.842771550527894
+      },
+      "commoncrawl": {
+        "cases": 100,
+        "top1": 77,
+        "top3": 88,
+        "top8": 95,
+        "mrr": 83.98406593406594,
+        "top1_rate": 0.77,
+        "top3_rate": 0.88,
+        "top8_rate": 0.95,
+        "mrr_rate": 0.8398406593406594
+      },
+      "quick3": {
+        "cases": 223,
+        "top1": 173,
+        "top3": 196,
+        "top8": 210,
+        "mrr": 186.9221523359681,
+        "top1_rate": 0.7757847533632287,
+        "top3_rate": 0.8789237668161435,
+        "top8_rate": 0.9417040358744395,
+        "mrr_rate": 0.8382159297577044
+      },
+      "quick5": {
+        "cases": 277,
+        "top1": 213,
+        "top3": 252,
+        "top8": 267,
+        "mrr": 234.46362292797895,
+        "top1_rate": 0.7689530685920578,
+        "top3_rate": 0.9097472924187726,
+        "top8_rate": 0.9638989169675091,
+        "mrr_rate": 0.8464390719421623
+      },
+      "commonvoice": {
+        "cases": 100,
+        "top1": 80,
+        "top3": 94,
+        "top8": 99,
+        "mrr": 87.09285714285713,
+        "top1_rate": 0.8,
+        "top3_rate": 0.94,
+        "top8_rate": 0.99,
+        "mrr_rate": 0.8709285714285713
+      },
+      "lihkg": {
+        "cases": 100,
+        "top1": 86,
+        "top3": 93,
+        "top8": 98,
+        "mrr": 89.91856452726019,
+        "top1_rate": 0.86,
+        "top3_rate": 0.93,
+        "top8_rate": 0.98,
+        "mrr_rate": 0.8991856452726019
+      },
+      "openrice": {
+        "cases": 100,
+        "top1": 81,
+        "top3": 95,
+        "top8": 96,
+        "mrr": 88.08888888888889,
+        "top1_rate": 0.81,
+        "top3_rate": 0.95,
+        "top8_rate": 0.96,
+        "mrr_rate": 0.8808888888888888
+      },
+      "wiki": {
+        "cases": 100,
+        "top1": 62,
+        "top3": 78,
+        "top8": 89,
+        "mrr": 72.30139877087495,
+        "top1_rate": 0.62,
+        "top3_rate": 0.78,
+        "top8_rate": 0.89,
+        "mrr_rate": 0.7230139877087496
+      }
+    },
+    "full": {
+      "all": {
+        "cases": 500,
+        "top1": 387,
+        "top3": 449,
+        "top8": 479,
+        "mrr": 422.22849881811544,
+        "top1_rate": 0.774,
+        "top3_rate": 0.898,
+        "top8_rate": 0.958,
+        "mrr_rate": 0.8444569976362308
+      },
+      "commoncrawl": {
+        "cases": 100,
+        "top1": 79,
+        "top3": 88,
+        "top8": 96,
+        "mrr": 85.03763736263737,
+        "top1_rate": 0.79,
+        "top3_rate": 0.88,
+        "top8_rate": 0.96,
+        "mrr_rate": 0.8503763736263736
+      },
+      "quick3": {
+        "cases": 223,
+        "top1": 173,
+        "top3": 196,
+        "top8": 210,
+        "mrr": 186.9221523359681,
+        "top1_rate": 0.7757847533632287,
+        "top3_rate": 0.8789237668161435,
+        "top8_rate": 0.9417040358744395,
+        "mrr_rate": 0.8382159297577044
+      },
+      "quick5": {
+        "cases": 277,
+        "top1": 214,
+        "top3": 253,
+        "top8": 269,
+        "mrr": 235.30634648214738,
+        "top1_rate": 0.7725631768953068,
+        "top3_rate": 0.9133574007220217,
+        "top8_rate": 0.9711191335740073,
+        "mrr_rate": 0.8494813952424093
+      },
+      "commonvoice": {
+        "cases": 100,
+        "top1": 80,
+        "top3": 94,
+        "top8": 99,
+        "mrr": 87.09285714285713,
+        "top1_rate": 0.8,
+        "top3_rate": 0.94,
+        "top8_rate": 0.99,
+        "mrr_rate": 0.8709285714285713
+      },
+      "lihkg": {
+        "cases": 100,
+        "top1": 86,
+        "top3": 94,
+        "top8": 98,
+        "mrr": 90.27570738440303,
+        "top1_rate": 0.86,
+        "top3_rate": 0.94,
+        "top8_rate": 0.98,
+        "mrr_rate": 0.9027570738440304
+      },
+      "openrice": {
+        "cases": 100,
+        "top1": 81,
+        "top3": 95,
+        "top8": 97,
+        "mrr": 88.1888888888889,
+        "top1_rate": 0.81,
+        "top3_rate": 0.95,
+        "top8_rate": 0.97,
+        "mrr_rate": 0.8818888888888889
+      },
+      "wiki": {
+        "cases": 100,
+        "top1": 61,
+        "top3": 78,
+        "top8": 89,
+        "mrr": 71.63340803932911,
+        "top1_rate": 0.61,
+        "top3_rate": 0.78,
+        "top8_rate": 0.89,
+        "mrr_rate": 0.7163340803932912
+      }
+    }
+  },
+  "quick_engine_latency": {
+    "preview": {
+      "median_us": 2775.5,
+      "p95_us": 3342
+    },
+    "full": {
+      "median_us": 223125.5,
+      "p95_us": 622956
+    }
+  },
+  "mobile_full_pool_latency": {
+    "median_us": 2555.5
+  },
+  "limitations": [
+    "ITE table contains only events selected by other keyboards' autocorrection",
+    "TEST_SECTION_ID is a trial, not a participant; participant map unavailable",
+    "Aalto/source data and Quick development may have historical tuning exposure",
+    "Prompt preservation labels are source-copy controls, not certified error-free text",
+    "Spelling ablations share current retrieval; missing candidates remain failures",
+    "No training or policy promotion from this audit; protected confirmation/test files were not opened"
+  ]
+}

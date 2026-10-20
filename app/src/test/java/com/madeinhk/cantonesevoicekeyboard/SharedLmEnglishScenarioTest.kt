@@ -11,6 +11,24 @@ import org.junit.Test
 import java.io.File
 
 class SharedLmEnglishScenarioTest {
+    @Test fun actualShortCodePreviewRetainsEveryMatchThroughJni() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() }).use { quick ->
+            for (version in listOf(3, 5)) for (left in listOf("", "I use ", "我想")) {
+                for (code in listOf("df", "DF", "d", "of")) {
+                    val preview = quick.previewCandidates(version, code, left, "")
+                    val full = quick.candidates(version, code, left, "")
+                    assertFalse(preview.isEmpty())
+                    assertEquals(full.map { it.text }.sorted(), preview.map { it.text }.sorted())
+                    assertEquals(preview.indices.toList(), preview.map { it.rank })
+                }
+            }
+            assertTrue(quick.previewCandidates(3, "dfg", "", "").isEmpty())
+        }
+    }
+
     private fun fake() = SharedLmEnglishEngine({ 7L }, { handle, _, _ ->
         assertEquals(7L, handle)
         listOf("hello", "help", "the")
@@ -41,8 +59,7 @@ class SharedLmEnglishScenarioTest {
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     @Test fun pendingUncertainLookupCommitsLiterallyWithoutLateRewrite() = kotlinx.coroutines.test.runTest {
         val dispatcher=kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
-        KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=fake(),jointDecoder=true,
-            scope=kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob()+dispatcher),
+        KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=fake(),scope=kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob()+dispatcher),
             lookupDispatcher=dispatcher).use { s ->
             s.start();s.type("teh");s.press(KeyboardKeyKind.Space)
             testScheduler.advanceUntilIdle()
@@ -153,28 +170,45 @@ class SharedLmEnglishScenarioTest {
             for(word in listOf("wastg","bokeh","Alstom","Xentara")) {
                 assertNull("Unexpected automatic correction: $word",english.predict(word,floatArrayOf(),floatArrayOf(),"","").correction)
             }
-            val correction=english.predict("yiu",floatArrayOf(),floatArrayOf(),"how are ","")
-            assertTrue(correction.candidates.any {it.word.equals("you",true)})
-            assertEquals("you",correction.correction?.lowercase())
-            assertEquals("hello",english.predict("hwllo",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("hello",english.predict("helo",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("hello",english.predict("helllo",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("the",english.predict("teh",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("look",english.predict("lokk",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("these",english.predict("thses",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("example",english.predict("exmaole",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("types",english.predict("tyoes",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("sure",english.predict("sjre",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("barely",english.predict("varely",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("english",english.predict("engloaj",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("the",english.predict("thr",floatArrayOf(),floatArrayOf(),"see all ","").correction?.lowercase())
-            assertEquals("rubbish",english.predict("rjbbish",floatArrayOf(),floatArrayOf(),"see all ","").correction?.lowercase())
-            assertEquals("trigger",english.predict("troggee",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("merge",english.predict("mwrge",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("error",english.predict("wrror",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
-            assertEquals("you support",english.predict("youbsupport",floatArrayOf(),floatArrayOf(),"did ","").correction?.lowercase())
-            assertEquals("you support",english.predict("yousupport",floatArrayOf(),floatArrayOf(),"did ","").correction?.lowercase())
-            assertEquals("in the",english.predict("inthe",floatArrayOf(),floatArrayOf(),"","").correction?.lowercase())
+            // The learned rule deliberately abstains on uncertain proposals.
+            // Suggested alternatives remain available for explicit selection.
+            for ((typed, target, automatic) in listOf(
+                Triple("hwllo", "hello", true), Triple("helo", "hello", false),
+                Triple("helllo", "hello", true), Triple("teh", "the", true),
+                Triple("lokk", "look", false), Triple("thses", "these", false),
+                Triple("exmaole", "example", false), Triple("tyoes", "types", false),
+                Triple("sjre", "sure", true), Triple("varely", "barely", false),
+                Triple("engloaj", "english", false), Triple("troggee", "trigger", false),
+                Triple("mwrge", "merge", false), Triple("wrror", "error", true),
+                Triple("inthe", "in the", true))) {
+                val prediction = english.predict(typed, floatArrayOf(), floatArrayOf(), "", "")
+                assertTrue("$typed still offers $target", prediction.candidates.any { it.word.equals(target, true) })
+                assertEquals("$typed automatic decision", if (automatic) target else null, prediction.correction?.lowercase())
+            }
+            assertEquals("you", english.predict("yiu", floatArrayOf(), floatArrayOf(), "how are ", "").correction?.lowercase())
+            assertEquals("the", english.predict("thr", floatArrayOf(), floatArrayOf(), "see all ", "").correction?.lowercase())
+            assertEquals("you support", english.predict("youbsupport", floatArrayOf(), floatArrayOf(), "did ", "").correction?.lowercase())
+            assertEquals("you support", english.predict("yousupport", floatArrayOf(), floatArrayOf(), "did ", "").correction?.lowercase())
+            val knownMistap=english.predict("hou",floatArrayOf(),floatArrayOf(),"let me know if ","")
+            assertTrue(knownMistap.known)
+            assertEquals("you",knownMistap.correction)
+            assertNull(english.predict("don't",floatArrayOf(),floatArrayOf(),"I ","").correction)
+            for (mode in listOf(KeyboardInputMode.AlphaNum,KeyboardInputMode.Quick)) {
+                KeyboardScenario(initialText="let me know if ",initialMode=mode,englishEngine=english).use { s ->
+                    s.engine.lookup={_,_,_,_->emptyList()}
+                    s.start();s.type("hou")
+                    val words=if(mode==KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                    assertTrue(words.any { it.text=="you" })
+                    assertEquals(KeyboardToolbarContent.Candidates,s.snapshot().toolbar())
+                    s.press(KeyboardKeyKind.Space)
+                    assertEquals("let me know if you ",s.editor.text)
+                    s.press(KeyboardKeyKind.Delete)
+                    assertEquals("let me know if ",s.editor.text)
+                    assertEquals("hou",s.editor.composing)
+                    s.press(KeyboardKeyKind.Space)
+                    assertEquals("let me know if hou ",s.editor.text)
+                }
+            }
             val result=english.predict("hel",floatArrayOf(),floatArrayOf(),"I said ","")
             assertFalse(result.candidates.isEmpty())
             assertTrue(result.candidates.any {it.word.equals("hello",true)})
@@ -190,19 +224,19 @@ class SharedLmEnglishScenarioTest {
                 s.start();s.type("keyboard");s.press(KeyboardKeyKind.Space)
                 assertEquals("keyboard ",s.editor.text)
                 s.type("varely");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely ",s.editor.text)
+                assertEquals("keyboard varely ",s.editor.text)
                 s.type("lokk");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look ",s.editor.text)
+                assertEquals("keyboard varely look ",s.editor.text)
                 s.type("thses");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look these ",s.editor.text)
+                assertEquals("keyboard varely look thses ",s.editor.text)
                 s.type("exmaole");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look these example ",s.editor.text)
+                assertEquals("keyboard varely look thses exmaole ",s.editor.text)
                 s.type("mwrge");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look these example merge ",s.editor.text)
+                assertEquals("keyboard varely look thses exmaole mwrge ",s.editor.text)
                 s.type("wrror");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look these example merge error ",s.editor.text)
+                assertEquals("keyboard varely look thses exmaole mwrge error ",s.editor.text)
                 s.type("youbsupport");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look these example merge error you support ",s.editor.text)
+                assertEquals("keyboard varely look thses exmaole mwrge error you support ",s.editor.text)
             }
             KeyboardScenario(initialMode=KeyboardInputMode.Quick,quickEngine=quick,englishEngine=english).use { s ->
                 s.start();s.type("df")

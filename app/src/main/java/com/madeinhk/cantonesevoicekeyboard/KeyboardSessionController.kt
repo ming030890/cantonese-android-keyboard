@@ -12,7 +12,7 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardRenderState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +31,6 @@ internal class KeyboardSessionController(
             enabledLayouts = { KeyboardSettings.getEnabledLayouts(service) },
             quickVersion = { KeyboardSettings.getQuickVersion(service) },
             autocorrectEnabled = { KeyboardSettings.isAutocorrectEnabled(service, it) },
-            jointDecoderEnabled = { KeyboardSettings.isJointDecoderEnabled(service) },
         ),
         createDependencies = { editor, currentSession, isVisible ->
             val voice = VoiceInputCoordinator(service, editor, currentSession, isVisible)
@@ -75,7 +74,7 @@ internal class KeyboardSessionController(
         return boundaryQueue!!.enqueue { pendingTouch=touch;action() }
     }
     private fun waitForBoundary(action: () -> Unit): Boolean {
-        if ((!settings.jointDecoderEnabled() && english?.sharedSuggestions!=true) || english?.needsBoundaryTransaction()!=true) return false
+        if (english?.needsBoundaryTransaction()!=true) return false
         return boundaryQueue?.begin({ english.settleBoundary() }, action,{english.settleContextRevision()}) == true
     }
     private fun flushBoundaryLiteral() {
@@ -115,20 +114,25 @@ internal class KeyboardSessionController(
     val quickCandidates = if (english == null) quick.candidates else combine(quick.candidates, english.candidates) { chinese, words ->
         val mix = english.quick && english.word == quick.getComposingText() && autocorrectActive(KeyboardInputMode.Quick)
         Triple(chinese, if (mix) words else emptyList(), quick.getComposingText())
-    }.mapLatest { (chinese, words, code) ->
-        if (words.isEmpty()) chinese else if (code.length == 2 && chinese.isNotEmpty()) {
+    }.transformLatest { (chinese, words, code) ->
+        if (words.isEmpty()) emit(chinese) else if (code.length == 2) {
             // A complete Quick code keeps every Chinese match ahead of English
             // suggestions, even when the surrounding text is English.
-            (chinese + words).distinctBy { it.text }.mapIndexed { i, candidate -> candidate.copy(rank = i) }
+            // Also skip mixed ranking while Chinese lookup is pending: ranking
+            // the literal English code alone competes for the same native LM.
+            emit((chinese + words).distinctBy { it.text }.mapIndexed { i, candidate -> candidate.copy(rank = i) })
         } else {
+            // Chinese lookup is already ranked. Make it usable immediately while
+            // the English worker prepares the final bilingual ordering.
+            emit(chinese)
             val topCount = 8
             val topChinese = chinese.take(topCount)
             val pool = (topChinese + words).map { it.text }.distinct()
             val rankedTop = english.rankCandidates(pool)
             val tail = chinese.drop(topCount).filter { it.text !in rankedTop }
             val ranked = rankedTop + tail.map { it.text }
-            if (code != quick.getComposingText()) emptyList() else
-                ranked.mapIndexed { i, text -> com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate(text, i) }
+            if (code == quick.getComposingText())
+                emit(ranked.mapIndexed { i, text -> com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate(text, i) })
         }
     }.stateIn(english.scope, SharingStarted.Eagerly, emptyList())
     val handwritingRecognizing = handwriting.recognizing

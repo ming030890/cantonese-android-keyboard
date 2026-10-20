@@ -8,6 +8,16 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
+@Preview(name = "Known word contextual correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioSharedLmKnownWordCorrection() = ScenarioScreen(remember { KeyboardScenarios.sharedLmKnownWordCorrection() })
+
+@PreviewTest
+@Preview(name = "Uncertain spelling remains selectable", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioUncertainSharedLmSpelling() = ScenarioScreen(remember { KeyboardScenarios.uncertainSharedLmSpelling() })
+
+@PreviewTest
 @Preview(name = "Shared LM spelling suggestion", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioSharedLmSpellingSuggestion() = ScenarioScreen(remember { KeyboardScenarios.sharedLmSpellingSuggestions() })
@@ -41,6 +51,11 @@ fun ScenarioQuickEnglishCandidates() = ScenarioScreen(remember { KeyboardScenari
 @Preview(name = "Two letter Quick code Chinese first", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioTwoLetterQuickCandidates() = ScenarioScreen(remember { KeyboardScenarios.twoLetterQuickCandidates() })
+
+@PreviewTest
+@Preview(name = "Short Quick code before full ranking", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioShortCodePreviewCandidates() = ScenarioScreen(remember { KeyboardScenarios.shortCodePreviewCandidates() })
 
 @PreviewTest
 @Preview(name = "Long bilingual candidates", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)

@@ -172,7 +172,11 @@ class QuickInputCoordinatorTest {
         val c = QuickInputCoordinator({ backend }, ImeEditor({ null }, { null }), scope = this)
         c.onKey("o")
         testScheduler.runCurrent()
-        assertTrue(entered.await(5, java.util.concurrent.TimeUnit.SECONDS))
+        // Let the main test dispatcher publish a short-code preview before the
+        // blocking worker enters full ranking.
+        assertTrue(kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            entered.await(5, java.util.concurrent.TimeUnit.SECONDS)
+        })
         c.discard()
         release.countDown()
         assertTrue(finished.await(5, java.util.concurrent.TimeUnit.SECONDS))

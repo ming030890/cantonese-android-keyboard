@@ -4,9 +4,8 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[1]
-CLASSES=['com.madeinhk.cantonesevoicekeyboard.EnglishNativeEngineTest',
- 'com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardTouchControllerTest',
- 'com.madeinhk.cantonesevoicekeyboard.ContextRevisionInputConnectionTest']
+CLASSES=['com.madeinhk.cantonesevoicekeyboard.SharedLmEnglishInstrumentedTest',
+ 'com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardTouchControllerTest']
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 

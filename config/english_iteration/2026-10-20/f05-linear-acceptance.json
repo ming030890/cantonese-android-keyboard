@@ -1,0 +1,234 @@
+{
+  "scope": "Linear fit/cutoff/selection on separate prompt groups; source has historical development exposure",
+  "input_sha256": {
+    "build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "build/english-iteration-2026-10-20/native-cache.json": "c4cf55303800beb689dc2b9caa73ba54c1de9528dfa3846e5ce8d5213a4887b6",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/fit_english_acceptance.py": "234836a158b1b8dd33fdb9a507fe3cdf2f605ee007c1b46c87b380f1f9186f1b",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/align_mobile_targets.py": "3240a34c9cd46eab5ce4c9036ab928e499e67f7f833c003da511b71c8aeb5bb4"
+  },
+  "alignment": {
+    "excluded_ambiguous_or_unmatched_reference": 2272,
+    "retained": 9728,
+    "multiword_targets": 86
+  },
+  "fit_rows": 1364,
+  "fit_groups": 503,
+  "calibration_cases": 1154,
+  "trials": [
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.6060100777482609,
+          1.0518345900537627,
+          1.173847074835433
+        ],
+        "regularization": 0.001,
+        "threshold": 0.7302466922225531,
+        "cutoff_metric": "f0.5",
+        "calibration_f05": 0.8110119047619048
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 353,
+        "correct": 324,
+        "false_changes": 7,
+        "wrong": 29,
+        "f05": 0.7670454545454546,
+        "precision": 0.9178470254957507,
+        "recall": 0.46285714285714286,
+        "false_change_rate": 0.005604483586869495,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.546266883498369,
+          0.9784573489703149,
+          1.0775561703764058
+        ],
+        "regularization": 0.01,
+        "threshold": 0.7282246486651247,
+        "cutoff_metric": "f0.5",
+        "calibration_f05": 0.8110119047619048
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 353,
+        "correct": 324,
+        "false_changes": 7,
+        "wrong": 29,
+        "f05": 0.7670454545454546,
+        "precision": 0.9178470254957507,
+        "recall": 0.46285714285714286,
+        "false_change_rate": 0.005604483586869495,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    },
+    {
+      "model": {
+        "features": [
+          "winner_score",
+          "runner_margin"
+        ],
+        "means": [
+          -10.631607231506504,
+          6.314342624630746
+        ],
+        "scales": [
+          5.2767124542021,
+          4.830294184051234
+        ],
+        "weights": [
+          1.2760394761939382,
+          0.6239666268405312,
+          0.6305344035134209
+        ],
+        "regularization": 0.1,
+        "threshold": 0.7178138899133228,
+        "cutoff_metric": "f0.5",
+        "calibration_f05": 0.8112094395280236
+      },
+      "cutoff_found": true,
+      "selection": {
+        "cases": 1949,
+        "top1": 527,
+        "top8": 599,
+        "mrr": 556.5261904761903,
+        "typos": 700,
+        "preservation": 1249,
+        "applied": 356,
+        "correct": 327,
+        "false_changes": 7,
+        "wrong": 29,
+        "f05": 0.769774011299435,
+        "precision": 0.9185393258426966,
+        "recall": 0.46714285714285714,
+        "false_change_rate": 0.005604483586869495,
+        "top8_rate": 0.3073370959466393,
+        "mrr_rate": 0.28554447946443834
+      }
+    }
+  ],
+  "champion": {
+    "model": {
+      "features": [
+        "winner_score",
+        "runner_margin"
+      ],
+      "means": [
+        -10.631607231506504,
+        6.314342624630746
+      ],
+      "scales": [
+        5.2767124542021,
+        4.830294184051234
+      ],
+      "weights": [
+        1.2760394761939382,
+        0.6239666268405312,
+        0.6305344035134209
+      ],
+      "regularization": 0.1,
+      "threshold": 0.7178138899133228,
+      "cutoff_metric": "f0.5",
+      "calibration_f05": 0.8112094395280236
+    },
+    "cutoff_found": true,
+    "selection": {
+      "cases": 1949,
+      "top1": 527,
+      "top8": 599,
+      "mrr": 556.5261904761903,
+      "typos": 700,
+      "preservation": 1249,
+      "applied": 356,
+      "correct": 327,
+      "false_changes": 7,
+      "wrong": 29,
+      "f05": 0.769774011299435,
+      "precision": 0.9185393258426966,
+      "recall": 0.46714285714285714,
+      "false_change_rate": 0.005604483586869495,
+      "top8_rate": 0.3073370959466393,
+      "mrr_rate": 0.28554447946443834
+    }
+  },
+  "qualified": true,
+  "evaluation": {
+    "cases": 2042,
+    "top1": 573,
+    "top8": 648,
+    "mrr": 603.0333333333333,
+    "typos": 744,
+    "applied": 364,
+    "correct": 336,
+    "false_changes": 9,
+    "preservation": 1298,
+    "wrong": 28,
+    "f05": 0.7636363636363637,
+    "precision": 0.9230769230769231,
+    "recall": 0.45161290322580644,
+    "false_change_rate": 0.006933744221879815,
+    "top8_rate": 0.31733594515181196,
+    "mrr_rate": 0.295315050603983
+  },
+  "primary_metric": "f0.5",
+  "baseline_evaluation": {
+    "cases": 2042,
+    "top1": 573,
+    "top8": 648,
+    "mrr": 603.0333333333333,
+    "typos": 744,
+    "applied": 511,
+    "correct": 399,
+    "false_changes": 41,
+    "wrong": 112,
+    "preservation": 1298,
+    "f05": 0.7155667144906743,
+    "precision": 0.7808219178082192,
+    "recall": 0.5362903225806451,
+    "false_change_rate": 0.031587057010785825,
+    "top8_rate": 0.31733594515181196,
+    "mrr_rate": 0.295315050603983
+  }
+}

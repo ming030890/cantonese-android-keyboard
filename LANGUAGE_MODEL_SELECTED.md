@@ -10,11 +10,21 @@ English shows prefix completions, next-word suggestions and spelling alternative
 Spelling candidates come from the model's existing TRAIN-attested English tokens,
 using bounded insertion/deletion/substitution/adjacent-swap edits. The same LM ranks
 them with an edit penalty. Users may select a suggestion or accept a clear spelling
-correction on Space; Backspace restores the original. Known vocabulary spellings
-and uncertain alternatives are preserved. No old dictionary/model is restored.
-The experimental gates allow only one-edit automatic corrections, require a score
-margin of4 (6 without left context) and raw LM probability >=0.0001;
-these are heuristics, not fitted confidence probabilities. Words missing from the
+correction on Space; Backspace restores the original. Original-word evidence
+helps preserve intentional words while allowing contextual mistaps. No old dictionary/model is restored.
+The native implementation currently uses length-dependent edit limits, keyboard
+neighbour/edit penalties and split-word proposals. Acceptance
+now uses a fitted six-feature logistic rule with original-word evidence compiled from
+`../QwenASR/crates/cantonese-ngram/src/english_acceptance.json`.
+On the aligned mobile development evaluation it reduces wrong replacements from
+112 to 23, while correct replacements fall from 399 to 361. F₀.₅ improves from
+0.7156 originally and 0.7636 in the previous rule to 0.7917; precision is 94.0%
+and typo recall is 48.5%. The score is a learned
+decision value, not a per-user correctness guarantee. Prefix completion no longer
+pays a spelling-error penalty. See [ENGLISH_TYPING_ITERATION.md](ENGLISH_TYPING_ITERATION.md)
+for provenance, tradeoffs and the remaining heuristic constants.
+Actual tap coordinates are captured but are not yet used by this shared engine.
+Words missing from the
 model's English token set cannot be proposed by this generator.
 
 The packed model is 12,675,264 bytes, SHA-256
@@ -48,8 +58,8 @@ Host timing is not phone latency. No phone was connected during integration.
 Actual-bundle native smoke checks also confirm shared weight allocation and identical
 scores between cached and fresh contexts after appends, cursor edits and a sliding
 window (maximum difference 0). See `config/language_model/shared_cnn_native_smoke.json`
-and `shared_cnn_native_parity.json`. Historical correction code/tests remain as
-legacy fixtures, but the production loader constructs only `SharedLmEnglishEngine`;
+and `shared_cnn_native_parity.json`. The retired correction code/tests have been deleted;
+the production loader constructs only `SharedLmEnglishEngine`;
 old spelling resources are neither staged nor packaged.
 
 Integration verification (2026-10-19): `:app:verifyKeyboard` passed unit/scenario,
@@ -69,3 +79,11 @@ unchanged corpus words was altered. Gates were tightened using these development
 checks; this is not independent held-out qualification or a calibrated confidence.
 See `shared_cnn_spelling_audit.json`; replay with `scripts/evaluate_shared_spelling.py`.
 The same shared weights/vocabulary and original V2 quality limitations remain.
+
+The 2026-10-20 [pipeline review](CANDIDATE_PIPELINE_REVIEW.md) supersedes that
+synthetic audit as a description of current diagnostic quality: on a frozen SSD
+cohort of 1,500 recorded mobile events plus 1,500 source-preservation controls,
+native decisions achieved 75.36% precision, 44.45% typo recall and 47 unwanted
+changes among 1,576 preservation cases. The artificial cohort mixture, historical
+data exposure and event-label limitations prevent interpreting these as production
+population rates. No tested simplification qualified a replacement policy.

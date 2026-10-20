@@ -26,7 +26,7 @@ class AutocorrectDeadlineScenarioTest {
                         EnglishPrediction(correction=if(word=="teh") "the" else null,replaceBefore=word.length)
                 }
                 try {
-                    KeyboardScenario(initialMode=mode,englishEngine=engine,jointDecoder=true,scope=scope,
+                    KeyboardScenario(initialMode=mode,englishEngine=engine,scope=scope,
                         lookupDispatcher=DelayedWorker(scope,latency)).use {s ->
                         s.start();s.type("teh");runCurrent()
                         advanceTimeBy(pauseBeforeSpace);runCurrent()
@@ -50,8 +50,7 @@ class AutocorrectDeadlineScenarioTest {
                     EnglishPrediction(correction=if(word=="teh") "the" else null,confidence=.9999,replaceBefore=word.length)
             }
             try {
-                KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=engine,jointDecoder=true,
-                    scope=scope,lookupDispatcher=DelayedWorker(scope,latency)).use {s ->
+                KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,englishEngine=engine,scope=scope,lookupDispatcher=DelayedWorker(scope,latency)).use {s ->
                     s.start();s.type("teh");advanceUntilIdle();s.press(KeyboardKeyKind.Space);advanceUntilIdle()
                     s.type("meeting");advanceUntilIdle();s.press(KeyboardKeyKind.Space);advanceUntilIdle()
                     assertEquals(if(latency<40) "the meeting " else "teh meeting ",s.editor.text)
