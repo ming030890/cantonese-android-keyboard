@@ -1,0 +1,40 @@
+{
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "policy_sha256": "1d5733cc3f09778485318cb5c579086f67977b19dc52577cd6dbd298ae4784da",
+  "probe_sha256": "ba493f5b4203acdd7ac14f6e67141330d1dec18a657be7760268016735606eab",
+  "cases": 9728,
+  "decision_mismatches": [],
+  "evaluation": {
+    "cases": 2042,
+    "top1": 582,
+    "top8": 655,
+    "mrr": 611.7190476190475,
+    "typos": 744,
+    "applied": 450,
+    "correct": 418,
+    "false_changes": 8,
+    "preservation": 1298,
+    "wrong": 32,
+    "f05": 0.8215408805031447,
+    "precision": 0.9288888888888889,
+    "recall": 0.5618279569892473,
+    "false_change_rate": 0.0061633281972265025,
+    "top8_rate": 0.3207639569049951,
+    "mrr_rate": 0.2995685835548714
+  },
+  "baseline_evaluation": {
+    "cases": 2042,
+    "typos": 744,
+    "controls": 1298,
+    "correct": 397,
+    "wrong": 33,
+    "false_changes": 8,
+    "recall": 0.5336021505376344,
+    "precision": 0.9232558139534883,
+    "f05": 0.8056006493506493
+  },
+  "apostrophe_policy_sha256": "0de96ace3507ddb0aeb9944b0ece3cd389aa434f2bc87640bd9044be4cf25d96",
+  "forms_sha256": "610b016b874e823de73b41a1c9fb62705e7af15a463f6e3a5542e3102cdbc9a8",
+  "candidate_order_changes": 9197,
+  "predictions_sha256": "93a197f73761327e4c28ca061bc592aa63646e0e4af8f7625631bcf011e6fcb0"
+}

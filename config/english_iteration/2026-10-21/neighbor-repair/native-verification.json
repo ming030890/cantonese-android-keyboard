@@ -1,0 +1,2477 @@
+{
+  "native_parity_cases": 15719,
+  "decision_mismatches": 0,
+  "candidate_order_changes": 0,
+  "frozen_selection_sha256": "6d344296b5db7914986e94b12c6800ccfb20fd9647592f29c768ebd2411f11c5",
+  "real_evaluation": {
+    "all_regression": {
+      "before": {
+        "cases": 2042,
+        "typos": 744,
+        "controls": 1298,
+        "correct": 364,
+        "wrong": 23,
+        "false_changes": 5,
+        "recall": 0.489247311827957,
+        "precision": 0.9405684754521964,
+        "f05": 0.794066317626527
+      },
+      "after": {
+        "cases": 2042,
+        "typos": 744,
+        "controls": 1298,
+        "correct": 372,
+        "wrong": 25,
+        "false_changes": 6,
+        "recall": 0.5,
+        "precision": 0.9370277078085643,
+        "f05": 0.7975986277873071
+      }
+    },
+    "primary_unambiguous": {
+      "before": {
+        "cases": 82,
+        "typos": 82,
+        "controls": 0,
+        "correct": 73,
+        "wrong": 0,
+        "false_changes": 0,
+        "recall": 0.8902439024390244,
+        "precision": 1.0,
+        "f05": 0.9759358288770054
+      },
+      "after": {
+        "cases": 82,
+        "typos": 82,
+        "controls": 0,
+        "correct": 81,
+        "wrong": 0,
+        "false_changes": 0,
+        "recall": 0.9878048780487805,
+        "precision": 1.0,
+        "f05": 0.9975369458128078
+      }
+    },
+    "preservation": {
+      "before": {
+        "cases": 1298,
+        "typos": 0,
+        "controls": 1298,
+        "correct": 0,
+        "wrong": 5,
+        "false_changes": 5,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f05": 0.0
+      },
+      "after": {
+        "cases": 1298,
+        "typos": 0,
+        "controls": 1298,
+        "correct": 0,
+        "wrong": 6,
+        "false_changes": 6,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f05": 0.0
+      }
+    },
+    "primary_by_length": {
+      "4-5": {
+        "before": {
+          "cases": 15,
+          "typos": 15,
+          "controls": 0,
+          "correct": 12,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.8,
+          "precision": 1.0,
+          "f05": 0.9523809523809523
+        },
+        "after": {
+          "cases": 15,
+          "typos": 15,
+          "controls": 0,
+          "correct": 15,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 1.0,
+          "precision": 1.0,
+          "f05": 1.0
+        }
+      },
+      "6-7": {
+        "before": {
+          "cases": 41,
+          "typos": 41,
+          "controls": 0,
+          "correct": 37,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9024390243902439,
+          "precision": 1.0,
+          "f05": 0.9788359788359788
+        },
+        "after": {
+          "cases": 41,
+          "typos": 41,
+          "controls": 0,
+          "correct": 41,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 1.0,
+          "precision": 1.0,
+          "f05": 1.0
+        }
+      },
+      "8-32": {
+        "before": {
+          "cases": 26,
+          "typos": 26,
+          "controls": 0,
+          "correct": 24,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9230769230769231,
+          "precision": 1.0,
+          "f05": 0.9836065573770492
+        },
+        "after": {
+          "cases": 26,
+          "typos": 26,
+          "controls": 0,
+          "correct": 25,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9615384615384616,
+          "precision": 1.0,
+          "f05": 0.9920634920634921
+        }
+      }
+    },
+    "changes": [
+      {
+        "id": "012bff46b991e46d9c604deab7a52583ff874b7f7fea54409f4daee838a7bc29",
+        "typed": "soumd",
+        "target": "sound",
+        "before": null,
+        "after": "sound"
+      },
+      {
+        "id": "0178bc2c5cdee169024e7fb0ccf1f5cbd6be636d0c74e610ce42d3aa44bf4ce3",
+        "typed": "wuestion",
+        "target": "questions",
+        "before": null,
+        "after": "question"
+      },
+      {
+        "id": "019ee1dba2ae5a0936d790dd07c7ef6918fcbd90c9ba82992c417d7086296bb8",
+        "typed": "todat",
+        "target": "today",
+        "before": null,
+        "after": "today"
+      },
+      {
+        "id": "02eee58c829bc982c3b4f5c0f77b15c1958f3f59792900261feb0e10c6fe37df",
+        "typed": "enckave",
+        "target": "enclave",
+        "before": null,
+        "after": "enclave"
+      },
+      {
+        "id": "03210286f9131fa66faa6a018fded9cd87a882c80b76de590718fb83e047ba83",
+        "typed": "royten",
+        "target": "rotten",
+        "before": null,
+        "after": "rotten"
+      },
+      {
+        "id": "03337f5ec37e0b650cb63efba7ed0e859c25cae122ad4ba4a992e036cbd68cce",
+        "typed": "aucrion",
+        "target": "auction",
+        "before": null,
+        "after": "auction"
+      },
+      {
+        "id": "04da840481cf4808b1c7cc66d0bad32c5e5c4683802bcdd022905e2753d07b27",
+        "typed": "doylr",
+        "target": "doyle",
+        "before": null,
+        "after": "doyle"
+      },
+      {
+        "id": "0511810c53ad948b95f6217613a160acf962e334ecce2e10f17587957c874668",
+        "typed": "markwt",
+        "target": "market",
+        "before": null,
+        "after": "market"
+      },
+      {
+        "id": "062e9f8ffe88680222ff59fab33611d19f41e533d20376ba8bca9b2977a7e3d9",
+        "typed": "dissodent",
+        "target": "dissident",
+        "before": null,
+        "after": "dissident"
+      },
+      {
+        "id": "4e703f2ede2fad026aa55238b9b88596c1bc144991cecf0585931544350bcce8",
+        "typed": "unexploded",
+        "target": "unexploded",
+        "before": null,
+        "after": "unexplored"
+      }
+    ]
+  },
+  "fresh_words": 2000,
+  "fresh": {
+    "all_regression": {
+      "before": {
+        "cases": 4000,
+        "typos": 2000,
+        "controls": 2000,
+        "correct": 945,
+        "wrong": 12,
+        "false_changes": 1,
+        "recall": 0.4725,
+        "precision": 0.987460815047022,
+        "f05": 0.8107412491420728
+      },
+      "after": {
+        "cases": 4000,
+        "typos": 2000,
+        "controls": 2000,
+        "correct": 1243,
+        "wrong": 12,
+        "false_changes": 1,
+        "recall": 0.6215,
+        "precision": 0.9904382470119522,
+        "f05": 0.8853276353276354
+      }
+    },
+    "primary_unambiguous": {
+      "before": {
+        "cases": 1129,
+        "typos": 1129,
+        "controls": 0,
+        "correct": 810,
+        "wrong": 1,
+        "false_changes": 0,
+        "recall": 0.7174490699734278,
+        "precision": 0.998766954377312,
+        "f05": 0.9261376629316259
+      },
+      "after": {
+        "cases": 1129,
+        "typos": 1129,
+        "controls": 0,
+        "correct": 1108,
+        "wrong": 1,
+        "false_changes": 0,
+        "recall": 0.9813994685562445,
+        "precision": 0.9990982867448152,
+        "f05": 0.995507637017071
+      }
+    },
+    "preservation": {
+      "before": {
+        "cases": 2000,
+        "typos": 0,
+        "controls": 2000,
+        "correct": 0,
+        "wrong": 1,
+        "false_changes": 1,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f05": 0.0
+      },
+      "after": {
+        "cases": 2000,
+        "typos": 0,
+        "controls": 2000,
+        "correct": 0,
+        "wrong": 1,
+        "false_changes": 1,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f05": 0.0
+      }
+    },
+    "primary_by_length": {
+      "4-5": {
+        "before": {
+          "cases": 181,
+          "typos": 181,
+          "controls": 0,
+          "correct": 61,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.3370165745856354,
+          "precision": 1.0,
+          "f05": 0.7176470588235294
+        },
+        "after": {
+          "cases": 181,
+          "typos": 181,
+          "controls": 0,
+          "correct": 173,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9558011049723757,
+          "precision": 1.0,
+          "f05": 0.9908361970217641
+        }
+      },
+      "6-7": {
+        "before": {
+          "cases": 497,
+          "typos": 497,
+          "controls": 0,
+          "correct": 366,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.7364185110663984,
+          "precision": 1.0,
+          "f05": 0.9331973482916879
+        },
+        "after": {
+          "cases": 497,
+          "typos": 497,
+          "controls": 0,
+          "correct": 490,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9859154929577465,
+          "precision": 1.0,
+          "f05": 0.9971509971509972
+        }
+      },
+      "8-32": {
+        "before": {
+          "cases": 451,
+          "typos": 451,
+          "controls": 0,
+          "correct": 383,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.8492239467849224,
+          "precision": 0.9973958333333334,
+          "f05": 0.9637644690488173
+        },
+        "after": {
+          "cases": 451,
+          "typos": 451,
+          "controls": 0,
+          "correct": 445,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.9866962305986696,
+          "precision": 0.9977578475336323,
+          "f05": 0.9955257270693513
+        }
+      }
+    },
+    "changes": [
+      {
+        "id": "fresh:corsair:neighbor",
+        "typed": "coesair",
+        "target": "corsair",
+        "before": null,
+        "after": "corsair"
+      },
+      {
+        "id": "fresh:alice:neighbor",
+        "typed": "aiice",
+        "target": "alice",
+        "before": null,
+        "after": "alice"
+      },
+      {
+        "id": "fresh:rule:neighbor",
+        "typed": "rulw",
+        "target": "rule",
+        "before": null,
+        "after": "rule"
+      },
+      {
+        "id": "fresh:dream:neighbor",
+        "typed": "dgeam",
+        "target": "dream",
+        "before": null,
+        "after": "dream"
+      },
+      {
+        "id": "fresh:tech:neighbor",
+        "typed": "tecg",
+        "target": "tech",
+        "before": null,
+        "after": "tech"
+      },
+      {
+        "id": "fresh:resolution:neighbor",
+        "typed": "resolktion",
+        "target": "resolution",
+        "before": null,
+        "after": "resolution"
+      },
+      {
+        "id": "fresh:scan:neighbor",
+        "typed": "sczn",
+        "target": "scan",
+        "before": null,
+        "after": "scan"
+      },
+      {
+        "id": "fresh:addresses:neighbor",
+        "typed": "afdresses",
+        "target": "addresses",
+        "before": null,
+        "after": "addresses"
+      },
+      {
+        "id": "fresh:items:neighbor",
+        "typed": "itejs",
+        "target": "items",
+        "before": null,
+        "after": "items"
+      },
+      {
+        "id": "fresh:debit:neighbor",
+        "typed": "ddbit",
+        "target": "debit",
+        "before": null,
+        "after": "debit"
+      },
+      {
+        "id": "fresh:found:neighbor",
+        "typed": "foumd",
+        "target": "found",
+        "before": null,
+        "after": "found"
+      },
+      {
+        "id": "fresh:decision:neighbor",
+        "typed": "dwcision",
+        "target": "decision",
+        "before": null,
+        "after": "decision"
+      },
+      {
+        "id": "fresh:crepe:neighbor",
+        "typed": "cfepe",
+        "target": "crepe",
+        "before": null,
+        "after": "crepe"
+      },
+      {
+        "id": "fresh:quiet:neighbor",
+        "typed": "quuet",
+        "target": "quiet",
+        "before": null,
+        "after": "quiet"
+      },
+      {
+        "id": "fresh:secure:neighbor",
+        "typed": "sscure",
+        "target": "secure",
+        "before": null,
+        "after": "secure"
+      },
+      {
+        "id": "fresh:modular:neighbor",
+        "typed": "morular",
+        "target": "modular",
+        "before": null,
+        "after": "modular"
+      },
+      {
+        "id": "fresh:bookmark:neighbor",
+        "typed": "bookmari",
+        "target": "bookmark",
+        "before": null,
+        "after": "bookmark"
+      },
+      {
+        "id": "fresh:hostel:neighbor",
+        "typed": "nostel",
+        "target": "hostel",
+        "before": null,
+        "after": "hostel"
+      },
+      {
+        "id": "fresh:users:neighbor",
+        "typed": "uqers",
+        "target": "users",
+        "before": null,
+        "after": "users"
+      },
+      {
+        "id": "fresh:notes:neighbor",
+        "typed": "nktes",
+        "target": "notes",
+        "before": null,
+        "after": "notes"
+      },
+      {
+        "id": "fresh:concert:neighbor",
+        "typed": "clncert",
+        "target": "concert",
+        "before": null,
+        "after": "concert"
+      },
+      {
+        "id": "fresh:candy:neighbor",
+        "typed": "candh",
+        "target": "candy",
+        "before": null,
+        "after": "candy"
+      },
+      {
+        "id": "fresh:provided:neighbor",
+        "typed": "peovided",
+        "target": "provided",
+        "before": null,
+        "after": "provided"
+      },
+      {
+        "id": "fresh:reset:neighbor",
+        "typed": "rrset",
+        "target": "reset",
+        "before": null,
+        "after": "reset"
+      },
+      {
+        "id": "fresh:figure:neighbor",
+        "typed": "fogure",
+        "target": "figure",
+        "before": null,
+        "after": "figure"
+      },
+      {
+        "id": "fresh:linux:neighbor",
+        "typed": "lknux",
+        "target": "linux",
+        "before": null,
+        "after": "linux"
+      },
+      {
+        "id": "fresh:sake:neighbor",
+        "typed": "sqke",
+        "target": "sake",
+        "before": null,
+        "after": "sake"
+      },
+      {
+        "id": "fresh:required:neighbor",
+        "typed": "requored",
+        "target": "required",
+        "before": null,
+        "after": "required"
+      },
+      {
+        "id": "fresh:cloud:neighbor",
+        "typed": "cioud",
+        "target": "cloud",
+        "before": null,
+        "after": "cloud"
+      },
+      {
+        "id": "fresh:complaint:neighbor",
+        "typed": "complaiht",
+        "target": "complaint",
+        "before": null,
+        "after": "complaint"
+      },
+      {
+        "id": "fresh:pixel:neighbor",
+        "typed": "pkxel",
+        "target": "pixel",
+        "before": null,
+        "after": "pixel"
+      },
+      {
+        "id": "fresh:culture:neighbor",
+        "typed": "cklture",
+        "target": "culture",
+        "before": null,
+        "after": "culture"
+      },
+      {
+        "id": "fresh:enable:neighbor",
+        "typed": "enahle",
+        "target": "enable",
+        "before": null,
+        "after": "enable"
+      },
+      {
+        "id": "fresh:rewarding:neighbor",
+        "typed": "rewardijg",
+        "target": "rewarding",
+        "before": null,
+        "after": "rewarding"
+      },
+      {
+        "id": "fresh:position:neighbor",
+        "typed": "podition",
+        "target": "position",
+        "before": null,
+        "after": "position"
+      },
+      {
+        "id": "fresh:chance:neighbor",
+        "typed": "chsnce",
+        "target": "chance",
+        "before": null,
+        "after": "chance"
+      },
+      {
+        "id": "fresh:smoked:neighbor",
+        "typed": "smkked",
+        "target": "smoked",
+        "before": null,
+        "after": "smoked"
+      },
+      {
+        "id": "fresh:homemade:neighbor",
+        "typed": "homemads",
+        "target": "homemade",
+        "before": null,
+        "after": "homemade"
+      },
+      {
+        "id": "fresh:officer:neighbor",
+        "typed": "ofcicer",
+        "target": "officer",
+        "before": null,
+        "after": "officer"
+      },
+      {
+        "id": "fresh:idol:neighbor",
+        "typed": "idop",
+        "target": "idol",
+        "before": null,
+        "after": "idol"
+      },
+      {
+        "id": "fresh:input:neighbor",
+        "typed": "inpht",
+        "target": "input",
+        "before": null,
+        "after": "input"
+      },
+      {
+        "id": "fresh:supply:neighbor",
+        "typed": "sypply",
+        "target": "supply",
+        "before": null,
+        "after": "supply"
+      },
+      {
+        "id": "fresh:highly:neighbor",
+        "typed": "highky",
+        "target": "highly",
+        "before": null,
+        "after": "highly"
+      },
+      {
+        "id": "fresh:updates:neighbor",
+        "typed": "updstes",
+        "target": "updates",
+        "before": null,
+        "after": "updates"
+      },
+      {
+        "id": "fresh:jazz:neighbor",
+        "typed": "jazx",
+        "target": "jazz",
+        "before": null,
+        "after": "jazz"
+      },
+      {
+        "id": "fresh:login:neighbor",
+        "typed": "oogin",
+        "target": "login",
+        "before": null,
+        "after": "login"
+      },
+      {
+        "id": "fresh:wallet:neighbor",
+        "typed": "waolet",
+        "target": "wallet",
+        "before": null,
+        "after": "wallet"
+      },
+      {
+        "id": "fresh:johnson:neighbor",
+        "typed": "johndon",
+        "target": "johnson",
+        "before": null,
+        "after": "johnson"
+      },
+      {
+        "id": "fresh:auto:neighbor",
+        "typed": "auho",
+        "target": "auto",
+        "before": null,
+        "after": "auto"
+      },
+      {
+        "id": "fresh:explore:neighbor",
+        "typed": "explkre",
+        "target": "explore",
+        "before": null,
+        "after": "explore"
+      },
+      {
+        "id": "fresh:updated:neighbor",
+        "typed": "updzted",
+        "target": "updated",
+        "before": null,
+        "after": "updated"
+      },
+      {
+        "id": "fresh:fishing:neighbor",
+        "typed": "fisging",
+        "target": "fishing",
+        "before": null,
+        "after": "fishing"
+      },
+      {
+        "id": "fresh:cache:neighbor",
+        "typed": "csche",
+        "target": "cache",
+        "before": null,
+        "after": "cache"
+      },
+      {
+        "id": "fresh:jelly:neighbor",
+        "typed": "jelpy",
+        "target": "jelly",
+        "before": null,
+        "after": "jelly"
+      },
+      {
+        "id": "fresh:nokia:neighbor",
+        "typed": "gokia",
+        "target": "nokia",
+        "before": null,
+        "after": "nokia"
+      },
+      {
+        "id": "fresh:desktop:neighbor",
+        "typed": "desmtop",
+        "target": "desktop",
+        "before": null,
+        "after": "desktop"
+      },
+      {
+        "id": "fresh:defect:neighbor",
+        "typed": "defecg",
+        "target": "defect",
+        "before": null,
+        "after": "defect"
+      },
+      {
+        "id": "fresh:utmost:neighbor",
+        "typed": "uthost",
+        "target": "utmost",
+        "before": null,
+        "after": "utmost"
+      },
+      {
+        "id": "fresh:metal:neighbor",
+        "typed": "mstal",
+        "target": "metal",
+        "before": null,
+        "after": "metal"
+      },
+      {
+        "id": "fresh:purchased:neighbor",
+        "typed": "purcnased",
+        "target": "purchased",
+        "before": null,
+        "after": "purchased"
+      },
+      {
+        "id": "fresh:technical:neighbor",
+        "typed": "technicao",
+        "target": "technical",
+        "before": null,
+        "after": "technical"
+      },
+      {
+        "id": "fresh:piece:neighbor",
+        "typed": "piecw",
+        "target": "piece",
+        "before": null,
+        "after": "piece"
+      },
+      {
+        "id": "fresh:processor:neighbor",
+        "typed": "prpcessor",
+        "target": "processor",
+        "before": null,
+        "after": "processor"
+      },
+      {
+        "id": "fresh:refresh:neighbor",
+        "typed": "refresy",
+        "target": "refresh",
+        "before": null,
+        "after": "refresh"
+      },
+      {
+        "id": "fresh:unauthorized:neighbor",
+        "typed": "unauthorjzed",
+        "target": "unauthorized",
+        "before": null,
+        "after": "unauthorized"
+      },
+      {
+        "id": "fresh:chrome:neighbor",
+        "typed": "curome",
+        "target": "chrome",
+        "before": null,
+        "after": "chrome"
+      },
+      {
+        "id": "fresh:prawn:neighbor",
+        "typed": "prawj",
+        "target": "prawn",
+        "before": null,
+        "after": "prawn"
+      },
+      {
+        "id": "fresh:active:neighbor",
+        "typed": "aftive",
+        "target": "active",
+        "before": null,
+        "after": "active"
+      },
+      {
+        "id": "fresh:loved:neighbor",
+        "typed": "lovsd",
+        "target": "loved",
+        "before": null,
+        "after": "loved"
+      },
+      {
+        "id": "fresh:sent:neighbor",
+        "typed": "sfnt",
+        "target": "sent",
+        "before": null,
+        "after": "sent"
+      },
+      {
+        "id": "fresh:swift:neighbor",
+        "typed": "zwift",
+        "target": "swift",
+        "before": null,
+        "after": "swift"
+      },
+      {
+        "id": "fresh:detail:neighbor",
+        "typed": "dstail",
+        "target": "detail",
+        "before": null,
+        "after": "detail"
+      },
+      {
+        "id": "fresh:convenient:neighbor",
+        "typed": "convenidnt",
+        "target": "convenient",
+        "before": null,
+        "after": "convenient"
+      },
+      {
+        "id": "fresh:catch:neighbor",
+        "typed": "caych",
+        "target": "catch",
+        "before": null,
+        "after": "catch"
+      },
+      {
+        "id": "fresh:angel:neighbor",
+        "typed": "anhel",
+        "target": "angel",
+        "before": null,
+        "after": "angel"
+      },
+      {
+        "id": "fresh:capital:neighbor",
+        "typed": "capitap",
+        "target": "capital",
+        "before": null,
+        "after": "capital"
+      },
+      {
+        "id": "fresh:rating:neighbor",
+        "typed": "ratibg",
+        "target": "rating",
+        "before": null,
+        "after": "rating"
+      },
+      {
+        "id": "fresh:elite:neighbor",
+        "typed": "elitf",
+        "target": "elite",
+        "before": null,
+        "after": "elite"
+      },
+      {
+        "id": "fresh:bronze:neighbor",
+        "typed": "gronze",
+        "target": "bronze",
+        "before": null,
+        "after": "bronze"
+      },
+      {
+        "id": "fresh:errors:neighbor",
+        "typed": "errots",
+        "target": "errors",
+        "before": null,
+        "after": "errors"
+      },
+      {
+        "id": "fresh:flirt:neighbor",
+        "typed": "rlirt",
+        "target": "flirt",
+        "before": null,
+        "after": "flirt"
+      },
+      {
+        "id": "fresh:asked:neighbor",
+        "typed": "askdd",
+        "target": "asked",
+        "before": null,
+        "after": "asked"
+      },
+      {
+        "id": "fresh:bakery:neighbor",
+        "typed": "baksry",
+        "target": "bakery",
+        "before": null,
+        "after": "bakery"
+      },
+      {
+        "id": "fresh:woman:neighbor",
+        "typed": "wlman",
+        "target": "woman",
+        "before": null,
+        "after": "woman"
+      },
+      {
+        "id": "fresh:sangria:neighbor",
+        "typed": "sangriw",
+        "target": "sangria",
+        "before": null,
+        "after": "sangria"
+      },
+      {
+        "id": "fresh:foul:neighbor",
+        "typed": "fkul",
+        "target": "foul",
+        "before": null,
+        "after": "foul"
+      },
+      {
+        "id": "fresh:coconut:neighbor",
+        "typed": "cocobut",
+        "target": "coconut",
+        "before": null,
+        "after": "coconut"
+      },
+      {
+        "id": "fresh:dressing:neighbor",
+        "typed": "drsssing",
+        "target": "dressing",
+        "before": null,
+        "after": "dressing"
+      },
+      {
+        "id": "fresh:fruity:neighbor",
+        "typed": "fduity",
+        "target": "fruity",
+        "before": null,
+        "after": "fruity"
+      },
+      {
+        "id": "fresh:termination:neighbor",
+        "typed": "terminagion",
+        "target": "termination",
+        "before": null,
+        "after": "termination"
+      },
+      {
+        "id": "fresh:peak:neighbor",
+        "typed": "pwak",
+        "target": "peak",
+        "before": null,
+        "after": "peak"
+      },
+      {
+        "id": "fresh:ginger:neighbor",
+        "typed": "gknger",
+        "target": "ginger",
+        "before": null,
+        "after": "ginger"
+      },
+      {
+        "id": "fresh:informed:neighbor",
+        "typed": "imformed",
+        "target": "informed",
+        "before": null,
+        "after": "informed"
+      },
+      {
+        "id": "fresh:korean:neighbor",
+        "typed": "iorean",
+        "target": "korean",
+        "before": null,
+        "after": "korean"
+      },
+      {
+        "id": "fresh:blame:neighbor",
+        "typed": "blxme",
+        "target": "blame",
+        "before": null,
+        "after": "blame"
+      },
+      {
+        "id": "fresh:canada:neighbor",
+        "typed": "canaca",
+        "target": "canada",
+        "before": null,
+        "after": "canada"
+      },
+      {
+        "id": "fresh:virus:neighbor",
+        "typed": "vlrus",
+        "target": "virus",
+        "before": null,
+        "after": "virus"
+      },
+      {
+        "id": "fresh:database:neighbor",
+        "typed": "databaxe",
+        "target": "database",
+        "before": null,
+        "after": "database"
+      },
+      {
+        "id": "fresh:weeks:neighbor",
+        "typed": "wweks",
+        "target": "weeks",
+        "before": null,
+        "after": "weeks"
+      },
+      {
+        "id": "fresh:closed:neighbor",
+        "typed": "ckosed",
+        "target": "closed",
+        "before": null,
+        "after": "closed"
+      },
+      {
+        "id": "fresh:provider:neighbor",
+        "typed": "pgovider",
+        "target": "provider",
+        "before": null,
+        "after": "provider"
+      },
+      {
+        "id": "fresh:tommy:neighbor",
+        "typed": "tomhy",
+        "target": "tommy",
+        "before": null,
+        "after": "tommy"
+      },
+      {
+        "id": "fresh:committee:neighbor",
+        "typed": "cojmittee",
+        "target": "committee",
+        "before": null,
+        "after": "committee"
+      },
+      {
+        "id": "fresh:edge:neighbor",
+        "typed": "exge",
+        "target": "edge",
+        "before": null,
+        "after": "edge"
+      },
+      {
+        "id": "fresh:gate:neighbor",
+        "typed": "gatw",
+        "target": "gate",
+        "before": null,
+        "after": "gate"
+      },
+      {
+        "id": "fresh:tank:neighbor",
+        "typed": "tsnk",
+        "target": "tank",
+        "before": null,
+        "after": "tank"
+      },
+      {
+        "id": "fresh:justin:neighbor",
+        "typed": "justij",
+        "target": "justin",
+        "before": null,
+        "after": "justin"
+      },
+      {
+        "id": "fresh:developer:neighbor",
+        "typed": "drveloper",
+        "target": "developer",
+        "before": null,
+        "after": "developer"
+      },
+      {
+        "id": "fresh:ivan:neighbor",
+        "typed": "ivxn",
+        "target": "ivan",
+        "before": null,
+        "after": "ivan"
+      },
+      {
+        "id": "fresh:sigma:neighbor",
+        "typed": "sibma",
+        "target": "sigma",
+        "before": null,
+        "after": "sigma"
+      },
+      {
+        "id": "fresh:retweet:neighbor",
+        "typed": "rerweet",
+        "target": "retweet",
+        "before": null,
+        "after": "retweet"
+      },
+      {
+        "id": "fresh:accuracy:neighbor",
+        "typed": "accuracu",
+        "target": "accuracy",
+        "before": null,
+        "after": "accuracy"
+      },
+      {
+        "id": "fresh:produce:neighbor",
+        "typed": "prodice",
+        "target": "produce",
+        "before": null,
+        "after": "produce"
+      },
+      {
+        "id": "fresh:nick:neighbor",
+        "typed": "nidk",
+        "target": "nick",
+        "before": null,
+        "after": "nick"
+      },
+      {
+        "id": "fresh:setup:neighbor",
+        "typed": "sstup",
+        "target": "setup",
+        "before": null,
+        "after": "setup"
+      },
+      {
+        "id": "fresh:bella:neighbor",
+        "typed": "bdlla",
+        "target": "bella",
+        "before": null,
+        "after": "bella"
+      },
+      {
+        "id": "fresh:creme:neighbor",
+        "typed": "cgeme",
+        "target": "creme",
+        "before": null,
+        "after": "creme"
+      },
+      {
+        "id": "fresh:locker:neighbor",
+        "typed": "lockfr",
+        "target": "locker",
+        "before": null,
+        "after": "locker"
+      },
+      {
+        "id": "fresh:coach:neighbor",
+        "typed": "coacg",
+        "target": "coach",
+        "before": null,
+        "after": "coach"
+      },
+      {
+        "id": "fresh:higher:neighbor",
+        "typed": "hkgher",
+        "target": "higher",
+        "before": null,
+        "after": "higher"
+      },
+      {
+        "id": "fresh:paid:neighbor",
+        "typed": "pxid",
+        "target": "paid",
+        "before": null,
+        "after": "paid"
+      },
+      {
+        "id": "fresh:info:neighbor",
+        "typed": "ijfo",
+        "target": "info",
+        "before": null,
+        "after": "info"
+      },
+      {
+        "id": "fresh:williams:neighbor",
+        "typed": "willjams",
+        "target": "williams",
+        "before": null,
+        "after": "williams"
+      },
+      {
+        "id": "fresh:jones:neighbor",
+        "typed": "jonex",
+        "target": "jones",
+        "before": null,
+        "after": "jones"
+      },
+      {
+        "id": "fresh:forever:neighbor",
+        "typed": "dorever",
+        "target": "forever",
+        "before": null,
+        "after": "forever"
+      },
+      {
+        "id": "fresh:identity:neighbor",
+        "typed": "isentity",
+        "target": "identity",
+        "before": null,
+        "after": "identity"
+      },
+      {
+        "id": "fresh:sugar:neighbor",
+        "typed": "sugae",
+        "target": "sugar",
+        "before": null,
+        "after": "sugar"
+      },
+      {
+        "id": "fresh:jacky:neighbor",
+        "typed": "jacuy",
+        "target": "jacky",
+        "before": null,
+        "after": "jacky"
+      },
+      {
+        "id": "fresh:shape:neighbor",
+        "typed": "smape",
+        "target": "shape",
+        "before": null,
+        "after": "shape"
+      },
+      {
+        "id": "fresh:audio:neighbor",
+        "typed": "qudio",
+        "target": "audio",
+        "before": null,
+        "after": "audio"
+      },
+      {
+        "id": "fresh:factory:neighbor",
+        "typed": "facfory",
+        "target": "factory",
+        "before": null,
+        "after": "factory"
+      },
+      {
+        "id": "fresh:protest:neighbor",
+        "typed": "protesh",
+        "target": "protest",
+        "before": null,
+        "after": "protest"
+      },
+      {
+        "id": "fresh:grammar:neighbor",
+        "typed": "grammad",
+        "target": "grammar",
+        "before": null,
+        "after": "grammar"
+      },
+      {
+        "id": "fresh:scallop:neighbor",
+        "typed": "scalloo",
+        "target": "scallop",
+        "before": null,
+        "after": "scallop"
+      },
+      {
+        "id": "fresh:auntie:neighbor",
+        "typed": "auhtie",
+        "target": "auntie",
+        "before": null,
+        "after": "auntie"
+      },
+      {
+        "id": "fresh:lonely:neighbor",
+        "typed": "lonfly",
+        "target": "lonely",
+        "before": null,
+        "after": "lonely"
+      },
+      {
+        "id": "fresh:assassin:neighbor",
+        "typed": "assqssin",
+        "target": "assassin",
+        "before": null,
+        "after": "assassin"
+      },
+      {
+        "id": "fresh:sync:neighbor",
+        "typed": "sgnc",
+        "target": "sync",
+        "before": null,
+        "after": "sync"
+      },
+      {
+        "id": "fresh:puff:neighbor",
+        "typed": "pkff",
+        "target": "puff",
+        "before": null,
+        "after": "puff"
+      },
+      {
+        "id": "fresh:unsure:neighbor",
+        "typed": "unsire",
+        "target": "unsure",
+        "before": null,
+        "after": "unsure"
+      },
+      {
+        "id": "fresh:itunes:neighbor",
+        "typed": "itunfs",
+        "target": "itunes",
+        "before": null,
+        "after": "itunes"
+      },
+      {
+        "id": "fresh:monitor:neighbor",
+        "typed": "monutor",
+        "target": "monitor",
+        "before": null,
+        "after": "monitor"
+      },
+      {
+        "id": "fresh:canceled:neighbor",
+        "typed": "canceped",
+        "target": "canceled",
+        "before": null,
+        "after": "canceled"
+      },
+      {
+        "id": "fresh:locate:neighbor",
+        "typed": "pocate",
+        "target": "locate",
+        "before": null,
+        "after": "locate"
+      },
+      {
+        "id": "fresh:discord:neighbor",
+        "typed": "diecord",
+        "target": "discord",
+        "before": null,
+        "after": "discord"
+      },
+      {
+        "id": "fresh:income:neighbor",
+        "typed": "igcome",
+        "target": "income",
+        "before": null,
+        "after": "income"
+      },
+      {
+        "id": "fresh:beans:neighbor",
+        "typed": "bewns",
+        "target": "beans",
+        "before": null,
+        "after": "beans"
+      },
+      {
+        "id": "fresh:soccer:neighbor",
+        "typed": "qoccer",
+        "target": "soccer",
+        "before": null,
+        "after": "soccer"
+      },
+      {
+        "id": "fresh:moving:neighbor",
+        "typed": "movinn",
+        "target": "moving",
+        "before": null,
+        "after": "moving"
+      },
+      {
+        "id": "fresh:irene:neighbor",
+        "typed": "ireje",
+        "target": "irene",
+        "before": null,
+        "after": "irene"
+      },
+      {
+        "id": "fresh:popcorn:neighbor",
+        "typed": "popcorg",
+        "target": "popcorn",
+        "before": null,
+        "after": "popcorn"
+      },
+      {
+        "id": "fresh:cable:neighbor",
+        "typed": "csble",
+        "target": "cable",
+        "before": null,
+        "after": "cable"
+      },
+      {
+        "id": "fresh:context:neighbor",
+        "typed": "clntext",
+        "target": "context",
+        "before": null,
+        "after": "context"
+      },
+      {
+        "id": "fresh:couple:neighbor",
+        "typed": "couplw",
+        "target": "couple",
+        "before": null,
+        "after": "couple"
+      },
+      {
+        "id": "fresh:kelvin:neighbor",
+        "typed": "kelvjn",
+        "target": "kelvin",
+        "before": null,
+        "after": "kelvin"
+      },
+      {
+        "id": "fresh:vicky:neighbor",
+        "typed": "vifky",
+        "target": "vicky",
+        "before": null,
+        "after": "vicky"
+      },
+      {
+        "id": "fresh:victim:neighbor",
+        "typed": "victij",
+        "target": "victim",
+        "before": null,
+        "after": "victim"
+      },
+      {
+        "id": "fresh:gamer:neighbor",
+        "typed": "gwmer",
+        "target": "gamer",
+        "before": null,
+        "after": "gamer"
+      },
+      {
+        "id": "fresh:deluxe:neighbor",
+        "typed": "reluxe",
+        "target": "deluxe",
+        "before": null,
+        "after": "deluxe"
+      },
+      {
+        "id": "fresh:trial:neighbor",
+        "typed": "trkal",
+        "target": "trial",
+        "before": null,
+        "after": "trial"
+      },
+      {
+        "id": "fresh:jean:neighbor",
+        "typed": "jexn",
+        "target": "jean",
+        "before": null,
+        "after": "jean"
+      },
+      {
+        "id": "fresh:treasure:neighbor",
+        "typed": "greasure",
+        "target": "treasure",
+        "before": null,
+        "after": "treasure"
+      },
+      {
+        "id": "fresh:curve:neighbor",
+        "typed": "xurve",
+        "target": "curve",
+        "before": null,
+        "after": "curve"
+      },
+      {
+        "id": "fresh:walking:neighbor",
+        "typed": "walkinh",
+        "target": "walking",
+        "before": null,
+        "after": "walking"
+      },
+      {
+        "id": "fresh:piano:neighbor",
+        "typed": "piani",
+        "target": "piano",
+        "before": null,
+        "after": "piano"
+      },
+      {
+        "id": "fresh:known:neighbor",
+        "typed": "mnown",
+        "target": "known",
+        "before": null,
+        "after": "known"
+      },
+      {
+        "id": "fresh:teach:neighbor",
+        "typed": "teafh",
+        "target": "teach",
+        "before": null,
+        "after": "teach"
+      },
+      {
+        "id": "fresh:license:neighbor",
+        "typed": "licenae",
+        "target": "license",
+        "before": null,
+        "after": "license"
+      },
+      {
+        "id": "fresh:harden:neighbor",
+        "typed": "hsrden",
+        "target": "harden",
+        "before": null,
+        "after": "harden"
+      },
+      {
+        "id": "fresh:epic:neighbor",
+        "typed": "eplc",
+        "target": "epic",
+        "before": null,
+        "after": "epic"
+      },
+      {
+        "id": "fresh:funding:neighbor",
+        "typed": "fundinr",
+        "target": "funding",
+        "before": null,
+        "after": "funding"
+      },
+      {
+        "id": "fresh:experienced:neighbor",
+        "typed": "experiensed",
+        "target": "experienced",
+        "before": null,
+        "after": "experienced"
+      },
+      {
+        "id": "fresh:rectify:neighbor",
+        "typed": "rectifu",
+        "target": "rectify",
+        "before": null,
+        "after": "rectify"
+      },
+      {
+        "id": "fresh:custard:neighbor",
+        "typed": "custaed",
+        "target": "custard",
+        "before": null,
+        "after": "custard"
+      },
+      {
+        "id": "fresh:margin:neighbor",
+        "typed": "margun",
+        "target": "margin",
+        "before": null,
+        "after": "margin"
+      },
+      {
+        "id": "fresh:playoff:neighbor",
+        "typed": "playofd",
+        "target": "playoff",
+        "before": null,
+        "after": "playoff"
+      },
+      {
+        "id": "fresh:testing:neighbor",
+        "typed": "testjng",
+        "target": "testing",
+        "before": null,
+        "after": "testing"
+      },
+      {
+        "id": "fresh:teaching:neighbor",
+        "typed": "teachinr",
+        "target": "teaching",
+        "before": null,
+        "after": "teaching"
+      },
+      {
+        "id": "fresh:sending:neighbor",
+        "typed": "sendinn",
+        "target": "sending",
+        "before": null,
+        "after": "sending"
+      },
+      {
+        "id": "fresh:trading:neighbor",
+        "typed": "tradiny",
+        "target": "trading",
+        "before": null,
+        "after": "trading"
+      },
+      {
+        "id": "fresh:inch:neighbor",
+        "typed": "jnch",
+        "target": "inch",
+        "before": null,
+        "after": "inch"
+      },
+      {
+        "id": "fresh:camera:neighbor",
+        "typed": "camdra",
+        "target": "camera",
+        "before": null,
+        "after": "camera"
+      },
+      {
+        "id": "fresh:lower:neighbor",
+        "typed": "lkwer",
+        "target": "lower",
+        "before": null,
+        "after": "lower"
+      },
+      {
+        "id": "fresh:protests:neighbor",
+        "typed": "protesgs",
+        "target": "protests",
+        "before": null,
+        "after": "protests"
+      },
+      {
+        "id": "fresh:classical:neighbor",
+        "typed": "classicak",
+        "target": "classical",
+        "before": null,
+        "after": "classical"
+      },
+      {
+        "id": "fresh:dancing:neighbor",
+        "typed": "dajcing",
+        "target": "dancing",
+        "before": null,
+        "after": "dancing"
+      },
+      {
+        "id": "fresh:emergency:neighbor",
+        "typed": "emwrgency",
+        "target": "emergency",
+        "before": null,
+        "after": "emergency"
+      },
+      {
+        "id": "fresh:advanced:neighbor",
+        "typed": "advagced",
+        "target": "advanced",
+        "before": null,
+        "after": "advanced"
+      },
+      {
+        "id": "fresh:involved:neighbor",
+        "typed": "igvolved",
+        "target": "involved",
+        "before": null,
+        "after": "involved"
+      },
+      {
+        "id": "fresh:outlet:neighbor",
+        "typed": "ouglet",
+        "target": "outlet",
+        "before": null,
+        "after": "outlet"
+      },
+      {
+        "id": "fresh:bruno:neighbor",
+        "typed": "beuno",
+        "target": "bruno",
+        "before": null,
+        "after": "bruno"
+      },
+      {
+        "id": "fresh:opera:neighbor",
+        "typed": "ipera",
+        "target": "opera",
+        "before": null,
+        "after": "opera"
+      },
+      {
+        "id": "fresh:appeal:neighbor",
+        "typed": "xppeal",
+        "target": "appeal",
+        "before": null,
+        "after": "appeal"
+      },
+      {
+        "id": "fresh:sheet:neighbor",
+        "typed": "qheet",
+        "target": "sheet",
+        "before": null,
+        "after": "sheet"
+      },
+      {
+        "id": "fresh:retail:neighbor",
+        "typed": "rdtail",
+        "target": "retail",
+        "before": null,
+        "after": "retail"
+      },
+      {
+        "id": "fresh:saint:neighbor",
+        "typed": "saijt",
+        "target": "saint",
+        "before": null,
+        "after": "saint"
+      },
+      {
+        "id": "fresh:supper:neighbor",
+        "typed": "suppfr",
+        "target": "supper",
+        "before": null,
+        "after": "supper"
+      },
+      {
+        "id": "fresh:advice:neighbor",
+        "typed": "arvice",
+        "target": "advice",
+        "before": null,
+        "after": "advice"
+      },
+      {
+        "id": "fresh:noodle:neighbor",
+        "typed": "noowle",
+        "target": "noodle",
+        "before": null,
+        "after": "noodle"
+      },
+      {
+        "id": "fresh:warning:neighbor",
+        "typed": "warnibg",
+        "target": "warning",
+        "before": null,
+        "after": "warning"
+      },
+      {
+        "id": "fresh:juno:neighbor",
+        "typed": "jjno",
+        "target": "juno",
+        "before": null,
+        "after": "juno"
+      },
+      {
+        "id": "fresh:weekday:neighbor",
+        "typed": "seekday",
+        "target": "weekday",
+        "before": null,
+        "after": "weekday"
+      },
+      {
+        "id": "fresh:property:neighbor",
+        "typed": "propetty",
+        "target": "property",
+        "before": null,
+        "after": "property"
+      },
+      {
+        "id": "fresh:awards:neighbor",
+        "typed": "awarws",
+        "target": "awards",
+        "before": null,
+        "after": "awards"
+      },
+      {
+        "id": "fresh:baileys:neighbor",
+        "typed": "baildys",
+        "target": "baileys",
+        "before": null,
+        "after": "baileys"
+      },
+      {
+        "id": "fresh:mortar:neighbor",
+        "typed": "morhar",
+        "target": "mortar",
+        "before": null,
+        "after": "mortar"
+      },
+      {
+        "id": "fresh:howard:neighbor",
+        "typed": "howarx",
+        "target": "howard",
+        "before": null,
+        "after": "howard"
+      },
+      {
+        "id": "fresh:submitting:neighbor",
+        "typed": "subhitting",
+        "target": "submitting",
+        "before": null,
+        "after": "submitting"
+      },
+      {
+        "id": "fresh:clubs:neighbor",
+        "typed": "clkbs",
+        "target": "clubs",
+        "before": null,
+        "after": "clubs"
+      },
+      {
+        "id": "fresh:weight:neighbor",
+        "typed": "weivht",
+        "target": "weight",
+        "before": null,
+        "after": "weight"
+      },
+      {
+        "id": "fresh:assure:neighbor",
+        "typed": "sssure",
+        "target": "assure",
+        "before": null,
+        "after": "assure"
+      },
+      {
+        "id": "fresh:domain:neighbor",
+        "typed": "donain",
+        "target": "domain",
+        "before": null,
+        "after": "domain"
+      },
+      {
+        "id": "fresh:systems:neighbor",
+        "typed": "ststems",
+        "target": "systems",
+        "before": null,
+        "after": "systems"
+      },
+      {
+        "id": "fresh:cathy:neighbor",
+        "typed": "csthy",
+        "target": "cathy",
+        "before": null,
+        "after": "cathy"
+      },
+      {
+        "id": "fresh:hydro:neighbor",
+        "typed": "bydro",
+        "target": "hydro",
+        "before": null,
+        "after": "hydro"
+      },
+      {
+        "id": "fresh:programmer:neighbor",
+        "typed": "programker",
+        "target": "programmer",
+        "before": null,
+        "after": "programmer"
+      },
+      {
+        "id": "fresh:vivian:neighbor",
+        "typed": "viviqn",
+        "target": "vivian",
+        "before": null,
+        "after": "vivian"
+      },
+      {
+        "id": "fresh:daisy:neighbor",
+        "typed": "dwisy",
+        "target": "daisy",
+        "before": null,
+        "after": "daisy"
+      },
+      {
+        "id": "fresh:amber:neighbor",
+        "typed": "ambeg",
+        "target": "amber",
+        "before": null,
+        "after": "amber"
+      },
+      {
+        "id": "fresh:benz:neighbor",
+        "typed": "bebz",
+        "target": "benz",
+        "before": null,
+        "after": "benz"
+      },
+      {
+        "id": "fresh:cultures:neighbor",
+        "typed": "culturws",
+        "target": "cultures",
+        "before": null,
+        "after": "cultures"
+      },
+      {
+        "id": "fresh:experiences:neighbor",
+        "typed": "experiencws",
+        "target": "experiences",
+        "before": null,
+        "after": "experiences"
+      },
+      {
+        "id": "fresh:pose:neighbor",
+        "typed": "pkse",
+        "target": "pose",
+        "before": null,
+        "after": "pose"
+      },
+      {
+        "id": "fresh:jerry:neighbor",
+        "typed": "jwrry",
+        "target": "jerry",
+        "before": null,
+        "after": "jerry"
+      },
+      {
+        "id": "fresh:lobby:neighbor",
+        "typed": "lonby",
+        "target": "lobby",
+        "before": null,
+        "after": "lobby"
+      },
+      {
+        "id": "fresh:nation:neighbor",
+        "typed": "natiin",
+        "target": "nation",
+        "before": null,
+        "after": "nation"
+      },
+      {
+        "id": "fresh:communist:neighbor",
+        "typed": "commubist",
+        "target": "communist",
+        "before": null,
+        "after": "communist"
+      },
+      {
+        "id": "fresh:overcook:neighbor",
+        "typed": "overcoom",
+        "target": "overcook",
+        "before": null,
+        "after": "overcook"
+      },
+      {
+        "id": "fresh:sesame:neighbor",
+        "typed": "swsame",
+        "target": "sesame",
+        "before": null,
+        "after": "sesame"
+      },
+      {
+        "id": "fresh:lucas:neighbor",
+        "typed": "lucac",
+        "target": "lucas",
+        "before": null,
+        "after": "lucas"
+      },
+      {
+        "id": "fresh:winning:neighbor",
+        "typed": "winnlng",
+        "target": "winning",
+        "before": null,
+        "after": "winning"
+      },
+      {
+        "id": "fresh:euro:neighbor",
+        "typed": "eufo",
+        "target": "euro",
+        "before": null,
+        "after": "euro"
+      },
+      {
+        "id": "fresh:outdoors:neighbor",
+        "typed": "kutdoors",
+        "target": "outdoors",
+        "before": null,
+        "after": "outdoors"
+      },
+      {
+        "id": "fresh:valued:neighbor",
+        "typed": "vakued",
+        "target": "valued",
+        "before": null,
+        "after": "valued"
+      },
+      {
+        "id": "fresh:addressed:neighbor",
+        "typed": "addrdssed",
+        "target": "addressed",
+        "before": null,
+        "after": "addressed"
+      },
+      {
+        "id": "fresh:german:neighbor",
+        "typed": "germam",
+        "target": "german",
+        "before": null,
+        "after": "german"
+      },
+      {
+        "id": "fresh:godiva:neighbor",
+        "typed": "gowiva",
+        "target": "godiva",
+        "before": null,
+        "after": "godiva"
+      },
+      {
+        "id": "fresh:owner:neighbor",
+        "typed": "oqner",
+        "target": "owner",
+        "before": null,
+        "after": "owner"
+      },
+      {
+        "id": "fresh:script:neighbor",
+        "typed": "svript",
+        "target": "script",
+        "before": null,
+        "after": "script"
+      },
+      {
+        "id": "fresh:talks:neighbor",
+        "typed": "tqlks",
+        "target": "talks",
+        "before": null,
+        "after": "talks"
+      },
+      {
+        "id": "fresh:jennie:neighbor",
+        "typed": "jennke",
+        "target": "jennie",
+        "before": null,
+        "after": "jennie"
+      },
+      {
+        "id": "fresh:aaron:neighbor",
+        "typed": "aaeon",
+        "target": "aaron",
+        "before": null,
+        "after": "aaron"
+      },
+      {
+        "id": "fresh:assembly:neighbor",
+        "typed": "asqembly",
+        "target": "assembly",
+        "before": null,
+        "after": "assembly"
+      },
+      {
+        "id": "fresh:cocktails:neighbor",
+        "typed": "coxktails",
+        "target": "cocktails",
+        "before": null,
+        "after": "cocktails"
+      },
+      {
+        "id": "fresh:extradition:neighbor",
+        "typed": "extradituon",
+        "target": "extradition",
+        "before": null,
+        "after": "extradition"
+      },
+      {
+        "id": "fresh:extension:neighbor",
+        "typed": "extejsion",
+        "target": "extension",
+        "before": null,
+        "after": "extension"
+      },
+      {
+        "id": "fresh:selling:neighbor",
+        "typed": "sellung",
+        "target": "selling",
+        "before": null,
+        "after": "selling"
+      },
+      {
+        "id": "fresh:father:neighbor",
+        "typed": "fafher",
+        "target": "father",
+        "before": null,
+        "after": "father"
+      },
+      {
+        "id": "fresh:accounting:neighbor",
+        "typed": "ascounting",
+        "target": "accounting",
+        "before": null,
+        "after": "accounting"
+      },
+      {
+        "id": "fresh:included:neighbor",
+        "typed": "inclkded",
+        "target": "included",
+        "before": null,
+        "after": "included"
+      },
+      {
+        "id": "fresh:plaza:neighbor",
+        "typed": "olaza",
+        "target": "plaza",
+        "before": null,
+        "after": "plaza"
+      },
+      {
+        "id": "fresh:stick:neighbor",
+        "typed": "sticu",
+        "target": "stick",
+        "before": null,
+        "after": "stick"
+      },
+      {
+        "id": "fresh:mussels:neighbor",
+        "typed": "nussels",
+        "target": "mussels",
+        "before": null,
+        "after": "mussels"
+      },
+      {
+        "id": "fresh:remove:neighbor",
+        "typed": "gemove",
+        "target": "remove",
+        "before": null,
+        "after": "remove"
+      },
+      {
+        "id": "fresh:liked:neighbor",
+        "typed": "lkked",
+        "target": "liked",
+        "before": null,
+        "after": "liked"
+      },
+      {
+        "id": "fresh:protected:neighbor",
+        "typed": "protectdd",
+        "target": "protected",
+        "before": null,
+        "after": "protected"
+      },
+      {
+        "id": "fresh:purple:neighbor",
+        "typed": "pyrple",
+        "target": "purple",
+        "before": null,
+        "after": "purple"
+      },
+      {
+        "id": "fresh:reasons:neighbor",
+        "typed": "reasojs",
+        "target": "reasons",
+        "before": null,
+        "after": "reasons"
+      },
+      {
+        "id": "fresh:refunds:neighbor",
+        "typed": "refunvs",
+        "target": "refunds",
+        "before": null,
+        "after": "refunds"
+      },
+      {
+        "id": "fresh:investigation:neighbor",
+        "typed": "investigatikn",
+        "target": "investigation",
+        "before": null,
+        "after": "investigation"
+      },
+      {
+        "id": "fresh:valid:neighbor",
+        "typed": "vwlid",
+        "target": "valid",
+        "before": null,
+        "after": "valid"
+      },
+      {
+        "id": "fresh:jumbo:neighbor",
+        "typed": "jhmbo",
+        "target": "jumbo",
+        "before": null,
+        "after": "jumbo"
+      },
+      {
+        "id": "fresh:mental:neighbor",
+        "typed": "mentao",
+        "target": "mental",
+        "before": null,
+        "after": "mental"
+      },
+      {
+        "id": "fresh:overcooked:neighbor",
+        "typed": "ovsrcooked",
+        "target": "overcooked",
+        "before": null,
+        "after": "overcooked"
+      },
+      {
+        "id": "fresh:farewell:neighbor",
+        "typed": "rarewell",
+        "target": "farewell",
+        "before": null,
+        "after": "farewell"
+      },
+      {
+        "id": "fresh:channels:neighbor",
+        "typed": "channfls",
+        "target": "channels",
+        "before": null,
+        "after": "channels"
+      },
+      {
+        "id": "fresh:davis:neighbor",
+        "typed": "dqvis",
+        "target": "davis",
+        "before": null,
+        "after": "davis"
+      },
+      {
+        "id": "fresh:mainland:neighbor",
+        "typed": "maigland",
+        "target": "mainland",
+        "before": null,
+        "after": "mainland"
+      },
+      {
+        "id": "fresh:adventure:neighbor",
+        "typed": "asventure",
+        "target": "adventure",
+        "before": null,
+        "after": "adventure"
+      },
+      {
+        "id": "fresh:fighter:neighbor",
+        "typed": "fighfer",
+        "target": "fighter",
+        "before": null,
+        "after": "fighter"
+      },
+      {
+        "id": "fresh:clause:neighbor",
+        "typed": "clwuse",
+        "target": "clause",
+        "before": null,
+        "after": "clause"
+      },
+      {
+        "id": "fresh:notify:neighbor",
+        "typed": "notity",
+        "target": "notify",
+        "before": null,
+        "after": "notify"
+      },
+      {
+        "id": "fresh:award:neighbor",
+        "typed": "awagd",
+        "target": "award",
+        "before": null,
+        "after": "award"
+      },
+      {
+        "id": "fresh:features:neighbor",
+        "typed": "featires",
+        "target": "features",
+        "before": null,
+        "after": "features"
+      },
+      {
+        "id": "fresh:hyper:neighbor",
+        "typed": "hgper",
+        "target": "hyper",
+        "before": null,
+        "after": "hyper"
+      },
+      {
+        "id": "fresh:justify:neighbor",
+        "typed": "justifj",
+        "target": "justify",
+        "before": null,
+        "after": "justify"
+      },
+      {
+        "id": "fresh:inquiry:neighbor",
+        "typed": "lnquiry",
+        "target": "inquiry",
+        "before": null,
+        "after": "inquiry"
+      },
+      {
+        "id": "fresh:qualify:neighbor",
+        "typed": "qkalify",
+        "target": "qualify",
+        "before": null,
+        "after": "qualify"
+      },
+      {
+        "id": "fresh:carmen:neighbor",
+        "typed": "cxrmen",
+        "target": "carmen",
+        "before": null,
+        "after": "carmen"
+      },
+      {
+        "id": "fresh:december:neighbor",
+        "typed": "eecember",
+        "target": "december",
+        "before": null,
+        "after": "december"
+      },
+      {
+        "id": "fresh:broth:neighbor",
+        "typed": "brofh",
+        "target": "broth",
+        "before": null,
+        "after": "broth"
+      },
+      {
+        "id": "fresh:carol:neighbor",
+        "typed": "cwrol",
+        "target": "carol",
+        "before": null,
+        "after": "carol"
+      },
+      {
+        "id": "fresh:medicine:neighbor",
+        "typed": "medivine",
+        "target": "medicine",
+        "before": null,
+        "after": "medicine"
+      },
+      {
+        "id": "fresh:eagle:neighbor",
+        "typed": "eagoe",
+        "target": "eagle",
+        "before": null,
+        "after": "eagle"
+      },
+      {
+        "id": "fresh:humble:neighbor",
+        "typed": "humnle",
+        "target": "humble",
+        "before": null,
+        "after": "humble"
+      },
+      {
+        "id": "fresh:preferred:neighbor",
+        "typed": "preferrwd",
+        "target": "preferred",
+        "before": null,
+        "after": "preferred"
+      },
+      {
+        "id": "fresh:fancy:neighbor",
+        "typed": "fancu",
+        "target": "fancy",
+        "before": null,
+        "after": "fancy"
+      },
+      {
+        "id": "fresh:silva:neighbor",
+        "typed": "zilva",
+        "target": "silva",
+        "before": null,
+        "after": "silva"
+      },
+      {
+        "id": "fresh:reserve:neighbor",
+        "typed": "rezerve",
+        "target": "reserve",
+        "before": null,
+        "after": "reserve"
+      },
+      {
+        "id": "fresh:permit:neighbor",
+        "typed": "psrmit",
+        "target": "permit",
+        "before": null,
+        "after": "permit"
+      },
+      {
+        "id": "fresh:external:neighbor",
+        "typed": "externxl",
+        "target": "external",
+        "before": null,
+        "after": "external"
+      },
+      {
+        "id": "fresh:mayo:neighbor",
+        "typed": "mxyo",
+        "target": "mayo",
+        "before": null,
+        "after": "mayo"
+      },
+      {
+        "id": "fresh:alfred:neighbor",
+        "typed": "alvred",
+        "target": "alfred",
+        "before": null,
+        "after": "alfred"
+      },
+      {
+        "id": "fresh:affairs:neighbor",
+        "typed": "affajrs",
+        "target": "affairs",
+        "before": null,
+        "after": "affairs"
+      },
+      {
+        "id": "fresh:anti:neighbor",
+        "typed": "anfi",
+        "target": "anti",
+        "before": null,
+        "after": "anti"
+      },
+      {
+        "id": "fresh:changed:neighbor",
+        "typed": "changdd",
+        "target": "changed",
+        "before": null,
+        "after": "changed"
+      },
+      {
+        "id": "fresh:analyst:neighbor",
+        "typed": "anzlyst",
+        "target": "analyst",
+        "before": null,
+        "after": "analyst"
+      },
+      {
+        "id": "fresh:panda:neighbor",
+        "typed": "pajda",
+        "target": "panda",
+        "before": null,
+        "after": "panda"
+      }
+    ]
+  },
+  "hashes": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/verify_unambiguous_neighbors.py": "8069e3f82e3f6274fd18e0b900e8f2d7ea0c4a77396746813339da0d3e40e89f",
+    "build/neighbor-repair-2026-10-21/ngram_probe.before": "f3e178256736f52b3fc55e8284be2753965cf705ce5aae8fae984dc98f805f49",
+    "app/build/english-host/release/ngram_probe": "746ed1fd8ff4a397d73285149c5908404f971c66a18f7303586e6748cdbd54f2",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/resources/english_neighbor_lexicon.txt": "ba939858f719641d910bcacc3174855abba3f32cbd394f849098f9cf52af9cfb",
+    "/Volumes/SSD/cantonese_ngram/experiments/spelling-vocabulary-v77/candidates.txt": "346323cd605464785e631af886877ef9d1bd12bc8d583dfb55253a44f291fab6",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/apostrophe-native-cache.json": "c5fbd00d9001b55c99f9ec829d298f292df64831978821f2c57647cb17dda600",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/single-edit-final-2026-10-21/predictions.jsonl": "e9e62d861a3c3f6a859eb118587dd731d8e2d63f0644b169aaf8267ca54f98a1",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/config/english_iteration/2026-10-21/single-edit/words.tsv": "de19a59e5c2f300408348f47dc8432707b5b64260bd343d922947be1865e997e"
+  },
+  "predictions_sha256": "8a34ba7d76808a2bc3ff5e961d2c8103129fa46fea89f7bfb8faf1bc5091baab"
+}

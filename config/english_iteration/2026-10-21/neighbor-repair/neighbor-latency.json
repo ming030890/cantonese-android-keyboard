@@ -1,0 +1,113 @@
+{
+  "method": "Four alternating release-host process pairs; first engine call includes lazy lexical index initialization but excludes process start/model load. 64 repeated warm calls per process. Not Android input-to-display latency. Run without other verification workloads.",
+  "request": {
+    "left": "",
+    "typed": "gwme",
+    "spelling_limit": 8,
+    "timing": true
+  },
+  "first_call": {
+    "before": {
+      "samples": 4,
+      "median_us": 1346.5,
+      "p95_us": 1366
+    },
+    "after": {
+      "samples": 4,
+      "median_us": 2983.5,
+      "p95_us": 3020
+    }
+  },
+  "warm": {
+    "before": {
+      "samples": 256,
+      "median_us": 952.0,
+      "p95_us": 982
+    },
+    "after": {
+      "samples": 256,
+      "median_us": 986.0,
+      "p95_us": 1019
+    }
+  },
+  "rounds": [
+    {
+      "before": {
+        "first_call_us": 1329,
+        "warm": {
+          "samples": 64,
+          "median_us": 943.5,
+          "p95_us": 966
+        }
+      },
+      "after": {
+        "first_call_us": 2991,
+        "warm": {
+          "samples": 64,
+          "median_us": 989.5,
+          "p95_us": 1017
+        }
+      }
+    },
+    {
+      "after": {
+        "first_call_us": 3020,
+        "warm": {
+          "samples": 64,
+          "median_us": 997.0,
+          "p95_us": 1061
+        }
+      },
+      "before": {
+        "first_call_us": 1366,
+        "warm": {
+          "samples": 64,
+          "median_us": 947.5,
+          "p95_us": 979
+        }
+      }
+    },
+    {
+      "before": {
+        "first_call_us": 1329,
+        "warm": {
+          "samples": 64,
+          "median_us": 959.0,
+          "p95_us": 977
+        }
+      },
+      "after": {
+        "first_call_us": 2976,
+        "warm": {
+          "samples": 64,
+          "median_us": 973.5,
+          "p95_us": 1005
+        }
+      }
+    },
+    {
+      "after": {
+        "first_call_us": 2899,
+        "warm": {
+          "samples": 64,
+          "median_us": 974.5,
+          "p95_us": 1001
+        }
+      },
+      "before": {
+        "first_call_us": 1364,
+        "warm": {
+          "samples": 64,
+          "median_us": 956.0,
+          "p95_us": 983
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/benchmark_neighbor_fallback.py": "7e79abd456df785d57fdfa8b6be2501098016c53339815471304598d608876fb",
+    "build/neighbor-repair-2026-10-21/ngram_probe.before": "f3e178256736f52b3fc55e8284be2753965cf705ce5aae8fae984dc98f805f49",
+    "app/build/english-host/release/ngram_probe": "746ed1fd8ff4a397d73285149c5908404f971c66a18f7303586e6748cdbd54f2",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322"
+  }
+}

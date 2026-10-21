@@ -33,6 +33,11 @@ fun ScenarioQuickApostropheCorrection() = ScenarioScreen(remember { KeyboardScen
 fun ScenarioQuickEnglishCorrection() = ScenarioScreen(remember { KeyboardScenarios.quickEnglishCorrection() })
 
 @PreviewTest
+@Preview(name = "Unambiguous neighbor correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioUnambiguousNeighborCorrection() = ScenarioScreen(remember { KeyboardScenarios.unambiguousNeighborCorrection() })
+
+@PreviewTest
 @Preview(name = "Known word contextual correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioSharedLmKnownWordCorrection() = ScenarioScreen(remember { KeyboardScenarios.sharedLmKnownWordCorrection() })

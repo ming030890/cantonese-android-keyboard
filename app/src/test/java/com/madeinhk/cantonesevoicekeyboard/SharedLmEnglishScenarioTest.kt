@@ -11,6 +11,37 @@ import org.junit.Test
 import java.io.File
 
 class SharedLmEnglishScenarioTest {
+    @Test fun refittedAcceptanceCorrectsAtSpaceAndUndoAcrossLayoutsThroughJni() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+            KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+            val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            assertEquals("game", english.predict("gwme", floatArrayOf(), floatArrayOf(), "", "").correction)
+            assertNull("Competing burger/butter repairs remain uncertain",
+                english.predict("butger", floatArrayOf(), floatArrayOf(), "", "").correction)
+            KeyboardScenario(initialMode=mode, clipboardText=null, quickEngine=quick,
+                englishEngine=english).use { s ->
+                s.quickVersion=version
+                s.start(); s.type("gwme")
+                val candidates = if (mode==KeyboardInputMode.Quick) s.snapshot().quickCandidates
+                    else s.snapshot().englishCandidates
+                assertTrue(candidates.any { it.text=="game" })
+                assertEquals(KeyboardToolbarContent.Candidates,s.snapshot().toolbar())
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("game ",s.editor.text)
+                assertEquals("",s.editor.composing)
+                s.press(KeyboardKeyKind.Delete)
+                assertEquals("",s.editor.text)
+                assertEquals("gwme",s.editor.composing)
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("gwme ",s.editor.text)
+            }
+        }
+    }
+
     @Test fun mixedRankingReceivesObservedKeysAndCandidatesBeyondTheOldEightItemCutoff() {
         var observedKeys: String? = null
         val phrases=(1..12).map { "候選$it" }
@@ -173,7 +204,7 @@ class SharedLmEnglishScenarioTest {
         // These are current model decisions, including known limitations, not gold labels
         // for fitting the policy. Keep the user's example outside the frozen eval set.
         val words = listOf(
-            "whrn" to "when", "i" to "i", "tyoe" to "tyoe", "i" to "i",
+            "whrn" to "when", "i" to "i", "tyoe" to "type", "i" to "i",
             "dont" to "don't", "rrally" to "really", "know" to "know",
             "whay" to "what", "it" to "it", "meant" to "meant",
         )
@@ -207,7 +238,7 @@ class SharedLmEnglishScenarioTest {
                         assertEquals(label, committed, s.editor.text)
                         assertEquals(label, "", s.editor.composing)
                     }
-                    assertEquals("when i tyoe i don't really know what it meant ", s.editor.text)
+                    assertEquals("when i type i don't really know what it meant ", s.editor.text)
                 }
             } finally {
                 scope.coroutineContext[kotlinx.coroutines.Job]?.cancel()
@@ -423,12 +454,12 @@ class SharedLmEnglishScenarioTest {
             // The learned rule deliberately abstains on uncertain proposals.
             // Suggested alternatives remain available for explicit selection.
             for ((typed, target, automatic) in listOf(
-                Triple("hwllo", "hello", true), Triple("helo", "hello", false),
+                Triple("hwllo", "hello", true), Triple("helo", "hello", true),
                 Triple("helllo", "hello", true), Triple("teh", "the", true),
-                Triple("lokk", "look", false), Triple("thses", "these", false),
-                Triple("exmaole", "example", false), Triple("tyoes", "types", false),
-                Triple("sjre", "sure", true), Triple("varely", "barely", false),
-                Triple("engloaj", "english", false), Triple("troggee", "trigger", false),
+                Triple("lokk", "look", true), Triple("thses", "these", false),
+                Triple("exmaole", "example", false), Triple("tyoes", "types", true),
+                Triple("sjre", "sure", true), Triple("varely", "barely", true),
+                Triple("engloaj", "english", true), Triple("troggee", "trigger", true),
                 Triple("mwrge", "merge", false), Triple("wrror", "error", true),
                 Triple("inthe", "in the", true))) {
                 val prediction = english.predict(typed, floatArrayOf(), floatArrayOf(), "", "")
@@ -474,19 +505,19 @@ class SharedLmEnglishScenarioTest {
                 s.start();s.type("keyboard");s.press(KeyboardKeyKind.Space)
                 assertEquals("keyboard ",s.editor.text)
                 s.type("varely");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard varely ",s.editor.text)
+                assertEquals("keyboard barely ",s.editor.text)
                 s.type("lokk");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard varely look ",s.editor.text)
+                assertEquals("keyboard barely look ",s.editor.text)
                 s.type("thses");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard varely look thses ",s.editor.text)
+                assertEquals("keyboard barely look thses ",s.editor.text)
                 s.type("exmaole");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard varely look thses exmaole ",s.editor.text)
+                assertEquals("keyboard barely look thses exmaole ",s.editor.text)
                 s.type("mwrge");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard varely look thses exmaole mwrge ",s.editor.text)
+                assertEquals("keyboard barely look thses exmaole merge ",s.editor.text)
                 s.type("wrror");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard varely look thses exmaole mwrge error ",s.editor.text)
+                assertEquals("keyboard barely look thses exmaole merge error ",s.editor.text)
                 s.type("youbsupport");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard varely look thses exmaole mwrge error you support ",s.editor.text)
+                assertEquals("keyboard barely look thses exmaole merge error you support ",s.editor.text)
             }
             KeyboardScenario(initialMode=KeyboardInputMode.Quick,quickEngine=quick,englishEngine=english).use { s ->
                 s.start();s.type("df")

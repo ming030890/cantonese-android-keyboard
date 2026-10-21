@@ -140,8 +140,9 @@ with fixed English model results; Rust tests verify the actual search and confid
 |---|---|---|---|
 | AC-01 | Type `teh`, then Space, punctuation, or newline on English/Quick | Compose the word; show literal input plus spelling alternatives; commit `the` and the exact boundary when confident. A pending lookup resolves through the bounded boundary queue; subsequent typing waits in order. Cursor changes, layout/hide, failure, timeout, and submitting Enter prevent delayed replacement. | `boundaryCorrectionAndUndoOnBothLayouts`, `pendingBoundaryQueuesNewInputAndSupportsUndo`, real JNI timing test |
 | AC-01b | Quick `whrn` while Chinese inference is occupied, then Space and Backspace | English inference does not acquire either Quick ranking lock; offer `when`, commit `when `, and undo to `whrn`. Retain bounded literal fallback if English itself misses its deadline. | `quickControllerCorrectsWhileChineseWorkerIsOccupied`, Kotlin/JNI monitor regression, Rust lock regression; Quick English screenshot |
-| AC-01c | Reported sentence `whrn i tyoe i dont rrally know whay it meant` on Quick3/5, with lookup ready or still pending at Space | Current model commits `when i tyoe i don't really know what it meant ` word by word; ready candidate bars include the literal and accepted replacement. `tyoe` remains a model limitation; the reported sentence stays outside evaluation labels. | `reportedSentenceCorrectsAtSpaceInBothQuickVersions`, real JNI/controller and injected scheduler |
+| AC-01c | Reported sentence `whrn i tyoe i dont rrally know whay it meant` on Quick3/5, with lookup ready or still pending at Space | Current model commits `when i type i don't really know what it meant ` word by word; ready candidate bars include the literal and accepted replacement. The reported `tyoe → type` repair improves with the shared acceptance refit; the reported sentence stays outside evaluation labels. | `reportedSentenceCorrectsAtSpaceInBothQuickVersions`, real JNI/controller and injected scheduler |
 | AC-01d | English/Quick `I dont` then Space, Backspace, Space | Offer `don't`, commit `I don't `, undo to `dont`, then honor undo suppression and recommit `I dont `. Restoration uses TRAIN-attested forms and a calibrated same-CNN byte-sequence decision. | `dontRestoresApostropheOnSpaceAndUndoInBothLayouts`, real JNI; Quick apostrophe screenshot |
+| AC-01e | English/Quick3/Quick5 `gwme`, Space, Backspace, Space | Offer `game`, commit `game `, undo to `gwme`, then recommit literal `gwme `. The six-feature acceptance rule and five existing edit costs are fitted on TRAIN, with no edit-distance exception, position term, or runtime dictionary. `butger` remains uncorrected under the current fit. | `refittedAcceptanceCorrectsAtSpaceAndUndoAcrossLayoutsThroughJni`, real JNI/controller; unambiguous-neighbour scenario screenshot |
 | AC-02 | Immediate Backspace after correction | Remove delimiter and restore original composition; recommit without repeating the correction. Guard undo against cursor/selection changes. | boundary and selection scenarios |
 | AC-03 | Type English prefixes in Quick beyond six letters | Protect plausible English from automatic Chinese phrase conversion; preserve conversion for non-English sequences. Chinese and English candidates share LM ranking; selection stays explicit. Exact one/two-root codes remain literal unless tapped. | Quick conversion and selection scenarios |
 | AC-04 | Switch to symbols and return, or enter punctuation there | Keep originating English/Quick word ownership. Punctuation resolves the word; digits and identifiers finish literally. | `numberPanelPreservesWordForPunctuationButDigitsStayLiteral` |
@@ -430,3 +431,15 @@ word tokens. Actual touch coordinates remain unused by the active scorer.
 `SharedLmEnglishScenarioTest` covers real JNI/controller behavior on both layouts;
 `ScenarioSharedLmKnownWordCorrection` renders the same state with fake model data.
 See `LITERAL_ACCEPTANCE_ITERATION.md` for selection, evaluation and host latency.
+
+### D-23 (2026-10-21): Existing operation costs fitted on recorded typos
+
+Five existing native edit costs are calibrated on recorded TRAIN data; the
+selected change retains the shared acceptance cutoff and adds no first-position
+penalty. Real evaluation F₀.₅ improves 0.80560 → 0.82154, clean changes remain
+8/1,298. `helo`, `tyoes`, `varely`, and `engloaj` now automatically correct in
+the empty-context JNI characterization. `exmaole` still offers `example` but
+abstains automatically there. D-20's fake uncertain-response screenshot remains
+a UI rendering test; its `varely` response does not describe this native fit.
+Correction, immediate Backspace undo and subsequent literal recommit remain
+covered through the real JNI/controller. See `EDIT_POSITION_COSTS.md`.

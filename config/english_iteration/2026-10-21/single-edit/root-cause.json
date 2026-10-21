@@ -1,0 +1,784 @@
+{
+  "method": "Fixed diagnostic ablations, no fitting or cutoff search; all counterfactuals uncalibrated and undeployed.",
+  "synthetic": {
+    "cases": 5991,
+    "native_parity": true,
+    "variants": {
+      "baseline": {
+        "all": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1463,
+          "wrong": 103,
+          "false_changes": 1,
+          "recall": 0.29312762973352036,
+          "precision": 0.934227330779055,
+          "f05": 0.6499333629498001
+        },
+        "synthetic": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1463,
+          "wrong": 103,
+          "false_changes": 1,
+          "recall": 0.29312762973352036,
+          "precision": 0.934227330779055,
+          "f05": 0.6499333629498001
+        }
+      },
+      "winner_lm_in_acceptance": {
+        "all": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1880,
+          "wrong": 232,
+          "false_changes": 1,
+          "recall": 0.3766780204367862,
+          "precision": 0.8901515151515151,
+          "f05": 0.6994568048217873
+        },
+        "synthetic": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1880,
+          "wrong": 232,
+          "false_changes": 1,
+          "recall": 0.3766780204367862,
+          "precision": 0.8901515151515151,
+          "f05": 0.6994568048217873
+        }
+      },
+      "remove_length_surcharge": {
+        "all": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1430,
+          "wrong": 100,
+          "false_changes": 1,
+          "recall": 0.2865157283109597,
+          "precision": 0.934640522875817,
+          "f05": 0.6435064350643507
+        },
+        "synthetic": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1430,
+          "wrong": 100,
+          "false_changes": 1,
+          "recall": 0.2865157283109597,
+          "precision": 0.934640522875817,
+          "f05": 0.6435064350643507
+        }
+      },
+      "exclude_completions_from_correction_pool": {
+        "all": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1468,
+          "wrong": 117,
+          "false_changes": 1,
+          "recall": 0.29412943297936284,
+          "precision": 0.9261829652996846,
+          "f05": 0.6477804253816962
+        },
+        "synthetic": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1468,
+          "wrong": 117,
+          "false_changes": 1,
+          "recall": 0.29412943297936284,
+          "precision": 0.9261829652996846,
+          "f05": 0.6477804253816962
+        }
+      },
+      "final_letter_as_edit": {
+        "all": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1465,
+          "wrong": 105,
+          "false_changes": 1,
+          "recall": 0.29352835103185737,
+          "precision": 0.9331210191082803,
+          "f05": 0.6498979682370686
+        },
+        "synthetic": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 1465,
+          "wrong": 105,
+          "false_changes": 1,
+          "recall": 0.29352835103185737,
+          "precision": 0.9331210191082803,
+          "f05": 0.6498979682370686
+        }
+      },
+      "without_learned_gate": {
+        "all": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 3295,
+          "wrong": 1437,
+          "false_changes": 448,
+          "recall": 0.6601883390102183,
+          "precision": 0.6963229078613694,
+          "f05": 0.688782975876918
+        },
+        "synthetic": {
+          "cases": 5991,
+          "typos": 4991,
+          "controls": 1000,
+          "correct": 3295,
+          "wrong": 1437,
+          "false_changes": 448,
+          "recall": 0.6601883390102183,
+          "precision": 0.6963229078613694,
+          "f05": 0.688782975876918
+        }
+      }
+    },
+    "misses": {
+      "ranking": 1511,
+      "not_returned": 8,
+      "learned_gate": 1832,
+      "completion": 118,
+      "short_candidate": 20,
+      "short_input": 39
+    }
+  },
+  "real_typing": {
+    "cases": 9728,
+    "native_parity": true,
+    "variants": {
+      "baseline": {
+        "all": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 1805,
+          "wrong": 111,
+          "false_changes": 25,
+          "recall": 0.5094552639006492,
+          "precision": 0.9420668058455115,
+          "f05": 0.8053002587668422
+        },
+        "evaluation": {
+          "cases": 2042,
+          "typos": 744,
+          "controls": 1298,
+          "correct": 364,
+          "wrong": 23,
+          "false_changes": 5,
+          "recall": 0.489247311827957,
+          "precision": 0.9405684754521964,
+          "f05": 0.794066317626527
+        },
+        "selection": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 365,
+          "wrong": 29,
+          "false_changes": 4,
+          "recall": 0.5214285714285715,
+          "precision": 0.9263959390862944,
+          "f05": 0.8018453427065027
+        },
+        "train": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1076,
+          "wrong": 59,
+          "false_changes": 16,
+          "recall": 0.5126250595521677,
+          "precision": 0.9480176211453745,
+          "f05": 0.8103630064768791
+        }
+      },
+      "winner_lm_in_acceptance": {
+        "all": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 2033,
+          "wrong": 253,
+          "false_changes": 62,
+          "recall": 0.5738075077617838,
+          "precision": 0.8893263342082239,
+          "f05": 0.8012138409395444
+        },
+        "evaluation": {
+          "cases": 2042,
+          "typos": 744,
+          "controls": 1298,
+          "correct": 421,
+          "wrong": 52,
+          "false_changes": 14,
+          "recall": 0.5658602150537635,
+          "precision": 0.8900634249471459,
+          "f05": 0.7985584218512898
+        },
+        "selection": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 397,
+          "wrong": 58,
+          "false_changes": 10,
+          "recall": 0.5671428571428572,
+          "precision": 0.8725274725274725,
+          "f05": 0.7876984126984127
+        },
+        "train": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1215,
+          "wrong": 143,
+          "false_changes": 38,
+          "recall": 0.5788470700333492,
+          "precision": 0.894698085419735,
+          "f05": 0.8066657814367282
+        }
+      },
+      "remove_length_surcharge": {
+        "all": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 1718,
+          "wrong": 119,
+          "false_changes": 26,
+          "recall": 0.4848998024273215,
+          "precision": 0.9352204681545999,
+          "f05": 0.7887246350197411
+        },
+        "evaluation": {
+          "cases": 2042,
+          "typos": 744,
+          "controls": 1298,
+          "correct": 347,
+          "wrong": 24,
+          "false_changes": 5,
+          "recall": 0.46639784946236557,
+          "precision": 0.9353099730458221,
+          "f05": 0.7787253141831239
+        },
+        "selection": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 346,
+          "wrong": 29,
+          "false_changes": 4,
+          "recall": 0.4942857142857143,
+          "precision": 0.9226666666666666,
+          "f05": 0.7863636363636364
+        },
+        "train": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1025,
+          "wrong": 66,
+          "false_changes": 17,
+          "recall": 0.4883277751310148,
+          "precision": 0.9395050412465628,
+          "f05": 0.7929753984217855
+        }
+      },
+      "exclude_completions_from_correction_pool": {
+        "all": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 1817,
+          "wrong": 135,
+          "false_changes": 27,
+          "recall": 0.5128422241038668,
+          "precision": 0.9308401639344263,
+          "f05": 0.8003700114527355
+        },
+        "evaluation": {
+          "cases": 2042,
+          "typos": 744,
+          "controls": 1298,
+          "correct": 367,
+          "wrong": 26,
+          "false_changes": 5,
+          "recall": 0.4932795698924731,
+          "precision": 0.9338422391857506,
+          "f05": 0.792314335060449
+        },
+        "selection": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 369,
+          "wrong": 35,
+          "false_changes": 4,
+          "recall": 0.5271428571428571,
+          "precision": 0.9133663366336634,
+          "f05": 0.7966321243523317
+        },
+        "train": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1081,
+          "wrong": 74,
+          "false_changes": 18,
+          "recall": 0.5150071462601239,
+          "precision": 0.935930735930736,
+          "f05": 0.8044351838071142
+        }
+      },
+      "final_letter_as_edit": {
+        "all": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 1822,
+          "wrong": 120,
+          "false_changes": 25,
+          "recall": 0.5142534575218741,
+          "precision": 0.9382080329557158,
+          "f05": 0.8054106621872513
+        },
+        "evaluation": {
+          "cases": 2042,
+          "typos": 744,
+          "controls": 1298,
+          "correct": 368,
+          "wrong": 24,
+          "false_changes": 5,
+          "recall": 0.4946236559139785,
+          "precision": 0.9387755102040817,
+          "f05": 0.7958477508650519
+        },
+        "selection": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 366,
+          "wrong": 32,
+          "false_changes": 4,
+          "recall": 0.5228571428571429,
+          "precision": 0.9195979899497487,
+          "f05": 0.7984293193717278
+        },
+        "train": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1088,
+          "wrong": 64,
+          "false_changes": 16,
+          "recall": 0.5183420676512626,
+          "precision": 0.9444444444444444,
+          "f05": 0.8110928880274341
+        }
+      },
+      "without_learned_gate": {
+        "all": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 2324,
+          "wrong": 3320,
+          "false_changes": 2733,
+          "recall": 0.6559412926898109,
+          "precision": 0.4117647058823529,
+          "f05": 0.4448868639687584
+        },
+        "evaluation": {
+          "cases": 2042,
+          "typos": 744,
+          "controls": 1298,
+          "correct": 481,
+          "wrong": 712,
+          "false_changes": 588,
+          "recall": 0.646505376344086,
+          "precision": 0.40318524727577537,
+          "f05": 0.4360043509789703
+        },
+        "selection": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 464,
+          "wrong": 671,
+          "false_changes": 539,
+          "recall": 0.6628571428571428,
+          "precision": 0.40881057268722465,
+          "f05": 0.44274809160305345
+        },
+        "train": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1379,
+          "wrong": 1937,
+          "false_changes": 1606,
+          "recall": 0.6569795140543115,
+          "precision": 0.4158624849215923,
+          "f05": 0.4488055718284189
+        }
+      }
+    },
+    "misses": {
+      "learned_gate": 518,
+      "ranking": 387,
+      "not_returned": 415,
+      "short_input": 234,
+      "completion": 176,
+      "short_candidate": 8
+    }
+  },
+  "paired_context": {
+    "partition": "TRAIN only; deterministic hash-order sample, no fitting",
+    "recorded_context": {
+      "cases": 2048,
+      "typos": 749,
+      "controls": 1299,
+      "correct": 395,
+      "wrong": 27,
+      "false_changes": 9,
+      "recall": 0.527369826435247,
+      "precision": 0.9360189573459715,
+      "f05": 0.8104226508001642
+    },
+    "empty_context": {
+      "cases": 2048,
+      "typos": 749,
+      "controls": 1299,
+      "correct": 247,
+      "wrong": 22,
+      "false_changes": 4,
+      "recall": 0.32977303070761016,
+      "precision": 0.9182156133828996,
+      "f05": 0.6767123287671233
+    }
+  },
+  "fit_exposure": {
+    "eligible_fit_rows": 2644,
+    "empty_context_rows": 208,
+    "unknown_input_rows": 1364,
+    "unknown_empty_context_rows": 88
+  },
+  "examples": [
+    {
+      "typed": "plizza",
+      "target": "pizza",
+      "trace": {
+        "winner": "pizza",
+        "runner": "pizzas",
+        "score_parts": {
+          "lm": -9.099627494812012,
+          "cost": 4.5,
+          "score": -13.599627494812012
+        },
+        "features": {
+          "winner_score": -13.599627494812012,
+          "runner_margin": 5.0228166580200195,
+          "known_word": 0,
+          "literal_score": 0.0,
+          "score_over_literal": 0.0,
+          "observed_apostrophe": 0
+        },
+        "contributions": {
+          "winner_score": -0.38745456505172404,
+          "runner_margin": 0.19262540750154253,
+          "known_word": 1.5245787019844628,
+          "literal_score": 0.1266685527722653,
+          "score_over_literal": 0.7418981905092255,
+          "observed_apostrophe": 0.1255947570797969
+        },
+        "logit": 1.0346748492474098,
+        "decision_score": 0.7378212085451437,
+        "cutoff": 0.7535520633370493,
+        "guard": "learned_gate",
+        "decision": null
+      },
+      "counterfactuals": {
+        "baseline": null,
+        "winner_lm_in_acceptance": "pizza",
+        "remove_length_surcharge": "pizza",
+        "exclude_completions_from_correction_pool": null,
+        "final_letter_as_edit": null,
+        "without_learned_gate": "pizza"
+      }
+    },
+    {
+      "typed": "piza",
+      "target": "pizza",
+      "trace": {
+        "winner": "pizza",
+        "runner": "lisa",
+        "score_parts": {
+          "lm": -9.099627494812012,
+          "cost": 4.5,
+          "score": -13.599627494812012
+        },
+        "features": {
+          "winner_score": -13.599627494812012,
+          "runner_margin": 2.7670907974243164,
+          "known_word": 0,
+          "literal_score": 0.0,
+          "score_over_literal": 0.0,
+          "observed_apostrophe": 0
+        },
+        "contributions": {
+          "winner_score": -0.38745456505172404,
+          "runner_margin": -0.46065074004896067,
+          "known_word": 1.5245787019844628,
+          "literal_score": 0.1266685527722653,
+          "score_over_literal": 0.7418981905092255,
+          "observed_apostrophe": 0.1255947570797969
+        },
+        "logit": 0.3813987016969067,
+        "decision_score": 0.594210408432626,
+        "cutoff": 0.7535520633370493,
+        "guard": "learned_gate",
+        "decision": null
+      },
+      "counterfactuals": {
+        "baseline": null,
+        "winner_lm_in_acceptance": "pizza",
+        "remove_length_surcharge": "pizza",
+        "exclude_completions_from_correction_pool": null,
+        "final_letter_as_edit": null,
+        "without_learned_gate": "pizza"
+      }
+    },
+    {
+      "typed": "butger",
+      "target": "burger",
+      "trace": {
+        "winner": "burger",
+        "runner": "butter",
+        "score_parts": {
+          "lm": -11.182453155517578,
+          "cost": 1.0,
+          "score": -12.182453155517578
+        },
+        "features": {
+          "winner_score": -12.182453155517578,
+          "runner_margin": 1.948470115661621,
+          "known_word": 0,
+          "literal_score": 0.0,
+          "score_over_literal": 0.0,
+          "observed_apostrophe": 0
+        },
+        "contributions": {
+          "winner_score": -0.1500959591942123,
+          "runner_margin": -0.6977297994457755,
+          "known_word": 1.5245787019844628,
+          "literal_score": 0.1266685527722653,
+          "score_over_literal": 0.7418981905092255,
+          "observed_apostrophe": 0.1255947570797969
+        },
+        "logit": 0.38167824815760354,
+        "decision_score": 0.5942778121293428,
+        "cutoff": 0.7535520633370493,
+        "guard": "learned_gate",
+        "decision": null
+      },
+      "counterfactuals": {
+        "baseline": null,
+        "winner_lm_in_acceptance": null,
+        "remove_length_surcharge": null,
+        "exclude_completions_from_correction_pool": null,
+        "final_letter_as_edit": null,
+        "without_learned_gate": "burger"
+      }
+    },
+    {
+      "typed": "gruop",
+      "target": "group",
+      "trace": {
+        "winner": "group",
+        "runner": "trump",
+        "score_parts": {
+          "lm": -11.335022926330566,
+          "cost": 1.0,
+          "score": -12.335022926330566
+        },
+        "features": {
+          "winner_score": -12.335022926330566,
+          "runner_margin": 3.8578062057495117,
+          "known_word": 0,
+          "literal_score": 0.0,
+          "score_over_literal": 0.0,
+          "observed_apostrophe": 0
+        },
+        "contributions": {
+          "winner_score": -0.17564944763389195,
+          "runner_margin": -0.1447708840470939,
+          "known_word": 1.5245787019844628,
+          "literal_score": 0.1266685527722653,
+          "score_over_literal": 0.7418981905092255,
+          "observed_apostrophe": 0.1255947570797969
+        },
+        "logit": 0.9090836751166054,
+        "decision_score": 0.7128126177471846,
+        "cutoff": 0.7535520633370493,
+        "guard": "learned_gate",
+        "decision": null
+      },
+      "counterfactuals": {
+        "baseline": null,
+        "winner_lm_in_acceptance": null,
+        "remove_length_surcharge": null,
+        "exclude_completions_from_correction_pool": null,
+        "final_letter_as_edit": null,
+        "without_learned_gate": "group"
+      }
+    },
+    {
+      "typed": "lunc",
+      "target": "lunch",
+      "trace": {
+        "winner": "lunch",
+        "runner": "lunchtime",
+        "score_parts": {
+          "lm": -9.542513847351074,
+          "cost": 0.0,
+          "score": -9.542513847351074
+        },
+        "features": {
+          "winner_score": -9.542513847351074,
+          "runner_margin": 4.733695030212402,
+          "known_word": 0,
+          "literal_score": 0.0,
+          "score_over_literal": 0.0,
+          "observed_apostrophe": 0
+        },
+        "contributions": {
+          "winner_score": 0.29206016539862795,
+          "runner_margin": 0.1088934848920233,
+          "known_word": 1.5245787019844628,
+          "literal_score": 0.1266685527722653,
+          "score_over_literal": 0.7418981905092255,
+          "observed_apostrophe": 0.1255947570797969
+        },
+        "logit": 1.6304576570882425,
+        "decision_score": 0.8362323235640693,
+        "cutoff": 0.7535520633370493,
+        "guard": "completion",
+        "decision": null
+      },
+      "counterfactuals": {
+        "baseline": null,
+        "winner_lm_in_acceptance": null,
+        "remove_length_surcharge": null,
+        "exclude_completions_from_correction_pool": null,
+        "final_letter_as_edit": null,
+        "without_learned_gate": null
+      }
+    },
+    {
+      "typed": "provied",
+      "target": "provide",
+      "trace": {
+        "winner": "provide",
+        "runner": "provided",
+        "score_parts": {
+          "lm": -10.572940826416016,
+          "cost": 1.0,
+          "score": -11.572940826416016
+        },
+        "features": {
+          "winner_score": -11.572940826416016,
+          "runner_margin": 4.052648544311523,
+          "known_word": 0,
+          "literal_score": 0.0,
+          "score_over_literal": 0.0,
+          "observed_apostrophe": 0
+        },
+        "contributions": {
+          "winner_score": -0.048010426964959586,
+          "runner_margin": -0.08834299334502625,
+          "known_word": 1.5245787019844628,
+          "literal_score": 0.1266685527722653,
+          "score_over_literal": 0.7418981905092255,
+          "observed_apostrophe": 0.1255947570797969
+        },
+        "logit": 1.0931505864876054,
+        "decision_score": 0.7489745331917345,
+        "cutoff": 0.7535520633370493,
+        "guard": "learned_gate",
+        "decision": null
+      },
+      "counterfactuals": {
+        "baseline": null,
+        "winner_lm_in_acceptance": "provide",
+        "remove_length_surcharge": null,
+        "exclude_completions_from_correction_pool": null,
+        "final_letter_as_edit": null,
+        "without_learned_gate": "provide"
+      }
+    }
+  ],
+  "synthetic_ranking_causes": {
+    "deletion": {
+      "target_is_completion": 246,
+      "ranking_failure": 661,
+      "ranking_completion_winner": 151,
+      "better_target_lm_overridden_by_cost": 112
+    },
+    "insertion": {
+      "target_is_completion": 0,
+      "ranking_failure": 256,
+      "ranking_completion_winner": 20,
+      "better_target_lm_overridden_by_cost": 127
+    },
+    "qwerty_substitution": {
+      "target_is_completion": 0,
+      "ranking_failure": 184,
+      "ranking_completion_winner": 27,
+      "better_target_lm_overridden_by_cost": 7
+    },
+    "substitution": {
+      "target_is_completion": 0,
+      "ranking_failure": 259,
+      "ranking_completion_winner": 23,
+      "better_target_lm_overridden_by_cost": 29
+    },
+    "transposition": {
+      "target_is_completion": 0,
+      "ranking_failure": 151,
+      "ranking_completion_winner": 22,
+      "better_target_lm_overridden_by_cost": 7
+    }
+  },
+  "hashes": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/analyze_single_edit_root_cause.py": "859affcfc5e8b3b168fc05b0767f8f7906d9cf994304bb2b9cd5e247bcabe1ef",
+    "app/build/english-host/release/ngram_probe": "f3e178256736f52b3fc55e8284be2753965cf705ce5aae8fae984dc98f805f49",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_acceptance.json": "d97608cbbbd36bc257858760c3e70ed38269efae9efb9c16e0a236fe73947ffd",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_apostrophe_acceptance.json": "0de96ace3507ddb0aeb9944b0ece3cd389aa434f2bc87640bd9044be4cf25d96",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/single-edit-final-2026-10-21/predictions.jsonl": "e9e62d861a3c3f6a859eb118587dd731d8e2d63f0644b169aaf8267ca54f98a1",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/config/english_iteration/2026-10-21/single-edit/report.json": "49c9bc91d2012feaba44eae96d93c82024a80cba58f38dcd343f0be1372dcff0",
+    "build/single-edit-root-cause-2026-10-21/synthetic-native.json": "1c079dc612a85395a66c330307be844e9ae083ef868427c3ad83a5599faa45b4",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/apostrophe-native-cache.json": "c5fbd00d9001b55c99f9ec829d298f292df64831978821f2c57647cb17dda600",
+    "build/single-edit-root-cause-2026-10-21/empty-context-native.json": "c846970374204da8aca62a85fc8035c6f2b23cbbf686b4012d5907ff5aad90eb",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/english-iteration-2026-10-20/native-cache.json": "c4cf55303800beb689dc2b9caa73ba54c1de9528dfa3846e5ce8d5213a4887b6",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/config/english_iteration/2026-10-20/f05-linear-acceptance.json": "ec855715314cde3be0dabfe4f208ef0884b42e4a83e605f84d7455b6ad27d484"
+  }
+}

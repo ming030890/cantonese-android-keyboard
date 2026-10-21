@@ -1,0 +1,32 @@
+{
+  "apk_sha256": "36157c7c3be40e68ef3814763af0bfdd9e616939957f17b9d744aaf4d071404c",
+  "engine_sha256": "cd9147ba11adcb2fe420e29fa0c4585b707ac470c3883c9a7fa529d2904c4b21",
+  "staged_engine_sha256": "0534c1aadb1cd3fe003aa3cd33b166c8e06f8cd1b6dbc4cf992607c1b04d3482",
+  "compiled_staged_merged_match": true,
+  "stripped_engine_matches_apk": true,
+  "lexicon_embedded": true,
+  "license_packaged": true,
+  "host_library_bytes_before": 2543136,
+  "host_library_bytes_after": 3737168,
+  "unit": {
+    "tests": 218,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 10
+  },
+  "screenshots": {
+    "tests": 80,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "actual_jni_run": {
+    "tests": 18,
+    "skipped": 0,
+    "failures": 0,
+    "command": ":app:testDebugUnitTest --tests *SharedLmEnglishScenarioTest -PenglishNativeLibrary=.../libcantonese_engine.dylib",
+    "log_sha256": "8c085fe403d5bdf7a6e9a529f100c9df6992b804d403a4c1038d5ca3258e3208"
+  },
+  "verify_keyboard_log_sha256": "c3d2f5f15f24338b512445aaf171713bd282e3ce153f94aa9659cc544fef446a",
+  "installed_on_phone": false
+}

@@ -1,0 +1,499 @@
+{
+  "rule": "Only on abstention and unknown input, ASCII letters length 4\u201332: exactly one dictionary repair across all single replacements, insertions, deletions and swaps, and it is a neighboring replacement present in model suggestions. Existing corrections and known inputs are preserved.",
+  "ambiguity": "Full source dictionary, independent of LM ranking and reference labels. Lexical uniqueness is not a guarantee of free-typing intent, names or multi-edit errors.",
+  "require_first": true,
+  "binding": {
+    "lexicon": "ba939858f719641d910bcacc3174855abba3f32cbd394f849098f9cf52af9cfb",
+    "source": "346323cd605464785e631af886877ef9d1bd12bc8d583dfb55253a44f291fab6",
+    "cache": "c5fbd00d9001b55c99f9ec829d298f292df64831978821f2c57647cb17dda600",
+    "cases": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "references": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "script": "353cb16572065615187a8cb896e9e1901f94b7ed76b0631f3e09f93c4f4a57df"
+  },
+  "lexicon_words": 120321,
+  "selection_qualified": true,
+  "partitions": {
+    "train": {
+      "all_regression": {
+        "before": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1076,
+          "wrong": 59,
+          "false_changes": 16,
+          "recall": 0.5126250595521677,
+          "precision": 0.9480176211453745,
+          "f05": 0.8103630064768791
+        },
+        "after": {
+          "cases": 5737,
+          "typos": 2099,
+          "controls": 3638,
+          "correct": 1095,
+          "wrong": 61,
+          "false_changes": 16,
+          "recall": 0.5216769890424011,
+          "precision": 0.9472318339100346,
+          "f05": 0.8143685854529228
+        }
+      },
+      "primary_unambiguous": {
+        "before": {
+          "cases": 278,
+          "typos": 278,
+          "controls": 0,
+          "correct": 250,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.8992805755395683,
+          "precision": 1.0,
+          "f05": 0.9780907668231612
+        },
+        "after": {
+          "cases": 278,
+          "typos": 278,
+          "controls": 0,
+          "correct": 269,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9676258992805755,
+          "precision": 1.0,
+          "f05": 0.9933530280649926
+        }
+      },
+      "preservation": {
+        "before": {
+          "cases": 3638,
+          "typos": 0,
+          "controls": 3638,
+          "correct": 0,
+          "wrong": 16,
+          "false_changes": 16,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        },
+        "after": {
+          "cases": 3638,
+          "typos": 0,
+          "controls": 3638,
+          "correct": 0,
+          "wrong": 16,
+          "false_changes": 16,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        }
+      },
+      "primary_by_length": {
+        "4-5": {
+          "before": {
+            "cases": 42,
+            "typos": 42,
+            "controls": 0,
+            "correct": 38,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9047619047619048,
+            "precision": 1.0,
+            "f05": 0.979381443298969
+          },
+          "after": {
+            "cases": 42,
+            "typos": 42,
+            "controls": 0,
+            "correct": 41,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9761904761904762,
+            "precision": 1.0,
+            "f05": 0.9951456310679612
+          }
+        },
+        "6-7": {
+          "before": {
+            "cases": 132,
+            "typos": 132,
+            "controls": 0,
+            "correct": 124,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9393939393939394,
+            "precision": 1.0,
+            "f05": 0.9872611464968153
+          },
+          "after": {
+            "cases": 132,
+            "typos": 132,
+            "controls": 0,
+            "correct": 129,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9772727272727273,
+            "precision": 1.0,
+            "f05": 0.9953703703703703
+          }
+        },
+        "8-32": {
+          "before": {
+            "cases": 104,
+            "typos": 104,
+            "controls": 0,
+            "correct": 88,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.8461538461538461,
+            "precision": 1.0,
+            "f05": 0.9649122807017544
+          },
+          "after": {
+            "cases": 104,
+            "typos": 104,
+            "controls": 0,
+            "correct": 99,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9519230769230769,
+            "precision": 1.0,
+            "f05": 0.99
+          }
+        }
+      },
+      "changes": [
+        {
+          "id": "00ec92c2a71d65bf3b0e8e3ed5993879af018127dc343959b6a9db1f581be277",
+          "typed": "tevision",
+          "target": "revision",
+          "before": null,
+          "after": "revision"
+        },
+        {
+          "id": "010c9ba9dec81a4479275847a18e8ba9dc16347c453fcd34025a1347be475115",
+          "typed": "frncing",
+          "target": "fencing",
+          "before": null,
+          "after": "fencing"
+        },
+        {
+          "id": "0179b6d364e9ce493eef5c7b7cf449a5fffe3a818880d3b52f289dbf36925ca5",
+          "typed": "odfice",
+          "target": "office",
+          "before": null,
+          "after": "office"
+        },
+        {
+          "id": "01853c9d4f7caee96667aec240e45d3e9dc5be1090b471389e063e37b4396272",
+          "typed": "psnthers",
+          "target": "panthers",
+          "before": null,
+          "after": "panthers"
+        },
+        {
+          "id": "019f60fdec1c1d3fa6cace4f28bb25d52861b7ce4369e6dcb22530bce3cede2a",
+          "typed": "reachimg",
+          "target": "reaching",
+          "before": null,
+          "after": "reaching"
+        },
+        {
+          "id": "01b03737b9836258304978bc7f406a0ba8662a4ca132493f53b821fb9aa80c91",
+          "typed": "recriver",
+          "target": "receiver",
+          "before": null,
+          "after": "receiver"
+        },
+        {
+          "id": "01c37a1d1e4d33752abcf802fda342ed9e5df8a42de70a127189650b4e477bf0",
+          "typed": "oncw",
+          "target": "once",
+          "before": null,
+          "after": "once"
+        },
+        {
+          "id": "01d51014bdcc9c86193b8367df9d8149c49bce0cfe847107f57b86eb3324e20c",
+          "typed": "reversimg",
+          "target": "reversing",
+          "before": null,
+          "after": "reversing"
+        },
+        {
+          "id": "0227a4c229d8ffaed5ec186517738e19f6cab477947ad1fe63c8527ebf0efc88",
+          "typed": "grohnd",
+          "target": "ground",
+          "before": null,
+          "after": "ground"
+        },
+        {
+          "id": "0245b94aeb09a0fae763e08c6c2554bff6f1313af00e22c457a4c86abda7d5c0",
+          "typed": "buzinessman",
+          "target": "businessman",
+          "before": null,
+          "after": "businessman"
+        },
+        {
+          "id": "0292a0d26a75460c88f5bfe0178a562969bc7dc022af26ac4bcaea8804f4f3fa",
+          "typed": "operatinb",
+          "target": "operating",
+          "before": null,
+          "after": "operating"
+        },
+        {
+          "id": "03e694263ea854dbd3ef6a20ad91f9de68ac813070cb2f2719752f2c6a2d4f1a",
+          "typed": "bencu",
+          "target": "bench",
+          "before": null,
+          "after": "bench"
+        },
+        {
+          "id": "040ee6b552b9a6386737ab9a68b9518db0147f816a3f3e71adc6abb83316a365",
+          "typed": "nrian",
+          "target": "brian",
+          "before": null,
+          "after": "brian"
+        },
+        {
+          "id": "04f6ecb24174cbaec623656317819c86732c78f1c03cbb458b0bb50df9de4b6c",
+          "typed": "diolomats",
+          "target": "diplomats",
+          "before": null,
+          "after": "diplomats"
+        },
+        {
+          "id": "058cf681521bd3476f560b968bc5de307979276e014b02c52fcc148c2a6f1f43",
+          "typed": "travking",
+          "target": "travkin",
+          "before": null,
+          "after": "tracking"
+        },
+        {
+          "id": "06427e2304ecb191cd7cc9866495b0ff52e3c3552e066ecc61d44e36dc5ab4a7",
+          "typed": "proveeding",
+          "target": "proceeding",
+          "before": null,
+          "after": "proceeding"
+        },
+        {
+          "id": "065e3577ce7b65c0d77060a0d621d5771c3a99f1433de993f1ff29a24c9909a5",
+          "typed": "croxkett",
+          "target": "crockett",
+          "before": null,
+          "after": "crockett"
+        },
+        {
+          "id": "069c8d8747625561e21880bedb204e1a0e7ab7b74d6a414398e538199a02de8c",
+          "typed": "batlor",
+          "target": "baylor",
+          "before": null,
+          "after": "baylor"
+        },
+        {
+          "id": "0744ec7b25f45c906a6b6ab699e7eb1b4e15a0378ca258b4f78e9d2e32b85c3d",
+          "typed": "resignatiob",
+          "target": "resignation",
+          "before": null,
+          "after": "resignation"
+        },
+        {
+          "id": "07b25bd821ecdbfe3e5d3bffb15d59b58207741cc30e745cf58b03de59cafca7",
+          "typed": "eefend",
+          "target": "defense",
+          "before": null,
+          "after": "defend"
+        },
+        {
+          "id": "07b83db77fb6c242f255300d8e0be58de339a4ae634f2b543911bed3ef8f0139",
+          "typed": "cutrent",
+          "target": "current",
+          "before": null,
+          "after": "current"
+        }
+      ]
+    },
+    "selection": {
+      "all_regression": {
+        "before": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 365,
+          "wrong": 29,
+          "false_changes": 4,
+          "recall": 0.5214285714285715,
+          "precision": 0.9263959390862944,
+          "f05": 0.8018453427065027
+        },
+        "after": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 369,
+          "wrong": 30,
+          "false_changes": 4,
+          "recall": 0.5271428571428571,
+          "precision": 0.924812030075188,
+          "f05": 0.8035714285714286
+        }
+      },
+      "primary_unambiguous": {
+        "before": {
+          "cases": 83,
+          "typos": 83,
+          "controls": 0,
+          "correct": 79,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9518072289156626,
+          "precision": 1.0,
+          "f05": 0.9899749373433584
+        },
+        "after": {
+          "cases": 83,
+          "typos": 83,
+          "controls": 0,
+          "correct": 83,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 1.0,
+          "precision": 1.0,
+          "f05": 1.0
+        }
+      },
+      "preservation": {
+        "before": {
+          "cases": 1249,
+          "typos": 0,
+          "controls": 1249,
+          "correct": 0,
+          "wrong": 4,
+          "false_changes": 4,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        },
+        "after": {
+          "cases": 1249,
+          "typos": 0,
+          "controls": 1249,
+          "correct": 0,
+          "wrong": 4,
+          "false_changes": 4,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        }
+      },
+      "primary_by_length": {
+        "4-5": {
+          "before": {
+            "cases": 21,
+            "typos": 21,
+            "controls": 0,
+            "correct": 19,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9047619047619048,
+            "precision": 1.0,
+            "f05": 0.979381443298969
+          },
+          "after": {
+            "cases": 21,
+            "typos": 21,
+            "controls": 0,
+            "correct": 21,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f05": 1.0
+          }
+        },
+        "6-7": {
+          "before": {
+            "cases": 34,
+            "typos": 34,
+            "controls": 0,
+            "correct": 34,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f05": 1.0
+          },
+          "after": {
+            "cases": 34,
+            "typos": 34,
+            "controls": 0,
+            "correct": 34,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f05": 1.0
+          }
+        },
+        "8-32": {
+          "before": {
+            "cases": 28,
+            "typos": 28,
+            "controls": 0,
+            "correct": 26,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9285714285714286,
+            "precision": 1.0,
+            "f05": 0.9848484848484849
+          },
+          "after": {
+            "cases": 28,
+            "typos": 28,
+            "controls": 0,
+            "correct": 28,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f05": 1.0
+          }
+        }
+      },
+      "changes": [
+        {
+          "id": "013eefeb62fa8a9fdfad6c35acfb583b695d410e2faee6c5917c8bd6779e394b",
+          "typed": "directirs",
+          "target": "directors",
+          "before": null,
+          "after": "directors"
+        },
+        {
+          "id": "03214338b4a826fb3cff79f5b5bc7c59d9187ae587508e0e2a97cc7ce6259103",
+          "typed": "grsde",
+          "target": "grade",
+          "before": null,
+          "after": "grade"
+        },
+        {
+          "id": "0387b6c7eb5f4722fad45ac8704042e491cebea5f2b388fe583f2224f4a040fa",
+          "typed": "auarters",
+          "target": "quarter",
+          "before": null,
+          "after": "quarters"
+        },
+        {
+          "id": "072c83178b4728070ada413d84acbb2c1f5d2e1de2fb467b6eb7ac606e6145a8",
+          "typed": "yoirs",
+          "target": "yours",
+          "before": null,
+          "after": "yours"
+        },
+        {
+          "id": "075166f0fa714b1e1844cd5726024832791fe119764ae18fea8607c576bcedd7",
+          "typed": "nominayed",
+          "target": "nominated",
+          "before": null,
+          "after": "nominated"
+        }
+      ]
+    }
+  }
+}

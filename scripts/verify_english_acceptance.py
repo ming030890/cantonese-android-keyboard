@@ -43,12 +43,17 @@ def main():
     apostrophe = json.loads(apostrophe_path.read_text())
     forms_path = policy_path.with_name('english_apostrophe_forms.json')
     accepted = json.loads((project/'config/english_iteration/2026-10-21/apostrophe-evaluation.json').read_text())
+    current_report_path = project/'config/english_iteration/2026-10-21/acceptance-refit/evaluation.json'
+    current_report = json.loads(current_report_path.read_text())
+    assert policy['provenance']['evaluation_sha256'] == digest(current_report_path)
     assert digest(model) == apostrophe['model_sha256']
     assert digest(forms_path) == apostrophe['forms_sha256']
     assert accepted['binding']['apostrophe_policy'] == digest(apostrophe_path)
-    assert accepted['binding']['policy'] == digest(policy_path)
+    before_policy = project/'config/english_iteration/2026-10-21/acceptance-refit/before-policy.json'
+    assert accepted['binding']['policy'] == digest(before_policy)
     assert accepted['binding']['forms'] == digest(forms_path)
     assert digest(model) == policy['model_sha256'], 'Policy requires recalibration for this model'
+    cost_report = json.loads((project/'config/english_iteration/2026-10-21/edit-position-costs/evaluation.json').read_text())
     cases = [json.loads(l) for l in (args.iteration/'cases.jsonl').open() if not json.loads(l)['category'].startswith('prefix_')]
     old = json.loads((args.iteration/'native-cache.json').read_text())['outputs'][:len(cases)]
     references = {r['SENTENCE_ID']: r['SENTENCE'] for r in csv.DictReader(open('/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv'))}
@@ -60,7 +65,12 @@ def main():
     cases, old = map(list, zip(*rows))
     print(f'Checking actual native decisions for {len(cases)} aligned cases', flush=True)
     actual = probe(args.probe, model, [dict(left=c['left'], typed=c['typed'], spelling_limit=4096) for c in cases])
-    rankings = [rerank(o['candidates'], 0.) for o in old]
+    # Recheck the acceptance gate on current scores. Independent edit-cost
+    # replay and candidate-pool parity are covered by verify_edit_costs.py.
+    rankings = [sorted((r for r in o['candidates'] if r['word'] not in
+                       {e['word'] for e in o['apostropheEvidence']}),
+                       key=lambda r:(-r['score'],r['word'])) for o in actual]
+    old_rankings = [rerank(o['candidates'], 0.) for o in old]
     expected = [decision(policy, c, o, r) for c, o, r in zip(cases, actual, rankings)]
     for i, output in enumerate(actual):
         for evidence in output['apostropheEvidence']:
@@ -73,11 +83,11 @@ def main():
     report = dict(model_sha256=digest(model), policy_sha256=digest(policy_path), probe_sha256=digest(args.probe),
                   cases=len(cases), decision_mismatches=mismatches,
                   evaluation=metric(cases, actual, [o['candidates'] for o in actual], native, 'evaluation'),
-                  baseline_evaluation=accepted['baseline_evaluation'],
+                  baseline_evaluation=cost_report['baseline_evaluation'],
                   apostrophe_policy_sha256=digest(apostrophe_path), forms_sha256=digest(forms_path),
-                  candidate_order_changes=sum([r['word'] for r in a['candidates']] != [r['word'] for r in b] for a,b in zip(actual,rankings)))
+                  candidate_order_changes=sum([r['word'] for r in a['candidates']] != [r['word'] for r in b] for a,b in zip(actual,old_rankings)))
     for field in ('cases', 'correct', 'wrong', 'typos', 'f05'):
-        assert report['evaluation'][field] == accepted['evaluation'][field], field
+        assert report['evaluation'][field] == cost_report['evaluation'][field], field
     predictions = args.output.with_suffix('.predictions.json')
     predictions.write_text(json.dumps(dict(model_sha256=digest(model), policy_sha256=digest(policy_path),
                                            case_ids=[c['id'] for c in cases], outputs=actual)))

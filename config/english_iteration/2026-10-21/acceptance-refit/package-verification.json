@@ -1,0 +1,40 @@
+{
+  "apk_sha256": "e226aae9917a086e2b21964da383c4ded01abdbe9f9bed8280cb3110116ea531",
+  "packaged_engine_sha256": "381f023bfc6cd80ccd2170bfabaeb5f691e1c39ac5f88a0439f97e2c559b4395",
+  "compiled_staged_merged_match": true,
+  "stripped_engine_matches_apk": true,
+  "withdrawn_dictionary_absent": true,
+  "withdrawn_license_absent": true,
+  "changed_policy_fields": [
+    "weights",
+    "threshold",
+    "provenance"
+  ],
+  "policy_sha256": "1d5733cc3f09778485318cb5c579086f67977b19dc52577cd6dbd298ae4784da",
+  "unit": {
+    "tests": 218,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 10
+  },
+  "screenshots": {
+    "tests": 80,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "actual_jni": {
+    "name": "com.madeinhk.cantonesevoicekeyboard.SharedLmEnglishScenarioTest",
+    "tests": "18",
+    "skipped": "0",
+    "failures": "0",
+    "errors": "0",
+    "timestamp": "2026-10-21T20:30:41.579Z",
+    "hostname": "Tonys-Mac-mini-2.local",
+    "time": "22.312"
+  },
+  "jni_report_sha256": "1345cf1e1beaad2c47f4489e1947d1987897631dd42f41cd841886453219d42b",
+  "verify_keyboard_log_sha256": "ec057b4952c5c842353427f3fbe48fe0c4e0283a8a74bc54653f72a2aa8cc891",
+  "host_library_bytes": 2547504,
+  "installed_on_phone": false
+}

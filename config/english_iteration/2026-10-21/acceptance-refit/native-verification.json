@@ -1,0 +1,617 @@
+{
+  "runtime_change": "Existing six coefficients and global threshold only; no runtime lexical or edit-distance fallback",
+  "panels": {
+    "real": {
+      "all": {
+        "before": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 1805,
+          "wrong": 111,
+          "false_changes": 25,
+          "recall": 0.5094552639006492,
+          "precision": 0.9420668058455115,
+          "f05": 0.8053002587668422
+        },
+        "after": {
+          "cases": 9728,
+          "typos": 3543,
+          "controls": 6185,
+          "correct": 1935,
+          "wrong": 155,
+          "false_changes": 32,
+          "recall": 0.54614733276884,
+          "precision": 0.9258373205741627,
+          "f05": 0.8128202974040158
+        }
+      },
+      "primary": {
+        "before": {
+          "cases": 443,
+          "typos": 443,
+          "controls": 0,
+          "correct": 402,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.90744920993228,
+          "precision": 1.0,
+          "f05": 0.9800097513408094
+        },
+        "after": {
+          "cases": 443,
+          "typos": 443,
+          "controls": 0,
+          "correct": 418,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9435665914221218,
+          "precision": 1.0,
+          "f05": 0.9881796690307328
+        }
+      },
+      "controls": {
+        "before": {
+          "cases": 6185,
+          "typos": 0,
+          "controls": 6185,
+          "correct": 0,
+          "wrong": 25,
+          "false_changes": 25,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        },
+        "after": {
+          "cases": 6185,
+          "typos": 0,
+          "controls": 6185,
+          "correct": 0,
+          "wrong": 32,
+          "false_changes": 32,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        }
+      },
+      "by_length": {
+        "4-5": {
+          "before": {
+            "cases": 78,
+            "typos": 78,
+            "controls": 0,
+            "correct": 69,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.8846153846153846,
+            "precision": 1.0,
+            "f05": 0.9745762711864406
+          },
+          "after": {
+            "cases": 78,
+            "typos": 78,
+            "controls": 0,
+            "correct": 72,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9230769230769231,
+            "precision": 1.0,
+            "f05": 0.9836065573770492
+          }
+        },
+        "6-7": {
+          "before": {
+            "cases": 207,
+            "typos": 207,
+            "controls": 0,
+            "correct": 195,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9420289855072463,
+            "precision": 1.0,
+            "f05": 0.9878419452887538
+          },
+          "after": {
+            "cases": 207,
+            "typos": 207,
+            "controls": 0,
+            "correct": 201,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9710144927536232,
+            "precision": 1.0,
+            "f05": 0.9940652818991098
+          }
+        },
+        "8-32": {
+          "before": {
+            "cases": 158,
+            "typos": 158,
+            "controls": 0,
+            "correct": 138,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.8734177215189873,
+            "precision": 1.0,
+            "f05": 0.971830985915493
+          },
+          "after": {
+            "cases": 158,
+            "typos": 158,
+            "controls": 0,
+            "correct": 145,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9177215189873418,
+            "precision": 1.0,
+            "f05": 0.9823848238482384
+          }
+        }
+      }
+    },
+    "original": {
+      "all": {
+        "before": {
+          "cases": 2000,
+          "typos": 1000,
+          "controls": 1000,
+          "correct": 442,
+          "wrong": 13,
+          "false_changes": 1,
+          "recall": 0.442,
+          "precision": 0.9714285714285714,
+          "f05": 0.7836879432624113
+        },
+        "after": {
+          "cases": 2000,
+          "typos": 1000,
+          "controls": 1000,
+          "correct": 552,
+          "wrong": 15,
+          "false_changes": 1,
+          "recall": 0.552,
+          "precision": 0.9735449735449735,
+          "f05": 0.8445532435740514
+        }
+      },
+      "primary": {
+        "before": {
+          "cases": 343,
+          "typos": 343,
+          "controls": 0,
+          "correct": 284,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.8279883381924198,
+          "precision": 1.0,
+          "f05": 0.9601081812035159
+        },
+        "after": {
+          "cases": 343,
+          "typos": 343,
+          "controls": 0,
+          "correct": 321,
+          "wrong": 0,
+          "false_changes": 0,
+          "recall": 0.9358600583090378,
+          "precision": 1.0,
+          "f05": 0.986478180700676
+        }
+      },
+      "controls": {
+        "before": {
+          "cases": 1000,
+          "typos": 0,
+          "controls": 1000,
+          "correct": 0,
+          "wrong": 1,
+          "false_changes": 1,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        },
+        "after": {
+          "cases": 1000,
+          "typos": 0,
+          "controls": 1000,
+          "correct": 0,
+          "wrong": 1,
+          "false_changes": 1,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        }
+      },
+      "by_length": {
+        "4-5": {
+          "before": {
+            "cases": 88,
+            "typos": 88,
+            "controls": 0,
+            "correct": 56,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.6363636363636364,
+            "precision": 1.0,
+            "f05": 0.8974358974358975
+          },
+          "after": {
+            "cases": 88,
+            "typos": 88,
+            "controls": 0,
+            "correct": 73,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.8295454545454546,
+            "precision": 1.0,
+            "f05": 0.9605263157894737
+          }
+        },
+        "6-7": {
+          "before": {
+            "cases": 163,
+            "typos": 163,
+            "controls": 0,
+            "correct": 142,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.8711656441717791,
+            "precision": 1.0,
+            "f05": 0.9712722298221614
+          },
+          "after": {
+            "cases": 163,
+            "typos": 163,
+            "controls": 0,
+            "correct": 157,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9631901840490797,
+            "precision": 1.0,
+            "f05": 0.9924146649810367
+          }
+        },
+        "8-32": {
+          "before": {
+            "cases": 92,
+            "typos": 92,
+            "controls": 0,
+            "correct": 86,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9347826086956522,
+            "precision": 1.0,
+            "f05": 0.9862385321100917
+          },
+          "after": {
+            "cases": 92,
+            "typos": 92,
+            "controls": 0,
+            "correct": 91,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.9891304347826086,
+            "precision": 1.0,
+            "f05": 0.9978070175438597
+          }
+        }
+      }
+    },
+    "exposed_new_words": {
+      "all": {
+        "before": {
+          "cases": 4000,
+          "typos": 2000,
+          "controls": 2000,
+          "correct": 945,
+          "wrong": 12,
+          "false_changes": 1,
+          "recall": 0.4725,
+          "precision": 0.987460815047022,
+          "f05": 0.8107412491420728
+        },
+        "after": {
+          "cases": 4000,
+          "typos": 2000,
+          "controls": 2000,
+          "correct": 1246,
+          "wrong": 23,
+          "false_changes": 5,
+          "recall": 0.623,
+          "precision": 0.9818754925137904,
+          "f05": 0.8804409270774449
+        }
+      },
+      "primary": {
+        "before": {
+          "cases": 1129,
+          "typos": 1129,
+          "controls": 0,
+          "correct": 810,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.7174490699734278,
+          "precision": 0.998766954377312,
+          "f05": 0.9261376629316259
+        },
+        "after": {
+          "cases": 1129,
+          "typos": 1129,
+          "controls": 0,
+          "correct": 975,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.8635961027457927,
+          "precision": 0.9989754098360656,
+          "f05": 0.9686071925293066
+        }
+      },
+      "controls": {
+        "before": {
+          "cases": 2000,
+          "typos": 0,
+          "controls": 2000,
+          "correct": 0,
+          "wrong": 1,
+          "false_changes": 1,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        },
+        "after": {
+          "cases": 2000,
+          "typos": 0,
+          "controls": 2000,
+          "correct": 0,
+          "wrong": 5,
+          "false_changes": 5,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        }
+      },
+      "by_length": {
+        "4-5": {
+          "before": {
+            "cases": 181,
+            "typos": 181,
+            "controls": 0,
+            "correct": 61,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.3370165745856354,
+            "precision": 1.0,
+            "f05": 0.7176470588235294
+          },
+          "after": {
+            "cases": 181,
+            "typos": 181,
+            "controls": 0,
+            "correct": 108,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.5966850828729282,
+            "precision": 1.0,
+            "f05": 0.8809135399673735
+          }
+        },
+        "6-7": {
+          "before": {
+            "cases": 497,
+            "typos": 497,
+            "controls": 0,
+            "correct": 366,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.7364185110663984,
+            "precision": 1.0,
+            "f05": 0.9331973482916879
+          },
+          "after": {
+            "cases": 497,
+            "typos": 497,
+            "controls": 0,
+            "correct": 440,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.8853118712273642,
+            "precision": 1.0,
+            "f05": 0.974745237040319
+          }
+        },
+        "8-32": {
+          "before": {
+            "cases": 451,
+            "typos": 451,
+            "controls": 0,
+            "correct": 383,
+            "wrong": 1,
+            "false_changes": 0,
+            "recall": 0.8492239467849224,
+            "precision": 0.9973958333333334,
+            "f05": 0.9637644690488173
+          },
+          "after": {
+            "cases": 451,
+            "typos": 451,
+            "controls": 0,
+            "correct": 427,
+            "wrong": 1,
+            "false_changes": 0,
+            "recall": 0.9467849223946785,
+            "precision": 0.9976635514018691,
+            "f05": 0.9870550161812298
+          }
+        }
+      }
+    },
+    "held_out_word_groups": {
+      "all": {
+        "before": {
+          "cases": 4848,
+          "typos": 4040,
+          "controls": 808,
+          "correct": 1020,
+          "wrong": 59,
+          "false_changes": 6,
+          "recall": 0.2524752475247525,
+          "precision": 0.9453197405004634,
+          "f05": 0.6103398755385352
+        },
+        "after": {
+          "cases": 4848,
+          "typos": 4040,
+          "controls": 808,
+          "correct": 1656,
+          "wrong": 108,
+          "false_changes": 12,
+          "recall": 0.4099009900990099,
+          "precision": 0.9387755102040817,
+          "f05": 0.7462148521989906
+        }
+      },
+      "primary": {
+        "before": {
+          "cases": 617,
+          "typos": 617,
+          "controls": 0,
+          "correct": 348,
+          "wrong": 4,
+          "false_changes": 0,
+          "recall": 0.5640194489465153,
+          "precision": 0.9886363636363636,
+          "f05": 0.8592592592592593
+        },
+        "after": {
+          "cases": 617,
+          "typos": 617,
+          "controls": 0,
+          "correct": 468,
+          "wrong": 4,
+          "false_changes": 0,
+          "recall": 0.7585089141004863,
+          "precision": 0.9915254237288136,
+          "f05": 0.9341317365269461
+        }
+      },
+      "controls": {
+        "before": {
+          "cases": 808,
+          "typos": 0,
+          "controls": 808,
+          "correct": 0,
+          "wrong": 6,
+          "false_changes": 6,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        },
+        "after": {
+          "cases": 808,
+          "typos": 0,
+          "controls": 808,
+          "correct": 0,
+          "wrong": 12,
+          "false_changes": 12,
+          "recall": 0.0,
+          "precision": 0.0,
+          "f05": 0.0
+        }
+      },
+      "by_length": {
+        "4-5": {
+          "before": {
+            "cases": 63,
+            "typos": 63,
+            "controls": 0,
+            "correct": 7,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.1111111111111111,
+            "precision": 1.0,
+            "f05": 0.38461538461538464
+          },
+          "after": {
+            "cases": 63,
+            "typos": 63,
+            "controls": 0,
+            "correct": 19,
+            "wrong": 0,
+            "false_changes": 0,
+            "recall": 0.30158730158730157,
+            "precision": 1.0,
+            "f05": 0.6834532374100719
+          }
+        },
+        "6-7": {
+          "before": {
+            "cases": 257,
+            "typos": 257,
+            "controls": 0,
+            "correct": 121,
+            "wrong": 1,
+            "false_changes": 0,
+            "recall": 0.4708171206225681,
+            "precision": 0.9918032786885246,
+            "f05": 0.8120805369127517
+          },
+          "after": {
+            "cases": 257,
+            "typos": 257,
+            "controls": 0,
+            "correct": 186,
+            "wrong": 1,
+            "false_changes": 0,
+            "recall": 0.7237354085603113,
+            "precision": 0.9946524064171123,
+            "f05": 0.9253731343283582
+          }
+        },
+        "8-32": {
+          "before": {
+            "cases": 297,
+            "typos": 297,
+            "controls": 0,
+            "correct": 220,
+            "wrong": 3,
+            "false_changes": 0,
+            "recall": 0.7407407407407407,
+            "precision": 0.9865470852017937,
+            "f05": 0.9251471825063078
+          },
+          "after": {
+            "cases": 297,
+            "typos": 297,
+            "controls": 0,
+            "correct": 263,
+            "wrong": 3,
+            "false_changes": 0,
+            "recall": 0.8855218855218855,
+            "precision": 0.9887218045112782,
+            "f05": 0.9662013225569435
+          }
+        }
+      }
+    }
+  },
+  "native_decisions": 24567,
+  "decision_mismatches": 0,
+  "candidate_order_changes": 0,
+  "hashes": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/verify_acceptance_refit.py": "a095c099ddd899bc01583afa8190f3441af863f38a8252bcd6014b23d8339b61",
+    "app/build/english-host/release/ngram_probe": "dcd7a45172e05b9a48914e930c587811744e7ea170c86a52127f7bfbe92e18de",
+    "/Volumes/SSD/cantonese_ngram/experiments/spelling-vocabulary-v77/candidates.txt": "346323cd605464785e631af886877ef9d1bd12bc8d583dfb55253a44f291fab6",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/language_model/model.cng": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_acceptance.json": "1d5733cc3f09778485318cb5c579086f67977b19dc52577cd6dbd298ae4784da",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_apostrophe_acceptance.json": "0de96ace3507ddb0aeb9944b0ece3cd389aa434f2bc87640bd9044be4cf25d96",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/apostrophe-native-cache.json": "c5fbd00d9001b55c99f9ec829d298f292df64831978821f2c57647cb17dda600",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/single-edit-final-2026-10-21/predictions.jsonl": "e9e62d861a3c3f6a859eb118587dd731d8e2d63f0644b169aaf8267ca54f98a1",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/single-edit-root-cause-2026-10-21/synthetic-native.json": "1c079dc612a85395a66c330307be844e9ae083ef868427c3ad83a5599faa45b4",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/neighbor-repair-2026-10-21/native-verification.predictions.json": "8a34ba7d76808a2bc3ff5e961d2c8103129fa46fea89f7bfb8faf1bc5091baab",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/acceptance-refit-2026-10-21/cases.jsonl": "e8bf0ac7bd44434a9e6e229620af7998e7496c4649db4a7fa346ff1a5b331290",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/acceptance-refit-2026-10-21/generated-native.json": "7c7d8666995069f9f33d6bef69a35e78a0c24217ad9616105c426208ed965aaa"
+  },
+  "predictions_sha256": "9f2024752bdaad5ae054548f82cf28021a7192a380e966e798c36495d9967829"
+}

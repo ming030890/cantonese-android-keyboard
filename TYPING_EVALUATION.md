@@ -4,13 +4,22 @@ Updated 2026-10-21. Keep this protocol for future iterations. The acceptance
 metrics requested by the user are **latency and F₀.₅**.
 
 Current mixed-candidate iteration: [protocol, generalization checks and BOS
-ablation](MIXED_CANDIDATE_RANKING.md). Autocorrection F₀.₅ remains 0.79407;
+ablation](MIXED_CANDIDATE_RANKING.md). That iteration retained autocorrection F₀.₅ 0.79407;
 candidate retrieval improves overall, with explicitly recorded Chinese
 regressions and increased full-pool ranking latency. Keep BOS enabled. User
 examples are regression tests, excluded from calibration targets. Do not retune
 the four coefficients against the exposed evaluation/generalization panels.
 
 ## Acceptance
+
+For the 2026-10-21 neighbouring-replacement repair, the user explicitly requests
+**unambiguous cases only** as the primary typo evaluation. Define these before
+inference labels: unknown dictionary input, 4+ letters, exactly one dictionary
+repair across all single replacements/insertions/deletions/swaps, and that repair
+is a neighbouring-key replacement. Include missing-model targets in the denominator.
+Keep clean-word preservation and the complete frozen cohort as separate regression
+reports; do not blend ambiguous typos into the primary fix ratio. See
+[the edit-cost calibration](EDIT_POSITION_COSTS.md).
 
 - Use **F₀.₅** as the primary automatic-correction quality metric. Accept an
   improvement over the current accepted baseline; there is no separate 95%
@@ -98,15 +107,36 @@ Use zero for an empty denominator, as in the evaluator.
 | Earlier precision-focused rule | 224 | 12 | 520 | 94.92% | 30.11% | 0.66351 |
 | Two-feature F₀.₅ rule | 336 | 28 | 408 | 92.31% | 45.16% | 0.76364 |
 | Literal-aware word rule | 361 | 23 | 383 | 94.01% | 48.52% | 0.79167 |
-| **Current word + apostrophe restoration** | **364** | **23** | **380** | **94.06%** | **48.92%** | **0.79407** |
+| Word + apostrophe restoration | 364 | 23 | 380 | 94.06% | 48.92% | 0.79407 |
+| Withdrawn neighbour-fallback experiment | 372 | 25 | 372 | 93.70% | 50.00% | 0.79760 |
+| Shared-rule refit | 397 | 33 | 347 | 92.33% | 53.36% | 0.80560 |
+| **Current five-cost calibration** | **418** | **32** | **326** | **92.89%** | **56.18%** | **0.82154** |
 
-Current pipeline changes 5/1,298 preservation controls. Its compiled native decisions
-match the frozen rule on all 9,728 aligned cases. Model SHA-256:
+The shared-rule refit changed **8/1,298** preservation controls (originally 5).
+It gains 33 correct fixes and adds 10 wrong replacements, including three clean
+changes. The primary evaluation still reports only unambiguous neighbouring
+replacements, with clean controls and the full real-typing cohort separately.
+
+That earlier refit changed only the existing six-feature coefficients and global cutoff. The separate
+single-edit fallback and runtime dictionary were removed at the user's request.
+Per-length constants were tested on TRAIN/selection, but the selected global
+refit performed better under the agreed metrics. There is no runtime length branch.
+
+The earlier compiled decisions matched the frozen shared-rule prediction on **24,567** cases,
+including 4,848 new held-out synthetic word-group cases. Model SHA-256:
 `915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322`.
-Policy SHA-256:
+Current policy SHA-256:
+`1d5733cc3f09778485318cb5c579086f67977b19dc52577cd6dbd298ae4784da`.
+Prior word-policy SHA-256:
 `d97608cbbbd36bc257858760c3e70ed38269efae9efb9c16e0a236fe73947ffd`.
 
-The word rule retains that policy hash. Current restoration policy SHA-256:
+Earlier shared-rule reports: [selection](config/english_iteration/2026-10-21/acceptance-refit/selection.json),
+[evaluation](config/english_iteration/2026-10-21/acceptance-refit/evaluation.json),
+[native/generalization verification](config/english_iteration/2026-10-21/acceptance-refit/native-verification.json).
+The earlier [refit report](ACCEPTANCE_REFIT.md) records length ablations and remaining errors.
+The [lexical fallback](UNAMBIGUOUS_NEIGHBOR_REPAIR.md) is historical and withdrawn.
+
+Current restoration policy SHA-256:
 `0de96ace3507ddb0aeb9944b0ece3cd389aa434f2bc87640bd9044be4cf25d96`;
 TRAIN surface/count data SHA-256:
 `610b016b874e823de73b41a1c9fb62705e7af15a463f6e3a5542e3102cdbc9a8`.
@@ -193,3 +223,41 @@ to 2.917/5.945 ms; the TRAIN apostrophe panel rises from 1.483/3.826 ms to
 5.705/9.572 ms. This is an explicit latency cost for the F₀.₅ improvement.
 See [method, quality and limitations](APOSTROPHE_RESTORATION.md). Phone latency
 remains unmeasured.
+
+## Withdrawn neighbour-fallback experiment (2026-10-21)
+
+This experiment was removed at the user's request; its historical measurements
+remain below. The [lexical fallback](UNAMBIGUOUS_NEIGHBOR_REPAIR.md) raised primary new-word,
+unambiguous 4–5-letter recall from 33.7% to 95.6%. The full real-typing regression
+F₀.₅ improves to 0.79760, with one additional clean change explicitly retained.
+Release-host general English median/p95 changes from 2.768/5.665 ms to
+2.783/5.695 ms. First fallback call median changes from 1.347 to 2.984 ms on
+four process pairs; this includes lazy lexical initialization, excludes model
+loading, and is not phone input-to-display latency.
+
+## Shared acceptance refit, dictionary fallback removed (2026-10-21)
+
+The [current refit](ACCEPTANCE_REFIT.md) changes only the existing acceptance
+coefficients and global cutoff. Per-length constants were tested but did not win
+the requested 4–5-letter selection comparison. No runtime length or edit-distance
+branch is added. Full evaluation F₀.₅ is 0.80560, with clean changes 8/1,298.
+The paired release-host median/p95 is 2.726/5.575 → 2.755/5.648 ms; candidate
+lists are unchanged. These are engine timings, not phone input-to-display latency.
+
+## Five existing edit costs calibrated (2026-10-21)
+
+The [current edit-cost calibration](EDIT_POSITION_COSTS.md) keeps the accepted
+six-feature policy/cutoff and tunes five operation penalties. Selection rejects
+an extra first-character term. No new fallback or runtime word list is introduced.
+Full real evaluation F₀.₅ is **0.82154**, 418 correct / 32 wrong corrections,
+with 8/1,298 clean changes. Primary unambiguous-neighbour recall is 482/617
+(78.12%); 4–5-letter recall is 22/63 (34.92%), with two wrong short-word fixes.
+Selection and evaluation are frozen in
+[the dated reports](config/english_iteration/2026-10-21/edit-position-costs/).
+Model, word-policy and apostrophe-policy hashes above are unchanged. Native
+ranking now changes through five constants in `cnn_spelling.rs`; use the new
+verification report rather than the earlier coefficient-only parity report.
+
+Current paired English release-host median/p95 is 2.735/5.553 → 2.752/5.589 ms,
+1,024 calls per binary. Candidate ranking changes; candidate pools are preserved.
+Phone input-to-display latency remains unmeasured.

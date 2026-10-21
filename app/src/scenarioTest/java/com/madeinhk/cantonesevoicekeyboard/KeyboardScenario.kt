@@ -238,6 +238,15 @@ internal object KeyboardScenarios {
                     correction="when",reason="shared_lm_spelling")
             })).use { it.start();it.type("whrn");it.snapshot() }
 
+    fun unambiguousNeighborCorrection() = KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,
+        clipboardText=null,
+        englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
+            {1L},{_,_,_->emptyList()},{_,_,_,words,_->words},{_,_,_->
+                com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                    candidates=listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate("game",-12.0,1.0,1,0)),
+                    correction="game",reason="shared_lm_spelling")
+            })).use { it.start();it.type("gwme");it.snapshot() }
+
     fun sharedLmKnownWordCorrection() = KeyboardScenario(initialText="let me know if ",
         initialMode=KeyboardInputMode.AlphaNum,clipboardText=null,
         englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
