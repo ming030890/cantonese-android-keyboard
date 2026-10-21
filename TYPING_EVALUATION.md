@@ -159,3 +159,11 @@ First write a selection report; reveal evaluation only with `--evaluate` and
 `--frozen-selection` pointing to that report. This fitter requires NumPy.
 After accepting a fit, update the native policy, rebuild host/ARM64 libraries,
 verify native parity and the packaged APK, and retain the before/after reports.
+
+## Quick runtime contention regression (2026-10-21)
+
+[Quick autocorrect contention](QUICK_AUTOCORRECT_CONTENTION.md) isolates inference
+state while retaining shared weights and the accepted policy. Host English JNI
+latency during Chinese `df` ranking improves from 277.55/301.12 ms median/p95 to
+1.17/1.37 ms (32 calls per binary). This is separate from phone input-to-display
+latency. Frozen F₀.₅ stays 0.79167; native policy decisions retain parity.

@@ -8,6 +8,11 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
+@Preview(name = "Quick English correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioQuickEnglishCorrection() = ScenarioScreen(remember { KeyboardScenarios.quickEnglishCorrection() })
+
+@PreviewTest
 @Preview(name = "Known word contextual correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioSharedLmKnownWordCorrection() = ScenarioScreen(remember { KeyboardScenarios.sharedLmKnownWordCorrection() })

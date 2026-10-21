@@ -29,6 +29,119 @@ class SharedLmEnglishScenarioTest {
         }
     }
 
+    @Test fun englishSuggestionDoesNotWaitForQuickMonitor() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() }).use { quick ->
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            val occupied = java.util.concurrent.CountDownLatch(1)
+            val release = java.util.concurrent.CountDownLatch(1)
+            val workers = java.util.concurrent.Executors.newFixedThreadPool(2)
+            try {
+                val chinese = workers.submit {
+                    synchronized(quick) {
+                        occupied.countDown()
+                        check(release.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                    }
+                }
+                assertTrue(occupied.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                val result = workers.submit<EnglishPrediction> {
+                    english.predict("whrn", floatArrayOf(), floatArrayOf(), "", "")
+                }
+                // A generous test timeout proves independence, not phone latency.
+                assertEquals("when", result.get(1, java.util.concurrent.TimeUnit.SECONDS).correction)
+                release.countDown()
+                chinese.get(5, java.util.concurrent.TimeUnit.SECONDS)
+            } finally {
+                release.countDown()
+                workers.shutdownNow()
+                assertTrue(workers.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS))
+            }
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun quickControllerCorrectsWhileChineseWorkerIsOccupied() = kotlinx.coroutines.test.runTest {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+        val english = SharedLmEnglishEngine(quick::englishContextHandle)
+        val occupied = java.util.concurrent.CountDownLatch(1)
+        val release = java.util.concurrent.CountDownLatch(1)
+        val worker = java.util.concurrent.Executors.newSingleThreadExecutor()
+        val ui = kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
+        val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + ui)
+        try {
+            worker.submit {
+                synchronized(quick) {
+                    occupied.countDown()
+                    check(release.await(10, java.util.concurrent.TimeUnit.SECONDS))
+                }
+            }
+            assertTrue(occupied.await(5, java.util.concurrent.TimeUnit.SECONDS))
+            KeyboardScenario(initialMode=KeyboardInputMode.Quick, quickEngine=quick,
+                englishEngine=english, scope=scope,
+                englishDispatcher=kotlinx.coroutines.Dispatchers.Unconfined).use { s ->
+                try {
+                    s.start(); s.type("whrn"); testScheduler.runCurrent()
+                    assertEquals("whrn", s.editor.composing)
+                    assertTrue(s.snapshot().quickCandidates.any { it.text == "when" })
+                    assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                    s.press(KeyboardKeyKind.Space); testScheduler.runCurrent()
+                    assertEquals("when ", s.editor.text)
+                    assertEquals("", s.editor.composing)
+                    s.press(KeyboardKeyKind.Delete); testScheduler.runCurrent()
+                    assertEquals("", s.editor.text)
+                    assertEquals("whrn", s.editor.composing)
+                } finally { release.countDown() }
+            }
+        } finally {
+            release.countDown()
+            scope.coroutineContext[kotlinx.coroutines.Job]?.cancel()
+            worker.shutdownNow()
+            assertTrue(worker.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS))
+            quick.close()
+        }
+    }
+
+    @Test fun actualConcurrentQuickEnglishLatency() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() }).use { quick ->
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            val worker = java.util.concurrent.Executors.newSingleThreadExecutor()
+            val timings = mutableListOf<Double>()
+            try {
+                english.predict("whrn", floatArrayOf(), floatArrayOf(), "", "")
+                repeat(32) { index ->
+                    val entered = java.util.concurrent.CountDownLatch(1)
+                    val chinese = worker.submit {
+                        synchronized(quick) {
+                            entered.countDown()
+                            quick.candidates(3, "df", "I use item $index ", "")
+                        }
+                    }
+                    assertTrue(entered.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                    // Let the native call enter before measuring the other worker.
+                    // This is a host contention panel, not a phone latency assertion.
+                    java.util.concurrent.CountDownLatch(1).await(5, java.util.concurrent.TimeUnit.MILLISECONDS)
+                    val start = System.nanoTime()
+                    val prediction = english.predict("whrn", floatArrayOf(), floatArrayOf(), "", "")
+                    timings += (System.nanoTime() - start) / 1e6
+                    assertEquals("when", prediction.correction)
+                    chinese.get(5, java.util.concurrent.TimeUnit.SECONDS)
+                }
+                println("QUICK_ENGLISH_CONTENTION_MS=" + timings.joinToString(","))
+            } finally {
+                worker.shutdownNow()
+                assertTrue(worker.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS))
+            }
+        }
+    }
+
     private fun fake() = SharedLmEnglishEngine({ 7L }, { handle, _, _ ->
         assertEquals(7L, handle)
         listOf("hello", "help", "the")

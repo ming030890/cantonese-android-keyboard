@@ -18,8 +18,10 @@ internal interface QuickCandidateEngine : AutoCloseable {
 }
 
 /** Dictionary lookup, tokenization and ranking belong to the standalone Rust LM crate. */
-internal class NativeQuickEngine private constructor(private var handle: Long) : QuickCandidateEngine {
-    @Synchronized fun englishContextHandle(): Long = handle
+internal class NativeQuickEngine private constructor(@Volatile private var handle: Long) : QuickCandidateEngine {
+    // Reading the shared registry ID must not queue behind Chinese inference.
+    // JNI retains an Arc for in-flight calls; close removes future registry access.
+    fun englishContextHandle(): Long = handle
     companion object {
         init { System.loadLibrary("cantonese_engine") }
 
