@@ -11,6 +11,29 @@ import org.junit.Test
 import java.io.File
 
 class SharedLmEnglishScenarioTest {
+    @Test fun mixedRankingReceivesObservedKeysAndCandidatesBeyondTheOldEightItemCutoff() {
+        var observedKeys: String? = null
+        val phrases=(1..12).map { "候選$it" }
+        val engine=SharedLmEnglishEngine({7L},{_,_,_->emptyList()}, {_,left,_,pool,observed ->
+            observedKeys=observed
+            assertEquals("我想",left)
+            if (observed.length>2) assertTrue("Every generated phrase reaches the ranker",pool.containsAll(phrases))
+            listOf(phrases.last())+pool.filter { it!=phrases.last() }
+        }, {_,_,_->EnglishPrediction()})
+        KeyboardScenario(initialText="我想",clipboardText=null,englishEngine=engine).use { s ->
+            s.engine.lookup={_,_,_,_->phrases.mapIndexed { i,t -> com.madeinhk.cantonesevoicekeyboard.quick.QuickCandidate(t,i) }}
+            s.start();s.type("abcd")
+            assertEquals("abcd",observedKeys)
+            assertEquals(phrases.last(),s.snapshot().quickCandidates.first().text)
+            assertEquals((phrases+"abcd").toSet(),s.snapshot().quickCandidates.map { it.text }.toSet())
+            assertEquals("abcd",s.editor.composing)
+            assertEquals(KeyboardToolbarContent.Candidates,s.snapshot().toolbar())
+            s.choose(phrases.last())
+            assertEquals("我想${phrases.last()}",s.editor.text)
+            assertEquals("",s.editor.composing)
+        }
+    }
+
     @Test fun actualShortCodePreviewRetainsEveryMatchThroughJni() {
         val library = System.getProperty("english.native.library")
         assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
@@ -142,10 +165,124 @@ class SharedLmEnglishScenarioTest {
         }
     }
 
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun reportedSentenceCorrectsAtSpaceInBothQuickVersions() = kotlinx.coroutines.test.runTest {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        // These are current model decisions, including known limitations, not gold labels
+        // for fitting the policy. Keep the user's example outside the frozen eval set.
+        val words = listOf(
+            "whrn" to "when", "i" to "i", "tyoe" to "tyoe", "i" to "i",
+            "dont" to "don't", "rrally" to "really", "know" to "know",
+            "whay" to "what", "it" to "it", "meant" to "meant",
+        )
+        for (version in listOf(3, 5)) for (settleBeforeSpace in listOf(false, true)) {
+            val ui = kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
+            val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + ui)
+            try {
+                val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+                val english = SharedLmEnglishEngine(quick::englishContextHandle)
+                KeyboardScenario(initialMode=KeyboardInputMode.Quick, clipboardText=null,
+                    quickEngine=quick, englishEngine=english, scope=scope,
+                    lookupDispatcher=ui, englishDispatcher=ui).use { s ->
+                    s.quickVersion = version
+                    s.start()
+                    var committed = ""
+                    for ((typed, expected) in words) {
+                        s.type(typed)
+                        if (settleBeforeSpace) testScheduler.runCurrent()
+                        val label = "Quick$version settled=$settleBeforeSpace after $committed$typed"
+                        assertEquals(label, committed, s.editor.text)
+                        assertEquals(label, typed, s.editor.composing)
+                        if (settleBeforeSpace) {
+                            val candidates = s.snapshot().quickCandidates.map { it.text }
+                            assertTrue("$label offers literal", typed in candidates)
+                            if (typed != expected) assertTrue("$label offers correction", expected in candidates)
+                            assertEquals(label, KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                        }
+                        s.press(KeyboardKeyKind.Space)
+                        testScheduler.runCurrent()
+                        committed += "$expected "
+                        assertEquals(label, committed, s.editor.text)
+                        assertEquals(label, "", s.editor.composing)
+                    }
+                    assertEquals("when i tyoe i don't really know what it meant ", s.editor.text)
+                }
+            } finally {
+                scope.coroutineContext[kotlinx.coroutines.Job]?.cancel()
+                testScheduler.runCurrent()
+            }
+        }
+    }
+
+    @Test fun dontRestoresApostropheOnSpaceAndUndoInBothLayouts() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+            val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            KeyboardScenario(initialText="I ", initialMode=mode, quickEngine=quick,
+                englishEngine=english).use { s ->
+                s.start(); s.type("dont")
+                val candidates = if (mode==KeyboardInputMode.Quick) s.snapshot().quickCandidates
+                    else s.snapshot().englishCandidates
+                assertTrue(candidates.any { it.text=="don't" })
+                assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("I don't ", s.editor.text)
+                assertEquals("", s.editor.composing)
+                s.press(KeyboardKeyKind.Delete)
+                assertEquals("I ", s.editor.text)
+                assertEquals("dont", s.editor.composing)
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("I dont ", s.editor.text)
+            }
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun mixedModelRanksEnglishAndChinesePhrasesFromObservedKeys() = kotlinx.coroutines.test.runTest {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for (version in listOf(3,5)) for (word in listOf("humo", "continue")) {
+            val ui = kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
+            val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + ui)
+            try {
+                val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+                val english = SharedLmEnglishEngine(quick::englishContextHandle)
+                KeyboardScenario(initialMode=KeyboardInputMode.Quick, quickEngine=quick,
+                    englishEngine=english, scope=scope, lookupDispatcher=ui).use { s ->
+                    s.quickVersion=version; s.start(); s.type(word); testScheduler.runCurrent()
+                    val candidates=s.snapshot().quickCandidates.map { it.text }
+                    assertEquals(word,s.editor.composing)
+                    assertEquals("",s.editor.text)
+                    assertEquals(KeyboardToolbarContent.Candidates,s.snapshot().toolbar())
+                    if (word=="continue") {
+                        assertEquals("Quick$version English exact match", "continue",candidates.first())
+                        s.press(KeyboardKeyKind.Space);testScheduler.runCurrent()
+                        assertEquals("continue ",s.editor.text)
+                    } else {
+                        assertTrue("Quick$version offers 兒歌", "兒歌" in candidates)
+                        assertTrue("Quick$version offers 自歌", "自歌" in candidates)
+                        assertTrue("Quick$version coherent phrase outranks 自歌", candidates.indexOf("兒歌") < candidates.indexOf("自歌"))
+                        assertTrue("Quick$version 兒歌 in top eight", candidates.indexOf("兒歌") < 8)
+                        assertTrue("Quick$version chooses Chinese interpretation",candidates.first().any { it.code>127 })
+                        s.choose("兒歌"); testScheduler.runCurrent()
+                        assertEquals("兒歌",s.editor.text)
+                    }
+                    assertEquals("",s.editor.composing)
+                }
+            } finally {scope.coroutineContext[kotlinx.coroutines.Job]?.cancel();testScheduler.runCurrent()}
+        }
+    }
+
     private fun fake() = SharedLmEnglishEngine({ 7L }, { handle, _, _ ->
         assertEquals(7L, handle)
         listOf("hello", "help", "the")
-    }, { _, _, _, words -> words }, { _,_,typed ->
+    }, { _, _, _, words, _ -> words }, { _,_,typed ->
         EnglishPrediction(candidates=listOf("hello","help","the").filter {it.startsWith(typed,true)}
             .map {EnglishCandidate(it,0.0,0.0,0,(it.length-typed.length).coerceAtLeast(0))})
     })
@@ -204,7 +341,7 @@ class SharedLmEnglishScenarioTest {
     }
 
     private fun correcting() = SharedLmEnglishEngine({1L},{_,_,_->emptyList()},
-        {_,_,_,words->words}, {_,_,typed->
+        {_,_,_,words,_->words}, {_,_,typed->
             EnglishPrediction(candidates=listOf(EnglishCandidate("you",-1.0,2.0,1,0)),
                 correction=if(typed=="yiu") "you" else null,reason="shared_lm_spelling")
         })

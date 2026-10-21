@@ -39,6 +39,15 @@ def main():
     model = project/'app/src/main/assets/language_model/model.cng'
     policy_path = project.parent/'QwenASR/crates/cantonese-ngram/src/english_acceptance.json'
     policy = json.loads(policy_path.read_text())
+    apostrophe_path = policy_path.with_name('english_apostrophe_acceptance.json')
+    apostrophe = json.loads(apostrophe_path.read_text())
+    forms_path = policy_path.with_name('english_apostrophe_forms.json')
+    accepted = json.loads((project/'config/english_iteration/2026-10-21/apostrophe-evaluation.json').read_text())
+    assert digest(model) == apostrophe['model_sha256']
+    assert digest(forms_path) == apostrophe['forms_sha256']
+    assert accepted['binding']['apostrophe_policy'] == digest(apostrophe_path)
+    assert accepted['binding']['policy'] == digest(policy_path)
+    assert accepted['binding']['forms'] == digest(forms_path)
     assert digest(model) == policy['model_sha256'], 'Policy requires recalibration for this model'
     cases = [json.loads(l) for l in (args.iteration/'cases.jsonl').open() if not json.loads(l)['category'].startswith('prefix_')]
     old = json.loads((args.iteration/'native-cache.json').read_text())['outputs'][:len(cases)]
@@ -53,15 +62,22 @@ def main():
     actual = probe(args.probe, model, [dict(left=c['left'], typed=c['typed'], spelling_limit=4096) for c in cases])
     rankings = [rerank(o['candidates'], 0.) for o in old]
     expected = [decision(policy, c, o, r) for c, o, r in zip(cases, actual, rankings)]
+    for i, output in enumerate(actual):
+        for evidence in output['apostropheEvidence']:
+            logit = apostrophe['weights'][0] + sum(w*(x-m)/s for w,x,m,s in zip(
+                apostrophe['weights'][1:], evidence['features'], apostrophe['means'], apostrophe['scales']))
+            if 1/(1+math.exp(-max(-700,min(700,logit)))) >= apostrophe['threshold']:
+                expected[i] = evidence['word']
     native = [o['correction'] for o in actual]
     mismatches = [c['id'] for c, a, b in zip(cases, expected, native) if a != b]
     report = dict(model_sha256=digest(model), policy_sha256=digest(policy_path), probe_sha256=digest(args.probe),
                   cases=len(cases), decision_mismatches=mismatches,
                   evaluation=metric(cases, actual, [o['candidates'] for o in actual], native, 'evaluation'),
-                  baseline_evaluation=policy['provenance']['baseline'],
+                  baseline_evaluation=accepted['baseline_evaluation'],
+                  apostrophe_policy_sha256=digest(apostrophe_path), forms_sha256=digest(forms_path),
                   candidate_order_changes=sum([r['word'] for r in a['candidates']] != [r['word'] for r in b] for a,b in zip(actual,rankings)))
     for field in ('cases', 'correct', 'wrong', 'typos', 'f05'):
-        assert report['evaluation'][field] == policy['provenance']['evaluation'][field], field
+        assert report['evaluation'][field] == accepted['evaluation'][field], field
     predictions = args.output.with_suffix('.predictions.json')
     predictions.write_text(json.dumps(dict(model_sha256=digest(model), policy_sha256=digest(policy_path),
                                            case_ids=[c['id'] for c in cases], outputs=actual)))

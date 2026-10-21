@@ -125,12 +125,13 @@ internal class KeyboardSessionController(
             // Chinese lookup is already ranked. Make it usable immediately while
             // the English worker prepares the final bilingual ordering.
             emit(chinese)
-            val topCount = 8
-            val topChinese = chinese.take(topCount)
-            val pool = (topChinese + words).map { it.text }.distinct()
+            // Phrase output is bounded at 100, within JNI's 128-candidate limit
+            // with English. Only a one-letter root keeps the existing small
+            // shortlist: its dictionary can contain hundreds of single characters.
+            val participating = if (code.length == 1) chinese.take(8) else chinese
+            val pool = (participating + words).map { it.text }.distinct()
             val rankedTop = english.rankCandidates(pool)
-            val tail = chinese.drop(topCount).filter { it.text !in rankedTop }
-            val ranked = rankedTop + tail.map { it.text }
+            val ranked = rankedTop + chinese.filter { it.text !in rankedTop }.map { it.text }
             if (code == quick.getComposingText())
                 emit(ranked.mapIndexed { i, text -> com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate(text, i) })
         }

@@ -1,0 +1,282 @@
+{
+  "binding": {
+    "probe": "7f2007684945673a5c55c62f18ecda098be0878fe90990cd58cb77541604272a",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322"
+  },
+  "cohort_sha256": "1166a375f244134b06593820c5b7ce6a5469f37c87ecbe09a1a4c6233da9c9db",
+  "results": {
+    "bos": {
+      "all": {
+        "train": {
+          "n": 151,
+          "top1": 135,
+          "top8": 149,
+          "generated": 150,
+          "mrr": 141.14166666666668,
+          "top1_rate": 0.8940397350993378,
+          "top8_rate": 0.9867549668874173,
+          "generated_rate": 0.9933774834437086,
+          "mrr_rate": 0.9347130242825608
+        },
+        "selection": {
+          "n": 48,
+          "top1": 43,
+          "top8": 48,
+          "generated": 48,
+          "mrr": 45.03333333333333,
+          "top1_rate": 0.8958333333333334,
+          "top8_rate": 1.0,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.9381944444444444
+        },
+        "evaluation": {
+          "n": 57,
+          "top1": 52,
+          "top8": 57,
+          "generated": 57,
+          "mrr": 54.333333333333336,
+          "top1_rate": 0.9122807017543859,
+          "top8_rate": 1.0,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.9532163742690059
+        }
+      },
+      "evaluation_by_language": {
+        "chinese": {
+          "n": 32,
+          "top1": 29,
+          "top8": 32,
+          "generated": 32,
+          "mrr": 30.5,
+          "top1_rate": 0.90625,
+          "top8_rate": 1.0,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.953125
+        },
+        "english": {
+          "n": 25,
+          "top1": 23,
+          "top8": 25,
+          "generated": 25,
+          "mrr": 23.833333333333332,
+          "top1_rate": 0.92,
+          "top8_rate": 1.0,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.9533333333333333
+        }
+      },
+      "autocorrect": {
+        "cases": 2042,
+        "top1": 576,
+        "top8": 651,
+        "mrr": 606.0333333333333,
+        "typos": 744,
+        "applied": 387,
+        "correct": 364,
+        "false_changes": 5,
+        "preservation": 1298,
+        "wrong": 23,
+        "f05": 0.794066317626527,
+        "precision": 0.9405684754521964,
+        "recall": 0.489247311827957,
+        "false_change_rate": 0.003852080123266564,
+        "top8_rate": 0.3188050930460333,
+        "mrr_rate": 0.29678419849820437
+      }
+    },
+    "no_bos": {
+      "all": {
+        "train": {
+          "n": 151,
+          "top1": 131,
+          "top8": 148,
+          "generated": 150,
+          "mrr": 137.32738095238096,
+          "top1_rate": 0.8675496688741722,
+          "top8_rate": 0.9801324503311258,
+          "generated_rate": 0.9933774834437086,
+          "mrr_rate": 0.9094528539892779
+        },
+        "selection": {
+          "n": 48,
+          "top1": 43,
+          "top8": 47,
+          "generated": 48,
+          "mrr": 44.94444444444444,
+          "top1_rate": 0.8958333333333334,
+          "top8_rate": 0.9791666666666666,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.9363425925925926
+        },
+        "evaluation": {
+          "n": 57,
+          "top1": 49,
+          "top8": 57,
+          "generated": 57,
+          "mrr": 51.892857142857146,
+          "top1_rate": 0.8596491228070176,
+          "top8_rate": 1.0,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.9104010025062658
+        }
+      },
+      "evaluation_by_language": {
+        "chinese": {
+          "n": 32,
+          "top1": 26,
+          "top8": 32,
+          "generated": 32,
+          "mrr": 28.05952380952381,
+          "top1_rate": 0.8125,
+          "top8_rate": 1.0,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.8768601190476191
+        },
+        "english": {
+          "n": 25,
+          "top1": 23,
+          "top8": 25,
+          "generated": 25,
+          "mrr": 23.833333333333332,
+          "top1_rate": 0.92,
+          "top8_rate": 1.0,
+          "generated_rate": 1.0,
+          "mrr_rate": 0.9533333333333333
+        }
+      },
+      "autocorrect": {
+        "cases": 2042,
+        "top1": 574,
+        "top8": 649,
+        "mrr": 603.1690476190475,
+        "typos": 744,
+        "applied": 381,
+        "correct": 357,
+        "false_changes": 6,
+        "preservation": 1298,
+        "wrong": 24,
+        "f05": 0.7870370370370371,
+        "precision": 0.937007874015748,
+        "recall": 0.4798387096774194,
+        "false_change_rate": 0.004622496147919877,
+        "top8_rate": 0.3178256611165524,
+        "mrr_rate": 0.2953815120563406
+      }
+    }
+  },
+  "smoke": {
+    "bos": {
+      "scores": {
+        "\u5152\u6b4c": {
+          "cohesionLogProbability": 2.7083702087402344,
+          "logProbability": -16.052513122558594,
+          "logicalUnits": 2,
+          "meanLogProbability": -8.026256561279297,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -8.026256561279297
+        },
+        "\u81ea\u6b4c": {
+          "cohesionLogProbability": 0.25707054138183594,
+          "logProbability": -15.668511390686035,
+          "logicalUnits": 2,
+          "meanLogProbability": -7.834255695343018,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -7.834255695343018
+        },
+        "\u81ea\u5169": {
+          "cohesionLogProbability": -1.2432851791381836,
+          "logProbability": -14.577343940734863,
+          "logicalUnits": 2,
+          "meanLogProbability": -7.288671970367432,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -7.288671970367432
+        },
+        "\u515c\u5169": {
+          "cohesionLogProbability": 1.6906013488769531,
+          "logProbability": -14.743595123291016,
+          "logicalUnits": 2,
+          "meanLogProbability": -7.371797561645508,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -7.371797561645508
+        },
+        "continue": {
+          "cohesionLogProbability": 0.0,
+          "logProbability": -10.863919258117676,
+          "logicalUnits": 1,
+          "meanLogProbability": -10.863919258117676,
+          "supported": true,
+          "tokens": 1,
+          "unitLogProbability": -10.863919258117676
+        }
+      },
+      "order": [
+        "\u515c\u5169",
+        "\u81ea\u5169",
+        "\u5152\u6b4c",
+        "\u81ea\u6b4c",
+        "continue"
+      ]
+    },
+    "no_bos": {
+      "scores": {
+        "\u5152\u6b4c": {
+          "cohesionLogProbability": 3.265613555908203,
+          "logProbability": -16.87176513671875,
+          "logicalUnits": 2,
+          "meanLogProbability": -8.435882568359375,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -8.435882568359375
+        },
+        "\u81ea\u6b4c": {
+          "cohesionLogProbability": 1.1191520690917969,
+          "logProbability": -18.471582412719727,
+          "logicalUnits": 2,
+          "meanLogProbability": -9.235791206359863,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -9.235791206359863
+        },
+        "\u81ea\u5169": {
+          "cohesionLogProbability": 1.3777122497558594,
+          "logProbability": -17.679710388183594,
+          "logicalUnits": 2,
+          "meanLogProbability": -8.839855194091797,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -8.839855194091797
+        },
+        "\u515c\u5169": {
+          "cohesionLogProbability": 4.198253631591797,
+          "logProbability": -15.466686248779297,
+          "logicalUnits": 2,
+          "meanLogProbability": -7.733343124389648,
+          "supported": true,
+          "tokens": 2,
+          "unitLogProbability": -7.733343124389648
+        },
+        "continue": {
+          "cohesionLogProbability": 0.0,
+          "logProbability": -9.813509941101074,
+          "logicalUnits": 1,
+          "meanLogProbability": -9.813509941101074,
+          "supported": true,
+          "tokens": 1,
+          "unitLogProbability": -9.813509941101074
+        }
+      },
+      "order": [
+        "\u515c\u5169",
+        "\u5152\u6b4c",
+        "\u81ea\u5169",
+        "\u81ea\u6b4c",
+        "continue"
+      ]
+    }
+  },
+  "method": "Same frozen candidate sets, weights and acceptance policies; no refitting. No-BOS removes the prepended token; empty input uses output-bias prior. This is an inference mismatch with BOS-trained weights, not a no-BOS retrained model."
+}

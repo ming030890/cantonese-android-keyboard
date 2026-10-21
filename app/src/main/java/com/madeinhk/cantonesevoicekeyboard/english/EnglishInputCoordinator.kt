@@ -141,7 +141,7 @@ internal class EnglishInputCoordinator(
         return withContext(worker) {
             runCatching {
                 if (engine == null) engine = loader()
-                engine?.rankCandidates(left, right, candidates) ?: candidates
+                engine?.rankCandidates(left, right, candidates, text) ?: candidates
             }.onFailure(onError).getOrDefault(candidates)
         }
     }

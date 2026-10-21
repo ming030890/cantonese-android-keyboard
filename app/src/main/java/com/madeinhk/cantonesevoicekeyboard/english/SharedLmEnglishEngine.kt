@@ -9,8 +9,8 @@ internal class SharedLmEnglishEngine(
     private val complete: (Long, String, String) -> List<String> = { handle, left, prefix ->
         nativeComplete(handle, left, prefix).orEmpty().toList()
     },
-    private val rank: (Long, String, String, List<String>) -> List<String> = { handle, left, right, words ->
-        val array = JSONArray(checkNotNull(nativeRank(handle, left, right, words.toTypedArray())))
+    private val rank: (Long, String, String, List<String>, String) -> List<String> = { handle, left, right, words, observed ->
+        val array = JSONArray(checkNotNull(nativeRank(handle, left, right, words.toTypedArray(), observed)))
         val order = (0 until array.length()).map(array::getInt)
         check(order.sorted() == words.indices.toList())
         order.map(words::get)
@@ -44,12 +44,12 @@ internal class SharedLmEnglishEngine(
             plausiblePrefix=candidates.any {it.completedChars>0})
     }
 
-    override fun rankCandidates(left: String, right: String, candidates: List<String>): List<String> =
-        rank(contextHandle(), left, right, candidates)
+    override fun rankCandidates(left: String, right: String, candidates: List<String>, observed: String): List<String> =
+        rank(contextHandle(), left, right, candidates, observed)
 
     companion object {
         @JvmStatic private external fun nativeSuggest(handle: Long, left: String, typed: String): String?
         @JvmStatic private external fun nativeComplete(handle: Long, left: String, prefix: String): Array<String>?
-        @JvmStatic private external fun nativeRank(handle: Long, left: String, right: String, words: Array<String>): String?
+        @JvmStatic private external fun nativeRank(handle: Long, left: String, right: String, words: Array<String>, observed: String): String?
     }
 }

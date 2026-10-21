@@ -1,0 +1,91 @@
+{
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "probe_sha256": "7f2007684945673a5c55c62f18ecda098be0878fe90990cd58cb77541604272a",
+  "before_sha256": "932c3010e66ab76a6b9415f68d86bda95ea48c04122c445d83a129f203f4bed7",
+  "cohort_sha256": "1166a375f244134b06593820c5b7ce6a5469f37c87ecbe09a1a4c6233da9c9db",
+  "compiled_parity_rows": 256,
+  "quick_candidate_sets_changed": 0,
+  "actual_retrieval": {
+    "train": {
+      "n": 151,
+      "top1": 135,
+      "top8": 149,
+      "generated": 150,
+      "mrr": 141.14166666666668,
+      "top1_rate": 0.8940397350993378,
+      "top8_rate": 0.9867549668874173,
+      "generated_rate": 0.9933774834437086,
+      "mrr_rate": 0.9347130242825608
+    },
+    "selection": {
+      "n": 48,
+      "top1": 43,
+      "top8": 48,
+      "generated": 48,
+      "mrr": 45.03333333333333,
+      "top1_rate": 0.8958333333333334,
+      "top8_rate": 1.0,
+      "generated_rate": 1.0,
+      "mrr_rate": 0.9381944444444444
+    },
+    "evaluation": {
+      "n": 57,
+      "top1": 52,
+      "top8": 57,
+      "generated": 57,
+      "mrr": 54.333333333333336,
+      "top1_rate": 0.9122807017543859,
+      "top8_rate": 1.0,
+      "generated_rate": 1.0,
+      "mrr_rate": 0.9532163742690059
+    }
+  },
+  "evaluation_by_language": {
+    "chinese": {
+      "n": 32,
+      "top1": 29,
+      "top8": 32,
+      "generated": 32,
+      "mrr": 30.5,
+      "top1_rate": 0.90625,
+      "top8_rate": 1.0,
+      "generated_rate": 1.0,
+      "mrr_rate": 0.953125
+    },
+    "english": {
+      "n": 25,
+      "top1": 23,
+      "top8": 25,
+      "generated": 25,
+      "mrr": 23.833333333333332,
+      "top1_rate": 0.92,
+      "top8_rate": 1.0,
+      "generated_rate": 1.0,
+      "mrr_rate": 0.9533333333333333
+    }
+  },
+  "latency": {
+    "method": "One sequential process per engine over 256 fixed SSD rows; engine calls, not phone latency. Cold first calls included.",
+    "quick_before": {
+      "n": 256,
+      "median_us": 108370.0,
+      "p95_us": 889697
+    },
+    "quick_after": {
+      "n": 256,
+      "median_us": 110725.5,
+      "p95_us": 896773
+    },
+    "mixed_full_pool": {
+      "n": 256,
+      "median_us": 27872.0,
+      "p95_us": 163591
+    },
+    "same_engine_old_shortlist": {
+      "n": 256,
+      "median_us": 17874.0,
+      "p95_us": 91837
+    },
+    "shortlist_caveat": "Same current engine with old top-eight Chinese pool; isolates pool size, not a paired old-binary benchmark. Measurements from separate passes."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "binding": {
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "probe": "7f2007684945673a5c55c62f18ecda098be0878fe90990cd58cb77541604272a",
+    "before": "932c3010e66ab76a6b9415f68d86bda95ea48c04122c445d83a129f203f4bed7",
+    "policy": "91193775520806266d59bfd58d7caa3bb1f31792a3ae9f850cacc8396931c46a",
+    "cohort": "ec24dc5c39c56abfb7e6772cbbf4598476427ee3cd50cec36509c35d261f63e3"
+  },
+  "seed": "mixed-generalization-20261021-v1",
+  "method": "Frozen weights, fixed rows, no refitting. One case per prompt/document per panel. Development data with historical exposure; not an independent test.",
+  "sources": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "/Volumes/SSD/cantonese_ngram/experiments/keyboard-eval-v13-final/development.jsonl": "4be66cacb51c25880373e07ffe77bf37f721dffd4395a04cd0b7600b61cea9af",
+    "/Volumes/SSD/cantonese_ngram/data/shared-multilingual-v1-stage/eval/finalist_suite.jsonl": "6907e44417dd234223c261dbd66cdd347d2c15446d401183e2fa44ba435c46ab"
+  },
+  "overall": {
+    "before": {
+      "n": 64,
+      "top1": 42,
+      "top8": 60,
+      "generated": 61,
+      "mrr": 0.7495845734126985
+    },
+    "after": {
+      "n": 64,
+      "top1": 48,
+      "top8": 59,
+      "generated": 61,
+      "mrr": 0.8043402777777777
+    }
+  },
+  "panels": {
+    "chinese_context_phrase": {
+      "before": {
+        "n": 64,
+        "top1": 42,
+        "top8": 60,
+        "generated": 61,
+        "mrr": 0.7495845734126985
+      },
+      "after": {
+        "n": 64,
+        "top1": 48,
+        "top8": 59,
+        "generated": 61,
+        "mrr": 0.8043402777777777
+      }
+    }
+  },
+  "quick_candidate_sets_changed": 0
+}

@@ -1,7 +1,14 @@
 # Candidate and autocorrect evaluation protocol
 
-Updated 2026-10-20. Keep this protocol for future iterations. The acceptance
+Updated 2026-10-21. Keep this protocol for future iterations. The acceptance
 metrics requested by the user are **latency and F₀.₅**.
+
+Current mixed-candidate iteration: [protocol, generalization checks and BOS
+ablation](MIXED_CANDIDATE_RANKING.md). Autocorrection F₀.₅ remains 0.79407;
+candidate retrieval improves overall, with explicitly recorded Chinese
+regressions and increased full-pool ranking latency. Keep BOS enabled. User
+examples are regression tests, excluded from calibration targets. Do not retune
+the four coefficients against the exposed evaluation/generalization panels.
 
 ## Acceptance
 
@@ -90,13 +97,23 @@ Use zero for an empty denominator, as in the evaluator.
 | Original heuristic | 399 | 112 | 345 | 78.08% | 53.63% | 0.71557 |
 | Earlier precision-focused rule | 224 | 12 | 520 | 94.92% | 30.11% | 0.66351 |
 | Two-feature F₀.₅ rule | 336 | 28 | 408 | 92.31% | 45.16% | 0.76364 |
-| **Current literal-aware rule** | **361** | **23** | **383** | **94.01%** | **48.52%** | **0.79167** |
+| Literal-aware word rule | 361 | 23 | 383 | 94.01% | 48.52% | 0.79167 |
+| **Current word + apostrophe restoration** | **364** | **23** | **380** | **94.06%** | **48.92%** | **0.79407** |
 
-Current rule changes 5/1,298 preservation controls. Its compiled native decisions
+Current pipeline changes 5/1,298 preservation controls. Its compiled native decisions
 match the frozen rule on all 9,728 aligned cases. Model SHA-256:
 `915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322`.
 Policy SHA-256:
 `d97608cbbbd36bc257858760c3e70ed38269efae9efb9c16e0a236fe73947ffd`.
+
+The word rule retains that policy hash. Current restoration policy SHA-256:
+`0de96ace3507ddb0aeb9944b0ece3cd389aa434f2bc87640bd9044be4cf25d96`;
+TRAIN surface/count data SHA-256:
+`610b016b874e823de73b41a1c9fb62705e7af15a463f6e3a5542e3102cdbc9a8`.
+Current [restoration report](APOSTROPHE_RESTORATION.md) records the frozen
+[evaluation](config/english_iteration/2026-10-21/apostrophe-evaluation.json).
+Restoration gains three evaluation fixes with no additional wrong changes, while
+selection F₀.₅ declines from 0.80452 to 0.80185. Retain both results.
 
 The current [error analysis](AUTOCORRECT_ERROR_ANALYSIS.md) attributes missed
 fixes to generation, ranking and acceptance, with fixed diagnostic ablations.
@@ -167,3 +184,12 @@ state while retaining shared weights and the accepted policy. Host English JNI
 latency during Chinese `df` ranking improves from 277.55/301.12 ms median/p95 to
 1.17/1.37 ms (32 calls per binary). This is separate from phone input-to-display
 latency. Frozen F₀.₅ stays 0.79167; native policy decisions retain parity.
+
+## Apostrophe restoration latency (2026-10-21)
+
+The current pipeline restores TRAIN-attested missing apostrophes through the
+existing CNN byte fallback. General host median/p95 changes from 2.878/5.865 ms
+to 2.917/5.945 ms; the TRAIN apostrophe panel rises from 1.483/3.826 ms to
+5.705/9.572 ms. This is an explicit latency cost for the F₀.₅ improvement.
+See [method, quality and limitations](APOSTROPHE_RESTORATION.md). Phone latency
+remains unmeasured.

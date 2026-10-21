@@ -1,0 +1,33 @@
+{
+  "method": "Release host engine calls, 2 alternating process runs; not Android UI latency",
+  "candidate_lists_identical": 112,
+  "preview_candidate_sets_identical": 112,
+  "all_short_codes": {
+    "before": {
+      "median_us": 136036.5,
+      "p95_us": 456672
+    },
+    "after": {
+      "median_us": 133656.0,
+      "p95_us": 449085
+    },
+    "preview": {
+      "median_us": 714.5,
+      "p95_us": 1136
+    }
+  },
+  "df": {
+    "before": {
+      "median_us": 154790.0,
+      "p95_us": 206594
+    },
+    "after": {
+      "median_us": 154593.0,
+      "p95_us": 203645
+    },
+    "preview": {
+      "median_us": 712.5,
+      "p95_us": 751
+    }
+  }
+}

@@ -8,6 +8,26 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
+@Preview(name = "Mixed Chinese phrase ranking", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioMixedChinesePhrase() = ScenarioScreen(remember { KeyboardScenarios.mixedChinesePhrase() })
+
+@PreviewTest
+@Preview(name = "Mixed Chinese phrase second page", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioMixedChinesePhraseSecondPage() = ScenarioScreen(remember { KeyboardScenarios.mixedChinesePhrase() }, page = 1)
+
+@PreviewTest
+@Preview(name = "Mixed exact English ranking", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioMixedExactEnglish() = ScenarioScreen(remember { KeyboardScenarios.mixedExactEnglish() })
+
+@PreviewTest
+@Preview(name = "Quick apostrophe correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioQuickApostropheCorrection() = ScenarioScreen(remember { KeyboardScenarios.quickApostropheCorrection() })
+
+@PreviewTest
 @Preview(name = "Quick English correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioQuickEnglishCorrection() = ScenarioScreen(remember { KeyboardScenarios.quickEnglishCorrection() })

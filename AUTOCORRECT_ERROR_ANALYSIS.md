@@ -1,5 +1,9 @@
 # Autocorrection error analysis — 2026-10-20
 
+2026-10-21 update: [apostrophe restoration](APOSTROPHE_RESTORATION.md) closes the
+`dont` → `don't` generation gap. Current frozen F₀.₅ is 0.79407 (364 correct,
+23 wrong). The analysis below describes the earlier word-only pipeline.
+
 This records the two-feature baseline (F₀.₅ 0.76364). The subsequent
 [literal-aware iteration](LITERAL_ACCEPTANCE_ITERATION.md) addresses part of the
 acceptance loss and is now the accepted production-path rule.

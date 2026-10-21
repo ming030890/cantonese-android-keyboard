@@ -58,6 +58,13 @@ def verify_shared(project):
     if len(meta['tokens'])!=meta['vocab_size']:raise ValueError('CNN vocabulary mismatch')
     if selected['model_sha256']!=sha(model) or selected['model_bytes']!=len(raw):raise ValueError('Selected CNN mismatch')
     if selected['config']!={k:meta[k] for k in selected['config']}:raise ValueError('Selected CNN configuration mismatch')
+    native=project.parent/'QwenASR/crates/cantonese-ngram/src'
+    apostrophe=json.loads((native/'english_apostrophe_acceptance.json').read_text())
+    if apostrophe['model_sha256']!=sha(model):raise ValueError('Apostrophe model requires recalibration')
+    if apostrophe['forms_sha256']!=sha(native/'english_apostrophe_forms.json'):raise ValueError('Apostrophe forms require recalibration')
+    mixed=json.loads((native/'mixed_ranking.json').read_text())
+    if mixed['model_sha256']!=sha(model):raise ValueError('Mixed ranking requires recalibration')
+    if len(mixed['weights'])!=4 or not all(math.isfinite(w) for w in mixed['weights']):raise ValueError('Invalid mixed ranking weights')
     for old in ('typing','english','handwriting/lm_csr.bin'):
         if (assets/old).exists():raise ValueError('Obsolete spelling/count asset remains: '+old)
     fusion_path=assets/'language_model/handwriting_fusion.json';fusion=json.loads(fusion_path.read_text())

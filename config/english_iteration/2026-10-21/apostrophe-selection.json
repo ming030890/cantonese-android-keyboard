@@ -1,0 +1,106 @@
+{
+  "binding": {
+    "probe": "932c3010e66ab76a6b9415f68d86bda95ea48c04122c445d83a129f203f4bed7",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "cases": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "policy": "d97608cbbbd36bc257858760c3e70ed38269efae9efb9c16e0a236fe73947ffd",
+    "forms": "610b016b874e823de73b41a1c9fb62705e7af15a463f6e3a5542e3102cdbc9a8",
+    "apostrophe_policy": "0de96ace3507ddb0aeb9944b0ece3cd389aa434f2bc87640bd9044be4cf25d96"
+  },
+  "train": {
+    "cases": 5737,
+    "top1": 1639,
+    "top8": 1846,
+    "mrr": 1723.7809523809517,
+    "typos": 2099,
+    "applied": 1135,
+    "correct": 1076,
+    "false_changes": 16,
+    "preservation": 3638,
+    "wrong": 59,
+    "f05": 0.8103630064768791,
+    "precision": 0.9480176211453745,
+    "recall": 0.5126250595521677,
+    "false_change_rate": 0.0043980208905992305,
+    "top8_rate": 0.3217709604322817,
+    "mrr_rate": 0.3004673091129426
+  },
+  "selection": {
+    "cases": 1949,
+    "top1": 526,
+    "top8": 601,
+    "mrr": 557.0261904761903,
+    "typos": 700,
+    "applied": 394,
+    "correct": 365,
+    "false_changes": 4,
+    "preservation": 1249,
+    "wrong": 29,
+    "f05": 0.8018453427065027,
+    "precision": 0.9263959390862944,
+    "recall": 0.5214285714285715,
+    "false_change_rate": 0.0032025620496397116,
+    "top8_rate": 0.30836326321190355,
+    "mrr_rate": 0.2858010212807544
+  },
+  "baseline_selection": {
+    "cases": 1949,
+    "top1": 527,
+    "top8": 599,
+    "mrr": 556.5261904761903,
+    "typos": 700,
+    "applied": 389,
+    "correct": 363,
+    "false_changes": 4,
+    "preservation": 1249,
+    "wrong": 26,
+    "f05": 0.8045212765957447,
+    "precision": 0.9331619537275064,
+    "recall": 0.5185714285714286,
+    "false_change_rate": 0.0032025620496397116,
+    "top8_rate": 0.3073370959466393,
+    "mrr_rate": 0.28554447946443834
+  },
+  "selection_changes": [
+    {
+      "id": "0305dfa73c26a2f99c7aaaa79b25fd2d11a3fa1afae8ae5b0f2cd4714bd18236",
+      "typed": "dont",
+      "target": "don't",
+      "left": "",
+      "before": null,
+      "after": "don't"
+    },
+    {
+      "id": "03e80c9edd3154e4183042e2313a0ffc7f01bc57738be38a31bd615c22cb506e",
+      "typed": "dont",
+      "target": "done",
+      "left": "I haven't really ",
+      "before": null,
+      "after": "don't"
+    },
+    {
+      "id": "03ed5d7d82b3e6a12df773819a36cdee33479cf601124dcd80142f18e5fa6d9c",
+      "typed": "im",
+      "target": "in",
+      "left": "i need your help ",
+      "before": null,
+      "after": "i'm"
+    },
+    {
+      "id": "040f63a2f0dab8414c86fd9f19de1f4a49776f0d609b891f9b7bba4ae37f2b77",
+      "typed": "im",
+      "target": "i'm",
+      "left": "",
+      "before": null,
+      "after": "i'm"
+    },
+    {
+      "id": "0744bbc0d2e1d0481e144b54af66346530a95464036071f2cff50bf80a1b95bb",
+      "typed": "its",
+      "target": "it",
+      "left": "",
+      "before": null,
+      "after": "it's"
+    }
+  ]
+}

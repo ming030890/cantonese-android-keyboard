@@ -1,0 +1,1954 @@
+{
+  "policy": {
+    "means": [
+      -4.054836081607001,
+      -3.0132253851209367,
+      1.2238023400220643
+    ],
+    "scales": [
+      5.256729330924441,
+      5.021588556640954,
+      1.4229599218366238
+    ],
+    "weights": [
+      1.2272834814123075,
+      0.501842453586055,
+      0.24041983076030476,
+      0.7402110347027326
+    ],
+    "threshold": 0.8109033740693117,
+    "regularization": 0.1,
+    "calibration_f05": 0.9493670886075949,
+    "features": [
+      "surface_logp_minus_literal",
+      "surface_logp_minus_best_word_edit_score",
+      "log1p_surface_count_minus_log1p_bare_count"
+    ],
+    "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "forms_sha256": "610b016b874e823de73b41a1c9fb62705e7af15a463f6e3a5542e3102cdbc9a8",
+    "training_rows": 112,
+    "calibration_rows": 20,
+    "provenance": "TRAIN only; original observed cases plus missing-apostrophe examples/clean controls from unique TRAIN reference prompts; prompt-group fit/calibration"
+  },
+  "trials": [
+    {
+      "means": [
+        -4.054836081607001,
+        -3.0132253851209367,
+        1.2238023400220643
+      ],
+      "scales": [
+        5.256729330924441,
+        5.021588556640954,
+        1.4229599218366238
+      ],
+      "weights": [
+        1.5427497917638633,
+        0.5899161351842199,
+        0.25195144719241275,
+        1.3957203218008563
+      ],
+      "threshold": 0.8728378004958953,
+      "regularization": 0.001,
+      "calibration_f05": 0.9493670886075949
+    },
+    {
+      "means": [
+        -4.054836081607001,
+        -3.0132253851209367,
+        1.2238023400220643
+      ],
+      "scales": [
+        5.256729330924441,
+        5.021588556640954,
+        1.4229599218366238
+      ],
+      "weights": [
+        1.4776968599065563,
+        0.5929937940114776,
+        0.25258967131757587,
+        1.259365784947832
+      ],
+      "threshold": 0.8610092798192959,
+      "regularization": 0.01,
+      "calibration_f05": 0.9493670886075949
+    },
+    {
+      "means": [
+        -4.054836081607001,
+        -3.0132253851209367,
+        1.2238023400220643
+      ],
+      "scales": [
+        5.256729330924441,
+        5.021588556640954,
+        1.4229599218366238
+      ],
+      "weights": [
+        1.2272834814123075,
+        0.501842453586055,
+        0.24041983076030476,
+        0.7402110347027326
+      ],
+      "threshold": 0.8109033740693117,
+      "regularization": 0.1,
+      "calibration_f05": 0.9493670886075949
+    }
+  ],
+  "rows": [
+    {
+      "group": "7",
+      "left": "If ",
+      "typed": "hell",
+      "target": "he'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "he'll",
+      "features": [
+        0.6226081848144531,
+        -1.5154523849487305,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "7",
+      "left": "If he'll sign no ",
+      "typed": "issues",
+      "target": "issues",
+      "origin": "TRAIN observed/control",
+      "word": "issue's",
+      "features": [
+        -14.46656608581543,
+        -12.378763198852539,
+        -0.916290731874155
+      ]
+    },
+    {
+      "group": "8",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "20",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "57",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "71",
+      "left": "",
+      "typed": "its",
+      "target": "it's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -0.30297327041625977,
+        1.206313133239746,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "104",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "108",
+      "left": "You just ",
+      "typed": "cant",
+      "target": "can't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "can't",
+      "features": [
+        -1.6771221160888672,
+        -4.722867012023926,
+        1.9459101490553132
+      ]
+    },
+    {
+      "group": "116",
+      "left": "Remember blackberry ",
+      "typed": "doesnt",
+      "target": "doesn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "doesn't",
+      "features": [
+        -6.028550148010254,
+        2.160247802734375,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "116",
+      "left": "Remember blackberry doesn't work so ",
+      "typed": "well",
+      "target": "well",
+      "origin": "TRAIN observed/control",
+      "word": "we'll",
+      "features": [
+        -5.453561782836914,
+        0.8510265350341797,
+        -1.0986122886681096
+      ]
+    },
+    {
+      "group": "117",
+      "left": "",
+      "typed": "lets",
+      "target": "let's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "let's",
+      "features": [
+        -6.424195289611816,
+        -4.334726333618164,
+        1.0986122886681098
+      ]
+    },
+    {
+      "group": "118",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "148",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "158",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "161",
+      "left": "On a comparative basis I ",
+      "typed": "cant",
+      "target": "can't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "can't",
+      "features": [
+        1.3947525024414062,
+        -0.3440523147583008,
+        1.9459101490553132
+      ]
+    },
+    {
+      "group": "183",
+      "left": "We are all doing reasonably ",
+      "typed": "well",
+      "target": "well",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we'll",
+      "features": [
+        -9.729049682617188,
+        -3.6101865768432617,
+        -1.0986122886681096
+      ]
+    },
+    {
+      "group": "224",
+      "left": "Are you sure I ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        -1.8160858154296875,
+        0.872591495513916,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "226",
+      "left": "Okay ",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        2.661545753479004,
+        2.0567493438720703,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "261",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "263",
+      "left": "These are big storms and traffic ",
+      "typed": "isnt",
+      "target": "isn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "isn't",
+      "features": [
+        -2.754182815551758,
+        0.48447227478027344,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "265",
+      "left": "Chad thought we ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -10.285811424255371,
+        -1.4570131301879883,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "270",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "279",
+      "left": "I ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        1.2808136940002441,
+        5.022890090942383,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "299",
+      "left": "Theresa, ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        -0.029564857482910156,
+        2.127230644226074,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "321",
+      "left": "However, he is expected to play in this ",
+      "typed": "weeks",
+      "target": "week's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "week's",
+      "features": [
+        -5.71354866027832,
+        -8.045624732971191,
+        0.916290731874155
+      ]
+    },
+    {
+      "group": "330",
+      "left": "She probably ",
+      "typed": "wont",
+      "target": "won't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "won't",
+      "features": [
+        -1.065119743347168,
+        -2.973507881164551,
+        1.3862943611198906
+      ]
+    },
+    {
+      "group": "362",
+      "left": "If your reasonable, ",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        1.3584179878234863,
+        1.4990506172180176,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "379",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "404",
+      "left": "Feel free to use Robinson if he ",
+      "typed": "doesnt",
+      "target": "doesn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "doesn't",
+      "features": [
+        -4.832766532897949,
+        6.588141441345215,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "412",
+      "left": "I wouldn't say ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -1.1272659301757812,
+        -4.129894733428955,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "412",
+      "left": "I wouldn't say I'm 100 percent but ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -1.1173491477966309,
+        -3.5991177558898926,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "424",
+      "left": "We cleaned him up as ",
+      "typed": "well",
+      "target": "well",
+      "origin": "TRAIN observed/control",
+      "word": "we'll",
+      "features": [
+        -9.58520793914795,
+        -0.9608039855957031,
+        -1.0986122886681096
+      ]
+    },
+    {
+      "group": "426",
+      "left": "He is already on the job and hard at work on the ",
+      "typed": "issues",
+      "target": "issues",
+      "origin": "TRAIN observed/control",
+      "word": "issue's",
+      "features": [
+        -18.709636688232422,
+        -16.159914016723633,
+        -0.916290731874155
+      ]
+    },
+    {
+      "group": "445",
+      "left": "",
+      "typed": "youre",
+      "target": "you're",
+      "origin": "TRAIN prompt omission/control",
+      "word": "you're",
+      "features": [
+        -1.0215301513671875,
+        -0.7160835266113281,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "449",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "453",
+      "left": "Here it is again in case you ",
+      "typed": "didnt",
+      "target": "didn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "didn't",
+      "features": [
+        -4.219387054443359,
+        2.6857709884643555,
+        1.3862943611198906
+      ]
+    },
+    {
+      "group": "458",
+      "left": "He is expected to play in this ",
+      "typed": "weeks",
+      "target": "week's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "week's",
+      "features": [
+        -5.5775909423828125,
+        -8.031906127929688,
+        0.916290731874155
+      ]
+    },
+    {
+      "group": "464",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "473",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "476",
+      "left": "The team mate says ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN observed/control",
+      "word": "we're",
+      "features": [
+        -1.917276382446289,
+        -0.7821226119995117,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "480",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "485",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "488",
+      "left": "Wayne has not done much yet, so ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        2.4456892013549805,
+        5.2500152587890625,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "491",
+      "left": "He is listed as questionable for this ",
+      "typed": "weeks",
+      "target": "week's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "week's",
+      "features": [
+        -5.9676055908203125,
+        -7.459043502807617,
+        0.916290731874155
+      ]
+    },
+    {
+      "group": "506",
+      "left": "Ruth, ",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -3.53775691986084,
+        -1.5667104721069336,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "515",
+      "left": "Crestone ",
+      "typed": "wont",
+      "target": "won't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "won't",
+      "features": [
+        1.6500968933105469,
+        -2.8221349716186523,
+        1.3862943611198906
+      ]
+    },
+    {
+      "group": "518",
+      "left": "You ",
+      "typed": "cant",
+      "target": "can't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "can't",
+      "features": [
+        -0.3827505111694336,
+        -2.7084903717041016,
+        1.9459101490553132
+      ]
+    },
+    {
+      "group": "519",
+      "left": "He should still be able to play in the ",
+      "typed": "teams",
+      "target": "team's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "team's",
+      "features": [
+        -10.030055046081543,
+        -9.747655868530273,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "520",
+      "left": "And if he's not, then he ",
+      "typed": "doesnt",
+      "target": "doesn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "doesn't",
+      "features": [
+        -4.939270973205566,
+        6.7592620849609375,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "527",
+      "left": "He is listed as probable for this ",
+      "typed": "weeks",
+      "target": "week's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "week's",
+      "features": [
+        -5.987527847290039,
+        -7.145269393920898,
+        0.916290731874155
+      ]
+    },
+    {
+      "group": "531",
+      "left": "He is expected to miss six ",
+      "typed": "weeks",
+      "target": "weeks",
+      "origin": "TRAIN prompt omission/control",
+      "word": "week's",
+      "features": [
+        -15.806928634643555,
+        -8.514205932617188,
+        0.916290731874155
+      ]
+    },
+    {
+      "group": "546",
+      "left": "I ",
+      "typed": "cant",
+      "target": "can't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "can't",
+      "features": [
+        -0.37732553482055664,
+        -1.879730224609375,
+        1.9459101490553132
+      ]
+    },
+    {
+      "group": "568",
+      "left": "I ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        1.2808136940002441,
+        5.022890090942383,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "613",
+      "left": "You ",
+      "typed": "cant",
+      "target": "can't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "can't",
+      "features": [
+        -0.3827505111694336,
+        -2.7084903717041016,
+        1.9459101490553132
+      ]
+    },
+    {
+      "group": "613",
+      "left": "You can't destroy us, and you ",
+      "typed": "cant",
+      "target": "can't",
+      "origin": "TRAIN observed/control",
+      "word": "can't",
+      "features": [
+        -1.0032243728637695,
+        -2.39846134185791,
+        1.9459101490553132
+      ]
+    },
+    {
+      "group": "635",
+      "left": "I hope ",
+      "typed": "well",
+      "target": "we'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we'll",
+      "features": [
+        -1.1742362976074219,
+        0.3156423568725586,
+        -1.0986122886681096
+      ]
+    },
+    {
+      "group": "639",
+      "left": "Theresa, ",
+      "typed": "ive",
+      "target": "i've",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i've",
+      "features": [
+        0.40900707244873047,
+        1.3399810791015625,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "639",
+      "left": "Theresa, I've redrafted and ",
+      "typed": "were",
+      "target": "we're",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -5.8277482986450195,
+        -0.6987848281860352,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "646",
+      "left": "If she calls me yet today, ",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        0.7264919281005859,
+        -0.8429527282714844,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "658",
+      "left": "",
+      "typed": "its",
+      "target": "it's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -0.30297327041625977,
+        1.206313133239746,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "658",
+      "left": "It's this ",
+      "typed": "issues",
+      "target": "issue's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "issue's",
+      "features": [
+        -16.750286102294922,
+        -17.619436264038086,
+        -0.916290731874155
+      ]
+    },
+    {
+      "group": "662",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "668",
+      "left": "",
+      "typed": "ive",
+      "target": "i've",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i've",
+      "features": [
+        -0.7181577682495117,
+        0.5213184356689453,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "668",
+      "left": "I've sort of lost track of what all ",
+      "typed": "ive",
+      "target": "i've",
+      "origin": "TRAIN observed/control",
+      "word": "i've",
+      "features": [
+        -0.2027578353881836,
+        -1.8441352844238281,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "684",
+      "left": "He is listed as probable for ",
+      "typed": "mondays",
+      "target": "monday's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "monday's",
+      "features": [
+        -5.590155601501465,
+        -3.5858020782470703,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "700",
+      "left": "Megan, ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -1.5154409408569336,
+        -2.8889408111572266,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "705",
+      "left": "Just ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        2.473804473876953,
+        1.1056842803955078,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "707",
+      "left": "The results ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -12.443089485168457,
+        -4.474179267883301,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "711",
+      "left": "One would have thought ",
+      "typed": "id",
+      "target": "i'd",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'd",
+      "features": [
+        -6.7041521072387695,
+        -12.316719055175781,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "732",
+      "left": "Hope that all is ",
+      "typed": "well",
+      "target": "well",
+      "origin": "TRAIN observed/control",
+      "word": "we'll",
+      "features": [
+        -8.441757202148438,
+        -0.9302635192871094,
+        -1.0986122886681096
+      ]
+    },
+    {
+      "group": "758",
+      "left": "",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        1.1901168823242188,
+        3.319849967956543,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "803",
+      "left": "We ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        2.3992538452148438,
+        5.091033458709717,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "842",
+      "left": "",
+      "typed": "lets",
+      "target": "let's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "let's",
+      "features": [
+        -6.424195289611816,
+        -4.334726333618164,
+        1.0986122886681098
+      ]
+    },
+    {
+      "group": "901",
+      "left": "",
+      "typed": "its",
+      "target": "it's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -0.30297327041625977,
+        1.206313133239746,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "936",
+      "left": "I have an AM ",
+      "typed": "doctors",
+      "target": "doctor's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "doctor's",
+      "features": [
+        -9.9915771484375,
+        -9.444618225097656,
+        -0.4054651081081645
+      ]
+    },
+    {
+      "group": "943",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "976",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "981",
+      "left": "If we ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        2.792637825012207,
+        5.250758171081543,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "987",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "988",
+      "left": "I ",
+      "typed": "wont",
+      "target": "won't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "won't",
+      "features": [
+        2.2338380813598633,
+        -2.84893798828125,
+        1.3862943611198906
+      ]
+    },
+    {
+      "group": "1035",
+      "left": "",
+      "typed": "were",
+      "target": "we're",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -2.6942386627197266,
+        -2.7748823165893555,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1042",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1066",
+      "left": "",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        1.1901168823242188,
+        3.319849967956543,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "1068",
+      "left": "",
+      "typed": "thats",
+      "target": "that's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "that's",
+      "features": [
+        -1.545820713043213,
+        0.6151695251464844,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "1076",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1079",
+      "left": "",
+      "typed": "its",
+      "target": "it's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -0.30297327041625977,
+        1.206313133239746,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "1079",
+      "left": "It's not working very ",
+      "typed": "well",
+      "target": "well",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we'll",
+      "features": [
+        -13.05106258392334,
+        -4.066743850708008,
+        -1.0986122886681096
+      ]
+    },
+    {
+      "group": "1102",
+      "left": "I have been in contact with him, and he is familiar with the ",
+      "typed": "issues",
+      "target": "issues",
+      "origin": "TRAIN prompt omission/control",
+      "word": "issue's",
+      "features": [
+        -17.733972549438477,
+        -13.89297866821289,
+        -0.916290731874155
+      ]
+    },
+    {
+      "group": "1128",
+      "left": "About 10 Jordanian ",
+      "typed": "doctors",
+      "target": "doctors",
+      "origin": "TRAIN prompt omission/control",
+      "word": "doctor's",
+      "features": [
+        -13.878504753112793,
+        -10.445439338684082,
+        -0.4054651081081645
+      ]
+    },
+    {
+      "group": "1139",
+      "left": "The conditions ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -8.808734893798828,
+        -3.217287063598633,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1152",
+      "left": "We controlled the race from the start and ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        0.4639444351196289,
+        -4.45119571685791,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1154",
+      "left": "There are some ",
+      "typed": "issues",
+      "target": "issues",
+      "origin": "TRAIN observed/control",
+      "word": "issue's",
+      "features": [
+        -22.244461059570312,
+        -14.78243637084961,
+        -0.916290731874155
+      ]
+    },
+    {
+      "group": "1164",
+      "left": "",
+      "typed": "doctors",
+      "target": "doctors",
+      "origin": "TRAIN observed/control",
+      "word": "doctor's",
+      "features": [
+        -10.346687316894531,
+        -6.121423721313477,
+        -0.4054651081081645
+      ]
+    },
+    {
+      "group": "1189",
+      "left": "But his father likes what he sees from his ",
+      "typed": "sons",
+      "target": "son's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "son's",
+      "features": [
+        -7.689837455749512,
+        -5.5112199783325195,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "1199",
+      "left": "The appointments ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -8.70622444152832,
+        -2.401081085205078,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1200",
+      "left": "Now I really feel ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -1.6323509216308594,
+        -4.189075946807861,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1216",
+      "left": "Pilot Nick Young said communications at Sanaa airport ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -6.859295845031738,
+        -4.594486236572266,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1230",
+      "left": "",
+      "typed": "its",
+      "target": "it's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -0.30297327041625977,
+        1.206313133239746,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "1231",
+      "left": "The loans ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -10.03095817565918,
+        -2.8086767196655273,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1251",
+      "left": "There ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN observed/control",
+      "word": "we're",
+      "features": [
+        -14.646299362182617,
+        -7.714503288269043,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1275",
+      "left": "",
+      "typed": "ill",
+      "target": "i'll",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'll",
+      "features": [
+        -0.3266868591308594,
+        -1.931849479675293,
+        2.833213344056216
+      ]
+    },
+    {
+      "group": "1277",
+      "left": "He said the operating theatres ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -12.326627731323242,
+        -3.8829565048217773,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1280",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1308",
+      "left": "",
+      "typed": "its",
+      "target": "it's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -0.30297327041625977,
+        1.206313133239746,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "1317",
+      "left": "This time ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -0.009904861450195312,
+        -5.915992259979248,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1331",
+      "left": "I was a bit rusty but I ",
+      "typed": "didnt",
+      "target": "didn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "didn't",
+      "features": [
+        -3.571074962615967,
+        4.2464399337768555,
+        1.3862943611198906
+      ]
+    },
+    {
+      "group": "1333",
+      "left": "",
+      "typed": "were",
+      "target": "we're",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -2.6942386627197266,
+        -2.7748823165893555,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1340",
+      "left": "We ",
+      "typed": "dont",
+      "target": "don't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "don't",
+      "features": [
+        2.3992538452148438,
+        5.091033458709717,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "1360",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1371",
+      "left": "I will try to make sure ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        0.29367542266845703,
+        -5.919637680053711,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1383",
+      "left": "You get in traffic and you have dogfights and I forget ",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -2.560042381286621,
+        -7.720704078674316,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1396",
+      "left": "",
+      "typed": "im",
+      "target": "i'm",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "1400",
+      "left": "I ",
+      "typed": "didnt",
+      "target": "didn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "didn't",
+      "features": [
+        -3.2950849533081055,
+        4.284844398498535,
+        1.3862943611198906
+      ]
+    },
+    {
+      "group": "1406",
+      "left": "",
+      "typed": "were",
+      "target": "we're",
+      "origin": "TRAIN prompt omission/control",
+      "word": "we're",
+      "features": [
+        -2.6942386627197266,
+        -2.7748823165893555,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1410",
+      "left": "",
+      "typed": "ive",
+      "target": "i've",
+      "origin": "TRAIN prompt omission/control",
+      "word": "i've",
+      "features": [
+        -0.7181577682495117,
+        0.5213184356689453,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "1415",
+      "left": "Penske ",
+      "typed": "doesnt",
+      "target": "doesn't",
+      "origin": "TRAIN prompt omission/control",
+      "word": "doesn't",
+      "features": [
+        -6.031200408935547,
+        1.5125160217285156,
+        1.6094379124341003
+      ]
+    },
+    {
+      "group": "1441",
+      "left": "There ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN observed/control",
+      "word": "we're",
+      "features": [
+        -14.646299362182617,
+        -7.714503288269043,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1450",
+      "left": "The spokesman said ",
+      "typed": "its",
+      "target": "its",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -2.121342658996582,
+        -0.03300285339355469,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "1462",
+      "left": "On appeal they ",
+      "typed": "were",
+      "target": "were",
+      "origin": "TRAIN observed/control",
+      "word": "we're",
+      "features": [
+        -12.178574562072754,
+        -3.1347408294677734,
+        -0.8754687373539001
+      ]
+    },
+    {
+      "group": "1489",
+      "left": "",
+      "typed": "its",
+      "target": "it's",
+      "origin": "TRAIN prompt omission/control",
+      "word": "it's",
+      "features": [
+        -0.30297327041625977,
+        1.206313133239746,
+        1.3862943611198904
+      ]
+    },
+    {
+      "group": "1511",
+      "left": "I ",
+      "typed": "dont",
+      "target": "dont",
+      "origin": "TRAIN observed/control",
+      "word": "don't",
+      "features": [
+        1.2808136940002441,
+        5.022890090942383,
+        1.791759469228055
+      ]
+    },
+    {
+      "group": "264",
+      "left": "",
+      "typed": "thats",
+      "target": "that",
+      "origin": "TRAIN observed/control",
+      "word": "that's",
+      "features": [
+        -1.545820713043213,
+        0.6151695251464844,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "1034",
+      "left": "What ",
+      "typed": "id",
+      "target": "is",
+      "origin": "TRAIN observed/control",
+      "word": "i'd",
+      "features": [
+        -3.195216178894043,
+        -11.422774314880371,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "1310",
+      "left": "",
+      "typed": "lets",
+      "target": "let",
+      "origin": "TRAIN observed/control",
+      "word": "let's",
+      "features": [
+        -6.424195289611816,
+        -4.334726333618164,
+        1.0986122886681098
+      ]
+    },
+    {
+      "group": "173",
+      "left": "They have not ",
+      "typed": "issues",
+      "target": "issued",
+      "origin": "TRAIN observed/control",
+      "word": "issue's",
+      "features": [
+        -14.586783409118652,
+        -17.87554931640625,
+        -0.916290731874155
+      ]
+    },
+    {
+      "group": "1448",
+      "left": "",
+      "typed": "im",
+      "target": "the",
+      "origin": "TRAIN observed/control",
+      "word": "i'm",
+      "features": [
+        -3.2445874214172363,
+        -3.201641082763672,
+        3.091042453358316
+      ]
+    },
+    {
+      "group": "225",
+      "left": "Please respond ",
+      "typed": "id",
+      "target": "if",
+      "origin": "TRAIN observed/control",
+      "word": "i'd",
+      "features": [
+        -4.705532073974609,
+        -12.904973030090332,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "362",
+      "left": "if ",
+      "typed": "youre",
+      "target": "your",
+      "origin": "TRAIN observed/control",
+      "word": "you're",
+      "features": [
+        5.169063568115234,
+        2.255204200744629,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "1436",
+      "left": "The Mercedes engine takes advantage ",
+      "typed": "id",
+      "target": "of",
+      "origin": "TRAIN observed/control",
+      "word": "i'd",
+      "features": [
+        -7.424517631530762,
+        -13.09409236907959,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "749",
+      "left": "fuel surcharges, ",
+      "typed": "id",
+      "target": "if",
+      "origin": "TRAIN observed/control",
+      "word": "i'd",
+      "features": [
+        -4.448601722717285,
+        -9.607990264892578,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "858",
+      "left": "how ",
+      "typed": "id",
+      "target": "is",
+      "origin": "TRAIN observed/control",
+      "word": "i'd",
+      "features": [
+        -1.890768051147461,
+        -9.773455619812012,
+        0.6931471805599453
+      ]
+    },
+    {
+      "group": "544",
+      "left": "Try ",
+      "typed": "its",
+      "target": "it",
+      "origin": "TRAIN observed/control",
+      "word": "it's",
+      "features": [
+        -1.6130471229553223,
+        -1.7196359634399414,
+        1.3862943611198904
+      ]
+    }
+  ],
+  "labels": [
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "source_sha256": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+  "cases_sha256": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+  "script_sha256": "7a153e272ba90e89003e99213898d68b6b8297184354c782618ce514381ffcd2",
+  "feature_probe_sha256": "932c3010e66ab76a6b9415f68d86bda95ea48c04122c445d83a129f203f4bed7"
+}
