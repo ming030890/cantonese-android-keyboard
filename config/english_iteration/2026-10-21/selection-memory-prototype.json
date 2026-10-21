@@ -1,0 +1,89 @@
+{
+  "scope": "Experimental host cache microbenchmark and learn/undo smoke; no Android integration or user-replay quality claim.",
+  "binding": {
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "probe": "7f2007684945673a5c55c62f18ecda098be0878fe90990cd58cb77541604272a",
+    "cohort": "1166a375f244134b06593820c5b7ce6a5469f37c87ecbe09a1a4c6233da9c9db",
+    "implementation": "d6bfc08217bc9d5c6e30398efa6ce75325ec71aef8c41593b4856d3cdba99694"
+  },
+  "smoke": {
+    "3": {
+      "before": [
+        "兜兩",
+        "自兩",
+        "先兩",
+        "看兩",
+        "兒歌",
+        "自歌",
+        "自次",
+        "稅兩"
+      ],
+      "after_explicit_selection": [
+        "兒歌",
+        "兜兩",
+        "自兩",
+        "先兩",
+        "看兩",
+        "自歌",
+        "自次",
+        "稅兩"
+      ],
+      "after_undo": [
+        "兜兩",
+        "自兩",
+        "先兩",
+        "看兩",
+        "兒歌",
+        "自歌",
+        "自次",
+        "稅兩"
+      ]
+    },
+    "5": {
+      "before": [
+        "自靈",
+        "兜兩",
+        "自兩",
+        "先兩",
+        "看兩",
+        "兒歌",
+        "自歌",
+        "自次"
+      ],
+      "after_explicit_selection": [
+        "兒歌",
+        "自靈",
+        "兜兩",
+        "自兩",
+        "先兩",
+        "看兩",
+        "自歌",
+        "自次"
+      ],
+      "after_undo": [
+        "自靈",
+        "兜兩",
+        "自兩",
+        "先兩",
+        "看兩",
+        "兒歌",
+        "自歌",
+        "自次"
+      ]
+    }
+  },
+  "latency": {
+    "base_copy": {
+      "n": 2048,
+      "median_us": 0.125,
+      "p95_us": 0.167
+    },
+    "cached_selection_memory": {
+      "n": 2048,
+      "median_us": 0.667,
+      "p95_us": 0.834
+    }
+  },
+  "no_new_model": true,
+  "no_production_changes": true
+}
