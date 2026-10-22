@@ -1,0 +1,82 @@
+{
+  "scope": "Domain audit of the frozen v66 development evaluation; uses existing native outputs; no model fitting.",
+  "total_cases": 2042,
+  "prompt_groups": 259,
+  "by_source": {
+    "email": {
+      "prompt_groups": 85,
+      "case_fraction": 0.3623898139079334,
+      "metrics": {
+        "cases": 740,
+        "typos": 263,
+        "controls": 477,
+        "correct": 152,
+        "wrong": 11,
+        "false_changes": 1,
+        "recall": 0.5779467680608364,
+        "precision": 0.9325153374233128,
+        "f05": 0.8306010928961749
+      }
+    },
+    "memorable": {
+      "prompt_groups": 69,
+      "case_fraction": 0.23114593535749264,
+      "metrics": {
+        "cases": 472,
+        "typos": 193,
+        "controls": 279,
+        "correct": 108,
+        "wrong": 9,
+        "false_changes": 2,
+        "recall": 0.5595854922279793,
+        "precision": 0.9230769230769231,
+        "f05": 0.8169440242057489
+      }
+    },
+    "mobile": {
+      "prompt_groups": 47,
+      "case_fraction": 0.1493633692458374,
+      "metrics": {
+        "cases": 305,
+        "typos": 109,
+        "controls": 196,
+        "correct": 60,
+        "wrong": 5,
+        "false_changes": 2,
+        "recall": 0.5504587155963303,
+        "precision": 0.9230769230769231,
+        "f05": 0.8130081300813008
+      }
+    },
+    "news": {
+      "prompt_groups": 58,
+      "case_fraction": 0.25710088148873655,
+      "metrics": {
+        "cases": 525,
+        "typos": 179,
+        "controls": 346,
+        "correct": 98,
+        "wrong": 7,
+        "false_changes": 3,
+        "recall": 0.547486033519553,
+        "precision": 0.9333333333333333,
+        "f05": 0.8180300500834724
+      }
+    }
+  },
+  "control_origins": {
+    "recorded_typo": 744,
+    "recorded_preservation": 44,
+    "source_preservation": 1254
+  },
+  "question_prompts": 16,
+  "url_prompts": 0,
+  "at_sign_prompts": 0,
+  "non_ascii_prompts": 0,
+  "empty_context_cases": 198,
+  "hashes": {
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/edit-position-costs-2026-10-21/native-verification.predictions.json": "17a6ccbf5775ec2757e7b49ce031d4560d9e4df30963b73b666e62a710ec97ff"
+  }
+}

@@ -1,0 +1,639 @@
+{
+  "passed": true,
+  "cases": 12,
+  "empty_order_matches_v7": true,
+  "candidate_sets_match_v7": true,
+  "one_token_uses_neural": true,
+  "baseline_model": "/Volumes/SSD/cantonese_ngram/experiments/nested-curriculum-128-256-512-v7/export-width256/rust/model.cng",
+  "queries": [
+    {
+      "version": 3,
+      "code": "a",
+      "left": "",
+      "right": ""
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "我",
+      "right": ""
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "",
+      "right": "食"
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "我想",
+      "right": ""
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "今天天氣幾好",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "我",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "",
+      "right": "食"
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "我想",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "今天天氣幾好",
+      "right": ""
+    },
+    {
+      "left": "我",
+      "limit": 3
+    },
+    {
+      "left": "",
+      "right": "食",
+      "limit": 3
+    }
+  ],
+  "v9": [
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Unigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        261,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        401,
+        250,
+        250,
+        411,
+        197,
+        77,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Unigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        261,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        401,
+        250,
+        250,
+        411,
+        197,
+        77,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural",
+      "predictions": [
+        {
+          "score": -3.0046768188476562,
+          "token": "地",
+          "token_id": 93
+        },
+        {
+          "score": -3.2400312423706055,
+          "token": "們",
+          "token_id": 531
+        },
+        {
+          "score": -3.320805788040161,
+          "token": "都",
+          "token_id": 84
+        }
+      ]
+    },
+    {
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural",
+      "predictions": [
+        {
+          "score": -2.867499828338623,
+          "token": "好",
+          "token_id": 77
+        },
+        {
+          "score": -3.0031378269195557,
+          "token": ",",
+          "token_id": 3
+        },
+        {
+          "score": -3.784752130508423,
+          "token": "去",
+          "token_id": 130
+        }
+      ]
+    }
+  ],
+  "v7": [
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Unigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Bigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Unigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        261,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        401,
+        250,
+        250,
+        411,
+        197,
+        77,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Unigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Bigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Unigram"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        261,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        401,
+        250,
+        250,
+        411,
+        197,
+        77,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Bigram",
+      "predictions": [
+        {
+          "score": 16.461877822875977,
+          "token": "哋",
+          "token_id": 267
+        },
+        {
+          "score": 11.964288711547852,
+          "token": "們",
+          "token_id": 531
+        },
+        {
+          "score": 6.277517795562744,
+          "token": "話",
+          "token_id": 163
+        }
+      ]
+    },
+    {
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Unigram",
+      "predictions": [
+        {
+          "score": 0.0,
+          "token": "，",
+          "token_id": 3
+        },
+        {
+          "score": -0.07033775746822357,
+          "token": "。",
+          "token_id": 4
+        },
+        {
+          "score": -0.09409904479980469,
+          "token": "係",
+          "token_id": 68
+        }
+      ]
+    }
+  ]
+}

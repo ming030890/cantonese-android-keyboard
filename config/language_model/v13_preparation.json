@@ -1,0 +1,411 @@
+{
+  "protocol_sha256": "88a79024fadd9919d1d32dce25b024227526b279c4b29e43a27af698e97a4d19",
+  "partitions": {
+    "development": {
+      "unique_cases": 67268,
+      "panels": {
+        "natural": {
+          "n": 50000,
+          "groups": 8960,
+          "unique_targets": 3877,
+          "sources": {
+            "wiki": 10000,
+            "lihkg": 10000,
+            "openrice": 10000,
+            "commonvoice": 10000,
+            "commoncrawl": 10000
+          },
+          "uncovered_targets": 364,
+          "english_targets": 937,
+          "added_targets": 111
+        },
+        "english": {
+          "n": 5000,
+          "groups": 2239,
+          "unique_targets": 3393,
+          "sources": {
+            "wiki": 1849,
+            "lihkg": 1052,
+            "commoncrawl": 1689,
+            "openrice": 408,
+            "commonvoice": 2
+          },
+          "uncovered_targets": 1031,
+          "english_targets": 5000,
+          "added_targets": 3
+        },
+        "uncovered": {
+          "n": 5000,
+          "groups": 1881,
+          "unique_targets": 3502,
+          "sources": {
+            "wiki": 2336,
+            "openrice": 326,
+            "lihkg": 776,
+            "commoncrawl": 1561,
+            "commonvoice": 1
+          },
+          "uncovered_targets": 5000,
+          "english_targets": 2798,
+          "added_targets": 0
+        },
+        "rare": {
+          "n": 5000,
+          "groups": 2223,
+          "unique_targets": 3774,
+          "sources": {
+            "wiki": 2526,
+            "commoncrawl": 1236,
+            "lihkg": 907,
+            "openrice": 314,
+            "commonvoice": 17
+          },
+          "uncovered_targets": 0,
+          "english_targets": 3438,
+          "added_targets": 0
+        },
+        "rare_han": {
+          "n": 2339,
+          "groups": 1033,
+          "unique_targets": 1114,
+          "sources": {
+            "wiki": 1380,
+            "lihkg": 246,
+            "commoncrawl": 489,
+            "openrice": 174,
+            "commonvoice": 50
+          },
+          "uncovered_targets": 0,
+          "english_targets": 0,
+          "added_targets": 0
+        },
+        "added": {
+          "n": 4217,
+          "groups": 1188,
+          "unique_targets": 180,
+          "sources": {
+            "commoncrawl": 1909,
+            "wiki": 1004,
+            "openrice": 860,
+            "lihkg": 434,
+            "commonvoice": 10
+          },
+          "uncovered_targets": 0,
+          "english_targets": 25,
+          "added_targets": 4217
+        },
+        "quick": {
+          "n": 5000,
+          "groups": 2523,
+          "unique_targets": 1280,
+          "sources": {
+            "wiki": 1995,
+            "lihkg": 666,
+            "commoncrawl": 1788,
+            "openrice": 455,
+            "commonvoice": 96
+          },
+          "uncovered_targets": 8,
+          "english_targets": 0,
+          "added_targets": 7
+        },
+        "quick_added": {
+          "n": 1546,
+          "groups": 507,
+          "unique_targets": 128,
+          "sources": {
+            "wiki": 668,
+            "commoncrawl": 578,
+            "lihkg": 229,
+            "openrice": 61,
+            "commonvoice": 10
+          },
+          "uncovered_targets": 0,
+          "english_targets": 0,
+          "added_targets": 1546
+        },
+        "quick_uncovered": {
+          "n": 878,
+          "groups": 280,
+          "unique_targets": 224,
+          "sources": {
+            "lihkg": 212,
+            "commoncrawl": 197,
+            "wiki": 429,
+            "openrice": 39,
+            "commonvoice": 1
+          },
+          "uncovered_targets": 878,
+          "english_targets": 0,
+          "added_targets": 0
+        },
+        "quick_rare": {
+          "n": 2324,
+          "groups": 1032,
+          "unique_targets": 1108,
+          "sources": {
+            "wiki": 1380,
+            "lihkg": 246,
+            "commoncrawl": 474,
+            "openrice": 174,
+            "commonvoice": 50
+          },
+          "uncovered_targets": 0,
+          "english_targets": 0,
+          "added_targets": 0
+        }
+      },
+      "overlap_note": "Panel sizes are not additive; case IDs deduplicated across panels.",
+      "cases_sha256": "fb54bacf28099fc05e01c9c340f8f1a3ee39c69c5c44138072471b3cf71e8b80",
+      "panels_sha256": "7751f9dd2714e39dc3336a6a8000e366c3854a0873de184ee9290b3cb760b481"
+    },
+    "confirmation": {
+      "unique_cases": 16794,
+      "panels": {
+        "natural": {
+          "n": 12500,
+          "groups": 2267,
+          "unique_targets": 2190,
+          "sources": {
+            "wiki": 2500,
+            "lihkg": 2500,
+            "openrice": 2500,
+            "commonvoice": 2500,
+            "commoncrawl": 2500
+          },
+          "uncovered_targets": 85,
+          "english_targets": 306,
+          "added_targets": 35
+        },
+        "english": {
+          "n": 1250,
+          "groups": 569,
+          "unique_targets": 973,
+          "sources": {
+            "wiki": 389,
+            "lihkg": 309,
+            "commoncrawl": 412,
+            "openrice": 140
+          },
+          "uncovered_targets": 235,
+          "english_targets": 1250,
+          "added_targets": 0
+        },
+        "uncovered": {
+          "n": 1250,
+          "groups": 487,
+          "unique_targets": 1009,
+          "sources": {
+            "wiki": 530,
+            "commoncrawl": 421,
+            "lihkg": 216,
+            "openrice": 83
+          },
+          "uncovered_targets": 1250,
+          "english_targets": 661,
+          "added_targets": 0
+        },
+        "rare": {
+          "n": 1250,
+          "groups": 561,
+          "unique_targets": 1072,
+          "sources": {
+            "commoncrawl": 343,
+            "wiki": 548,
+            "openrice": 102,
+            "lihkg": 253,
+            "commonvoice": 4
+          },
+          "uncovered_targets": 0,
+          "english_targets": 861,
+          "added_targets": 0
+        },
+        "rare_han": {
+          "n": 577,
+          "groups": 247,
+          "unique_targets": 359,
+          "sources": {
+            "openrice": 33,
+            "commoncrawl": 117,
+            "wiki": 351,
+            "lihkg": 64,
+            "commonvoice": 12
+          },
+          "uncovered_targets": 0,
+          "english_targets": 0,
+          "added_targets": 0
+        },
+        "added": {
+          "n": 1105,
+          "groups": 322,
+          "unique_targets": 59,
+          "sources": {
+            "commoncrawl": 558,
+            "openrice": 220,
+            "wiki": 222,
+            "lihkg": 101,
+            "commonvoice": 4
+          },
+          "uncovered_targets": 0,
+          "english_targets": 6,
+          "added_targets": 1105
+        },
+        "quick": {
+          "n": 1250,
+          "groups": 642,
+          "unique_targets": 599,
+          "sources": {
+            "lihkg": 204,
+            "wiki": 477,
+            "commoncrawl": 423,
+            "openrice": 120,
+            "commonvoice": 26
+          },
+          "uncovered_targets": 4,
+          "english_targets": 0,
+          "added_targets": 0
+        },
+        "quick_added": {
+          "n": 419,
+          "groups": 151,
+          "unique_targets": 35,
+          "sources": {
+            "wiki": 145,
+            "commoncrawl": 224,
+            "lihkg": 29,
+            "commonvoice": 4,
+            "openrice": 17
+          },
+          "uncovered_targets": 0,
+          "english_targets": 0,
+          "added_targets": 419
+        },
+        "quick_uncovered": {
+          "n": 272,
+          "groups": 88,
+          "unique_targets": 140,
+          "sources": {
+            "wiki": 145,
+            "lihkg": 36,
+            "commoncrawl": 87,
+            "openrice": 4
+          },
+          "uncovered_targets": 272,
+          "english_targets": 0,
+          "added_targets": 0
+        },
+        "quick_rare": {
+          "n": 577,
+          "groups": 247,
+          "unique_targets": 359,
+          "sources": {
+            "openrice": 33,
+            "commoncrawl": 117,
+            "wiki": 351,
+            "lihkg": 64,
+            "commonvoice": 12
+          },
+          "uncovered_targets": 0,
+          "english_targets": 0,
+          "added_targets": 0
+        }
+      },
+      "overlap_note": "Panel sizes are not additive; case IDs deduplicated across panels.",
+      "cases_sha256": "6810c4561e77384eadfaa8fc487ec010ba45622023947db87df86cbe4a3dc71f",
+      "panels_sha256": "eb18131cab245ca39cf8c555279e0304689fa81d63156edda77969a0a5784106"
+    }
+  },
+  "hygiene": {
+    "wiki": {
+      "documents_seen": 5172,
+      "accepted_documents": 5037,
+      "excluded_boilerplate": 36,
+      "excluded_duplicate_lines": 27,
+      "excluded_markup": 13,
+      "duplicate_group": 57,
+      "excluded_repetition": 1,
+      "excluded_link_heavy": 1
+    },
+    "lihkg": {
+      "documents_seen": 1686,
+      "accepted_documents": 1372,
+      "excluded_link_heavy": 300,
+      "excluded_repetition": 13,
+      "duplicate_group": 1
+    },
+    "openrice": {
+      "documents_seen": 780,
+      "accepted_documents": 777,
+      "excluded_repetition": 2,
+      "excluded_link_heavy": 1
+    },
+    "commonvoice": {
+      "documents_seen": 4991,
+      "accepted_documents": 4991
+    },
+    "commoncrawl": {
+      "documents_seen": 1637,
+      "accepted_documents": 1637
+    }
+  },
+  "corpus_target_coverage": {
+    "development": {
+      "wiki": {
+        "all_targets": 942678,
+        "current_unknown_targets": 8484,
+        "original_v7_unsupported_targets": 9733
+      },
+      "lihkg": {
+        "all_targets": 302271,
+        "current_unknown_targets": 3726,
+        "original_v7_unsupported_targets": 4185
+      },
+      "openrice": {
+        "all_targets": 210367,
+        "current_unknown_targets": 1897,
+        "original_v7_unsupported_targets": 2761
+      },
+      "commonvoice": {
+        "all_targets": 42946,
+        "current_unknown_targets": 3,
+        "original_v7_unsupported_targets": 13
+      },
+      "commoncrawl": {
+        "all_targets": 796804,
+        "current_unknown_targets": 5326,
+        "original_v7_unsupported_targets": 7353
+      }
+    },
+    "confirmation": {
+      "wiki": {
+        "all_targets": 228462,
+        "current_unknown_targets": 2762,
+        "original_v7_unsupported_targets": 3043
+      },
+      "lihkg": {
+        "all_targets": 78814,
+        "current_unknown_targets": 772,
+        "original_v7_unsupported_targets": 887
+      },
+      "openrice": {
+        "all_targets": 50958,
+        "current_unknown_targets": 359,
+        "original_v7_unsupported_targets": 579
+      },
+      "commonvoice": {
+        "all_targets": 10627,
+        "current_unknown_targets": 0,
+        "original_v7_unsupported_targets": 4
+      },
+      "commoncrawl": {
+        "all_targets": 196435,
+        "current_unknown_targets": 1547,
+        "original_v7_unsupported_targets": 2173
+      }
+    }
+  },
+  "original_v7_vocab_size": 29762,
+  "current_vocab_size": 34081,
+  "confirmation_not_scored": true,
+  "no_training_or_test_documents_used": true
+}

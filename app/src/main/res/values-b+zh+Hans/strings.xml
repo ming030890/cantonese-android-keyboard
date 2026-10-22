@@ -118,4 +118,8 @@
     <string name="settings_open_onboarding_title">设置与新手指南</string>
     <string name="settings_open_onboarding_desc">检查麦克风权限、系统键盘启用及试用输入框</string>
     <string name="settings_at_least_one_layout">必须选择至少一个键盘布局</string>
+    <string name="subtype_quick">粤语 — 速成</string>
+    <string name="subtype_handwriting">粤语 — 手写</string>
+    <string name="settings_system_layouts">在 Android 启用键盘布局</string>
+    <string name="settings_system_layouts_description">在 Android 设置启用相同的键盘布局，即可使用导航栏的键盘切换按钮。</string>
 </resources>

@@ -1,0 +1,16 @@
+{
+  "verified_at_utc": "2026-10-22T22:32:12.587653+00:00",
+  "keyboard_gate": "passed",
+  "unit_scenario_jni_tests": 233,
+  "screenshot_checks": 83,
+  "native_rust_tests": 28,
+  "skipped": 0,
+  "panel_report_sha256": "ea38c90f79aebf2bfe97ca936d96c9b7fd015118f671c30ca746451a3461c76e",
+  "apk_sha256": "c1ec20855db88d9960d5368956f2ad9a9eb0b2b3fc5830be716663b4e21d2c27",
+  "arm64_library_sha256": "8ce6845ba343ab325f18b77b9d25a9de8fa83e6b188e8ae7140b030bc5bf5e22",
+  "packaged_library_sha256": "19b9ca4944953aeac19fef51200f64d7d084df6ab4d60122438074a65e5a528b",
+  "packaged_library_matches_gradle_stripped": true,
+  "native_host_library_sha256": "7a68f9581fb7a5d1053e2b7ef379415b85593feda028bfd31b7632cc6e389f7b",
+  "device_install_performed": false,
+  "phone_input_to_display_latency_measured": false
+}

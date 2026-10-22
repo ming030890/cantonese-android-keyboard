@@ -4,8 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.madeinhk.cantonesevoicekeyboard.KeyboardScenario
+import com.madeinhk.cantonesevoicekeyboard.KeyboardSubtypes
 import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
+
+@PreviewTest
+@Preview(name = "Candidates retained during rapid typing", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioUnifiedCandidatesPending() = ScenarioScreen(remember { KeyboardScenarios.unifiedCandidatesPending() })
 
 @PreviewTest
 @Preview(name = "Mixed Chinese phrase ranking", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
@@ -136,6 +143,11 @@ fun ScenarioAfterEmojiBackspace() = ScenarioScreen(remember { KeyboardScenarios.
 fun ScenarioTypingInterruptsVoice() = ScenarioScreen(remember { KeyboardScenarios.typingInterruptsVoice() })
 
 @PreviewTest
+@Preview(name = "Continue uses ASCII punctuation", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioContinuePunctuation() = ScenarioScreen(remember { KeyboardScenarios.continuePunctuation() })
+
+@PreviewTest
 @Preview(name = "Clipboard restored by new copy", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioClipboardAfterNewCopy() = ScenarioScreen(remember { KeyboardScenarios.clipboardAfterNewCopy() })
@@ -168,3 +180,14 @@ private fun ScenarioScreen(state: KeyboardRenderState, page: Int = 0) {
         )
     }
 }
+
+@PreviewTest
+@Preview(name = "English selected by system switcher", widthDp = 360, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioSystemEnglishLayout() = ScenarioScreen(remember {
+    KeyboardScenario().use { scenario ->
+        scenario.start()
+        scenario.controller.onSystemSubtypeSelected(KeyboardSubtypes.ENGLISH)
+        scenario.snapshot()
+    }
+})

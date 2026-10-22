@@ -33,30 +33,3 @@ internal fun shouldDismissAutofillOnTouch(
     y: Float,
 ): Boolean = action == MotionEvent.ACTION_DOWN &&
     shouldPassToAutofillView(autofillViewPresent, autofillBounds, x, y)
-
-internal fun computeNextLayoutTarget(
-    currentMode: KeyboardInputMode,
-    enabledLayouts: Set<String>,
-): String? {
-    val layoutOrder = listOf(
-        com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_QUICK,
-        com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_ENGLISH,
-        com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_HANDWRITING
-    )
-    val activeList = layoutOrder.filter { enabledLayouts.contains(it) }
-    if (activeList.size <= 1) return null
-    val currentLayoutId = when (currentMode) {
-        KeyboardInputMode.Quick -> com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_QUICK
-        KeyboardInputMode.AlphaNum -> com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_ENGLISH
-        KeyboardInputMode.Handwriting -> com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_HANDWRITING
-        KeyboardInputMode.Number -> return null
-    }
-    val currentIndex = activeList.indexOf(currentLayoutId)
-    val nextIndex = if (currentIndex >= 0) (currentIndex + 1) % activeList.size else 0
-    return when (activeList[nextIndex]) {
-        com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_QUICK -> "quick"
-        com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_ENGLISH -> "alpha"
-        com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.LAYOUT_HANDWRITING -> "handwriting"
-        else -> null
-    }
-}

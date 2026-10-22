@@ -201,4 +201,8 @@
     <string name="typing_diagnostics">Local typing diagnostics</string>
     <string name="typing_diagnostics_desc">Shows correction status without recording words or touch coordinates. Sharing happens only when you tap Export.</string>
     <string name="typing_export">Export typing diagnostics</string>
+    <string name="subtype_quick">Cantonese — Quick</string>
+    <string name="subtype_handwriting">Cantonese — Handwriting</string>
+    <string name="settings_system_layouts">Enable layouts in Android</string>
+    <string name="settings_system_layouts_description">Enable the same layouts in Android settings to use the navigation-bar keyboard switcher.</string>
 </resources>

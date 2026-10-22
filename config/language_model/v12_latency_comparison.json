@@ -1,0 +1,137 @@
+{
+  "method": "Actual release Rust models, six rounds of 300 requests per model/flow, alternating order, 60 warmups, alternating six contexts to force projection cache misses; includes Python pipe and serialization overhead. Quick a-code has two candidates; handwriting all 12362 classes; next-word full vocabulary top3. Desktop only, not Android, not total handwriting/keyboard latency.",
+  "models": {
+    "two_blocks": {
+      "path": "/Volumes/SSD/cantonese_ngram/experiments/dense-short-context-v11-small-complete/audit-final/model.cng",
+      "bytes": 5860722,
+      "sha256": "38f7b0f066e218e4d1e1703c02f070152006e1f0020f796d9e84e2c5efdaf0ca"
+    },
+    "three_blocks": {
+      "path": "/Volumes/SSD/cantonese_ngram/experiments/dense-capacity-v12-full/audit-final/model.cng",
+      "bytes": 6131426,
+      "sha256": "01955e2824ee8597709f9061563e39e131a33327238a0609f56cb070a241858f"
+    }
+  },
+  "flows": {
+    "quick_candidates": {
+      "two_blocks": {
+        "median_ms": 0.087459,
+        "p95_ms": 0.093459,
+        "samples": 1800
+      },
+      "three_blocks": {
+        "median_ms": 0.105708,
+        "p95_ms": 0.112792,
+        "samples": 1800
+      },
+      "median_increase_percent": 20.86577710698727,
+      "median_increase_ms": 0.018249,
+      "paired_round_medians": [
+        {
+          "two_blocks": 0.0872915,
+          "three_blocks": 0.105583
+        },
+        {
+          "three_blocks": 0.10589599999999999,
+          "two_blocks": 0.088042
+        },
+        {
+          "two_blocks": 0.0875835,
+          "three_blocks": 0.10575
+        },
+        {
+          "three_blocks": 0.10552049999999999,
+          "two_blocks": 0.087375
+        },
+        {
+          "two_blocks": 0.0869375,
+          "three_blocks": 0.1059795
+        },
+        {
+          "three_blocks": 0.10568749999999999,
+          "two_blocks": 0.087479
+        }
+      ]
+    },
+    "handwriting_priors": {
+      "two_blocks": {
+        "median_ms": 2.2446875,
+        "p95_ms": 2.3995,
+        "samples": 1800
+      },
+      "three_blocks": {
+        "median_ms": 2.234604,
+        "p95_ms": 2.384583,
+        "samples": 1800
+      },
+      "median_increase_percent": -0.4492162049283044,
+      "median_increase_ms": -0.010083499999999912,
+      "paired_round_medians": [
+        {
+          "two_blocks": 2.230146,
+          "three_blocks": 2.2346250000000003
+        },
+        {
+          "three_blocks": 2.2374585,
+          "two_blocks": 2.276917
+        },
+        {
+          "two_blocks": 2.2491045,
+          "three_blocks": 2.2534585
+        },
+        {
+          "three_blocks": 2.2214795,
+          "two_blocks": 2.251062
+        },
+        {
+          "two_blocks": 2.2262709999999997,
+          "three_blocks": 2.246979
+        },
+        {
+          "three_blocks": 2.2267915,
+          "two_blocks": 2.2393955
+        }
+      ]
+    },
+    "next_word": {
+      "two_blocks": {
+        "median_ms": 2.369,
+        "p95_ms": 2.491917,
+        "samples": 1800
+      },
+      "three_blocks": {
+        "median_ms": 2.3819375000000003,
+        "p95_ms": 2.479375,
+        "samples": 1800
+      },
+      "median_increase_percent": 0.5461165048543659,
+      "median_increase_ms": 0.012937500000000046,
+      "paired_round_medians": [
+        {
+          "two_blocks": 2.3675414999999997,
+          "three_blocks": 2.3979585
+        },
+        {
+          "three_blocks": 2.3754795,
+          "two_blocks": 2.3750419999999997
+        },
+        {
+          "two_blocks": 2.354271,
+          "three_blocks": 2.3876875
+        },
+        {
+          "three_blocks": 2.372896,
+          "two_blocks": 2.3716665
+        },
+        {
+          "two_blocks": 2.364542,
+          "three_blocks": 2.3812085
+        },
+        {
+          "three_blocks": 2.3826045,
+          "two_blocks": 2.3743749999999997
+        }
+      ]
+    }
+  }
+}

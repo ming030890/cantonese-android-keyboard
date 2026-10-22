@@ -4,11 +4,26 @@
     android:supportsInlineSuggestions="true"
     android:supportsSwitchingToNextInputMethod="true">
     <subtype
-        android:label="@string/subtype_cantonese_hk"
+        android:label="@string/subtype_quick"
         android:imeSubtypeMode="keyboard"
         android:imeSubtypeLocale="yue_HK"
         android:languageTag="yue-Hant-HK"
-        android:imeSubtypeExtraValue="KeyboardLayoutType=cantonese,AsciiCapable"
+        android:imeSubtypeExtraValue="KeyboardLayoutType=quick,AsciiCapable"
         android:isAsciiCapable="true"
         android:subtypeId="1001" />
+    <subtype
+        android:label="@string/subtype_english_hk"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeLocale="en_HK"
+        android:languageTag="en-HK"
+        android:imeSubtypeExtraValue="KeyboardLayoutType=english,AsciiCapable"
+        android:isAsciiCapable="true"
+        android:subtypeId="1002" />
+    <subtype
+        android:label="@string/subtype_handwriting"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeLocale="yue_HK"
+        android:languageTag="yue-Hant-HK"
+        android:imeSubtypeExtraValue="KeyboardLayoutType=handwriting"
+        android:subtypeId="1003" />
 </input-method>

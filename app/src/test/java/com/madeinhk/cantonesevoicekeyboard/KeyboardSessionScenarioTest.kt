@@ -14,6 +14,22 @@ import org.junit.Test
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class KeyboardSessionScenarioTest {
     @Test
+    fun reopeningAdvancesKeyboardSessionAndKeepsTheTextLayout() = KeyboardScenario().use { s ->
+        s.start()
+        s.mode(KeyboardInputMode.AlphaNum)
+        val first = s.snapshot().keyboardSession
+        s.controller.onSelectionChanged()
+        assertEquals(first, s.snapshot().keyboardSession)
+        s.hide()
+        s.controller.onStartInputView(null)
+        assertTrue(s.snapshot().keyboardSession > first)
+        assertEquals(KeyboardInputMode.AlphaNum, s.snapshot().inputMode)
+        assertEquals("", s.editor.text)
+        assertEquals("", s.editor.composing)
+        assertEquals(KeyboardToolbarContent.Clipboard, s.snapshot().toolbar())
+    }
+
+    @Test
     fun clipboardWinsIdlePredictionsThenTypingHidesIt() = KeyboardScenario().use { s ->
         s.start()
         assertEquals(listOf("我", "你"), s.snapshot().quickCandidates.map { it.text })

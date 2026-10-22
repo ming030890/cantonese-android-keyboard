@@ -1,0 +1,194 @@
+{
+  "data": "/Volumes/SSD/cantonese_ngram/data/campaign-character-coverage-v7",
+  "filter_version": "simple-strict-v3",
+  "diagnostic_only": "Training filter applied read-only to existing eval text; rejection/changes are mechanical hygiene indicators, not human linguistic-quality labels. No evaluation filtering, model evaluation or model selection.",
+  "splits": {
+    "validation": {
+      "wiki": {
+        "documents": 5172,
+        "document_groups": 5115,
+        "distinct_hashes": 5172,
+        "supported_targets": 1215631,
+        "coverage": {
+          "all": 1229033,
+          "unknown": 13402
+        },
+        "strict_filter_rejection_reasons": {
+          "low_han_ratio": 94,
+          "duplicate_lines": 27,
+          "link_heavy": 1,
+          "residual_markup": 13,
+          "boilerplate_only": 1,
+          "extreme_repetition": 1
+        },
+        "strict_filter_rejected_fraction": 0.02648878576952823,
+        "accepted_but_filter_would_change_documents": 204
+      },
+      "lihkg": {
+        "documents": 1686,
+        "document_groups": 1684,
+        "distinct_hashes": 1686,
+        "supported_targets": 432154,
+        "coverage": {
+          "all": 439008,
+          "unknown": 6854
+        },
+        "strict_filter_rejection_reasons": {
+          "low_han_ratio": 264,
+          "link_heavy": 159,
+          "extreme_repetition": 11
+        },
+        "strict_filter_rejected_fraction": 0.25741399762752076,
+        "accepted_but_filter_would_change_documents": 7
+      },
+      "openrice": {
+        "documents": 780,
+        "document_groups": 780,
+        "distinct_hashes": 780,
+        "supported_targets": 258961,
+        "coverage": {
+          "all": 262306,
+          "unknown": 3344
+        },
+        "strict_filter_rejection_reasons": {
+          "link_heavy": 1,
+          "low_han_ratio": 11,
+          "extreme_repetition": 2
+        },
+        "strict_filter_rejected_fraction": 0.017948717948717947,
+        "accepted_but_filter_would_change_documents": 17
+      },
+      "commonvoice": {
+        "documents": 4991,
+        "document_groups": 4991,
+        "distinct_hashes": 4991,
+        "supported_targets": 53556,
+        "coverage": {
+          "all": 53573,
+          "unknown": 17
+        },
+        "strict_filter_rejection_reasons": {},
+        "strict_filter_rejected_fraction": 0.0,
+        "accepted_but_filter_would_change_documents": 0
+      },
+      "commoncrawl": {
+        "documents": 1637,
+        "document_groups": 1637,
+        "distinct_hashes": 1637,
+        "supported_targets": 983713,
+        "coverage": {
+          "all": 993240,
+          "unknown": 9526
+        },
+        "strict_filter_rejection_reasons": {},
+        "strict_filter_rejected_fraction": 0.0,
+        "accepted_but_filter_would_change_documents": 0
+      }
+    },
+    "test": {
+      "wiki": {
+        "documents": 5171,
+        "document_groups": 5108,
+        "distinct_hashes": 5171,
+        "supported_targets": 1212512,
+        "coverage": {
+          "all": 1226237,
+          "unknown": 13725
+        },
+        "strict_filter_rejection_reasons": {
+          "low_han_ratio": 83,
+          "boilerplate_only": 5,
+          "residual_markup": 12,
+          "duplicate_lines": 20,
+          "extreme_repetition": 4
+        },
+        "strict_filter_rejected_fraction": 0.023979887836008507,
+        "accepted_but_filter_would_change_documents": 226
+      },
+      "lihkg": {
+        "documents": 1728,
+        "document_groups": 1726,
+        "distinct_hashes": 1728,
+        "supported_targets": 459304,
+        "coverage": {
+          "all": 467398,
+          "unknown": 8094
+        },
+        "strict_filter_rejection_reasons": {
+          "low_han_ratio": 299,
+          "link_heavy": 174,
+          "extreme_repetition": 10,
+          "residual_markup": 1
+        },
+        "strict_filter_rejected_fraction": 0.2800925925925926,
+        "accepted_but_filter_would_change_documents": 5
+      },
+      "openrice": {
+        "documents": 751,
+        "document_groups": 751,
+        "distinct_hashes": 751,
+        "supported_targets": 239089,
+        "coverage": {
+          "all": 241261,
+          "unknown": 2172
+        },
+        "strict_filter_rejection_reasons": {
+          "low_han_ratio": 12,
+          "extreme_repetition": 1
+        },
+        "strict_filter_rejected_fraction": 0.017310252996005325,
+        "accepted_but_filter_would_change_documents": 22
+      },
+      "commonvoice": {
+        "documents": 5035,
+        "document_groups": 5035,
+        "distinct_hashes": 5035,
+        "supported_targets": 53364,
+        "coverage": {
+          "all": 53372,
+          "unknown": 8
+        },
+        "strict_filter_rejection_reasons": {},
+        "strict_filter_rejected_fraction": 0.0,
+        "accepted_but_filter_would_change_documents": 0
+      },
+      "commoncrawl": {
+        "documents": 1726,
+        "document_groups": 1726,
+        "distinct_hashes": 1726,
+        "supported_targets": 1060176,
+        "coverage": {
+          "all": 1070407,
+          "unknown": 10231
+        },
+        "strict_filter_rejection_reasons": {},
+        "strict_filter_rejected_fraction": 0.0,
+        "accepted_but_filter_would_change_documents": 0
+      }
+    }
+  },
+  "totals": {
+    "validation": {
+      "documents": 14266,
+      "supported_targets": 2944015,
+      "all_targets": 2977160,
+      "unknown_targets": 33143,
+      "strict_rejected_documents": 585,
+      "accepted_but_changed": 228
+    },
+    "test": {
+      "documents": 14411,
+      "supported_targets": 3024445,
+      "all_targets": 3058675,
+      "unknown_targets": 34230,
+      "strict_rejected_documents": 621,
+      "accepted_but_changed": 253
+    }
+  },
+  "actual_scored_examples": {
+    "original_short_pilots": 1280,
+    "latest_short_pilots_and_full_development": 5000,
+    "final_text_test": 10000
+  },
+  "coverage_note": "Original v7 supported-vocabulary targets only; excludes added vocabulary targets. Rows/modes are correlated within documents."
+}

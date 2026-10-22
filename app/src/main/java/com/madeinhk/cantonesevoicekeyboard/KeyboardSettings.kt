@@ -41,6 +41,7 @@ object KeyboardSettings {
 
     fun init(context: Context) {
         _enabledLayoutsFlow.value = getEnabledLayouts(context)
+        KeyboardSubtypes.syncEnabled(context, _enabledLayoutsFlow.value)
         _quickVersionFlow.value = getQuickVersion(context)
     }
 
@@ -71,6 +72,7 @@ object KeyboardSettings {
             .putStringSet(KEY_ENABLED_LAYOUTS, safeLayouts)
             .apply()
         _enabledLayoutsFlow.value = safeLayouts
+        KeyboardSubtypes.syncEnabled(context, safeLayouts)
     }
 
     fun isLayoutEnabled(context: Context, layoutId: String): Boolean =

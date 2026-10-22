@@ -1,0 +1,19 @@
+{
+  "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/handwriting/model.safetensors": "b6916eacca94eeeaafd6d3c4b957e218a5681b55e8374f98d9109bfefa98af26",
+  "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/handwriting/labels.txt": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
+  "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/app/src/main/assets/handwriting/lm_csr.bin": "a413ec84e51b2f88c90af9b17ed4610d024743499ec72d1d61e7e78e3b2834e8",
+  "/Volumes/SSD/cantonese_ngram/experiments/count-distillation-128-256-v9/paired-width-comparison/width128/export/model.cng": "0f0f74ee928da0a92de6e201118d17131e2f9be1d709425609c7cb0e940e79d6",
+  "/Volumes/SSD/cantonese_ngram/data/campaign-wordshk-rehearsal-v8/vocab.json": "e49577545138bdb5d77e40c7d9dae0f61adf3c39d70d507848914ca47e34e873",
+  "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/target/release/handwriting_priors": "d3d71dbe1e1617d1a390461996b8c07b23a77f0438d65f97cef83e2b330a8a14",
+  "/Volumes/SSD/olhwd-trajectories/datas.npy": "55bbeba2787f7242fa12ac9dae5c892f7868f6cf0af00f4153ebb69af2647802",
+  "/Volumes/SSD/cantonese_ngram/data/campaign-character-coverage-v7/lihkg.train.jsonl": "9fc0be46bc9c26f6a3cc18290c8831f13ea2230978fc3628f9160916d9026530",
+  "/Volumes/SSD/cantonese_ngram/data/campaign-character-coverage-v7/commonvoice.train.jsonl": "5aa9ea8b08c8a2d5f771ee621b8663ef2263fc49d87f71084561219b9f4f05bf",
+  "/Volumes/SSD/cantonese_ngram/data/campaign-character-coverage-v7/openrice.train.jsonl": "45795b29b17d698b45fd5539716aee1af32f30778a38d75ad67f8d412073c1bc",
+  "/Volumes/SSD/cantonese_ngram/data/campaign-character-coverage-v7/commoncrawl.train.jsonl": "afc186c4c8319680b0014c3a0420ca94de7403e55e347e615fcc9aba0b2eee7a",
+  "/Volumes/SSD/cantonese_ngram/data/campaign-character-coverage-v7/wiki.train.jsonl": "5b80d3d0554814b0a0f4653d3f4fab223f86a2512cef6d7918f476c2ced901a0",
+  "/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique/fusion.json": "e6b9ea59b3959661a63425777ec92941f8cdc76bc9127591ba3ef42e6d49b67a",
+  "/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique/pairs.jsonl": "623293ab900c52c842c91bac773dcb4cec8e37d95a759de335731a30695a27c7",
+  "/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique/prepared.json": "b3a4d8c9a503bcc80ec8296aa9baf37780eaab7c0dc844153ec93e82b61e37ff",
+  "/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique/training.scores.f32": "5aee1dd709495692309bfe747041ec91bee89e590712866be5839fd09fe73400",
+  "/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique/training.status.json": "5330d260ca8d65ec2c6f5c34000db7d422a1f078c5408d41337fcfa90bbe0b37"
+}

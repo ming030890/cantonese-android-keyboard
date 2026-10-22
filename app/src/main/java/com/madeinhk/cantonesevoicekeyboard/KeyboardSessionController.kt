@@ -50,7 +50,8 @@ internal class KeyboardSessionController(
                 },
                 CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
                 onError = { android.util.Log.e("EnglishInputCoordinator", "English candidate engine failed", it) },
-                sharedSuggestions = true)
+                sharedSuggestions = true,
+                unifiedEngine = NativeSharedSuggestions(quick::englishContextHandle))
             KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english)
         },
     )
@@ -63,7 +64,11 @@ internal class KeyboardSessionController(
     private val handwriting = dependencies.handwriting
     private val suggestions = dependencies.suggestions
     private val english = dependencies.english
-    init { english?.onContextRevised = { refreshPredictions() } }
+    init {
+        english?.onContextRevised = { refreshPredictions() }
+        english?.quickEnglishEnabled = { autocorrectActive(KeyboardInputMode.Quick) }
+        english?.attachQuick(quick)
+    }
     private var editorAllowsEnglish = true
     private var textPanel = KeyboardInputMode.Quick
     private var pendingTouch: EnglishTouchEvidence? = null
@@ -111,7 +116,7 @@ internal class KeyboardSessionController(
     val handwritingCandidates = handwriting.candidates
     val englishCandidates = english?.candidates ?: MutableStateFlow(emptyList<com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate>())
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val quickCandidates = if (english == null) quick.candidates else combine(quick.candidates, english.candidates) { chinese, words ->
+    val quickCandidates = if (english?.hasUnifiedSuggestions == true) quick.joinedCandidates else if (english == null) quick.candidates else combine(quick.candidates, english.candidates) { chinese, words ->
         val mix = english.quick && english.word == quick.getComposingText() && autocorrectActive(KeyboardInputMode.Quick)
         Triple(chinese, if (mix) words else emptyList(), quick.getComposingText())
     }.transformLatest { (chinese, words, code) ->
@@ -158,6 +163,7 @@ internal class KeyboardSessionController(
         handwritingBusy = handwritingRecognizing.value,
         handwritingError = handwritingError.value,
         handwritingSession = handwritingSession.value,
+        keyboardSession = keyboardSession.value,
     )
 
     private var lastUserSelectedLayout: KeyboardInputMode? = null
@@ -185,7 +191,10 @@ internal class KeyboardSessionController(
     private val _handwritingSession = MutableStateFlow(0L)
     val handwritingSession = _handwritingSession.asStateFlow()
 
-    fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+    fun onStartInput(info: EditorInfo?, restarting: Boolean, systemSubtypeId: Int? = null) {
+        systemSubtypeId?.let { id ->
+            KeyboardSubtypes.mode(id, settings.enabledLayouts())?.let { lastUserSelectedLayout = it }
+        }
         boundaryQueue?.discard()
         if (restarting) finishEnglishLiteral() else english?.reset()
         english?.reloadBackend()
@@ -196,7 +205,11 @@ internal class KeyboardSessionController(
         if (!restarting) voice.finish(releaseModel = false, session = inputViewSession)
     }
 
+    private val _keyboardSession = MutableStateFlow(0L)
+    val keyboardSession = _keyboardSession.asStateFlow()
+
     fun onStartInputView(info: EditorInfo?) {
+        _keyboardSession.value++
         quick.setVersion(settings.quickVersion())
         updateEditorPresentation(info)
         ensureValidInputMode()
@@ -451,6 +464,10 @@ internal class KeyboardSessionController(
     }
 
     fun selectCandidate(text: String) {
+        if (english?.hasUnifiedSuggestions == true) {
+            if (_keyboardInputMode.value == KeyboardInputMode.Quick && !quick.canSelectJoined(text)) return
+            if (_keyboardInputMode.value == KeyboardInputMode.AlphaNum && !english.canSelect(text)) return
+        }
         if (queueEditorAction { selectCandidate(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
@@ -474,6 +491,11 @@ internal class KeyboardSessionController(
     }
 
     fun selectHandwritingCandidate(text: String) = selectCandidate(text)
+
+    fun onSystemSubtypeSelected(subtypeId: Int) {
+        val mode = KeyboardSubtypes.mode(subtypeId, settings.enabledLayouts()) ?: return
+        selectKeyboardInputMode(mode)
+    }
 
     fun selectKeyboardInputMode(mode: KeyboardInputMode) {
         flushBoundaryLiteral()

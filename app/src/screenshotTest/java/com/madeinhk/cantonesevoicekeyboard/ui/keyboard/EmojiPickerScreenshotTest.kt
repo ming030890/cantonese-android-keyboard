@@ -45,3 +45,18 @@ private fun EmojiSearchPreview(query: String?, dark: Boolean = false) {
 @Preview(name = "Emoji search dark", widthDp = 412, heightDp = KeyboardUiDefaults.EmojiSearchSurfaceHeightDp)
 @Composable
 fun EmojiDarkSearchScreenshot() = EmojiSearchPreview("heart", dark = true)
+
+@PreviewTest
+@Preview(name = "Recent emoji", widthDp = 412, heightDp = KeyboardUiDefaults.EmojiSurfaceHeightDp)
+@Preview(name = "Recent emoji narrow", widthDp = 320, heightDp = KeyboardUiDefaults.EmojiSurfaceHeightDp)
+@Composable
+fun EmojiRecentScreenshot() {
+    CantoneseVoiceKeyboardTheme(darkTheme = false) {
+        EmojiPickerPanel(
+            modifier = Modifier.fillMaxSize().background(BrandTheme.colors.keyboardBackground).padding(4.dp),
+            onEmojiPicked = {},
+            initialRecentEmoji = EmojiHistory().pick("😀").pick("❤️").pick("👍🏽")
+                .pick("🇭🇰").pick("👩‍🦰").pick("👍🏽").emoji,
+        )
+    }
+}

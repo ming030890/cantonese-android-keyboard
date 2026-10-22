@@ -118,4 +118,8 @@
     <string name="settings_open_onboarding_title">設定與新手指南</string>
     <string name="settings_open_onboarding_desc">檢查麥克風權限、系統鍵盤啟用及試用輸入框</string>
     <string name="settings_at_least_one_layout">必須選擇最少一個鍵盤佈局</string>
+    <string name="subtype_quick">粵語 — 速成</string>
+    <string name="subtype_handwriting">粵語 — 手寫</string>
+    <string name="settings_system_layouts">在 Android 啟用鍵盤配置</string>
+    <string name="settings_system_layouts_description">在 Android 設定啟用相同的鍵盤配置，即可使用導覽列的鍵盤切換按鈕。</string>
 </resources>

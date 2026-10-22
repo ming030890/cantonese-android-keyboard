@@ -1,0 +1,15 @@
+{
+  "synthetic_prompt_groups": 663,
+  "resolved_prompt_groups": 663,
+  "real_trials": 480,
+  "shared_trials": 137,
+  "shared_unique_reference_texts": 64,
+  "real_unique_reference_texts": 212,
+  "interpretation": "Real touch events were never training inputs. Text overlap limits prompt-independent generalization. Do not remove evaluation cases or refit using this audit.",
+  "hashes": {
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/touch-eval-public/synthetic/cases.jsonl": "7b1c39c30dabf096bde808ae21c03119f8c1d6bca44f660dca2db3943ca79a55",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/touch-eval-public/prepared/trials.jsonl": "c57865ede8594de0ed241e36d2d26688e5c10e68f139292ae471e1fd1efc2270",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/audit_touch_prompt_overlap.py": "56545c585c54d80c1aa115b7ba7929ec564ea41f93fb8c61a4d20a6798dad527"
+  }
+}

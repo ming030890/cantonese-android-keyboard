@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodSubtype
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InlineSuggestionsRequest
 import android.view.inputmethod.InlineSuggestionsResponse
@@ -50,6 +52,7 @@ class CantoneseInputMethodService :
     override fun onCreate() {
         val startedAt = SystemClock.elapsedRealtime()
         super.onCreate()
+        KeyboardSettings.init(this)
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
         Log.i(TAG, "onCreate completed in ${SystemClock.elapsedRealtime() - startedAt}ms")
@@ -78,6 +81,7 @@ class CantoneseInputMethodService :
                         handwritingRecognizing = controller.handwritingRecognizing,
                         handwritingError = controller.handwritingError,
                         handwritingSession = controller.handwritingSession,
+                        keyboardSession = controller.keyboardSession,
                         quickCandidates = controller.quickCandidates,
                         englishCandidates = controller.englishCandidates,
                         chinesePunctuation = controller.chinesePunctuation,
@@ -100,6 +104,7 @@ class CantoneseInputMethodService :
                         onAutofillTapped = controller::onAutofillTapped,
                         onEmojiPicked = controller::commitText,
                         onInterruptVoice = controller::interruptVoiceInput,
+                        onEmojiSearchKeyHandlerChanged = { emojiSearchKeyHandler = it },
                     )
                 }
             }
@@ -107,15 +112,38 @@ class CantoneseInputMethodService :
         }
     }
 
+    private var emojiSearchKeyHandler: ((android.view.KeyEvent) -> Boolean)? = null
+    private val searchConsumedKeys = mutableSetOf<Int>()
+
+    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent): Boolean {
+        if (isInputViewShown && emojiSearchKeyHandler?.invoke(event) == true) {
+            searchConsumedKeys += keyCode
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: android.view.KeyEvent): Boolean {
+        if (searchConsumedKeys.remove(keyCode)) return true
+        return super.onKeyUp(keyCode, event)
+    }
+
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
         super.onStartInput(info, restarting)
-        controller.onStartInput(info, restarting)
+        val subtype = getSystemService(InputMethodManager::class.java)?.currentInputMethodSubtype
+        controller.onStartInput(info, restarting, subtype?.hashCode())
+    }
+
+    override fun onCurrentInputMethodSubtypeChanged(newSubtype: InputMethodSubtype?) {
+        super.onCurrentInputMethodSubtypeChanged(newSubtype)
+        newSubtype?.let { controller.onSystemSubtypeSelected(it.hashCode()) }
     }
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         applyNavigationBarAppearance()
+        KeyboardSubtypes.syncEnabled(this, KeyboardSettings.getEnabledLayouts(this))
         controller.onStartInputView(info)
     }
 
@@ -125,6 +153,8 @@ class CantoneseInputMethodService :
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
+        emojiSearchKeyHandler = null
+        searchConsumedKeys.clear()
         controller.onFinishInputView()
         super.onFinishInputView(finishingInput)
         stopComposeLifecycle()

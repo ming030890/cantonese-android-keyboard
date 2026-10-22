@@ -1,0 +1,70 @@
+{
+  "schema": "public-phone-touch-eval-v1",
+  "primary_study": "vt_exp2",
+  "condition": "space",
+  "device": "Nexus 4, portrait, full size",
+  "archive_url": "https://osf.io/download/7ev5z/",
+  "source": "https://osf.io/5xwng/",
+  "training": "Synthetic taps only; no real evaluation taps, references or outcomes may fit parameters",
+  "observations": "First frame of each original tap; reconstruct closest key by rectangle distance with centre tie-break; apply recorded backspaces",
+  "context": "Previous observed input within this trial only; LEFT/RIGHT/ORIG fields are never inference inputs",
+  "boundaries": "Recorded spaces and explicit end-of-trial submission; word spans come from observed text",
+  "labels": "Unique optimal word alignment, allowing merges/splits up to three words; ambiguous labels excluded from F0.5, retained in whole-trial CER",
+  "metrics": [
+    "F0.5",
+    "precision",
+    "recall",
+    "clean_changes",
+    "whole_trial_CER",
+    "per_participant",
+    "latency"
+  ],
+  "excluded_conditions": [
+    "blindfolded",
+    "no feedback",
+    "no spaces",
+    "swipe spaces",
+    "small/tiny keyboard",
+    "watch",
+    "midair",
+    "desktop"
+  ],
+  "limits": [
+    "English mobile-email copy typing on older study devices; not modern chat or Cantonese/English qualification",
+    "Recognition occurred after sentences in original study; replay at word boundaries differs from original interaction",
+    "Key outputs reconstructed from geometry, not logged Gboard outputs",
+    "No usage-population weights are known; report corpus and participant results, not deployment precision",
+    "No per-key intended labels inferred for model fitting from these evaluation references"
+  ],
+  "archive_sha256": "76d9cc798b5694686333da8baec46ce025174068bbfef909a31fe01e67dcdf5d",
+  "evaluation_files": [
+    "noisy_typing/phone/vt_exp2/test/p10_space.log",
+    "noisy_typing/phone/vt_exp2/test/p11_space.log",
+    "noisy_typing/phone/vt_exp2/test/p12_space.log",
+    "noisy_typing/phone/vt_exp2/test/p13_space.log",
+    "noisy_typing/phone/vt_exp2/test/p14_space.log",
+    "noisy_typing/phone/vt_exp2/test/p15_space.log",
+    "noisy_typing/phone/vt_exp2/test/p16_space.log",
+    "noisy_typing/phone/vt_exp2/test/p17_space.log",
+    "noisy_typing/phone/vt_exp2/test/p18_space.log",
+    "noisy_typing/phone/vt_exp2/test/p19_space.log",
+    "noisy_typing/phone/vt_exp2/test/p1_space.log",
+    "noisy_typing/phone/vt_exp2/test/p20_space.log",
+    "noisy_typing/phone/vt_exp2/test/p21_space.log",
+    "noisy_typing/phone/vt_exp2/test/p22_space.log",
+    "noisy_typing/phone/vt_exp2/test/p23_space.log",
+    "noisy_typing/phone/vt_exp2/test/p24_space.log",
+    "noisy_typing/phone/vt_exp2/test/p2_space.log",
+    "noisy_typing/phone/vt_exp2/test/p3_space.log",
+    "noisy_typing/phone/vt_exp2/test/p4_space.log",
+    "noisy_typing/phone/vt_exp2/test/p5_space.log",
+    "noisy_typing/phone/vt_exp2/test/p6_space.log",
+    "noisy_typing/phone/vt_exp2/test/p7_space.log",
+    "noisy_typing/phone/vt_exp2/test/p8_space.log",
+    "noisy_typing/phone/vt_exp2/test/p9_space.log"
+  ],
+  "metadata_sha256": {
+    "noisy_typing/phone/vt_exp2/readme.txt": "e1a58da287c18722c7bed1d552df6c6e2df5f160da67f51c7b1de18378427098",
+    "noisy_typing/phone/vt_exp2/keyboard_nexus4.txt": "816e80d5cb37b43501157f26d0bbba859bafa7821b4931b2279c26fcf4e064c1"
+  }
+}

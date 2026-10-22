@@ -19,10 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.remember
 import androidx.compose.ui.zIndex
-import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 
@@ -375,53 +372,7 @@ internal fun AlphaNumBottomRow(
             modifier = Modifier.weight(1.3f),
             backgroundColor = keyboardColors.keyboardModifierKeySurface,
         ) {
-            Text(
-                text = modeSwitchLabel,
-                color = keyboardColors.keyboardKeyOnSurface,
-                style = keyboardTypography.keyboardModeSwitchKey,
-                maxLines = 1,
-                softWrap = false,
-            )
-        }
-        val context = LocalContext.current
-        val enabledLayouts = remember(context) {
-            KeyboardSettings.getEnabledLayouts(context)
-        }
-        val nextTarget = remember(enabledLayouts) {
-            computeNextLayoutTarget(KeyboardInputMode.AlphaNum, enabledLayouts)
-        }
-        KeyVisual(
-            key = keyRegistry.key(
-                id = "text.bottom.handwriting",
-                data = if (nextTarget != null) {
-                    KeyData(
-                        "text.bottom.handwriting",
-                        KeyboardKeyKind.ModeSwitch,
-                        text = nextTarget,
-                    )
-                } else {
-                    KeyData(
-                        "text.bottom.handwriting",
-                        KeyboardKeyKind.Settings,
-                    )
-                },
-                rowId = "text.bottom",
-            ),
-            keyRegistry = keyRegistry,
-            modifier = Modifier.weight(1.15f),
-            backgroundColor = keyboardColors.keyboardModifierKeySurface,
-        ) {
-            if (nextTarget != null) {
-                KeyboardIcon(
-                    modifier = Modifier.size(20.dp),
-                    color = keyboardColors.keyboardKeyOnSurface,
-                )
-            } else {
-                SettingsIcon(
-                    modifier = Modifier.size(20.dp),
-                    color = keyboardColors.keyboardKeyOnSurface,
-                )
-            }
+            ModeKeyLabel(modeSwitchLabel)
         }
         KeyVisual(
             key = keyRegistry.key(
@@ -453,7 +404,7 @@ internal fun AlphaNumBottomRow(
             modifier = Modifier.weight(0.9f),
         ) {
             SmileIcon(
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(30.dp),
                 color = keyboardColors.keyboardKeyOnSurface,
             )
         }
@@ -464,7 +415,7 @@ internal fun AlphaNumBottomRow(
                 rowId = "text.bottom",
             ),
             keyRegistry = keyRegistry,
-            modifier = Modifier.weight(3.45f),
+            modifier = Modifier.weight(4.6f),
         ) {
             Text(
                 text = stringResource(R.string.keyboard_key_space),
@@ -580,4 +531,15 @@ private fun CharacterKeyPopup(
             textAlign = TextAlign.Center,
         )
     }
+}
+
+@Composable
+internal fun ModeKeyLabel(label: String) {
+    Text(
+        text = label,
+        color = BrandTheme.colors.keyboardKeyOnSurface,
+        style = BrandTheme.typography.keyboardModeSwitchKey,
+        maxLines = 1,
+        softWrap = false,
+    )
 }

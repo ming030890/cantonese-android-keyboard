@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "data_and_model_hashes_verified": true,
+  "old_tokenizer_remapping_checked_cases": 128,
+  "model_actual_ids_checked": true,
+  "shuffled_top3": 0.0345,
+  "actual_natural_next_top3": 0.30074,
+  "document_partitions_disjoint": true,
+  "confirmation_scored": false,
+  "text_cases": 67268,
+  "quick_cases": 9730,
+  "notes": "Actual Rust Quick assertions ensure the intended target occurs in every evaluated dictionary candidate set. Text standalone numerical parity already verified on complete count bank; prediction controls and hash freezing repeat here."
+}

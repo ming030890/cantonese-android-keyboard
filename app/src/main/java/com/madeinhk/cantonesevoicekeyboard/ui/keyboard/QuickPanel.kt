@@ -8,13 +8,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -22,7 +20,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 
@@ -311,7 +308,6 @@ fun QuickBottomRow(
     rowHeight: Dp,
     action: KeyboardAction,
     keyRegistry: KeyboardKeyRegistry,
-    currentMode: KeyboardInputMode,
     modeSwitchLabel: String = "?123",
     modeSwitchTarget: String = "number.chinese",
     commaValue: String = "，",
@@ -320,12 +316,6 @@ fun QuickBottomRow(
     val keyboardColors = BrandTheme.colors
     val keyboardTypography = BrandTheme.typography
     val primaryColor = MaterialTheme.colorScheme.primary
-    val context = LocalContext.current
-    val enabledLayouts = remember(context) { KeyboardSettings.getEnabledLayouts(context) }
-    val nextTarget = remember(currentMode, enabledLayouts) {
-        computeNextLayoutTarget(currentMode, enabledLayouts)
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -347,47 +337,7 @@ fun QuickBottomRow(
             modifier = Modifier.weight(1.3f),
             backgroundColor = keyboardColors.keyboardModifierKeySurface,
         ) {
-            Text(
-                text = modeSwitchLabel,
-                color = keyboardColors.keyboardKeyOnSurface,
-                style = keyboardTypography.keyboardModeSwitchKey,
-                maxLines = 1,
-                softWrap = false,
-            )
-        }
-
-        KeyVisual(
-            key = keyRegistry.key(
-                id = "quick.bottom.switch",
-                data = if (nextTarget != null) {
-                    KeyData(
-                        "quick.bottom.switch",
-                        KeyboardKeyKind.ModeSwitch,
-                        text = nextTarget,
-                    )
-                } else {
-                    KeyData(
-                        "quick.bottom.switch",
-                        KeyboardKeyKind.Settings,
-                    )
-                },
-                rowId = "quick.bottom",
-            ),
-            keyRegistry = keyRegistry,
-            modifier = Modifier.weight(1.15f),
-            backgroundColor = keyboardColors.keyboardModifierKeySurface,
-        ) {
-            if (nextTarget != null) {
-                KeyboardIcon(
-                    modifier = Modifier.size(20.dp),
-                    color = keyboardColors.keyboardKeyOnSurface,
-                )
-            } else {
-                SettingsIcon(
-                    modifier = Modifier.size(20.dp),
-                    color = keyboardColors.keyboardKeyOnSurface,
-                )
-            }
+            ModeKeyLabel(modeSwitchLabel)
         }
 
         KeyVisual(
@@ -421,7 +371,7 @@ fun QuickBottomRow(
             modifier = Modifier.weight(0.9f),
         ) {
             SmileIcon(
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(30.dp),
                 color = keyboardColors.keyboardKeyOnSurface,
             )
         }
@@ -433,7 +383,7 @@ fun QuickBottomRow(
                 rowId = "quick.bottom",
             ),
             keyRegistry = keyRegistry,
-            modifier = Modifier.weight(3.45f),
+            modifier = Modifier.weight(4.6f),
         ) {
             Text(
                 text = stringResource(R.string.keyboard_key_space),

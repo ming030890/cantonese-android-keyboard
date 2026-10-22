@@ -25,6 +25,7 @@ internal class KeyboardScenario(
     quickEngine: QuickCandidateEngine? = null,
     voiceFactory: ((KeyboardEditor) -> VoiceSession)? = null,
     englishDispatcher: CoroutineDispatcher? = null,
+    unifiedEngine: com.madeinhk.cantonesevoicekeyboard.english.UnifiedSuggestionEngine? = null,
 ) : AutoCloseable {
     val editor = MemoryKeyboardEditor(initialText)
     val engine = ScenarioQuickEngine()
@@ -37,11 +38,12 @@ internal class KeyboardScenario(
                                KeyboardSettings.LAYOUT_HANDWRITING)
     val quick = QuickInputCoordinator({ quickEngine ?: engine }, editor, scope = scope, lookupDispatcher = lookupDispatcher)
     var autocorrectLayouts = setOf(KeyboardSettings.LAYOUT_ENGLISH, KeyboardSettings.LAYOUT_QUICK)
-    val english = englishEngine?.let { engine ->
+    val english = (englishEngine ?: unifiedEngine?.let { ScenarioEnglishEngine() })?.let { engine ->
         com.madeinhk.cantonesevoicekeyboard.english.EnglishInputCoordinator(editor, { engine },
             scope ?: CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Unconfined),
             englishDispatcher ?: if (scope == null) kotlinx.coroutines.Dispatchers.Unconfined else lookupDispatcher,
-            sharedSuggestions = engine is com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine)
+            sharedSuggestions = unifiedEngine != null || engine is com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine,
+            unifiedEngine = unifiedEngine)
     }
     val controller = KeyboardSessionController(
         editor,
@@ -325,6 +327,33 @@ internal object KeyboardScenarios {
         }
         it.start(); it.type("df"); it.snapshot()
     }
+    fun unifiedCandidatesPending(): KeyboardRenderState {
+        val queue = ArrayDeque<Runnable>()
+        val worker = object : CoroutineDispatcher() {
+            override fun dispatch(context: kotlin.coroutines.CoroutineContext, block: Runnable) { queue.addLast(block) }
+        }
+        val engine = object : com.madeinhk.cantonesevoicekeyboard.english.UnifiedSuggestionEngine {
+            override fun newRequest() = object : com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest {
+                private var cancelled = false
+                override fun cancel() { cancelled = true }
+                override fun ensureActive() { if (cancelled) throw kotlinx.coroutines.CancellationException() }
+            }
+            override fun compose(request: com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest,
+                version: Int, code: String, left: String, right: String, englishEnabled: Boolean) =
+                com.madeinhk.cantonesevoicekeyboard.english.JoinedSuggestions(
+                    chinese = listOf("你", "係"), display = listOf("你", "係", "of", "offer"), codeLength = 2)
+        }
+        return KeyboardScenario(clipboardText = null, unifiedEngine = engine,
+            scope = CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Unconfined),
+            englishDispatcher = worker).use { scenario ->
+            scenario.start(); scenario.type("of")
+            while (queue.isNotEmpty()) queue.removeFirst().run()
+            scenario.type("h")
+            // The completed row remains visible while the new request is queued.
+            scenario.snapshot()
+        }
+    }
+
     fun shortCodePreviewCandidates(): KeyboardRenderState {
         val queue = ArrayDeque<Runnable>()
         val worker = object : CoroutineDispatcher() {
@@ -353,6 +382,9 @@ internal object KeyboardScenarios {
     fun nextWordPredictions() = KeyboardScenario().use { it.start(); it.type("of"); it.choose("你"); it.snapshot() }
     fun afterEmojiBackspace() = KeyboardScenario(initialText = "你", clipboardText = null).use {
         it.start(); it.press(KeyboardKeyKind.Text, "👍🏽"); it.press(KeyboardKeyKind.Delete); it.snapshot()
+    }
+    fun continuePunctuation() = KeyboardScenario(clipboardText = null, englishEngine = ScenarioEnglishEngine()).use {
+        it.start(); it.type("continue"); it.snapshot()
     }
     fun typingInterruptsVoice() = KeyboardScenario(clipboardText = null, englishEngine = ScenarioEnglishEngine()).use {
         it.start(); it.editor.setComposingText("語音輸入")

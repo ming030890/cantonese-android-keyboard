@@ -11,6 +11,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -71,6 +73,7 @@ internal fun EmojiPickerPanel(
     onDelete: () -> Unit = {},
     search: EmojiSearchState = EmojiSearchState(),
     onSearchChanged: (EmojiSearchState) -> Unit = {},
+    initialRecentEmoji: List<String>? = null,
 ) {
     val context = LocalContext.current
     val preview = LocalInspectionMode.current
@@ -93,10 +96,10 @@ internal fun EmojiPickerPanel(
         context.getSharedPreferences("androidx.emoji2.emojipicker.preferences", 0)
     }
     var recent by remember {
-        mutableStateOf(if (preview) emptyList() else preferences.getString("pref_key_recent_emoji", "")
-            .orEmpty().split(',').filter(String::isNotEmpty).distinct().take(64))
+        mutableStateOf(EmojiHistory(initialRecentEmoji ?: if (preview) emptyList() else
+            preferences.getString("pref_key_recent_emoji", "").orEmpty().split(',')))
     }
-    var category by remember { mutableStateOf("emotions") }
+    val scope = rememberCoroutineScope()
     var variantEntry by remember { mutableStateOf<EmojiEntry?>(null) }
     val gridState = rememberLazyGridState()
     val focusRequester = remember { FocusRequester() }
@@ -106,20 +109,35 @@ internal fun EmojiPickerPanel(
     val selectionText = if (dark) Color(0xFFB7F1DA) else Color(0xFF00513B)
     val control = if (dark) colors.surfaceVariant else Color(0xFFE0EBE3)
     val foreground = BrandTheme.colors.keyboardKeyOnSurface
-    val filtered = remember(available, search.query, category, recent) {
+    val sections = remember(available, recent) {
+        emojiCategories.map { (id, _) ->
+            id to if (id == "recent") available?.let(recent::entries).orEmpty()
+                else available?.entries?.filter { it.category == id }.orEmpty()
+        }
+    }
+    val sectionStarts = remember(sections) {
+        var index = 0
+        sections.map { (_, entries) ->
+            index.also { index += 1 + entries.size.coerceAtLeast(1) }
+        }
+    }
+    val category by remember(sectionStarts) {
+        derivedStateOf {
+            emojiCategories[sectionStarts.indexOfLast { it <= gridState.firstVisibleItemIndex }.coerceAtLeast(0)].first
+        }
+    }
+    val filtered = remember(available, search.query, recent) {
         when {
             available == null -> emptyList()
-            search.active && search.query.isNotBlank() -> available.search(search.query)
-            category == "recent" -> recent.mapNotNull { emoji ->
-                available.entries.firstOrNull { emoji in it.variants }?.copy(emoji = emoji)
-            }
-            else -> available.entries.filter { it.category == category }
+            search.query.isNotBlank() -> available.search(search.query)
+            recent.emoji.isNotEmpty() -> recent.entries(available)
+            else -> available.entries.filter { it.category == "emotions" }
         }
     }
     fun pick(emoji: String) {
-        recent = (listOf(emoji) + recent).distinct().take(64)
+        recent = recent.pick(emoji)
         if (!preview) preferences.edit()
-            .putString("pref_key_recent_emoji", recent.joinToString(",")).apply()
+            .putString("pref_key_recent_emoji", recent.emoji.joinToString(",")).apply()
         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         variantEntry = null
         onEmojiPicked(emoji)
@@ -132,7 +150,7 @@ internal fun EmojiPickerPanel(
         }
     }
     LaunchedEffect(search.active) { if (search.active) focusRequester.requestFocus() }
-    LaunchedEffect(category, search.query) { gridState.scrollToItem(0) }
+    LaunchedEffect(search.active, search.query) { gridState.scrollToItem(0) }
 
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth().height(42.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -144,18 +162,7 @@ internal fun EmojiPickerPanel(
                     .background(control).clickable { onSearchChanged(search.open()) }
                     .focusRequester(focusRequester)
                     .onPreviewKeyEvent { event ->
-                        if (!search.active || event.type != KeyEventType.KeyDown) false
-                        else when (event.key) {
-                            Key.Backspace -> { onSearchChanged(search.delete()); true }
-                            Key.Escape -> { onSearchChanged(search.close()); true }
-                            Key.Enter -> { true }
-                            else -> {
-                                val code = event.utf16CodePoint
-                                if (code >= 32 && !event.isCtrlPressed && !event.isMetaPressed) {
-                                    onSearchChanged(search.type(String(Character.toChars(code)))); true
-                                } else false
-                            }
-                        }
+                        handleEmojiSearchKey(event.nativeKeyEvent, search, onSearchChanged)
                     }.focusable().padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -176,7 +183,7 @@ internal fun EmojiPickerPanel(
                     Box(Modifier.width(42.dp).height(34.dp).clip(RoundedCornerShape(20.dp))
                         .background(if (category == id) selection else Color.Transparent)
                         .semantics { contentDescription = categoryNames[index]; selected = category == id }
-                        .clickable { category = id; variantEntry = null }, contentAlignment = Alignment.Center) {
+                        .clickable { variantEntry = null; scope.launch { gridState.scrollToItem(sectionStarts[index]) } }, contentAlignment = Alignment.Center) {
                         Icon(painterResource(categoryIcons[index]), contentDescription = null,
                             tint = if (category == id) selectionText else foreground,
                             modifier = Modifier.size(21.dp))
@@ -184,11 +191,11 @@ internal fun EmojiPickerPanel(
                 }
             }
         }
-        Text(
+        if (search.active || variantEntry != null) Text(
             when {
                 variantEntry != null -> "Choose a variant"
                 search.active && search.query.isNotEmpty() -> "${filtered.size} results"
-                else -> categoryNames[emojiCategories.indexOfFirst { it.first == category }]
+                else -> if (recent.emoji.isEmpty()) "Smileys and emotions" else "Recent emoji"
             },
             fontSize = 12.sp, color = foreground.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, top = 4.dp, bottom = 2.dp),
@@ -199,6 +206,25 @@ internal fun EmojiPickerPanel(
                 LazyVerticalGrid(columns = GridCells.Fixed(8)) {
                     items(variants.variants) { emoji ->
                         EmojiCell(emoji, variants.name, false, { pick(emoji) }, {})
+                    }
+                }
+            } else if (!search.active) {
+                LazyVerticalGrid(columns = GridCells.Fixed(8), state = gridState) {
+                    sections.forEachIndexed { index, (id, entries) ->
+                        item(key = "$id.header", span = { GridItemSpan(maxLineSpan) }) {
+                            Text(categoryNames[index], fontSize = 12.sp,
+                                color = foreground.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp))
+                        }
+                        if (entries.isEmpty()) item(key = "$id.empty", span = { GridItemSpan(maxLineSpan) }) {
+                            Text(if (available == null) "Loading emoji…" else "Your recent emoji will appear here",
+                                color = foreground.copy(alpha = 0.7f), fontSize = 14.sp,
+                                modifier = Modifier.padding(12.dp))
+                        }
+                        items(entries, key = { "$id.${it.emoji}" }) { entry ->
+                            EmojiCell(entry.emoji, entry.name, entry.variants.size > 1,
+                                { pick(entry.emoji) }, { variantEntry = entry })
+                        }
                     }
                 }
             } else if (filtered.isEmpty()) {
@@ -243,12 +269,12 @@ private fun EmojiControl(label: String, description: String, modifier: Modifier,
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun EmojiCell(emoji: String, name: String, hasVariants: Boolean, onClick: () -> Unit, onLongClick: () -> Unit) {
-    Box(Modifier.fillMaxWidth().height(46.dp)
+    Box(Modifier.fillMaxWidth().height(52.dp)
         .semantics { contentDescription = name }
         .combinedClickable(onClick = onClick, onLongClick = if (hasVariants) onLongClick else null,
             onLongClickLabel = if (hasVariants) "Choose skin tone or variant" else null),
         contentAlignment = Alignment.Center) {
-        Text(emoji, fontSize = 28.sp)
+        Text(emoji, fontSize = 32.sp)
         if (hasVariants) Text("◢", fontSize = 7.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.BottomEnd).padding(end = 4.dp, bottom = 3.dp))
     }

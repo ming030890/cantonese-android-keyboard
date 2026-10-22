@@ -1,6 +1,10 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.main
 
+import android.content.ComponentName
+import android.os.Build
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import com.madeinhk.cantonesevoicekeyboard.CantoneseInputMethodService
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -70,6 +74,11 @@ fun SettingsScreen(
 
     SettingsScreenContent(
         enabledLayouts = enabledLayouts,
+        onConfigureSystemLayouts = if (Build.VERSION.SDK_INT < 34) ({
+            context.getSystemService(InputMethodManager::class.java)?.showInputMethodAndSubtypeEnabler(
+                ComponentName(context, CantoneseInputMethodService::class.java).flattenToShortString()
+            )
+        }) else null,
         onToggleLayout = { layoutId ->
             if (enabledLayouts.contains(layoutId) && enabledLayouts.size <= 1) {
                 Toast.makeText(
@@ -113,6 +122,7 @@ fun SettingsScreenContent(
     modifier: Modifier = Modifier,
     englishAutocorrect:Boolean=true, onEnglishAutocorrectChange:(Boolean)->Unit={},
     quickAutocorrect:Boolean=true, onQuickAutocorrectChange:(Boolean)->Unit={},
+    onConfigureSystemLayouts: (() -> Unit)? = null,
 
 ) {
     Box(
@@ -149,6 +159,14 @@ fun SettingsScreenContent(
                 quickVersion = quickVersion,
                 onQuickVersionChange = onQuickVersionChange
             )
+
+            if (onConfigureSystemLayouts != null) {
+                TextButton(onClick = onConfigureSystemLayouts) {
+                    Text(stringResource(R.string.settings_system_layouts), color = MintAccentColor)
+                }
+                Text(stringResource(R.string.settings_system_layouts_description),
+                    color = SecondaryTextColor, fontSize = 13.sp)
+            }
 
             Spacer(modifier = Modifier.height(28.dp))
 

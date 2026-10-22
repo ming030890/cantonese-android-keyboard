@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "partitions": {
+    "development": {
+      "unique_cases": 67268,
+      "groups": 9614,
+      "panel_counts": {
+        "natural": 50000,
+        "english": 5000,
+        "uncovered": 5000,
+        "rare": 5000,
+        "rare_han": 2339,
+        "added": 4217,
+        "quick": 5000,
+        "quick_added": 1546,
+        "quick_uncovered": 878,
+        "quick_rare": 2324
+      }
+    },
+    "confirmation": {
+      "unique_cases": 16794,
+      "groups": 2412,
+      "panel_counts": {
+        "natural": 12500,
+        "english": 1250,
+        "uncovered": 1250,
+        "rare": 1250,
+        "rare_han": 577,
+        "added": 1105,
+        "quick": 1250,
+        "quick_added": 419,
+        "quick_uncovered": 272,
+        "quick_rare": 577
+      }
+    }
+  },
+  "document_groups_disjoint": true,
+  "confirmation_model_scores_read": false,
+  "runtime_checks": {
+    "v7": {
+      "cases": 144,
+      "max_abs_log_probability_error": 0.00015473365783691406,
+      "export_checkpoint_parity_passed": true,
+      "actual_runtime_tokenizer_parity": true
+    },
+    "v11": {
+      "cases": 144,
+      "max_abs_log_probability_error": 0.000217437744140625,
+      "export_checkpoint_parity_passed": true,
+      "actual_runtime_tokenizer_parity": true
+    },
+    "v12": {
+      "cases": 144,
+      "max_abs_log_probability_error": 0.000225067138671875,
+      "export_checkpoint_parity_passed": true,
+      "actual_runtime_tokenizer_parity": true
+    }
+  },
+  "runtime_inputs": {
+    "quick_dictionary_sha256": {
+      "3": "8409d39a69bef3850225778078fa99c0b36b3734411df3e30c3241660643ac6c",
+      "5": "2542fc0106b862dd86335edad1c14efcdf2c54815edaa1b207b3ad3892099b12"
+    },
+    "labels_sha256": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
+    "legacy_counts_sha256": "a413ec84e51b2f88c90af9b17ed4610d024743499ec72d1d61e7e78e3b2834e8",
+    "release_probe_sha256": "320adfee7c482bb0770522f5442958e0d06fb25829ed8a052b6bb03c477681ad"
+  },
+  "candidate_panels_validated": true,
+  "source_text_not_modified": true
+}

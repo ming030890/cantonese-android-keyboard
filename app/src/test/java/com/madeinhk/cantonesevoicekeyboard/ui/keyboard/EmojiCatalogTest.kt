@@ -50,4 +50,25 @@ class EmojiCatalogTest {
         assertEquals("red hear", search.type("😀").delete().query)
         assertEquals(EmojiSearchState(), search.close())
     }
+    @Test fun recentEmojiMoveToFrontKeepVariantsAndSurviveSerialization() {
+        val history = EmojiHistory(listOf("😀", "👍🏽", "🇭🇰", "😀", ""))
+            .pick("👩‍🦰").pick("👍🏽")
+        val restored = EmojiHistory(history.emoji.joinToString(",").split(','))
+        assertEquals(listOf("👍🏽", "👩‍🦰", "😀", "🇭🇰"), restored.emoji)
+        assertEquals(restored.emoji, restored.entries(catalog()).map { it.emoji })
+        assertEquals("thumbs up", restored.entries(catalog()).first().name)
+        assertTrue(EmojiHistory().entries(catalog()).isEmpty())
+        assertTrue(EmojiHistory(listOf("obsolete")).entries(catalog()).isEmpty())
+    }
+
+    @Test fun recentEmojiRetainOnlyTheLatest64UniqueSelections() {
+        var history = EmojiHistory()
+        val emoji = catalog().entries.take(65).map { it.emoji }
+        emoji.forEach { history = history.pick(it) }
+        assertEquals(emoji.reversed().take(64), history.emoji)
+        history = history.pick(emoji.last())
+        assertEquals(64, history.emoji.size)
+        assertEquals(emoji.last(), history.emoji.first())
+    }
+
 }

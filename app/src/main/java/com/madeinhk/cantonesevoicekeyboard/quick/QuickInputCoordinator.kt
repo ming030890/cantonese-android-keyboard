@@ -7,6 +7,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+internal data class QuickSuggestionInput(val id: Long, val code: String, val version: Int, val left: String, val right: String)
+
 internal class QuickInputCoordinator(
     private val engineLoader: () -> QuickCandidateEngine?,
     private val editor: KeyboardEditor,
@@ -45,6 +47,23 @@ internal class QuickInputCoordinator(
     private var languageEvidence: QuickLanguageEvidence? = null
     private val _candidates = MutableStateFlow<List<QuickCandidate>>(emptyList())
     val candidates = _candidates.asStateFlow()
+    private val _joinedCandidates = MutableStateFlow<List<QuickCandidate>>(emptyList())
+    val joinedCandidates = _joinedCandidates.asStateFlow()
+    var onCandidateRequest: ((QuickSuggestionInput) -> Unit)? = null
+    var onSuggestionsInvalidated: (() -> Unit)? = null
+    var isCandidateRequestActive: ((Long) -> Boolean)? = null
+    private var displayedRequest: Long? = null
+    private var joinedInput: QuickSuggestionInput? = null
+    fun canSelectJoined(text: String) = displayedRequest == requestId && _joinedCandidates.value.any { it.text == text }
+    fun publishJoined(input: QuickSuggestionInput, result: com.madeinhk.cantonesevoicekeyboard.english.JoinedSuggestions) {
+        if (closed || requestId != input.id || composingText != input.code || currentVersion != input.version) return
+        _candidates.value = result.chinese.mapIndexed { i, text -> QuickCandidate(text, i) }
+        candidatesForCode = input.code
+        candidateCodeLength = result.codeLength
+        languageEvidence = result.evidence
+        displayedRequest = input.id
+        _joinedCandidates.value = result.display.mapIndexed { i, text -> QuickCandidate(text, i) }
+    }
 
     fun setVersion(version: Int) {
         require(version == 3 || version == 5)
@@ -159,6 +178,7 @@ internal class QuickInputCoordinator(
     }
 
     fun discard() {
+        _joinedCandidates.value = emptyList()
         if (composingText.isNotEmpty()) {
             editor.setComposingText("")
             editor.finishComposingText()
@@ -174,10 +194,27 @@ internal class QuickInputCoordinator(
     }
 
     private fun refreshCandidates() {
-        pending?.cancel()
-        val id = ++requestId
         val code = composingText
         val version = currentVersion
+        val before = if (onCandidateRequest != null) editor.getTextBeforeCursor(512).orEmpty() else ""
+        val after = if (onCandidateRequest != null) editor.getTextAfterCursor(256).orEmpty() else ""
+        val previous = joinedInput
+        if (onCandidateRequest != null && previous != null && previous.code == code && previous.version == version &&
+            previous.left == before.removeSuffix(code) && previous.right == after &&
+            (displayedRequest == requestId || isCandidateRequestActive?.invoke(previous.id) == true)) return
+        pending?.cancel()
+        val id = ++requestId
+        onCandidateRequest?.let { request ->
+            candidatesForCode = null
+            languageEvidence = null
+            displayedRequest = null
+            if (!closed) {
+                val input = QuickSuggestionInput(id, code, version, before.removeSuffix(code), after)
+                joinedInput = input
+                request(input)
+            }
+            return
+        }
         _candidates.value = emptyList()
         candidatesForCode = null
         languageEvidence = null
@@ -238,6 +275,9 @@ internal class QuickInputCoordinator(
     }
 
     private fun clearComposingState() {
+        onSuggestionsInvalidated?.invoke()
+        displayedRequest = null
+        joinedInput = null
         pending?.cancel()
         ++requestId
         composingText = ""

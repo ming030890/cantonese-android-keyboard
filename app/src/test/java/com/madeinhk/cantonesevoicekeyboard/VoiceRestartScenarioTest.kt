@@ -138,7 +138,7 @@ class VoiceRestartScenarioTest {
     }
 
     @Test fun typingInterruptsRecordingAndFinalizationAndRejectsLateCallbacks() = runTest {
-        for (finalizing in listOf(false, true)) {
+        for (finalizing in listOf(false, true)) for (word in listOf("xy", "continue")) {
             val stopGate = CountDownLatch(1)
             val fake = FakeAsrEngine(finalizeDurationMs = 0, stopGate = stopGate)
             lateinit var voice: VoiceInputCoordinator
@@ -154,22 +154,26 @@ class VoiceRestartScenarioTest {
                     if (finalizing) { voice.stopForTest(); fake.stopping.await() }
                     listener.onHypothesisChanged("你好")
                     assertEquals("你好", s.editor.composing)
-                    s.keyDown(KeyboardKeyKind.Text, "x")
+                    s.keyDown(KeyboardKeyKind.Text, word.take(1))
                     assertEquals(KeyboardUiState.Idle, s.snapshot().voice)
                     assertFalse(voice.isRecording())
                     assertEquals(0f, voice.volume.value)
-                    s.keyUp(KeyboardKeyKind.Text, "x")
+                    s.keyUp(KeyboardKeyKind.Text, word.take(1))
                     listener.onHypothesisChanged("stale")
                     listener.onTranscriptComplete(); listener.onTranscriptError()
-                    s.type("y")
+                    s.type(word.drop(1))
                     assertEquals("你好", s.editor.text)
-                    assertEquals("xy", s.editor.composing)
+                    assertEquals(word, s.editor.composing)
                     assertEquals(KeyboardUiState.Idle, s.snapshot().voice)
                     assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
                     stopGate.countDown()
                     voice.stopForTest(discard = true)?.join()
                     assertEquals("你好", s.editor.text)
-                    assertEquals("xy", s.editor.composing)
+                    assertEquals(word, s.editor.composing)
+                    s.press(KeyboardKeyKind.Text, "。")
+                    assertEquals("你好$word.", s.editor.text)
+                    assertEquals("", s.editor.composing)
+                    assertEquals(false, s.snapshot().chinesePunctuation)
                 } finally { stopGate.countDown() }
             }
         }

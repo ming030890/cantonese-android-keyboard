@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "per_source_tune": 200,
+  "per_source_audit": 100,
+  "conditions": [
+    [
+      "left0",
+      0,
+      0
+    ],
+    [
+      "left1",
+      1,
+      0
+    ],
+    [
+      "left2",
+      2,
+      0
+    ],
+    [
+      "left4",
+      4,
+      0
+    ],
+    [
+      "infill2",
+      2,
+      2
+    ],
+    [
+      "right2",
+      0,
+      2
+    ]
+  ],
+  "weights_grid": [
+    0,
+    0.025,
+    0.05,
+    0.075,
+    0.1,
+    0.15,
+    0.2,
+    0.3,
+    0.5,
+    0.75,
+    1,
+    1.25,
+    1.5,
+    2,
+    3,
+    4,
+    6,
+    8,
+    12,
+    16
+  ],
+  "selection": "Training tune rows only. Sequentially fit unigram on Unigram cases; bigram with that unigram fixed on Bigram cases; neural on Neural cases with count fallback fixed. Top1 then top4; smaller weight on ties.",
+  "audit": "Freeze all choices before writer/document-disjoint training audit. Audit never chooses weights. No test_datas.npy, LM validation/test, or unique-181 read.",
+  "right_context": "Observed suffix after the omitted target only, capped at two tokens. No target leakage.",
+  "neural_model_sha256": "0f0f74ee928da0a92de6e201118d17131e2f9be1d709425609c7cb0e940e79d6",
+  "vocabulary_sha256": "e49577545138bdb5d77e40c7d9dae0f61adf3c39d70d507848914ca47e34e873",
+  "reuse_cache": "/Volumes/SSD/cantonese_ngram/experiments/handwriting-rust-calibration-v7-unique",
+  "unused_mode_policy": "Retain the supplied baseline coefficient when a mode has no fitting cases; never optimize an empty subset",
+  "context_dependent_neural_vocabulary": true,
+  "prior_probe_sha256": "d3d71dbe1e1617d1a390461996b8c07b23a77f0438d65f97cef83e2b330a8a14",
+  "fit_neural_only": true
+}

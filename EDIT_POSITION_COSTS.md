@@ -104,3 +104,7 @@ The [package report](config/english_iteration/2026-10-21/edit-position-costs/pac
 checks that the compiled ARM library equals the staged and merged libraries,
 and that the stripped library equals the APK entry. The withdrawn dictionary
 and license are absent. The APK has not been installed on a phone.
+
+The [2026-10-22 follow-up](ADDITIONAL_EDIT_COSTS.md) tests the two extra-edit
+surcharges held fixed here. All four fitted proposals lose on selection, so
+3.0 and 4.5 are retained and the accepted v66 runtime remains unchanged.

@@ -1,0 +1,965 @@
+{
+  "comparison": "Matched 1000 updates, same initializer function/seed/data order/objective/optimizer; architecture selection from trends and context accuracy, not endpoint loss",
+  "context_reference": "v7 source-macro development accuracy, 1000 rows/source; repeated development reuse, not fresh test",
+  "late_window_steps": [
+    600,
+    800,
+    1000
+  ],
+  "configs": {
+    "e128-h256-b2-f512": {
+      "export_bytes": 5860722,
+      "late_mean_bigram_top1": 0.7988505747126436,
+      "late_mean_bigram_top3": 0.9581662657043571,
+      "late_bigram_top1_change_per_200": 0.004711307137129226,
+      "late_context_guard_passes": 2,
+      "late_context_checkpoints": 3,
+      "late_mean_worst_context_delta_top3": -0.00833333333333334,
+      "late_mean_context_delta_top3": -0.004840000000000003,
+      "endpoint_bigram_top1": 0.8011226944667201,
+      "endpoint_bigram_top3": 0.9585004009623096,
+      "endpoint_context_delta_top3": {
+        "short2": -0.005399999999999993,
+        "short4": -0.004400000000000004,
+        "next": -0.006600000000000006,
+        "infill2": -0.004200000000000004,
+        "missing": -0.01120000000000001
+      },
+      "curve": [
+        {
+          "name": "e128-h256-b2-f512",
+          "steps": 0,
+          "elapsed_seconds": 0,
+          "unigram_kl": 0.19817441701889038,
+          "bigram_kl": 2.315512480899947,
+          "bigram_top1": 0.5811948676824379,
+          "bigram_top3": 0.7299518845228549,
+          "retention": {
+            "passed": false,
+            "modes": {
+              "short2": {
+                "delta_ce": 0.47260306185181256,
+                "delta_top3": -0.02259999999999999
+              },
+              "short4": {
+                "delta_ce": 0.5566782203077338,
+                "delta_top3": -0.03020000000000001
+              },
+              "next": {
+                "delta_ce": 0.5945278525135475,
+                "delta_top3": -0.03260000000000001
+              },
+              "infill2": {
+                "delta_ce": 0.18067095691608248,
+                "delta_top3": -0.0132
+              },
+              "missing": {
+                "delta_ce": 0.20825067787067963,
+                "delta_top3": -0.017000000000000005
+              }
+            }
+          },
+          "selection_score": 2.5136868979188374,
+          "export_bytes": 5860722
+        },
+        {
+          "name": "e128-h256-b2-f512",
+          "steps": 200,
+          "elapsed_seconds": 19.27975279232487,
+          "unigram_kl": 0.01321639958769083,
+          "bigram_kl": 1.26661104075292,
+          "bigram_top1": 0.7608259823576584,
+          "bigram_top3": 0.917401764234162,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.021137653267104105,
+                "delta_top3": 0.0018000000000000017
+              },
+              "short4": {
+                "delta_ce": -0.011959208857174986,
+                "delta_top3": 0.00020000000000000017
+              },
+              "next": {
+                "delta_ce": -0.00414962812543429,
+                "delta_top3": -0.003400000000000003
+              },
+              "infill2": {
+                "delta_ce": -0.00743209493698096,
+                "delta_top3": -0.0038000000000000035
+              },
+              "missing": {
+                "delta_ce": 0.009900809754530115,
+                "delta_top3": -0.002400000000000002
+              }
+            }
+          },
+          "selection_score": 1.279827440340611,
+          "export_bytes": 5860722
+        },
+        {
+          "name": "e128-h256-b2-f512",
+          "steps": 400,
+          "elapsed_seconds": 37.852580917067826,
+          "unigram_kl": 0.007770528085529804,
+          "bigram_kl": 1.030760333566476,
+          "bigram_top1": 0.8039294306335204,
+          "bigram_top3": 0.952485966319166,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.022968586178077465,
+                "delta_top3": -0.001200000000000001
+              },
+              "short4": {
+                "delta_ce": -0.01554459032500155,
+                "delta_top3": -0.0040000000000000036
+              },
+              "next": {
+                "delta_ce": -0.008567196496134067,
+                "delta_top3": -0.005200000000000005
+              },
+              "infill2": {
+                "delta_ce": -0.00924864937997194,
+                "delta_top3": -0.0036000000000000034
+              },
+              "missing": {
+                "delta_ce": 0.010912099663115704,
+                "delta_top3": -0.006000000000000005
+              }
+            }
+          },
+          "selection_score": 1.0385308616520057,
+          "export_bytes": 5860722
+        },
+        {
+          "name": "e128-h256-b2-f512",
+          "steps": 600,
+          "elapsed_seconds": 55.91577587509528,
+          "unigram_kl": 0.008257602341473103,
+          "bigram_kl": 0.9444296993973448,
+          "bigram_top1": 0.791700080192462,
+          "bigram_top3": 0.9558941459502807,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.012878320945100974,
+                "delta_top3": -0.00040000000000000034
+              },
+              "short4": {
+                "delta_ce": -0.0021956438240593457,
+                "delta_top3": -0.0028000000000000026
+              },
+              "next": {
+                "delta_ce": 0.00754506745000807,
+                "delta_top3": -0.004600000000000004
+              },
+              "infill2": {
+                "delta_ce": -0.0036603519325844047,
+                "delta_top3": -0.005200000000000005
+              },
+              "missing": {
+                "delta_ce": 0.01871473462190476,
+                "delta_top3": -0.006800000000000006
+              }
+            }
+          },
+          "selection_score": 0.9526873017388179,
+          "export_bytes": 5860722
+        },
+        {
+          "name": "e128-h256-b2-f512",
+          "steps": 800,
+          "elapsed_seconds": 73.34714141720906,
+          "unigram_kl": 0.0069161392748355865,
+          "bigram_kl": 0.8954964009739723,
+          "bigram_top1": 0.803728949478749,
+          "bigram_top3": 0.9601042502004812,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.016214694511378448,
+                "delta_top3": -0.0006000000000000005
+              },
+              "short4": {
+                "delta_ce": -0.00989068122454917,
+                "delta_top3": -0.0030000000000000027
+              },
+              "next": {
+                "delta_ce": -0.0009703419614236708,
+                "delta_top3": -0.0040000000000000036
+              },
+              "infill2": {
+                "delta_ce": 0.006328804913314556,
+                "delta_top3": -0.007000000000000006
+              },
+              "missing": {
+                "delta_ce": 0.022846573042205876,
+                "delta_top3": -0.0064000000000000055
+              }
+            }
+          },
+          "selection_score": 0.9024125402488079,
+          "export_bytes": 5860722
+        },
+        {
+          "name": "e128-h256-b2-f512",
+          "steps": 1000,
+          "elapsed_seconds": 90.14121404197067,
+          "unigram_kl": 0.0060080960392951965,
+          "bigram_kl": 0.864812150194373,
+          "bigram_top1": 0.8011226944667201,
+          "bigram_top3": 0.9585004009623096,
+          "retention": {
+            "passed": false,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.01441154810478924,
+                "delta_top3": -0.005399999999999993
+              },
+              "short4": {
+                "delta_ce": -0.004077997068641537,
+                "delta_top3": -0.004400000000000004
+              },
+              "next": {
+                "delta_ce": 0.008079687773226495,
+                "delta_top3": -0.006600000000000006
+              },
+              "infill2": {
+                "delta_ce": 0.0066625895324570195,
+                "delta_top3": -0.004200000000000004
+              },
+              "missing": {
+                "delta_ce": 0.02745444217080948,
+                "delta_top3": -0.01120000000000001
+              }
+            }
+          },
+          "selection_score": 0.8708202462336682,
+          "export_bytes": 5860722
+        }
+      ],
+      "actual_export_bytes": 5860722
+    },
+    "e128-h256-b3-f512": {
+      "export_bytes": 6131426,
+      "late_mean_bigram_top1": 0.7984496124031008,
+      "late_mean_bigram_top3": 0.9580326116011761,
+      "late_bigram_top1_change_per_200": 0.008319967923015228,
+      "late_context_guard_passes": 3,
+      "late_context_checkpoints": 3,
+      "late_mean_worst_context_delta_top3": -0.008000000000000007,
+      "late_mean_context_delta_top3": -0.004920000000000003,
+      "endpoint_bigram_top1": 0.8075380914194066,
+      "endpoint_bigram_top3": 0.9599037690457097,
+      "endpoint_context_delta_top3": {
+        "short2": -0.003599999999999992,
+        "short4": -0.0030000000000000027,
+        "next": -0.006600000000000006,
+        "infill2": -0.006200000000000006,
+        "missing": -0.009200000000000009
+      },
+      "curve": [
+        {
+          "name": "e128-h256-b3-f512",
+          "steps": 0,
+          "elapsed_seconds": 0,
+          "unigram_kl": 0.19817441701889038,
+          "bigram_kl": 2.315512480899947,
+          "bigram_top1": 0.5811948676824379,
+          "bigram_top3": 0.7299518845228549,
+          "retention": {
+            "passed": false,
+            "modes": {
+              "short2": {
+                "delta_ce": 0.47260306185181256,
+                "delta_top3": -0.02259999999999999
+              },
+              "short4": {
+                "delta_ce": 0.5566782203077338,
+                "delta_top3": -0.03020000000000001
+              },
+              "next": {
+                "delta_ce": 0.5945278525135475,
+                "delta_top3": -0.03260000000000001
+              },
+              "infill2": {
+                "delta_ce": 0.18067095691608248,
+                "delta_top3": -0.0132
+              },
+              "missing": {
+                "delta_ce": 0.20825067787067963,
+                "delta_top3": -0.017000000000000005
+              }
+            }
+          },
+          "selection_score": 2.5136868979188374,
+          "export_bytes": 6131426
+        },
+        {
+          "name": "e128-h256-b3-f512",
+          "steps": 200,
+          "elapsed_seconds": 13.416716125328094,
+          "unigram_kl": 0.012421663850545883,
+          "bigram_kl": 1.265994741153535,
+          "bigram_top1": 0.7568163592622293,
+          "bigram_top3": 0.9153969526864475,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.02081371912364851,
+                "delta_top3": 0.0016000000000000124
+              },
+              "short4": {
+                "delta_ce": -0.009776426403876392,
+                "delta_top3": -0.00040000000000000034
+              },
+              "next": {
+                "delta_ce": -0.0027853078222603855,
+                "delta_top3": -1.1102230246251566e-17
+              },
+              "infill2": {
+                "delta_ce": -0.006468718893546654,
+                "delta_top3": -0.006600000000000006
+              },
+              "missing": {
+                "delta_ce": 0.010938152330659801,
+                "delta_top3": -0.0036000000000000034
+              }
+            }
+          },
+          "selection_score": 1.278416405004081,
+          "export_bytes": 6131426
+        },
+        {
+          "name": "e128-h256-b3-f512",
+          "steps": 400,
+          "elapsed_seconds": 26.79730425029993,
+          "unigram_kl": 0.008599748834967613,
+          "bigram_kl": 1.0260404701276211,
+          "bigram_top1": 0.8027265437048917,
+          "bigram_top3": 0.9526864474739375,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.02205329584586444,
+                "delta_top3": -0.001200000000000001
+              },
+              "short4": {
+                "delta_ce": -0.013728756456915292,
+                "delta_top3": -0.0038000000000000035
+              },
+              "next": {
+                "delta_ce": -0.005941284027207061,
+                "delta_top3": -0.0038000000000000035
+              },
+              "infill2": {
+                "delta_ce": -0.011702490347821915,
+                "delta_top3": -0.0020000000000000018
+              },
+              "missing": {
+                "delta_ce": 0.008659905400959556,
+                "delta_top3": -0.005600000000000005
+              }
+            }
+          },
+          "selection_score": 1.0346402189625887,
+          "export_bytes": 6131426
+        },
+        {
+          "name": "e128-h256-b3-f512",
+          "steps": 600,
+          "elapsed_seconds": 40.185547083150595,
+          "unigram_kl": 0.008744904771447182,
+          "bigram_kl": 0.9389877076670272,
+          "bigram_top1": 0.7908981555733761,
+          "bigram_top3": 0.956495589414595,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.012784685612330371,
+                "delta_top3": -0.0008000000000000007
+              },
+              "short4": {
+                "delta_ce": -0.0016937706988304768,
+                "delta_top3": -0.0040000000000000036
+              },
+              "next": {
+                "delta_ce": 0.007632692514056849,
+                "delta_top3": -0.005800000000000005
+              },
+              "infill2": {
+                "delta_ce": -0.00011168933362935008,
+                "delta_top3": -0.006800000000000006
+              },
+              "missing": {
+                "delta_ce": 0.019040623352478647,
+                "delta_top3": -0.006599999999999995
+              }
+            }
+          },
+          "selection_score": 0.9477326124384744,
+          "export_bytes": 6131426
+        },
+        {
+          "name": "e128-h256-b3-f512",
+          "steps": 800,
+          "elapsed_seconds": 53.5597869171761,
+          "unigram_kl": 0.005571273155510426,
+          "bigram_kl": 0.8923899867298796,
+          "bigram_top1": 0.7969125902165196,
+          "bigram_top3": 0.9576984763432237,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.017260327704111234,
+                "delta_top3": -0.0016000000000000014
+              },
+              "short4": {
+                "delta_ce": -0.010142451880220093,
+                "delta_top3": -0.0020000000000000018
+              },
+              "next": {
+                "delta_ce": -0.0018988169863124681,
+                "delta_top3": -0.0032000000000000028
+              },
+              "infill2": {
+                "delta_ce": 0.0035384500804706677,
+                "delta_top3": -0.008000000000000007
+              },
+              "missing": {
+                "delta_ce": 0.019243828329839553,
+                "delta_top3": -0.0064000000000000055
+              }
+            }
+          },
+          "selection_score": 0.89796125988539,
+          "export_bytes": 6131426
+        },
+        {
+          "name": "e128-h256-b3-f512",
+          "steps": 1000,
+          "elapsed_seconds": 66.92970645800233,
+          "unigram_kl": 0.006552086677402258,
+          "bigram_kl": 0.862792165368991,
+          "bigram_top1": 0.8075380914194066,
+          "bigram_top3": 0.9599037690457097,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.01518229028182123,
+                "delta_top3": -0.003599999999999992
+              },
+              "short4": {
+                "delta_ce": -0.004745942933531389,
+                "delta_top3": -0.0030000000000000027
+              },
+              "next": {
+                "delta_ce": 0.007274878495442572,
+                "delta_top3": -0.006600000000000006
+              },
+              "infill2": {
+                "delta_ce": 0.006363670087448536,
+                "delta_top3": -0.006200000000000006
+              },
+              "missing": {
+                "delta_ce": 0.024358815013500745,
+                "delta_top3": -0.009200000000000009
+              }
+            }
+          },
+          "selection_score": 0.8693442520463932,
+          "export_bytes": 6131426
+        }
+      ],
+      "actual_export_bytes": 6131426
+    },
+    "e224-h256-b2-f512": {
+      "export_bytes": 9452754,
+      "late_mean_bigram_top1": 0.7949746057203956,
+      "late_mean_bigram_top3": 0.9583667468591285,
+      "late_bigram_top1_change_per_200": 0.009823576583801131,
+      "late_context_guard_passes": 3,
+      "late_context_checkpoints": 3,
+      "late_mean_worst_context_delta_top3": -0.007200000000000002,
+      "late_mean_context_delta_top3": -0.004813333333333335,
+      "endpoint_bigram_top1": 0.8009222133119487,
+      "endpoint_bigram_top3": 0.9580994386527666,
+      "endpoint_context_delta_top3": {
+        "short2": -0.005599999999999994,
+        "short4": -0.005600000000000005,
+        "next": -0.0050000000000000044,
+        "infill2": -0.005800000000000005,
+        "missing": -0.006800000000000006
+      },
+      "curve": [
+        {
+          "name": "e224-h256-b2-f512",
+          "steps": 0,
+          "elapsed_seconds": 0,
+          "unigram_kl": 0.19817441701889038,
+          "bigram_kl": 2.315512480899947,
+          "bigram_top1": 0.5811948676824379,
+          "bigram_top3": 0.7299518845228549,
+          "retention": {
+            "passed": false,
+            "modes": {
+              "short2": {
+                "delta_ce": 0.47260306185181256,
+                "delta_top3": -0.02259999999999999
+              },
+              "short4": {
+                "delta_ce": 0.5566782248738222,
+                "delta_top3": -0.03020000000000001
+              },
+              "next": {
+                "delta_ce": 0.594527853598352,
+                "delta_top3": -0.03260000000000001
+              },
+              "infill2": {
+                "delta_ce": 0.18067095691608248,
+                "delta_top3": -0.0132
+              },
+              "missing": {
+                "delta_ce": 0.20825069111334155,
+                "delta_top3": -0.017000000000000005
+              }
+            }
+          },
+          "selection_score": 2.5136868979188374,
+          "export_bytes": 9452754
+        },
+        {
+          "name": "e224-h256-b2-f512",
+          "steps": 200,
+          "elapsed_seconds": 16.851186708081514,
+          "unigram_kl": 0.013928024098277092,
+          "bigram_kl": 1.2536863944350092,
+          "bigram_top1": 0.7630312750601443,
+          "bigram_top3": 0.9208099438652767,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.02182999727237043,
+                "delta_top3": 0.0018000000000000017
+              },
+              "short4": {
+                "delta_ce": -0.011678070793021434,
+                "delta_top3": 0.0
+              },
+              "next": {
+                "delta_ce": -0.004654417121596843,
+                "delta_top3": -0.0020000000000000018
+              },
+              "infill2": {
+                "delta_ce": -0.0053213029613310425,
+                "delta_top3": -0.0050000000000000044
+              },
+              "missing": {
+                "delta_ce": 0.01183180911173105,
+                "delta_top3": -0.002400000000000002
+              }
+            }
+          },
+          "selection_score": 1.2676144185332863,
+          "export_bytes": 9452754
+        },
+        {
+          "name": "e224-h256-b2-f512",
+          "steps": 400,
+          "elapsed_seconds": 32.324853083118796,
+          "unigram_kl": 0.007566715124994516,
+          "bigram_kl": 1.0184464104916726,
+          "bigram_top1": 0.8041299117882919,
+          "bigram_top3": 0.9526864474739375,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.022798833918711382,
+                "delta_top3": -0.0018000000000000017
+              },
+              "short4": {
+                "delta_ce": -0.015384214912541338,
+                "delta_top3": -0.006000000000000005
+              },
+              "next": {
+                "delta_ce": -0.008534628631756825,
+                "delta_top3": -0.0050000000000000044
+              },
+              "infill2": {
+                "delta_ce": -0.012643871892534709,
+                "delta_top3": -0.004400000000000004
+              },
+              "missing": {
+                "delta_ce": 0.007347295332711478,
+                "delta_top3": -0.005400000000000005
+              }
+            }
+          },
+          "selection_score": 1.0260131256166671,
+          "export_bytes": 9452754
+        },
+        {
+          "name": "e224-h256-b2-f512",
+          "steps": 600,
+          "elapsed_seconds": 48.7753047500737,
+          "unigram_kl": 0.0077226487919688225,
+          "bigram_kl": 0.9333281932069568,
+          "bigram_top1": 0.7812750601443464,
+          "bigram_top3": 0.9556936647955092,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.010364456572151149,
+                "delta_top3": -0.0030000000000000027
+              },
+              "short4": {
+                "delta_ce": -0.0001679517209529635,
+                "delta_top3": -0.0040000000000000036
+              },
+              "next": {
+                "delta_ce": 0.007482071418663949,
+                "delta_top3": -0.007400000000000006
+              },
+              "infill2": {
+                "delta_ce": -0.003579476880910981,
+                "delta_top3": -0.0032000000000000028
+              },
+              "missing": {
+                "delta_ce": 0.016001162281178337,
+                "delta_top3": -0.008199999999999995
+              }
+            }
+          },
+          "selection_score": 0.9410508419989256,
+          "export_bytes": 9452754
+        },
+        {
+          "name": "e224-h256-b2-f512",
+          "steps": 800,
+          "elapsed_seconds": 65.17589358333498,
+          "unigram_kl": 0.005330789368599653,
+          "bigram_kl": 0.8833236850548187,
+          "bigram_top1": 0.8027265437048917,
+          "bigram_top3": 0.9613071371291099,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.015702471585804824,
+                "delta_top3": -0.002200000000000002
+              },
+              "short4": {
+                "delta_ce": -0.008914850213937165,
+                "delta_top3": -0.002200000000000002
+              },
+              "next": {
+                "delta_ce": -0.0016044258249925392,
+                "delta_top3": -0.006600000000000006
+              },
+              "infill2": {
+                "delta_ce": 0.0061558331190259,
+                "delta_top3": -0.003400000000000003
+              },
+              "missing": {
+                "delta_ce": 0.023135970846912636,
+                "delta_top3": -0.0032000000000000028
+              }
+            }
+          },
+          "selection_score": 0.8886544744234184,
+          "export_bytes": 9452754
+        },
+        {
+          "name": "e224-h256-b2-f512",
+          "steps": 1000,
+          "elapsed_seconds": 80.67803950002417,
+          "unigram_kl": 0.005266342777758837,
+          "bigram_kl": 0.8509034643155337,
+          "bigram_top1": 0.8009222133119487,
+          "bigram_top3": 0.9580994386527666,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.013750526945805319,
+                "delta_top3": -0.005599999999999994
+              },
+              "short4": {
+                "delta_ce": -0.0019874660192057193,
+                "delta_top3": -0.005600000000000005
+              },
+              "next": {
+                "delta_ce": 0.009464157329243328,
+                "delta_top3": -0.0050000000000000044
+              },
+              "infill2": {
+                "delta_ce": 0.006435123238241048,
+                "delta_top3": -0.005800000000000005
+              },
+              "missing": {
+                "delta_ce": 0.02473680169408894,
+                "delta_top3": -0.006800000000000006
+              }
+            }
+          },
+          "selection_score": 0.8561698070932925,
+          "export_bytes": 9452754
+        }
+      ],
+      "actual_export_bytes": 9452754
+    },
+    "e224-h256-b3-f512": {
+      "export_bytes": 9723458,
+      "late_mean_bigram_top1": 0.797380379577653,
+      "late_mean_bigram_top3": 0.9602379043036621,
+      "late_bigram_top1_change_per_200": 0.0030072173215719027,
+      "late_context_guard_passes": 3,
+      "late_context_checkpoints": 3,
+      "late_mean_worst_context_delta_top3": -0.007133333333333339,
+      "late_mean_context_delta_top3": -0.004120000000000002,
+      "endpoint_bigram_top1": 0.8009222133119487,
+      "endpoint_bigram_top3": 0.9625100240577386,
+      "endpoint_context_delta_top3": {
+        "short2": -0.0019999999999999905,
+        "short4": -0.0038000000000000035,
+        "next": -0.004200000000000004,
+        "infill2": -0.005200000000000005,
+        "missing": -0.008600000000000007
+      },
+      "curve": [
+        {
+          "name": "e224-h256-b3-f512",
+          "steps": 0,
+          "elapsed_seconds": 0,
+          "unigram_kl": 0.19817441701889038,
+          "bigram_kl": 2.315512480899947,
+          "bigram_top1": 0.5811948676824379,
+          "bigram_top3": 0.7299518845228549,
+          "retention": {
+            "passed": false,
+            "modes": {
+              "short2": {
+                "delta_ce": 0.47260306185181256,
+                "delta_top3": -0.02259999999999999
+              },
+              "short4": {
+                "delta_ce": 0.5566782248738222,
+                "delta_top3": -0.03020000000000001
+              },
+              "next": {
+                "delta_ce": 0.594527853598352,
+                "delta_top3": -0.03260000000000001
+              },
+              "infill2": {
+                "delta_ce": 0.18067095691608248,
+                "delta_top3": -0.0132
+              },
+              "missing": {
+                "delta_ce": 0.20825069111334155,
+                "delta_top3": -0.017000000000000005
+              }
+            }
+          },
+          "selection_score": 2.5136868979188374,
+          "export_bytes": 9723458
+        },
+        {
+          "name": "e224-h256-b3-f512",
+          "steps": 200,
+          "elapsed_seconds": 16.482945874799043,
+          "unigram_kl": 0.0134609155356884,
+          "bigram_kl": 1.2523488983267956,
+          "bigram_top1": 0.7638331996792301,
+          "bigram_top3": 0.9206094627105053,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.021090403200546604,
+                "delta_top3": 0.0006000000000000117
+              },
+              "short4": {
+                "delta_ce": -0.009530371165368656,
+                "delta_top3": 0.0008000000000000007
+              },
+              "next": {
+                "delta_ce": -0.0019239907881248187,
+                "delta_top3": -0.00040000000000001146
+              },
+              "infill2": {
+                "delta_ce": -0.004759137443098194,
+                "delta_top3": -0.0036000000000000034
+              },
+              "missing": {
+                "delta_ce": 0.013375227884884211,
+                "delta_top3": -0.0010000000000000009
+              }
+            }
+          },
+          "selection_score": 1.265809813862484,
+          "export_bytes": 9723458
+        },
+        {
+          "name": "e224-h256-b3-f512",
+          "steps": 400,
+          "elapsed_seconds": 33.1845822497271,
+          "unigram_kl": 0.008243829011917114,
+          "bigram_kl": 1.0144335864308456,
+          "bigram_top1": 0.8035284683239775,
+          "bigram_top3": 0.9540898155573376,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.020448174321139413,
+                "delta_top3": -0.0026000000000000025
+              },
+              "short4": {
+                "delta_ce": -0.013107352148555051,
+                "delta_top3": -0.0050000000000000044
+              },
+              "next": {
+                "delta_ce": -0.005177348173433316,
+                "delta_top3": -0.004800000000000004
+              },
+              "infill2": {
+                "delta_ce": -0.00976780951843823,
+                "delta_top3": -0.0040000000000000036
+              },
+              "missing": {
+                "delta_ce": 0.012148892565362512,
+                "delta_top3": -0.0036000000000000034
+              }
+            }
+          },
+          "selection_score": 1.0226774154427627,
+          "export_bytes": 9723458
+        },
+        {
+          "name": "e224-h256-b3-f512",
+          "steps": 600,
+          "elapsed_seconds": 49.888196082785726,
+          "unigram_kl": 0.007644518278539181,
+          "bigram_kl": 0.9294070832002129,
+          "bigram_top1": 0.7949077786688051,
+          "bigram_top3": 0.9568965517241379,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.012208098511444377,
+                "delta_top3": -0.0010000000000000009
+              },
+              "short4": {
+                "delta_ce": -0.002133652889542148,
+                "delta_top3": -0.004400000000000004
+              },
+              "next": {
+                "delta_ce": 0.0072410351635651795,
+                "delta_top3": -0.007800000000000007
+              },
+              "infill2": {
+                "delta_ce": -0.004280652037111743,
+                "delta_top3": -0.004400000000000004
+              },
+              "missing": {
+                "delta_ce": 0.017021028652100333,
+                "delta_top3": -0.006399999999999994
+              }
+            }
+          },
+          "selection_score": 0.9370516014787521,
+          "export_bytes": 9723458
+        },
+        {
+          "name": "e224-h256-b3-f512",
+          "steps": 800,
+          "elapsed_seconds": 66.33559804176912,
+          "unigram_kl": 0.00482515525072813,
+          "bigram_kl": 0.8802042265230207,
+          "bigram_top1": 0.7963111467522053,
+          "bigram_top3": 0.9613071371291099,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.016394787674816412,
+                "delta_top3": -0.00020000000000000017
+              },
+              "short4": {
+                "delta_ce": -0.00983723303969004,
+                "delta_top3": -0.0014000000000000013
+              },
+              "next": {
+                "delta_ce": -0.0018947818873570554,
+                "delta_top3": -0.004600000000000004
+              },
+              "infill2": {
+                "delta_ce": 0.0027684508700504653,
+                "delta_top3": -0.0050000000000000044
+              },
+              "missing": {
+                "delta_ce": 0.020461483300407222,
+                "delta_top3": -0.0028000000000000026
+              }
+            }
+          },
+          "selection_score": 0.8850293817737488,
+          "export_bytes": 9723458
+        },
+        {
+          "name": "e224-h256-b3-f512",
+          "steps": 1000,
+          "elapsed_seconds": 82.6204613330774,
+          "unigram_kl": 0.004922296851873398,
+          "bigram_kl": 0.8477801284466248,
+          "bigram_top1": 0.8009222133119487,
+          "bigram_top3": 0.9625100240577386,
+          "retention": {
+            "passed": true,
+            "modes": {
+              "short2": {
+                "delta_ce": -0.015320041127037243,
+                "delta_top3": -0.0019999999999999905
+              },
+              "short4": {
+                "delta_ce": -0.006035464012715863,
+                "delta_top3": -0.0038000000000000035
+              },
+              "next": {
+                "delta_ce": 0.0025072286364386186,
+                "delta_top3": -0.004200000000000004
+              },
+              "infill2": {
+                "delta_ce": 0.0041045381463771236,
+                "delta_top3": -0.005200000000000005
+              },
+              "missing": {
+                "delta_ce": 0.02136413516392919,
+                "delta_top3": -0.008600000000000007
+              }
+            }
+          },
+          "selection_score": 0.8527024252984982,
+          "export_bytes": 9723458
+        }
+      ],
+      "actual_export_bytes": 9723458
+    }
+  },
+  "full_run_selected": "e128-h256-b3-f512",
+  "selection_reason": "Count learning curves essentially similar overall. Prefer compact 128 embedding; the three-block late count curve continues rising and all 600/800/1000 context guards pass, adding only 270704 bytes. Larger embeddings have no consistent accuracy advantage commensurate with 3.6MB. Single-seed trends are suggestive, not proof of superiority. No endpoint-loss winner or test selection."
+}

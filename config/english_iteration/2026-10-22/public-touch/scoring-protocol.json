@@ -1,0 +1,20 @@
+{
+  "schema": "public-phone-touch-scoring-v1",
+  "frozen_sha256": "d31b1f9c894a02949e31a1e06181cbe3fcf37956fa797020bf423c9c011b3c26",
+  "source_protocol_sha256": "5b14e49b66c0bd2de2fc631d89d40789d38c6f5de3b214eb94457b748eabcb96",
+  "lexicon_sha256": "ba939858f719641d910bcacc3174855abba3f32cbd394f849098f9cf52af9cfb",
+  "primary": "Unknown dictionary input, 4+ letters, exactly one single-edit dictionary repair, that repair is a neighbour substitution and equals the aligned target; clean controls separately retained",
+  "controls": "All observed labelled clean words, no source-copy controls added",
+  "full_cohort": "All uniquely labelled observed words, including unavailable model targets; whole-trial CER retains ambiguous and missing/split words",
+  "systems": [
+    "production",
+    "synthetic_text",
+    "synthetic_touch"
+  ],
+  "code_sha256": {
+    "evaluate_public_touch.py": "dcc5e70247fa809eea33a63a7ae91da2c56b301acfdcda6625f832a16369bb8d",
+    "public_touch_eval.py": "1e6f759c845d50b307ab458ce3d42cec9f2903ad83f0070b8a620f7766dac630",
+    "train_synthetic_touch.py": "2775a2757d7976252e63315ebdb21b5a5bd61e3327112091b9da02ae5aa8d94f",
+    "fit_tsi_touch.py": "40667afcca56c23f48d22118f011e0a324ace12c0179e06a37472481360a07bb"
+  }
+}

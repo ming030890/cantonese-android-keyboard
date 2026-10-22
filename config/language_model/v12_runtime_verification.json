@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "model_sha256": "01955e2824ee8597709f9061563e39e131a33327238a0609f56cb070a241858f",
+  "contexts": 4988,
+  "unigram_kl": 0.00233666505664587,
+  "unigram_top3": [
+    ",",
+    "。",
+    "係"
+  ],
+  "bigram_kl": 0.5839648910113551,
+  "bigram_top1": 0.8125501202886929,
+  "bigram_top3": 0.9685244587008821,
+  "max_abs_log_probability_error": 0.00022602081298828125,
+  "log_probability_tolerance": 0.0005,
+  "seconds": 6.158309834077954,
+  "runtime": "Actual release Rust CNG1 with neural_short_contexts; no count tables supplied",
+  "probe_sha256": "320adfee7c482bb0770522f5442958e0d06fb25829ed8a052b6bb03c477681ad"
+}

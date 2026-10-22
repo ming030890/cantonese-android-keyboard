@@ -1,0 +1,81 @@
+{
+  "steps": 10000,
+  "model_sha256": "01955e2824ee8597709f9061563e39e131a33327238a0609f56cb070a241858f",
+  "export_bytes": 6131426,
+  "config": {
+    "vocab_size": 34081,
+    "left": 8,
+    "right": 4,
+    "embedding": 128,
+    "hidden": 256,
+    "activation": "relu",
+    "residual_blocks": 3,
+    "layer_norm": true,
+    "ffn_hidden": 512
+  },
+  "format": "CNG1",
+  "neural_short_contexts": true,
+  "one_runtime_model": true,
+  "per_context_table": false,
+  "counts": {
+    "v7": {
+      "contexts": 4988,
+      "kl": 133.9882419348487,
+      "top1": 0.5803929430633521,
+      "top3": 0.7347634322373697
+    },
+    "candidate": {
+      "contexts": 4988,
+      "kl": 0.5840173456086951,
+      "top1": 0.8125501202886929,
+      "top3": 0.9685244587008821
+    }
+  },
+  "unigram": {
+    "v7": {
+      "kl": 2.988398551940918,
+      "top3": [
+        ",",
+        "。",
+        "」"
+      ]
+    },
+    "candidate": {
+      "kl": 0.0025597449857741594,
+      "top3": [
+        ",",
+        "。",
+        "係"
+      ]
+    }
+  },
+  "retention": {
+    "passed": true,
+    "modes": {
+      "short2": {
+        "delta_ce": -0.017295880689285604,
+        "delta_top3": -0.0016000000000000014
+      },
+      "short4": {
+        "delta_ce": -0.0036258902227041647,
+        "delta_top3": -0.004800000000000004
+      },
+      "next": {
+        "delta_ce": -0.00012375551152512542,
+        "delta_top3": -0.0036000000000000034
+      },
+      "infill2": {
+        "delta_ce": 0.0040129204378637874,
+        "delta_top3": -0.004600000000000004
+      },
+      "missing": {
+        "delta_ce": 0.018523564016516315,
+        "delta_top3": -0.008400000000000008
+      }
+    }
+  },
+  "validation_rows_per_source": 1000,
+  "selection_score": 0.5865770905944693,
+  "precision": "Both models row INT8 dequantized to FP32, matching runtime export; no BF16 count comparison",
+  "caveats": "Count fidelity measures TRAIN/lexical teacher memorization; repeated development validation; no final test in this audit. v7 vocabulary limitations affect count KL."
+}

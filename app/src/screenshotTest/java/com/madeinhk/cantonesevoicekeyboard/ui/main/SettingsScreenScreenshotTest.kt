@@ -170,3 +170,19 @@ private fun SettingsScreenScreenshotContent(
         )
     }
 }
+
+@PreviewTest
+@Preview(name = "Android 12 and 13 system layout setup", widthDp = 320, heightDp = 1000, fontScale = 1.3f)
+@Composable
+fun SettingsLegacySystemLayoutsScreenshot() {
+    CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
+        SettingsScreenContent(
+            enabledLayouts = KeyboardSettings.DEFAULT_LAYOUTS,
+            onToggleLayout = {},
+            multilingualTyping = false,
+            onMultilingualTypingChange = {},
+            onBack = {},
+            onConfigureSystemLayouts = {},
+        )
+    }
+}

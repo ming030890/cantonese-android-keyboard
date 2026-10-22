@@ -3,6 +3,8 @@ package com.madeinhk.cantonesevoicekeyboard.english
 import android.text.InputType
 import com.madeinhk.cantonesevoicekeyboard.KeyboardEditor
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
+import com.madeinhk.cantonesevoicekeyboard.quick.QuickInputCoordinator
+import com.madeinhk.cantonesevoicekeyboard.quick.QuickSuggestionInput
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,10 +18,19 @@ internal class EnglishInputCoordinator(
     private val worker: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
     private val onError: (Throwable) -> Unit = {},
     val sharedSuggestions: Boolean = false,
+    val unifiedEngine: UnifiedSuggestionEngine? = null,
 ) : AutoCloseable {
     private var engine: EnglishCandidateEngine? = null
     private var request = 0L
     private var pending: Deferred<EnglishPrediction?>? = null
+    private var nextWordsJob: Job? = null
+    private var nativeRequest: SuggestionRequest? = null
+    private var candidateRequest: Long? = null
+    private var joinedQuick: QuickInputCoordinator? = null
+    private var quickSnapshot: QuickSuggestionInput? = null
+    var quickEnglishEnabled: () -> Boolean = { true }
+    val hasUnifiedSuggestions get() = unifiedEngine != null
+
     private var resultWord: String? = null
     private var prediction = EnglishPrediction()
     private var apostropheBase: Pair<String, EnglishPrediction>? = null
@@ -41,17 +52,82 @@ internal class EnglishInputCoordinator(
     private val _candidates = MutableStateFlow<List<HandwritingCandidate>>(emptyList())
     val candidates = _candidates.asStateFlow()
 
+    fun attachQuick(quick: QuickInputCoordinator) {
+        if (unifiedEngine == null) return
+        joinedQuick = quick
+        quick.isCandidateRequestActive = { id -> this.quick && quickSnapshot?.id == id && pending?.isCancelled == false }
+        quick.onSuggestionsInvalidated = { cancelSuggestionWork(); ++request }
+        quick.onCandidateRequest = { input ->
+            quickSnapshot = input
+            this.quick = true
+            if (input.code.isNotEmpty()) {
+                contextWindow.onTyping()
+                undo = null
+                if (word.isEmpty()) safeStart = safeWordStart(input.left)
+            }
+            update(input.code, null)
+        }
+    }
+
+    private fun cancelSuggestionWork() {
+        nativeRequest?.cancel(); nativeRequest = null
+        nextWordsJob?.cancel(); nextWordsJob = null
+        pending?.cancel(); pending = null
+    }
+
+    private fun startUnifiedLookup(text: String, left: String, right: String,
+        input: QuickSuggestionInput? = null) {
+        val backend = unifiedEngine ?: return
+        cancelSuggestionWork()
+        if (closed) return
+        val id = ++request
+        candidateRequest = null
+        resultWord = null; prediction = EnglishPrediction()
+        val token = backend.newRequest()
+        nativeRequest = token
+        val allowEnglish = if (input != null) quickEnglishEnabled() && eligible() else eligible()
+        var joined: JoinedSuggestions? = null
+        val lookup = scope.async(worker) {
+            try {
+                token.ensureActive()
+                val result = backend.compose(token, input?.version ?: 0, text, left, right, allowEnglish)
+                token.ensureActive()
+                joined = result
+                result.english
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { token.ensureActive(); onError(error); null }
+            finally { token.close() }
+        }
+        pending = lookup
+        // A queued lookup may be cancelled before entering its body/finally.
+        lookup.invokeOnCompletion { token.close() }
+        scope.launch {
+            val result = lookup.await()
+            if (closed || request != id || word != text) return@launch
+            resultWord = text; prediction = result ?: EnglishPrediction()
+            val combined = joined ?: JoinedSuggestions(codeLength = text.take(12).length)
+            if (input != null) joinedQuick?.publishJoined(input, combined)
+            val words = if (text.isEmpty()) {
+                if (input == null) combined.display else emptyList()
+            } else
+                listOf(text) + result?.candidates.orEmpty().map { caseWord(it.word, text) }.filter { it != text }.distinct().take(8)
+            candidateRequest = id
+            _candidates.value = words.mapIndexed { i, candidate -> HandwritingCandidate(candidate, i) }
+        }
+    }
+
     fun reloadBackend() {
         reset()
         scope.launch(worker) { (engine as? AutoCloseable)?.close(); engine=null }
     }
     fun boundaryPending() = word.isNotEmpty() && resultWord != word && pending != null
-    fun needsBoundaryTransaction()=engine?.supportsAutomaticCorrection!=false &&
+    fun needsBoundaryTransaction()=!(hasUnifiedSuggestions && quick && !quickEnglishEnabled()) &&
+        engine?.supportsAutomaticCorrection!=false &&
         (boundaryPending() || (word.isNotEmpty() && engine?.supportsContextRevision==true))
     suspend fun settleContextRevision()=contextWindow.settle()
     fun cancelBoundaryCorrection() {
         if (!boundaryPending()) return
-        pending?.cancel();pending=null;prediction=EnglishPrediction(reason="boundary_cancelled");resultWord=word
+        cancelSuggestionWork();prediction=EnglishPrediction(reason="boundary_cancelled");resultWord=word
     }
     suspend fun settleBoundary() {
         val id=request;val text=word
@@ -59,7 +135,7 @@ internal class EnglishInputCoordinator(
         if(id!=request || text!=word) return
         if(result!=null) { prediction=result;resultWord=text }
         else {
-            pending?.cancel();pending=null
+            cancelSuggestionWork()
             // A timed-out decoder must not rewrite text after the boundary.
             resultWord=text;prediction=EnglishPrediction(reason="boundary_timeout")
         }
@@ -80,6 +156,15 @@ internal class EnglishInputCoordinator(
         if (word.isEmpty()) {
             val preceding = editor.getTextBeforeCursor(text.length + 256).orEmpty().removeSuffix(text)
             safeStart = safeWordStart(preceding)
+        }
+        if (hasUnifiedSuggestions && quick && word == text) {
+            // Quick already scheduled this editor snapshot. Keep the tap without
+            // launching the same shared-model request again.
+            evidence?.let {
+                if (!centers.contentEquals(it.centers)) { taps.fill(null); centers = it.centers.copyOf() }
+                if (taps.isNotEmpty()) taps[taps.lastIndex] = it
+            }
+            return
         }
         quick = true
         update(text, evidence)
@@ -105,7 +190,14 @@ internal class EnglishInputCoordinator(
     }
 
     private fun refresh() {
-        pending?.cancel(); val id = ++request
+        if (unifiedEngine != null) {
+            val input = quickSnapshot?.takeIf { quick && it.code == word }
+            val before = editor.getTextBeforeCursor(512).orEmpty()
+            startUnifiedLookup(word, input?.left ?: before.removeSuffix(word),
+                input?.right ?: editor.getTextAfterCursor(256).orEmpty(), input)
+            return
+        }
+        cancelSuggestionWork(); val id = ++request
         resultWord = null; prediction = EnglishPrediction()
         _candidates.value = if (eligible()) listOf(HandwritingCandidate(word, 0)) else emptyList()
         if (!eligible() || closed) return
@@ -153,10 +245,15 @@ internal class EnglishInputCoordinator(
 
     fun refreshNextWords() {
         if (!sharedSuggestions || word.isNotEmpty() || closed) return
-        pending?.cancel(); val id=++request
         val left=editor.getTextBeforeCursor(512).orEmpty()
         val right=editor.getTextAfterCursor(256).orEmpty()
-        scope.launch {
+        if (unifiedEngine != null) {
+            quick = false; quickSnapshot = null
+            startUnifiedLookup("", left, right)
+            return
+        }
+        cancelSuggestionWork(); val id=++request
+        nextWordsJob = scope.launch {
             val words=withContext(worker) {
                 runCatching {
                     if(engine==null) engine=loader()
@@ -168,7 +265,7 @@ internal class EnglishInputCoordinator(
         }
     }
 
-    fun canSelect(text: String) = _candidates.value.any { it.text == text }
+    fun canSelect(text: String) = (!hasUnifiedSuggestions || candidateRequest == request) && _candidates.value.any { it.text == text }
 
     fun finish(delimiter: String = "", correct: Boolean = false, chineseMatch: Boolean = false,
                selected: String? = null): Boolean {
@@ -176,7 +273,7 @@ internal class EnglishInputCoordinator(
             if(selected!=null && canSelect(selected)) {
                 val left=editor.getTextBeforeCursor(1).orEmpty()
                 editor.commitText((if(left.lastOrNull()?.isLetterOrDigit()==true) " " else "")+selected)
-                reset();return true
+                reset(preserveDisplay = hasUnifiedSuggestions);return true
             }
             undo = null; return false
         }
@@ -222,7 +319,7 @@ internal class EnglishInputCoordinator(
         val mayReconsider=allowCorrection && !suppress && allowEnglishDecision && eligible() && selected==null && delimiter==" "
         val remember=mayReconsider && currentResult && (!source.known || source.reconsiderKnown) && source.correction==null && replacement==original
         val originalCenters=centers.copyOf()
-        reset(cancelLookup = delayed == null, preserveContext = mayReconsider); undo = record
+        reset(cancelLookup = delayed == null, preserveContext = mayReconsider, preserveDisplay = hasUnifiedSuggestions); undo = record
         if(mayReconsider) contextWindow.boundary(original,replacement,delimiter,originalLeft,originalCenters,evidence,remember)
         if (delayed != null) {
             pendingBoundaryCursor = cursor
@@ -269,12 +366,13 @@ internal class EnglishInputCoordinator(
         return false
     }
 
-    fun reset(cancelLookup: Boolean = true, preserveContext: Boolean = false) {
+    fun reset(cancelLookup: Boolean = true, preserveContext: Boolean = false, preserveDisplay: Boolean = false) {
         if(!preserveContext) contextWindow.clear()
-        if (cancelLookup) pending?.cancel()
+        if (cancelLookup) cancelSuggestionWork()
         pending = null; ++request; word = ""; taps.clear(); centers = FloatArray(0)
         pendingBoundaryCursor = null
-        resultWord = null; prediction = EnglishPrediction(); _candidates.value = emptyList()
+        resultWord = null; prediction = EnglishPrediction()
+        if (!preserveDisplay) _candidates.value = emptyList()
         apostropheBase = null
         suppress = false; undo = null; safeStart = true
     }

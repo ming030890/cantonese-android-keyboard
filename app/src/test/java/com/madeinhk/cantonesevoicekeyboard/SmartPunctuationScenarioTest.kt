@@ -5,6 +5,25 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SmartPunctuationScenarioTest {
+    @Test fun continueEndsWithAsciiFullStopOnBothTextLayouts() {
+        for (mode in listOf(KeyboardInputMode.Quick, KeyboardInputMode.AlphaNum)) {
+            for (backend in listOf(false, true)) for (enabled in listOf(false, true)) {
+                for (prefix in listOf("", "你好")) for (period in listOf(".", "。")) {
+                    KeyboardScenario(initialText = prefix, initialMode = mode,
+                        englishEngine = if (backend) ScenarioEnglishEngine() else null).use { s ->
+                        if (!enabled) s.autocorrectLayouts = emptySet()
+                        s.start(); s.type("continue")
+                        assertEquals(false, s.snapshot().chinesePunctuation)
+                        s.press(KeyboardKeyKind.Text, period)
+                        assertEquals("${prefix}continue.", s.editor.text)
+                        assertEquals("", s.editor.composing)
+                        assertEquals(false, s.snapshot().chinesePunctuation)
+                    }
+                }
+            }
+        }
+    }
+
     @Test fun literalQuickCodesUseAsciiPunctuationWithOrWithoutAutocorrect() {
         for (backend in listOf(false, true)) for (enabled in listOf(false, true)) {
             for (code in listOf("df", "of", "DF")) for (punctuation in listOf(".", "。", ",", "，")) {

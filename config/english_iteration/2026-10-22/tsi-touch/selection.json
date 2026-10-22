@@ -1,0 +1,148 @@
+{
+  "protocol": "participant-disjoint TSI coordinate pilot v1",
+  "audit": {
+    "reference_words": 5981,
+    "outside_word_length_support": 972,
+    "unaligned_or_length_error": 123,
+    "boundary_error": 846,
+    "scored_words": 4040
+  },
+  "raw_sha256": {
+    "prompt_data.csv": "c0992922ff3f85440c7f3eaf2537d82df75202a9882d20757e49859ae5d13ba6",
+    "touch_data.csv": "f6aaa9c79596a5d61c5d2429d722db30013fd92d333d28863adc77e54ef4d8a3",
+    "keyboard_data.json": "642e95984ed8b04f5bb7c56bb6237c6654034c5ff0c15aef55a127c93530213d"
+  },
+  "probe_sha256": "871130e4b1e61e12ce0ed1937f51598f524fe2eee18e1ddbcf07dd73b683df9b",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "acceptance_sha256": "1d5733cc3f09778485318cb5c579086f67977b19dc52577cd6dbd298ae4784da",
+  "script_sha256": "40667afcca56c23f48d22118f011e0a324ace12c0179e06a37472481360a07bb",
+  "touch_model_sha256": "150a32a3cc716f9dfea453e630a84206dfba3a35750518865a25a1eaf494d5c9",
+  "weight": 0.125,
+  "panels": {
+    "calibration": {
+      "participants": [
+        "user11",
+        "user12"
+      ],
+      "baseline": {
+        "cases": 498,
+        "typos": 106,
+        "controls": 392,
+        "correct": 85,
+        "wrong": 1,
+        "false_changes": 1,
+        "f05": 0.9444444444444444,
+        "precision": 0.9883720930232558,
+        "recall": 0.8018867924528302
+      },
+      "touch": {
+        "cases": 498,
+        "typos": 106,
+        "controls": 392,
+        "correct": 87,
+        "wrong": 1,
+        "false_changes": 1,
+        "f05": 0.9497816593886463,
+        "precision": 0.9886363636363636,
+        "recall": 0.8207547169811321
+      }
+    },
+    "selection": {
+      "participants": [
+        "user13",
+        "user14"
+      ],
+      "baseline": {
+        "cases": 677,
+        "typos": 134,
+        "controls": 543,
+        "correct": 99,
+        "wrong": 3,
+        "false_changes": 1,
+        "f05": 0.9132841328413284,
+        "precision": 0.9705882352941176,
+        "recall": 0.7388059701492538
+      },
+      "touch": {
+        "cases": 677,
+        "typos": 134,
+        "controls": 543,
+        "correct": 98,
+        "wrong": 3,
+        "false_changes": 1,
+        "f05": 0.9107806691449815,
+        "precision": 0.9702970297029703,
+        "recall": 0.7313432835820896
+      }
+    }
+  },
+  "calibration_grid": {
+    "0.0": {
+      "cases": 498,
+      "typos": 106,
+      "controls": 392,
+      "correct": 85,
+      "wrong": 1,
+      "false_changes": 1,
+      "f05": 0.9444444444444444,
+      "precision": 0.9883720930232558,
+      "recall": 0.8018867924528302
+    },
+    "0.125": {
+      "cases": 498,
+      "typos": 106,
+      "controls": 392,
+      "correct": 87,
+      "wrong": 1,
+      "false_changes": 1,
+      "f05": 0.9497816593886463,
+      "precision": 0.9886363636363636,
+      "recall": 0.8207547169811321
+    },
+    "0.25": {
+      "cases": 498,
+      "typos": 106,
+      "controls": 392,
+      "correct": 84,
+      "wrong": 1,
+      "false_changes": 1,
+      "f05": 0.9417040358744395,
+      "precision": 0.9882352941176471,
+      "recall": 0.7924528301886793
+    },
+    "0.5": {
+      "cases": 498,
+      "typos": 106,
+      "controls": 392,
+      "correct": 80,
+      "wrong": 1,
+      "false_changes": 1,
+      "f05": 0.9302325581395349,
+      "precision": 0.9876543209876543,
+      "recall": 0.7547169811320755
+    },
+    "1.0": {
+      "cases": 498,
+      "typos": 106,
+      "controls": 392,
+      "correct": 72,
+      "wrong": 1,
+      "false_changes": 1,
+      "f05": 0.9045226130653267,
+      "precision": 0.9863013698630136,
+      "recall": 0.6792452830188679
+    },
+    "2.0": {
+      "cases": 498,
+      "typos": 106,
+      "controls": 392,
+      "correct": 65,
+      "wrong": 1,
+      "false_changes": 1,
+      "f05": 0.8783783783783784,
+      "precision": 0.9848484848484849,
+      "recall": 0.6132075471698113
+    }
+  },
+  "qualifies": false
+}

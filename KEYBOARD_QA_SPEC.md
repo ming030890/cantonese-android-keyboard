@@ -55,13 +55,13 @@ model quality or a requirement that real models return this exact ranking.
 | QK-03 | Choose a displayed next-word prediction | Append that prediction once; remain out of composition; refresh next-word predictions again. | Baseline; `qk03` |
 | QK-04 | Cursor/selection callback while a code is active | Keep composing text and code candidates; do not replace them with idle predictions. | Baseline; `qk04` |
 | QK-05 | Backspace with an active code and previously committed text | Remove one composing letter per press. Preserve committed text until composition is empty; a subsequent Backspace edits committed text. | Baseline; `qk05`; deleting all input alone does not restore clipboard |
-| QK-06 | Rapid code changes while lookup is pending | Only the latest requested code/version/context result may be displayed. Cancelled work must not restore older candidates. | Baseline; `qk06`, existing real-worker cancellation test |
+| QK-06 | Rapid code changes while lookup is pending | Cancel superseded requests, including inside native inference. Only the latest code/version/context may publish; cancelled work must not restore older candidates or corrupt the next CNN context. | Agreed 2026-10-22; `UnifiedSuggestionScenarioTest` queued/running/native cancellation cases |
 | QK-07 | Insert a whole English next-word prediction between English words | Add the needed left/right word separators; do not add separators to ordinary Chinese Quick selection. | Baseline; `qk07`, existing coordinator tests |
 | QK-08 | Space, Enter, or switch layout while composing Quick letters | Space/Enter preserve literal letters when autocorrect is disabled or no confident English correction exists. Enabled autocorrect follows AC-01. Layout switches remain literal. Never choose Chinese implicitly at these boundaries. | D-01 amended by D-07; `qk08`, autocorrect scenarios |
 | QK-09 | Compose more than a single two-letter code | Continue phrase lookup. Following input may commit a resolved six-character Chinese phrase only with fresh, strong LM Chinese evidence. Missing, pending or uncertain evidence preserves raw composition and unconsumed suffixes. Dictionary prefix membership does not decide the language. | D-09; `QuickLanguageScenarioTest`, native real-model regression, length/cap tests |
 | QK-10 | Paste, press Record, or enter punctuation while a Quick code is unfinished | Commit literal letters first. Paste inserts copied text once and clears Quick composition, then refreshes predictions. Record transitions to voice; punctuation follows the literal letters. Chinese conversion requires explicit candidate selection at these boundaries. | Rule D-05 derived from confirmed literal policies; `qk10` |
 | QK-11 | Type a complete two-letter Quick code such as `df`, including in English context | Keep all Chinese code matches in their Quick ranking ahead of English suggestions. Retain literal English for explicit selection. Longer input continues bilingual ranking. | Agreed 2026-10-19; `twoLetterQuickCodeKeepsChineseBeforeEnglishInEnglishContext`, two-letter scenario screenshot |
-| QK-12 | Type a short Quick code while full/English ranking is pending | Show a selectable preview using one model distribution for known characters, followed by rare matches in dictionary order. Full sequence ranking then refines the order. Display Chinese results without waiting for mixed ranking; two-letter codes never request mixed ranking. Cancelled previews/results must not restore an old code. | Agreed latency fix 2026-10-20; `shortCodePreviewIsSelectableBeforeFullRankingAndRejectsLateResults`, `chineseCandidatesAppearWhileEnglishWorkerIsStillPending`; final candidate screenshots unchanged |
+| QK-12 | Type while suggestions are pending | One shared composing request owns Quick and English results. Short codes filter the full next-token score table before selecting matches; dictionary-only characters follow in frequency order. Publish one completed row. Retain the previous row while its replacement is pending, but reject selections from it. Two-letter codes keep Chinese ahead of English. | Agreed 2026-10-22, supersedes the preview/full/mixed publication sequence; `UnifiedSuggestionScenarioTest`, retained-row screenshot |
 | QK-13 | Longer Quick input produces Chinese phrases and English alternatives | Rank all generated phrases with English using calibrated sequence and input evidence. Forward observed keys; candidates beyond the previous eight-item shortlist must participate. No word-specific ranking exceptions. | `mixedRankingReceivesObservedKeysAndCandidatesBeyondTheOldEightItemCutoff`, actual JNI `mixedModelRanksEnglishAndChinesePhrasesFromObservedKeys`; mixed Chinese (both pages) and English screenshots. `兒歌` outranks `自歌` and is selectable; it is not currently first. |
 
 ## Other text input and editor context
@@ -73,7 +73,7 @@ model quality or a requirement that real models return this exact ranking.
 | ED-03 | Enter in an editor with a configured action | Execute the editor action; otherwise insert newline. Custom action takes precedence. | Baseline; `EditorActionResolverTest`, `ImeEditorTest`; OS integration gap |
 | ED-04 | Backspace with an editor selection | Delete the selection; otherwise delete the preceding character. | Baseline; `ImeEditorTest` decision helper; real InputConnection integration gap |
 | ED-05 | Backspace after an emoji | One press deletes the entire preceding visible character, including surrogate pairs, skin tones, flags, variation selectors and joined emoji. Preserve adjacent text and any text after the cursor. | Agreed 2026-10-19; `ImeEditorTest`, `ed05` sequence |
-| ED-06 | Type literal Latin letters (including two-letter Quick codes), then punctuation | Insert ASCII punctuation after literal Latin input. Use Chinese punctuation after selected Chinese text. Key labels and symbol panels reflect the same context decision; update after typing, selection, deletion and cursor changes. Autocorrect must use the normalized delimiter. | Agreed 2026-10-19; `SmartPunctuationScenarioTest`, Quick ASCII/Chinese scenario screenshots |
+| ED-06 | Type literal Latin letters (including two-letter Quick codes and `continue`), then punctuation | Insert ASCII punctuation after literal Latin input. Use Chinese punctuation after selected Chinese text. Key labels and symbol panels reflect the same context decision; update after typing, selection, deletion and cursor changes. Autocorrect must use the normalized delimiter. | Agreed 2026-10-19; `SmartPunctuationScenarioTest` (including `continue.` on both layouts), Quick ASCII/Chinese and continue scenario screenshots |
 
 ## Handwriting
 
@@ -109,6 +109,7 @@ layouts. Emoji uses its own panel rather than this toolbar.
 | UX-01 | Too many candidates for toolbar width | Pack measured label widths in ranked order; arrows consume space only when visible; no omitted or duplicated indices. English words and Chinese phrases remain on one line. | `ux01`, measured-width tests, normal/narrow long-word and phrase screenshots |
 | UX-02 | Candidate set shrinks or changes | Clamp/reset the page to a valid page; obsolete candidate keys must not be tappable. | Baseline; existing key-unmount tests; Compose page-reset interaction gap |
 | UX-03 | Text key versus control key, key release/cancel/repeat | Text dispatches once on release; cancel inserts nothing. Delete occurs on down/repeat, not an extra time on up. | Baseline; `ux03`, existing touch/dispatcher tests |
+| UX-05 | Tap the plain symbols key; select a layout using Android's navigation-bar keyboard switcher | Symbols toggle directly; Space keeps the freed width. Android exposes Quick (original subtype 1001), English (1002), and Handwriting (1003). System selections change layout without inserting text; unfinished Quick input commits literally once. Reopening follows the system subtype while numeric/password editors retain their appropriate startup layout. Enabled layouts sync on Android 14+; Android 12/13 use the system layout-enabler screen linked from Settings. | Agreed 2026-10-22; `SystemKeyboardSubtypeScenarioTest`, keyboard screenshots; actual globe visibility and switching remain an on-device integration check |
 | UX-04 | Shift/symbol/emoji controls | Change the visible panel/key labels without committing text. Emoji selection commits selected emoji once. | Static preview coverage and existing emoji commit scenario; full Compose interaction gap |
 
 ## Session and asynchronous work
@@ -316,7 +317,16 @@ The picker uses the production Compose UI in previews as well as the IME. It sho
 an eight-column scrolling grid, mint selected-category/emoji pills, nine categories,
 recent selections and long-press variants. The offline index contains 1,790 base
 emoji and 2,982 complete sequences from AndroidX 1.6.0 with CLDR 48 English names
-and keywords. Existing AndroidX recent history is retained.
+and keywords. Existing AndroidX recent history is retained. The picker always starts at Recent emoji, including with empty history. Categories form
+one continuous vertical sheet; tabs jump to sections and scrolling updates the selected tab.
+Every new visible keyboard session restores the selected text layout and closes emoji/search. Picks from categories,
+search and variants move the complete sequence to the front without duplicates,
+retaining the latest 64 selections across sessions. `EmojiCatalogTest` covers order,
+serialization and the limit; `EmojiPickerInteractionTest` covers selecting and reopening.
+Recent screenshots cover full and narrow widths. Emoji keys use a 30 dp smiley
+(previously 22 dp), reducing internal space on both English and Quick layouts.
+Verified 2026-10-21: `:app:verifyKeyboard` passes, and all four emoji interaction
+tests pass on the Android 16 ARM64 emulator.
 
 Search places its query/results panel above the existing `AlphaNumPanel` and
 `AlphaNumBottomRow`. It uses the same touch dispatcher, key geometry, haptics,
@@ -327,8 +337,8 @@ availability. Choosing a result commits one complete Unicode sequence through
 the normal emoji callback. Done or the emoji key returns to browsing; the header
 back control closes search. The standard layout-switch control exits search.
 
-Browsing height is 480 dp (previously 369 dp), allowing roughly seven rows on
-an uninset preview. Search height is 497 dp: the 176 dp results panel replaces
+Browsing height is 560 dp, with 32 sp emoji in 52 dp cells. Search height is
+545 dp: the 224 dp results panel replaces
 the normal 48 dp toolbar above the unchanged English key rows. System-owned
 navigation/caption/cutout insets remain reserved inside the surface.
 
@@ -443,3 +453,42 @@ abstains automatically there. D-20's fake uncertain-response screenshot remains
 a UI rendering test; its `varely` response does not describe this native fit.
 Correction, immediate Backspace undo and subsequent literal recommit remain
 covered through the real JNI/controller. See `EDIT_POSITION_COSTS.md`.
+
+### D-24 (2026-10-22): Unified, cancellable suggestion requests
+
+Quick and English use one composing request and one final candidate-row publication.
+Compute the full next-token distribution, filter by the Quick code or English
+prefix/spelling eligibility, then choose the best matching candidates. Never
+truncate global predictions before matching. Multi-character phrases require
+conditional distributions at each retained prefix; reuse them in the same request.
+Rare dictionary characters without a single LM token remain available in frequency
+order on short codes. Preserve the existing correction policy and two-letter
+Chinese priority. Keep the prior completed row visible during a replacement, but
+reject stale taps. New input, changed context, layout/session changes and boundary
+timeouts cancel obsolete work, including native inference. Disabled Quick
+correction must not wait for Chinese inference at a word boundary.
+
+`UnifiedSuggestionScenarioTest` exercises production controller/key-receiver
+sequences, queued and running cancellation, timeouts, undo, mode round-trips and
+native JNI scoring. `ScenarioUnifiedCandidatesPending` renders the retained row.
+See [implementation and verification](UNIFIED_SUGGESTIONS.md) for host results and
+remaining phone latency coverage.
+
+Emoji follow-up (2026-10-22): the retained search receiver reads current Compose state
+after layout/session changes. Regression coverage exercises layout change → search
+typing → new visible session → host typing → reopened search, plus cross-category
+scrolling and empty-history Recent selection.
+
+Physical keyboard events are handled by the visible IME service during emoji search,
+including text, Space, Delete, Escape and Enter. Both halves of consumed key events
+stay out of the host editor; hidden IME windows must not intercept hardware input.
+Final follow-up validation: six emoji interaction tests pass on Android 16 ARM64;
+`:app:verifyKeyboard` passes (221 unit/scenario passes, 13 opt-in tests skipped),
+with the nine updated emoji baselines inspected. Real IME browsing/search clear the
+system navigation controls. The emulator has a temporary UI-only APK for this check;
+model asset delivery has not been deployed or verified.
+
+The final real-service check typed `heart` through Android hardware key events:
+46 results appeared in the picker while the host EditText stayed empty. Closing
+the IME with the system hide control and tapping the editor restored the English
+keyboard, with emoji search closed. Both expanded views cleared navigation controls.

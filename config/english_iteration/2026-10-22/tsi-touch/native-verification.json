@@ -1,0 +1,61 @@
+{
+  "native_decision_mismatches": 0,
+  "selection_cases": 677,
+  "candidate_pool_mismatches": 0,
+  "max_score_error": 0.0,
+  "mapping_invariance_cases": 677,
+  "missing_touch_parity_cases": 677,
+  "aalto_no_touch_parity_cases": 2042,
+  "aalto_metrics": {
+    "cases": 2042,
+    "typos": 744,
+    "controls": 1298,
+    "correct": 418,
+    "wrong": 32,
+    "false_changes": 8,
+    "f05": 0.8215408805031447,
+    "precision": 0.9288888888888889,
+    "recall": 0.5618279569892473
+  },
+  "selection_baseline": {
+    "cases": 677,
+    "typos": 134,
+    "controls": 543,
+    "correct": 99,
+    "wrong": 3,
+    "false_changes": 1,
+    "f05": 0.9132841328413284,
+    "precision": 0.9705882352941176,
+    "recall": 0.7388059701492538
+  },
+  "selection_touch": {
+    "cases": 677,
+    "typos": 134,
+    "controls": 543,
+    "correct": 98,
+    "wrong": 3,
+    "false_changes": 1,
+    "f05": 0.9107806691449815,
+    "precision": 0.9702970297029703,
+    "recall": 0.7313432835820896
+  },
+  "latency": {
+    "boundary": "Warm release-host engine calls; excludes phone scheduling/rendering",
+    "no_touch": {
+      "calls": 480,
+      "median_ms": 1.5465,
+      "p95_ms": 3.36505
+    },
+    "touch": {
+      "calls": 480,
+      "median_ms": 1.5705,
+      "p95_ms": 3.3633499999999987
+    }
+  },
+  "hashes": {
+    "build/tsi-touch/baseline-probe": "871130e4b1e61e12ce0ed1937f51598f524fe2eee18e1ddbcf07dd73b683df9b",
+    "build/tsi-touch/native/release/ngram_probe": "de2df3b4b7d65fa7b3312308b45373fd32d920d51335279474c4ab3b3880bd85",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/config/english_iteration/2026-10-22/tsi-touch/touch-model.json": "150a32a3cc716f9dfea453e630a84206dfba3a35750518865a25a1eaf494d5c9",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/verify_tsi_touch.py": "13bfcd332937f2fa063bfb8846862d55dc57d66c0623a0c242f27c753318fafb"
+  }
+}

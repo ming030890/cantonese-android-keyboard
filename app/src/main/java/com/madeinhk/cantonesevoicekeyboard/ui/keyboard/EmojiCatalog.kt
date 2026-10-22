@@ -43,3 +43,14 @@ internal data class EmojiSearchState(val active: Boolean = false, val query: Str
     fun clear() = copy(query = "")
     fun close() = EmojiSearchState()
 }
+
+/** Most recent first; keep complete sequences and the legacy picker's comma-separated format. */
+internal class EmojiHistory(emoji: List<String> = emptyList()) {
+    val emoji = emoji.filter(String::isNotBlank).distinct().take(64)
+
+    fun pick(value: String) = EmojiHistory(listOf(value) + emoji)
+
+    fun entries(catalog: EmojiCatalog): List<EmojiEntry> = emoji.mapNotNull { value ->
+        catalog.entries.firstOrNull { it.emoji == value || value in it.variants }?.copy(emoji = value)
+    }
+}

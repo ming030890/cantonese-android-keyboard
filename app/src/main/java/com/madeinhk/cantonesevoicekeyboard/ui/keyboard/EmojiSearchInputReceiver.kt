@@ -38,3 +38,23 @@ internal class EmojiSearchInputReceiver(
         if (!state().active) keyboard.onKeyCancel(data)
     }
 }
+
+/** IME windows do not own Android focus, so hardware keys arrive at the service. */
+internal fun handleEmojiSearchKey(
+    event: android.view.KeyEvent,
+    search: EmojiSearchState,
+    update: (EmojiSearchState) -> Unit,
+): Boolean {
+    if (!search.active || event.action != android.view.KeyEvent.ACTION_DOWN) return false
+    when (event.keyCode) {
+        android.view.KeyEvent.KEYCODE_DEL -> update(search.delete())
+        android.view.KeyEvent.KEYCODE_ESCAPE, android.view.KeyEvent.KEYCODE_ENTER -> update(search.close())
+        else -> {
+            val code = event.unicodeChar
+            if (code >= 32 && code <= Character.MAX_CODE_POINT && !event.isCtrlPressed && !event.isMetaPressed) {
+                update(search.type(String(Character.toChars(code))))
+            } else return false
+        }
+    }
+    return true
+}

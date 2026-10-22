@@ -1,0 +1,358 @@
+{
+  "passed": true,
+  "cases": 12,
+  "zero_one_and_longer_context_use_same_neural_model": true,
+  "count_asset_present": false,
+  "queries": [
+    {
+      "version": 3,
+      "code": "a",
+      "left": "",
+      "right": ""
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "我",
+      "right": ""
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "",
+      "right": "食"
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "我想",
+      "right": ""
+    },
+    {
+      "version": 3,
+      "code": "a",
+      "left": "今天天氣幾好",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "我",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "",
+      "right": "食"
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "我想",
+      "right": ""
+    },
+    {
+      "version": 5,
+      "code": "a",
+      "left": "今天天氣幾好",
+      "right": ""
+    },
+    {
+      "left": "",
+      "limit": 3
+    },
+    {
+      "left": "我",
+      "limit": 3
+    }
+  ],
+  "results": [
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        261,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        401,
+        250,
+        250,
+        411,
+        197,
+        77,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        118,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        261,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "candidates": [
+        "日",
+        "曰"
+      ],
+      "context_ids": [
+        0,
+        0,
+        401,
+        250,
+        250,
+        411,
+        197,
+        77,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural"
+    },
+    {
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural",
+      "predictions": [
+        {
+          "score": -1.954461693763733,
+          "token": ",",
+          "token_id": 3
+        },
+        {
+          "score": -2.8640003204345703,
+          "token": "。",
+          "token_id": 4
+        },
+        {
+          "score": -2.976698875427246,
+          "token": "係",
+          "token_id": 68
+        }
+      ]
+    },
+    {
+      "context_ids": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        88,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "Neural",
+      "predictions": [
+        {
+          "score": -0.6961797475814819,
+          "token": "哋",
+          "token_id": 267
+        },
+        {
+          "score": -0.7154020071029663,
+          "token": "地",
+          "token_id": 93
+        },
+        {
+          "score": -0.795864462852478,
+          "token": "們",
+          "token_id": 531
+        }
+      ]
+    }
+  ],
+  "model_sha256": "38f7b0f066e218e4d1e1703c02f070152006e1f0020f796d9e84e2c5efdaf0ca",
+  "count_input": "None"
+}

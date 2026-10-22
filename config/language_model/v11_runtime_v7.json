@@ -1,0 +1,10 @@
+{
+  "model_sha256": "206e576650d034b44de1fcaf944d26a8082b5c8ba280e3cece343150d54a70f4",
+  "runtime": "Actual release Rust CNG1, identical teacher contexts and FP32 inference",
+  "contexts": 4988,
+  "bigram_top1": 0.5803929430633521,
+  "bigram_top3": 0.7347634322373697,
+  "bigram_kl": 133.82596923491008,
+  "seconds": 5.485524875111878,
+  "vocabulary_caveat": "New input tokens map to original UNK; unavailable output targets receive log probability -10000"
+}

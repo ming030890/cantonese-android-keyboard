@@ -1,0 +1,307 @@
+{
+  "scope": "Only two additional-edit surcharges; v66 base costs, acceptance/cutoff and all generation/split rules fixed.",
+  "protocol": "Four TRAIN ranking fits; select better real F0.5 with no primary or short-primary F0.5 decline. Keep baseline on ties. Existing development evaluation is historically exposed, not independent confirmation.",
+  "baseline_costs": {
+    "neighbor_replacement": 0.574436466482213,
+    "other_replacement": 3.7162379435897606,
+    "swap_or_alternation": 0.9146548439690982,
+    "extra_character": 4.541078382355206,
+    "missing_character": 1.9126156502899054,
+    "additional_same_length_edit": 3.0,
+    "additional_length_change_edit": 4.5,
+    "first_character_change": 0.0
+  },
+  "baseline_selection": {
+    "real": {
+      "cases": 1949,
+      "typos": 700,
+      "controls": 1249,
+      "correct": 401,
+      "wrong": 31,
+      "false_changes": 6,
+      "recall": 0.5728571428571428,
+      "precision": 0.9282407407407407,
+      "f05": 0.8257825370675453
+    },
+    "unambiguous_neighbor": {
+      "cases": 1385,
+      "typos": 598,
+      "controls": 787,
+      "correct": 467,
+      "wrong": 11,
+      "false_changes": 7,
+      "recall": 0.7809364548494984,
+      "precision": 0.9769874476987448,
+      "f05": 0.9302788844621513
+    },
+    "unambiguous_neighbor_4_5": {
+      "cases": 72,
+      "typos": 72,
+      "controls": 0,
+      "correct": 32,
+      "wrong": 1,
+      "false_changes": 0,
+      "recall": 0.4444444444444444,
+      "precision": 0.9696969696969697,
+      "f05": 0.7843137254901961
+    }
+  },
+  "trials": [
+    {
+      "family": "shared_multiplier",
+      "regularization": 0.01,
+      "costs": {
+        "neighbor_replacement": 0.574436466482213,
+        "other_replacement": 3.7162379435897606,
+        "swap_or_alternation": 0.9146548439690982,
+        "extra_character": 4.541078382355206,
+        "missing_character": 1.9126156502899054,
+        "additional_same_length_edit": 2.593208524823987,
+        "additional_length_change_edit": 3.889812787235981,
+        "first_character_change": 0.0
+      },
+      "support": {
+        "fit_cases": 1473,
+        "cases_with_any_multi_edit_candidate": 1082,
+        "gold_cases_by_surcharge": {
+          "additional_same_length_edit": 237,
+          "additional_length_change_edit": 75
+        }
+      },
+      "selection": {
+        "real": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 400,
+          "wrong": 32,
+          "false_changes": 6,
+          "recall": 0.5714285714285714,
+          "precision": 0.9259259259259259,
+          "f05": 0.8237232289950577
+        },
+        "unambiguous_neighbor": {
+          "cases": 1385,
+          "typos": 598,
+          "controls": 787,
+          "correct": 437,
+          "wrong": 10,
+          "false_changes": 6,
+          "recall": 0.7307692307692307,
+          "precision": 0.9776286353467561,
+          "f05": 0.915758591785415
+        },
+        "unambiguous_neighbor_4_5": {
+          "cases": 72,
+          "typos": 72,
+          "controls": 0,
+          "correct": 25,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.3472222222222222,
+          "precision": 0.9615384615384616,
+          "f05": 0.7102272727272727
+        }
+      },
+      "recalibrate_cutoff": false
+    },
+    {
+      "family": "shared_multiplier",
+      "regularization": 0.1,
+      "costs": {
+        "neighbor_replacement": 0.574436466482213,
+        "other_replacement": 3.7162379435897606,
+        "swap_or_alternation": 0.9146548439690982,
+        "extra_character": 4.541078382355206,
+        "missing_character": 1.9126156502899054,
+        "additional_same_length_edit": 2.6881318102186924,
+        "additional_length_change_edit": 4.032197715328039,
+        "first_character_change": 0.0
+      },
+      "support": {
+        "fit_cases": 1473,
+        "cases_with_any_multi_edit_candidate": 1082,
+        "gold_cases_by_surcharge": {
+          "additional_same_length_edit": 237,
+          "additional_length_change_edit": 75
+        }
+      },
+      "selection": {
+        "real": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 398,
+          "wrong": 32,
+          "false_changes": 6,
+          "recall": 0.5685714285714286,
+          "precision": 0.9255813953488372,
+          "f05": 0.8223140495867769
+        },
+        "unambiguous_neighbor": {
+          "cases": 1385,
+          "typos": 598,
+          "controls": 787,
+          "correct": 442,
+          "wrong": 10,
+          "false_changes": 6,
+          "recall": 0.7391304347826086,
+          "precision": 0.9778761061946902,
+          "f05": 0.9185369908561929
+        },
+        "unambiguous_neighbor_4_5": {
+          "cases": 72,
+          "typos": 72,
+          "controls": 0,
+          "correct": 27,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.375,
+          "precision": 0.9642857142857143,
+          "f05": 0.7336956521739131
+        }
+      },
+      "recalibrate_cutoff": false
+    },
+    {
+      "family": "separate_surcharges",
+      "regularization": 0.01,
+      "costs": {
+        "neighbor_replacement": 0.574436466482213,
+        "other_replacement": 3.7162379435897606,
+        "swap_or_alternation": 0.9146548439690982,
+        "extra_character": 4.541078382355206,
+        "missing_character": 1.9126156502899054,
+        "additional_same_length_edit": 2.5086925944677043,
+        "additional_length_change_edit": 3.97327519247353,
+        "first_character_change": 0.0
+      },
+      "support": {
+        "fit_cases": 1473,
+        "cases_with_any_multi_edit_candidate": 1082,
+        "gold_cases_by_surcharge": {
+          "additional_same_length_edit": 237,
+          "additional_length_change_edit": 75
+        }
+      },
+      "selection": {
+        "real": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 400,
+          "wrong": 33,
+          "false_changes": 6,
+          "recall": 0.5714285714285714,
+          "precision": 0.9237875288683602,
+          "f05": 0.8223684210526315
+        },
+        "unambiguous_neighbor": {
+          "cases": 1385,
+          "typos": 598,
+          "controls": 787,
+          "correct": 436,
+          "wrong": 10,
+          "false_changes": 6,
+          "recall": 0.7290969899665551,
+          "precision": 0.9775784753363229,
+          "f05": 0.9151973131821999
+        },
+        "unambiguous_neighbor_4_5": {
+          "cases": 72,
+          "typos": 72,
+          "controls": 0,
+          "correct": 25,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.3472222222222222,
+          "precision": 0.9615384615384616,
+          "f05": 0.7102272727272727
+        }
+      },
+      "recalibrate_cutoff": false
+    },
+    {
+      "family": "separate_surcharges",
+      "regularization": 0.1,
+      "costs": {
+        "neighbor_replacement": 0.574436466482213,
+        "other_replacement": 3.7162379435897606,
+        "swap_or_alternation": 0.9146548439690982,
+        "extra_character": 4.541078382355206,
+        "missing_character": 1.9126156502899054,
+        "additional_same_length_edit": 2.7136274487889214,
+        "additional_length_change_edit": 4.162235062514215,
+        "first_character_change": 0.0
+      },
+      "support": {
+        "fit_cases": 1473,
+        "cases_with_any_multi_edit_candidate": 1082,
+        "gold_cases_by_surcharge": {
+          "additional_same_length_edit": 237,
+          "additional_length_change_edit": 75
+        }
+      },
+      "selection": {
+        "real": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 398,
+          "wrong": 32,
+          "false_changes": 6,
+          "recall": 0.5685714285714286,
+          "precision": 0.9255813953488372,
+          "f05": 0.8223140495867769
+        },
+        "unambiguous_neighbor": {
+          "cases": 1385,
+          "typos": 598,
+          "controls": 787,
+          "correct": 449,
+          "wrong": 11,
+          "false_changes": 7,
+          "recall": 0.7508361204013378,
+          "precision": 0.9760869565217392,
+          "f05": 0.920836751435603
+        },
+        "unambiguous_neighbor_4_5": {
+          "cases": 72,
+          "typos": 72,
+          "controls": 0,
+          "correct": 28,
+          "wrong": 1,
+          "false_changes": 0,
+          "recall": 0.3888888888888889,
+          "precision": 0.9655172413793104,
+          "f05": 0.7446808510638298
+        }
+      },
+      "recalibrate_cutoff": false
+    }
+  ],
+  "champion": null,
+  "selection_diagnostic": {
+    "family": "shared_multiplier",
+    "regularization": 0.01,
+    "primary_correct_fixes_lost": 30,
+    "lost_with_same_correct_winner": 30,
+    "lost_with_different_winner": 0,
+    "explanation": "For these one-edit neighbour targets the score is unchanged. A preserved correct winner that stops correcting therefore loses acceptance through the runner margin."
+  },
+  "hashes": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/fit_additional_edit_costs.py": "bb254f6c89d6e314ed57cc4fd30bf54d593fe031197b8dd225172cc9297e4fc1",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/fit_edit_position_costs.py": "b3fe5222e6801bb2522c7612fad81caa8a446f4adf6905b29c0eb36ffbe76331",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_acceptance.json": "1d5733cc3f09778485318cb5c579086f67977b19dc52577cd6dbd298ae4784da",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/english_apostrophe_acceptance.json": "0de96ace3507ddb0aeb9944b0ece3cd389aa434f2bc87640bd9044be4cf25d96",
+    "/Users/tony/Documents/keyboard/QwenASR/crates/cantonese-ngram/src/cnn_spelling.rs": "0a3ce662d967e9af314e6aa2f9d41f16ab1f378e8a2416931ef448798a2fe98f",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/config/english_iteration/2026-10-21/edit-position-costs/selection.json": "109d59aa7bcab6559e3d52f92e421f85da8a96270e646514c6393d0509e444b3",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/apostrophe-native-cache.json": "c5fbd00d9001b55c99f9ec829d298f292df64831978821f2c57647cb17dda600",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/english-iteration-2026-10-20/cases.jsonl": "5f51fa164e2bf2b59080fd44affb20b8340557a498b822e6423d3b20f1d8f958",
+    "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/edit-position-costs-2026-10-21/native-verification.predictions.json": "17a6ccbf5775ec2757e7b49ce031d4560d9e4df30963b73b666e62a710ec97ff",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/acceptance-refit-2026-10-21/cases.jsonl": "e8bf0ac7bd44434a9e6e229620af7998e7496c4649db4a7fa346ff1a5b331290",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/acceptance-refit-2026-10-21/generated-native.json": "7c7d8666995069f9f33d6bef69a35e78a0c24217ad9616105c426208ed965aaa",
+    "/Volumes/SSD/cantonese_ngram/experiments/spelling-vocabulary-v77/candidates.txt": "346323cd605464785e631af886877ef9d1bd12bc8d583dfb55253a44f291fab6"
+  }
+}

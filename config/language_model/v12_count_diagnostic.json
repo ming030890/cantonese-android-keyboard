@@ -1,0 +1,19 @@
+{
+  "contexts": 4988,
+  "singleton_support_contexts": 148,
+  "median_teacher_support": 230.5,
+  "approx_mean_context_draws_in_10000_updates": 256.6158781074579,
+  "precision_reports": {
+    "fp32_unquantized": {
+      "top1": 0.8189655172413793,
+      "top3": 0.9683239775461107,
+      "kl": 0.5816846635841898
+    },
+    "int8_reconstructed_fp32": {
+      "top1": 0.8125501202886929,
+      "top3": 0.9685244587008821,
+      "kl": 0.5840173456086951
+    }
+  },
+  "note": "Fixed frozen checkpoint diagnostic, no tuning or training performed. This does not isolate capacity versus preservation objective or optimizer effects."
+}

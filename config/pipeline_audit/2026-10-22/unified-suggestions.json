@@ -1,0 +1,201 @@
+{
+  "scope": "Host native pipeline only; phone input-to-display latency unmeasured",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "probe_sha256": "c00b3124482655cea753b0632891a02cbc36302ae5487452e31b6e0990b31548",
+  "frozen_evaluation": {
+    "cases": 2042,
+    "parity_mismatches": [],
+    "quality": {
+      "cases": 2042,
+      "top1": 582,
+      "top8": 655,
+      "mrr": 611.7190476190475,
+      "typos": 744,
+      "applied": 450,
+      "correct": 418,
+      "false_changes": 8,
+      "preservation": 1298,
+      "wrong": 32,
+      "f05": 0.8215408805031447,
+      "precision": 0.9288888888888889,
+      "recall": 0.5618279569892473,
+      "false_change_rate": 0.0061633281972265025,
+      "top8_rate": 0.3207639569049951,
+      "mrr_rate": 0.2995685835548714
+    },
+    "before_latency": {
+      "samples": 2042,
+      "median_ms": 2.915083,
+      "p95_ms": 6.106999999999999
+    },
+    "after_latency": {
+      "samples": 2042,
+      "median_ms": 2.9266870000000003,
+      "p95_ms": 6.2496670000000005
+    }
+  },
+  "short": {
+    "before_latency": {
+      "samples": 112,
+      "median_ms": 145.252771,
+      "p95_ms": 480.649667
+    },
+    "after_latency": {
+      "samples": 112,
+      "median_ms": 1.748271,
+      "p95_ms": 3.802167
+    },
+    "candidate_sets_identical": true,
+    "df_forward_calls": 1
+  },
+  "phrase": {
+    "before_latency": {
+      "samples": 96,
+      "median_ms": 117.2973335,
+      "p95_ms": 362.69466700000004
+    },
+    "after_latency": {
+      "samples": 96,
+      "median_ms": 86.509875,
+      "p95_ms": 336.234125
+    },
+    "coverage_changes": [
+      {
+        "code": "humo",
+        "version": 3,
+        "left": "I use ",
+        "right": "",
+        "lost": [
+          "先歌",
+          "禿一人"
+        ],
+        "gained": [
+          "税一人",
+          "税兩"
+        ],
+        "before_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ],
+        "after_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ]
+      },
+      {
+        "code": "humo",
+        "version": 5,
+        "left": "I use ",
+        "right": "",
+        "lost": [
+          "先歌",
+          "禿一人"
+        ],
+        "gained": [
+          "税一人",
+          "税兩"
+        ],
+        "before_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ],
+        "after_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ]
+      },
+      {
+        "code": "humo",
+        "version": 3,
+        "left": "I use ",
+        "right": "",
+        "lost": [
+          "先歌",
+          "禿一人"
+        ],
+        "gained": [
+          "税一人",
+          "税兩"
+        ],
+        "before_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ],
+        "after_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ]
+      },
+      {
+        "code": "humo",
+        "version": 5,
+        "left": "I use ",
+        "right": "",
+        "lost": [
+          "先歌",
+          "禿一人"
+        ],
+        "gained": [
+          "税一人",
+          "税兩"
+        ],
+        "before_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ],
+        "after_top8": [
+          "him",
+          "稅兩",
+          "兜兩",
+          "humor",
+          "先兩",
+          "稅一人",
+          "humo",
+          "先次"
+        ]
+      }
+    ]
+  }
+}

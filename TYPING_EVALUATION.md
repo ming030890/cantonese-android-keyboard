@@ -261,3 +261,127 @@ verification report rather than the earlier coefficient-only parity report.
 Current paired English release-host median/p95 is 2.735/5.553 → 2.752/5.589 ms,
 1,024 calls per binary. Candidate ranking changes; candidate pools are preserved.
 Phone input-to-display latency remains unmeasured.
+
+## Additional-edit surcharges tested and retained (2026-10-22)
+
+The [two-surcharge experiment](ADDITIONAL_EDIT_COSTS.md) compares four TRAIN-fitted
+proposals with the v66 baseline while holding the five base costs and acceptance
+policy fixed. None qualifies on selection: best real F₀.₅ is 0.82372 versus
+0.82578; short primary fixes fall 32/72 → 25/72 for that proposal. The 30 lost
+primary fixes retain their correct top-ranked candidate but lose acceptance
+through smaller runner margins. Keep surcharges 3.0 and 4.5. No candidate
+evaluation, native/runtime change, latency rerun or release was performed.
+The accepted baseline remains v66, overall evaluation F₀.₅ 0.82154.
+
+## Boundary timing and domain representativeness audit (2026-10-22)
+
+Automatic replacement commits at a word boundary; composing-word suggestions
+update while typing. Therefore a word-boundary event with its observed sentence
+prefix is an appropriate core scoring unit. Keep per-key candidate updates,
+boundary queues, timeout/cancellation and undo as production-controller integration
+coverage. Full keystroke replay is supplementary, not required to define the
+boundary-decision F₀.₅ metric. Earlier prefixes may still reflect another keyboard's
+corrections, so this is not a closed-loop sentence evaluation of our own outputs.
+
+The [domain audit](config/english_iteration/2026-10-22/domain-audit.json) uses the
+source CSV's `SOURCE` labels and the existing frozen v66 native outputs. It
+introduces no fitting or cohort changes. The evaluation contains 259 prompt
+groups, with median eight words per prompt, and 2,042 scored cases:
+
+| Source label | Cases | Share of cases | F₀.₅ |
+|---|---:|---:|---:|
+| email | 740 | 36.2% | 0.83060 |
+| news | 525 | 25.7% | 0.81803 |
+| memorable | 472 | 23.1% | 0.81694 |
+| mobile | 305 | 14.9% | 0.81301 |
+
+Prompt shares differ: mobile is 47/259 (18.1%). Source labels are provenance
+categories, not a measured distribution of this keyboard's users' activities.
+The prompt set has no non-ASCII text, URLs or at-signs; only 16/259 prompts
+contain a question mark. Informal chat, slang, identifiers, emoji-adjacent words,
+and Cantonese/English code switching are not qualified by this corpus. Of 1,298
+preservation controls, 1,254 are constructed clean reference words and only 44
+are recorded preservation events. The sampled error/control prevalence must not
+be treated as natural mobile usage or used to claim deployment precision.
+
+Retain this cohort as a fixed English correction regression benchmark, with
+per-domain results alongside the overall score. Its F₀.₅ 0.82154 does not establish
+representative quality for the full mobile keyboard. A mobile-product evaluation
+needs separately sourced conversational messages/fragments, realistic clean/error
+prevalence, names/addresses/URLs and mixed-language controls. Freeze source mix,
+weights, grouping and labels before fitting; do not retrospectively reweight
+this exposed cohort or infer product usage weights from these results.
+
+## Verified public provenance and source-label clarification (2026-10-22)
+
+The source is Aalto University's [ITE Typing dataset](https://zenodo.org/records/12528163),
+published in 2024 from a 2019–2020 mobile typing study. Its
+[official documentation](https://zenodo.org/records/12528163/files/README-datasets.md?download=1)
+identifies `ITE_words/ac_words_en.csv` as English autocorrection events and
+provides both sentence references and full keystroke logs upstream. Our current
+local evaluation uses the extracted AC events and sentence table, not that full
+keystroke log. The original study included 46,755 English participants using
+their own mobile devices, with keyboard interventions labelled afterwards.
+
+The source prompts include Enron email and Gigaword news. The
+[Enron mobile phrase-set publication](https://www.keithv.com/pub/enronmobile/)
+explains that its mobile sentences were obtained from genuine BlackBerry emails
+and includes phrase sets selected for memorability. “Memorable” does not mean
+invented text. Likewise the `mobile` SOURCE fraction describes a prompt-origin
+bucket, not the fraction of typing observations collected on phones. The
+previous informal characterization of this as mainly generic text rather than
+published mobile typing research was incorrect.
+
+Our 2,042-case evaluation is a locally constructed, filtered, prompt-grouped
+benchmark derived from that public research dataset. Its sampling, conservative
+alignment, added clean controls, splits and F₀.₅ scoring are our protocol, not an
+official dataset leaderboard or a score directly comparable with other keyboards
+without reproducing this protocol. Real mobile typing provenance does not remove
+the transcription-task, selected-intervention, domain and exposure limitations
+recorded above.
+
+## Public real-touch evaluation and synthetic training (2026-10-22)
+
+[Touch evaluation](TOUCH_EVALUATION.md) adds a frozen public phone-touch diagnostic:
+24 participants, 480 sentences, 3,081 uniquely labelled observed words plus
+whole-trial CER over all 480 sentences. Only normal-size, explicit-space,
+visible-feedback phone records are admitted by metadata. Real taps never fit
+the new coordinate/acceptance models; their fit/calibration/selection use 2,400
+synthetic words from existing TRAIN text.
+
+Production vs synthetic touch F₀.₅ is 0.86775 → 0.86945, but correct fixes fall
+332 → 325 while wrong fixes fall 15 → 11; whole-trial CER worsens
+2.8448% → 2.8650%. Participant-bootstrap uncertainty includes no improvement.
+The separate synthetic text-only refit scores 0.85642. Keep all three results;
+do not attribute acceptance refitting alone to touch. Primary unambiguous-neighbour
+F₀.₅ is 0.95694 → 0.96154 (80 → 75 correct fixes, 3 → 1 wrong).
+
+This is an exposed development diagnostic, not production qualification: older
+English mobile-email copy typing does not cover Cantonese/English chat or our
+layout, key outputs are reconstructed, and 137/480 trials share source prompt
+text with synthetic training. Ambiguous labels stay out of word F₀.₅ but remain
+in sentence CER. Do not remove difficult/missing-target cases or retune against
+these results. The older `human-touch-v28` is the same Google TSI source, already
+exposed across all 16 participants; it is not fresh confirmation either.
+No shipping scorer/policy, Android asset or accepted baseline changes.
+
+## Unified suggestion scheduling and score-table filtering (2026-10-22)
+
+The [unified request](UNIFIED_SUGGESTIONS.md) retains exactly the same English
+candidate scores/order and correction decisions on all **2,042** frozen evaluation
+cases. F₀.₅ remains **0.82154**, with 418 correct / 32 wrong replacements and
+8/1,298 changed preservation controls. No fitting or policy changes were made.
+
+A paired host panel (both Quick versions, seven short codes, four contexts, two
+alternating repetitions) preserves every short-code candidate set. Completed
+native request median/p95 improves **145.253/480.650 → 1.748/3.802 ms** (112 pairs).
+`df` computes one shared next-token distribution. This compares completed rows;
+the old pipeline also published an earlier preview, so it does not establish an
+improvement in first selectable candidates or Android input-to-display latency.
+
+The separate six-code phrase panel improves **117.297/362.695 → 86.510/336.234 ms**
+(96 pairs). Filtering by LM score before the segment shortlist changes two tail
+phrases for `humo` in English context on each Quick version; top-eight results in
+those cases remain unchanged. Phrase candidate coverage is therefore explicitly
+not identical. The full panel and exact changed candidates are retained in
+[the report](config/pipeline_audit/2026-10-22/unified-suggestions.json).

@@ -15,11 +15,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
@@ -42,6 +40,7 @@ fun KeyboardScreen(
     handwritingRecognizing: StateFlow<Boolean>,
     handwritingError: StateFlow<String?>,
     handwritingSession: StateFlow<Long>,
+    keyboardSession: StateFlow<Long> = MutableStateFlow(0L),
     quickCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow<List<HandwritingCandidate>>(emptyList()),
     englishCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow(emptyList()),
     chinesePunctuation: StateFlow<Boolean?> = MutableStateFlow(null),
@@ -62,6 +61,7 @@ fun KeyboardScreen(
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     onInterruptVoice: () -> Unit = {},
+    onEmojiSearchKeyHandlerChanged: (((android.view.KeyEvent) -> Boolean)?) -> Unit = {},
     initialEmojiPanel: Boolean = false,
     initialEmojiSearch: String? = null,
     initialUppercase: Boolean = false,
@@ -80,6 +80,7 @@ fun KeyboardScreen(
     val handwritingBusy by handwritingRecognizing.collectAsState()
     val handwritingError by handwritingError.collectAsState()
     val handwritingSession by handwritingSession.collectAsState()
+    val keyboardSession by keyboardSession.collectAsState()
     val quickCandidates by quickCandidates.collectAsState()
     val englishCandidates by englishCandidates.collectAsState()
     val chinesePunctuation by chinesePunctuation.collectAsState()
@@ -94,6 +95,7 @@ fun KeyboardScreen(
             handwritingBusy = handwritingBusy,
             handwritingError = handwritingError,
             handwritingSession = handwritingSession,
+            keyboardSession = keyboardSession,
             quickCandidates = quickCandidates,
             englishCandidates = englishCandidates,
             chinesePunctuation = chinesePunctuation,
@@ -116,6 +118,7 @@ fun KeyboardScreen(
         onEmojiPicked = onEmojiPicked,
         onKeyboardInputModeSelected = onKeyboardInputModeSelected,
         onInterruptVoice = onInterruptVoice,
+        onEmojiSearchKeyHandlerChanged = onEmojiSearchKeyHandlerChanged,
         initialEmojiPanel = initialEmojiPanel,
         initialEmojiSearch = initialEmojiSearch,
         initialUppercase = initialUppercase,
@@ -147,6 +150,7 @@ fun KeyboardScreen(
     onEmojiPicked: (String) -> Unit,
     onKeyboardInputModeSelected: (KeyboardInputMode) -> Unit = {},
     onInterruptVoice: () -> Unit = {},
+    onEmojiSearchKeyHandlerChanged: (((android.view.KeyEvent) -> Boolean)?) -> Unit = {},
     initialEmojiPanel: Boolean = false,
     initialEmojiSearch: String? = null,
     initialUppercase: Boolean = false,
@@ -166,10 +170,10 @@ fun KeyboardScreen(
     val handwritingFailure = renderState.handwritingError
     val handwritingSessionId = renderState.handwritingSession
 
-    var activePanel by remember(inputMode, initialEmojiPanel) {
+    var activePanel by remember(inputMode, renderState.keyboardSession, initialEmojiPanel) {
         mutableStateOf(if (initialEmojiPanel) KeyboardPanel.Emoji else inputMode.toPanel())
     }
-    var emojiSearch by remember(inputMode, initialEmojiSearch) {
+    var emojiSearch by remember(inputMode, renderState.keyboardSession, initialEmojiSearch) {
         mutableStateOf(EmojiSearchState(initialEmojiSearch != null, initialEmojiSearch.orEmpty()))
     }
     var searchSymbols by remember { mutableStateOf(false) }
@@ -231,8 +235,19 @@ fun KeyboardScreen(
         null
     }
     val inputReceiver = remember { KeyboardScreenInputReceiver() }
+    // The receiver survives layout/session changes; its closures must target the current state.
+    val currentSearch by rememberUpdatedState(emojiSearch)
+    val updateSearch by rememberUpdatedState<(EmojiSearchState) -> Unit>({ emojiSearch = it })
+    SideEffect {
+        onEmojiSearchKeyHandlerChanged(if (emojiSearchActive) { event ->
+            handleEmojiSearchKey(event, currentSearch) { updateSearch(it) }
+        } else null)
+    }
+    DisposableEffect(onEmojiSearchKeyHandlerChanged) {
+        onDispose { onEmojiSearchKeyHandlerChanged(null) }
+    }
     val searchReceiver = remember(inputReceiver) {
-        EmojiSearchInputReceiver(inputReceiver, { emojiSearch }, { emojiSearch = it })
+        EmojiSearchInputReceiver(inputReceiver, { currentSearch }, { updateSearch(it) })
     }
     val inputDispatcher = remember(searchReceiver) {
         CoroutineKeyboardInputDispatcher(searchReceiver)
@@ -522,7 +537,6 @@ fun KeyboardScreen(
                     rowHeight = textRowHeight,
                     action = action,
                     keyRegistry = keyRegistry,
-                    currentMode = KeyboardInputMode.Quick,
                     modeSwitchLabel = "?123",
                     modeSwitchTarget = "number.chinese",
                     commaValue = if (renderState.chinesePunctuation != false) "，" else ",",
@@ -575,7 +589,7 @@ fun KeyboardScreen(
                             data = KeyData(
                                 keyId = "bottom.mode.number",
                                 kind = KeyboardKeyKind.ModeSwitch,
-                                text = "number.chinese"
+                                text = "number.chinese",
                             ),
                             rowId = "bottom"
                         ),
@@ -587,46 +601,7 @@ fun KeyboardScreen(
                         verticalPadding = 8.dp,
                         utilityStyle = true,
                     ) {
-                        Text(
-                            text = "?123",
-                            color = textVariantColor,
-                            style = keyboardTypography.keyboardModeSwitchKey,
-                            maxLines = 1,
-                            softWrap = false,
-                        )
-                    }
-
-                    val context = LocalContext.current
-                    val enabledLayouts = remember(context) {
-                        KeyboardSettings.getEnabledLayouts(context)
-                    }
-                    val nextLayoutTarget = remember(enabledLayouts) {
-                        computeNextLayoutTarget(KeyboardInputMode.Handwriting, enabledLayouts)
-                    }
-                    val showLayoutSwitch = activePanel == KeyboardPanel.Handwriting && nextLayoutTarget != null
-                    KeyVisual(
-                        key = keyRegistry.key(
-                            id = "bottom.secondary",
-                            data = if (showLayoutSwitch) {
-                                KeyData("bottom.secondary", KeyboardKeyKind.ModeSwitch, text = nextLayoutTarget)
-                            } else {
-                                KeyData("bottom.secondary", KeyboardKeyKind.Settings)
-                            },
-                            rowId = "bottom"
-                        ),
-                        keyRegistry = keyRegistry,
-                        modifier = Modifier.weight(0.75f),
-                        shape = RoundedCornerShape(8.dp),
-                        pressedScale = 0.92f,
-                        restingElevation = 2.dp,
-                        verticalPadding = 8.dp,
-                        utilityStyle = true,
-                    ) {
-                        if (showLayoutSwitch) {
-                            KeyboardIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
-                        } else {
-                            SettingsIcon(modifier = Modifier.size(20.dp), color = textVariantColor)
-                        }
+                        ModeKeyLabel("?123")
                     }
 
                     // Space Key
@@ -637,7 +612,7 @@ fun KeyboardScreen(
                             rowId = "bottom"
                         ),
                         keyRegistry = keyRegistry,
-                        modifier = Modifier.weight(2.1f),
+                        modifier = Modifier.weight(2.85f),
                         shape = RoundedCornerShape(8.dp),
                         pressedScale = 0.92f,
                         restingElevation = 2.dp,

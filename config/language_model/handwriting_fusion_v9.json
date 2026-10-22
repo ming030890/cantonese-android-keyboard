@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "weights": {
+    "unigram": 1,
+    "bigram": 1.5,
+    "neural": 1.25
+  },
+  "inputs": {
+    "handwriting_model_sha256": "b6916eacca94eeeaafd6d3c4b957e218a5681b55e8374f98d9109bfefa98af26",
+    "labels_sha256": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
+    "counts_sha256": "a413ec84e51b2f88c90af9b17ed4610d024743499ec72d1d61e7e78e3b2834e8"
+  },
+  "neural_model_sha256": "0f0f74ee928da0a92de6e201118d17131e2f9be1d709425609c7cb0e940e79d6",
+  "calibration_protocol_sha256": "ba95284e1dd9eb3c2654dd3a1b1bdb447d7d841483a2f527e5b2c84b47d59a47",
+  "selection": "unique training trajectories and TRAIN text only; frozen before audit",
+  "training_cases_by_mode": {
+    "Unigram": 1182,
+    "Neural": 4818
+  }
+}
