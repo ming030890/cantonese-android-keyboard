@@ -86,6 +86,7 @@ android {
     }
 
     androidResources {
+        noCompress.addAll(listOf("cng", "bin"))
         val ignores = mutableListOf(
             "!.svn", "!.git", "!.ds_store", "!*.scc", ".*", "<dir>_*",
             "!CVS", "!thumbs.db", "!picasa.ini", "!*~",

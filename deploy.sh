@@ -19,6 +19,12 @@ echo -e "${COLOR_INFO}==========================================================
 # ---------------------------------------------------------------------------
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE="com.madeinhk.cantonesevoicekeyboard"
+
+if [ -d "/Applications/Android Studio.app/Contents/jbr/Contents/Home" ]; then
+    export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+    export PATH="$JAVA_HOME/bin:$PATH"
+fi
+
 QWEN_ASR_DIR="${QWEN_ASR_DIR:-$PROJECT_DIR/../QwenASR}"
 QWEN_ASR_TARGET_DIR="${QWEN_ASR_TARGET_DIR:-/private/tmp/qwen-asr-android-release-target}"
 

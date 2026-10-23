@@ -13,6 +13,11 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE="com.madeinhk.cantonesevoicekeyboard"
 GRADLE_FILE="$PROJECT_DIR/app/build.gradle.kts"
 
+if [ -d "/Applications/Android Studio.app/Contents/jbr/Contents/Home" ]; then
+    export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+    export PATH="$JAVA_HOME/bin:$PATH"
+fi
+
 echo -e "${COLOR_INFO}================================================================${COLOR_RESET}"
 echo -e "${COLOR_INFO}        Cantonese Voice Keyboard Google Play Auto-Publisher      ${COLOR_RESET}"
 echo -e "${COLOR_INFO}================================================================${COLOR_RESET}"

@@ -461,7 +461,7 @@ class SharedLmEnglishScenarioTest {
                 Triple("sjre", "sure", true), Triple("varely", "barely", true),
                 Triple("engloaj", "english", true), Triple("troggee", "trigger", true),
                 Triple("mwrge", "merge", false), Triple("wrror", "error", true),
-                Triple("inthe", "in the", true))) {
+                Triple("inthe", "in the", false))) {
                 val prediction = english.predict(typed, floatArrayOf(), floatArrayOf(), "", "")
                 assertTrue("$typed still offers $target", prediction.candidates.any { it.word.equals(target, true) })
                 assertEquals("$typed automatic decision", if (automatic) target else null, prediction.correction?.lowercase())

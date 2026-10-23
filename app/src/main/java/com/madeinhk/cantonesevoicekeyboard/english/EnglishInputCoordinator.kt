@@ -141,6 +141,7 @@ internal class EnglishInputCoordinator(
         }
     }
 
+
     fun type(letter: String, evidence: EnglishTouchEvidence?) {
         contextWindow.onTyping()
         undo = null

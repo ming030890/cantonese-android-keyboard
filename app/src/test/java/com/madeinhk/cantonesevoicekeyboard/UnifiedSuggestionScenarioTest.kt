@@ -243,6 +243,12 @@ class UnifiedSuggestionScenarioTest {
                 assertEquals("", s.editor.text); assertEquals("gwme", s.editor.composing)
                 s.press(KeyboardKeyKind.Space)
                 assertEquals("gwme ", s.editor.text)
+
+                s.editor.text = ""
+                s.editor.composing = ""
+                s.type("thinl")
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("think ", s.editor.text)
             }
         }
     }

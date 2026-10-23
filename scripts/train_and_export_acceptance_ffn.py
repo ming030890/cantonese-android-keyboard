@@ -30,7 +30,7 @@ FEATURE_NAMES = [
     'known_word', 'typed_len', 'candidate_len', 'len_diff', 'total_edits', 'edit_ratio',
     'neighbor_replacements', 'other_replacements', 'swap_or_alternation',
     'extra_character', 'missing_character', 'first_character_change',
-    'is_space_split', 'observed_apostrophe'
+    'is_space_split', 'observed_apostrophe', 'completed_chars'
 ]
 
 
@@ -43,7 +43,7 @@ def extract_features(case, output):
     typed = case['typed'].lower()
     word = b['word'].lower()
     literal = output.get('literalScore')
-    if len(typed) < 3 or len(word) < 3 or b['completedChars'] or (output['known'] and literal is None):
+    if len(typed) < 2 or len(word) < 2 or (output['known'] and literal is None):
         return None, b['word']
 
     is_split = 1.0 if ' ' in word else 0.0
@@ -86,17 +86,18 @@ def extract_features(case, output):
             missing = 1.0
 
     apostrophe_feat = 1.0 if ("'" in typed or '’' in typed) else 0.0
+    completed_chars = float(b['completedChars'])
 
     feats = [
         raw_score, lit_score, raw_score - lit_score, raw_margin, pen_margin,
         1.0 if output['known'] else 0.0, len_typed, len_word, len_diff, edits, edit_ratio,
-        adj, non_adj, swap, extra, missing, first_diff, is_split, apostrophe_feat
+        adj, non_adj, swap, extra, missing, first_diff, is_split, apostrophe_feat, completed_chars
     ]
     return feats, b['word']
 
 
 class AcceptanceFFN(nn.Module):
-    def __init__(self, in_dim=19, hidden_dim=16):
+    def __init__(self, in_dim=20, hidden_dim=24):
         super().__init__()
         self.fc1 = nn.Linear(in_dim, hidden_dim)
         self.relu = nn.ReLU()
@@ -104,6 +105,7 @@ class AcceptanceFFN(nn.Module):
 
     def forward(self, x):
         return self.fc2(self.relu(self.fc1(x))).squeeze(-1)
+
 
 
 def calibrate_threshold(cases_sub, words_sub, restored_sub, logits_sub, valid_sub):
@@ -186,11 +188,11 @@ def main():
     X_sel_norm, sel_valid = get_norm_subset(sel_real_idx)
     X_eval_norm, eval_valid = get_norm_subset(eval_real_idx)
 
-    print('Training Acceptance FFN (19 -> 16 -> 1)...')
+    print('Training Acceptance FFN (20 -> 24 -> 1)...')
     torch.manual_seed(42)
-    model = AcceptanceFFN(len(FEATURE_NAMES), 16)
+    model = AcceptanceFFN(len(FEATURE_NAMES), 24)
     criterion = nn.BCEWithLogitsLoss(weight=torch.tensor(weights, dtype=torch.float32))
-    optimizer = optim.AdamW(model.parameters(), lr=0.01, weight_decay=1e-3)
+    optimizer = optim.AdamW(model.parameters(), lr=0.008, weight_decay=1e-3)
     x_t = torch.tensor(X_train_norm, dtype=torch.float32)
     y_t = torch.tensor(y_train, dtype=torch.float32)
 
@@ -238,15 +240,15 @@ def main():
     print(f'Champion FFN:        correct={m_eval["correct"]}, wrong={m_eval["wrong"]}, false_changes={m_eval["false_changes"]}, F0.5={m_eval["f05"]:.4f}, Prec={m_eval["precision"]:.4f}, Rec={m_eval["recall"]:.4f}')
 
     # Export weights for Rust inference
-    w1 = model.fc1.weight.detach().cpu().numpy().tolist()  # [16, 19]
-    b1 = model.fc1.bias.detach().cpu().numpy().tolist()    # [16]
-    w2 = model.fc2.weight.detach().cpu().numpy()[0].tolist() # [16]
+    w1 = model.fc1.weight.detach().cpu().numpy().tolist()  # [24, 20]
+    b1 = model.fc1.bias.detach().cpu().numpy().tolist()    # [24]
+    w2 = model.fc2.weight.detach().cpu().numpy()[0].tolist() # [24]
     b2 = float(model.fc2.bias.detach().cpu().item())       # scalar
 
     policy_payload = {
         'schema': 'shared-english-acceptance-v3-ffn',
         'model_sha256': digest(model_p),
-        'architecture': '19-16-1-relu',
+        'architecture': '20-24-1-relu',
         'features': FEATURE_NAMES,
         'means': mean.tolist(),
         'scales': std.tolist(),
@@ -257,8 +259,8 @@ def main():
         'threshold': sig_threshold,
         'threshold_logit': float(threshold),
         'margin_cap': 20.0,
-        'minimum_observed_length': 3,
-        'minimum_candidate_length': 3,
+        'minimum_observed_length': 2,
+        'minimum_candidate_length': 2,
         'preserve_known_words': False,
         'provenance': {
             'method': 'FFN with learned edit costs and length interactions, trained on real + synthetic typo data',
