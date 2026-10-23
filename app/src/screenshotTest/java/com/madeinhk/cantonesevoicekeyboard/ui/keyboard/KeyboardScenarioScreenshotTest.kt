@@ -32,6 +32,16 @@ fun ScenarioPinEditor() = ScenarioScreen(remember {
 fun ScenarioUnifiedCandidatesPending() = ScenarioScreen(remember { KeyboardScenarios.unifiedCandidatesPending() })
 
 @PreviewTest
+@Preview(name = "Fast candidates during full ranking", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioUnifiedCandidatesUpdating() = ScenarioScreen(remember { KeyboardScenarios.unifiedCandidatesUpdating() })
+
+@PreviewTest
+@Preview(name = "Handwriting visual alternatives", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioHandwritingAlternatives() = ScenarioScreen(remember { KeyboardScenarios.handwritingAlternatives() })
+
+@PreviewTest
 @Preview(name = "Mixed Chinese phrase ranking", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioMixedChinesePhrase() = ScenarioScreen(remember { KeyboardScenarios.mixedChinesePhrase() })

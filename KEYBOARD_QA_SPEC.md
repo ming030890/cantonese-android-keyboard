@@ -84,6 +84,7 @@ model quality or a requirement that real models return this exact ranking.
 | HW-02 | Recognition pending with no candidates | Show recognizing status; do not present stale candidate results. | Baseline; toolbar matrix, recognizing scenario screenshot |
 | HW-03 | Recognition returns candidates | Display those candidates; selecting one commits the selected text once and requests next-word predictions. | Baseline; real `hw03` coordinator sequence; snapshot scenario only mocks recognition output |
 | HW-04 | Handwriting inference error | Show the handwriting error on the handwriting layout. Do not show that error on English/Quick/number layouts. | Baseline; `hw04`, error scenario screenshot |
+| HW-03b | Recognition alternatives include labels outside the neural vocabulary | Preserve visual evidence; use the weakest supported contextual prior for classes lacking a finite fallback. Missing LM scores must not create an advantage over visually plausible modeled alternatives. | Native OOV-prior regression, 181-capture replay, `HandwritingAlternativesScenarioTest`, alternatives screenshot |
 | HW-05 | Multiple strokes, late results, changed characters, session closes | Cancel obsolete recognition; no late result may edit a different session. | Integration gap for recognizer callback wiring; existing recognition queue/debouncer unit tests cover their components |
 
 ## Voice
@@ -474,6 +475,31 @@ sequences, queued and running cancellation, timeouts, undo, mode round-trips and
 native JNI scoring. `ScenarioUnifiedCandidatesPending` renders the retained row.
 See [implementation and verification](UNIFIED_SUGGESTIONS.md) for host results and
 remaining phone latency coverage.
+
+Boundary follow-up (2026-10-23): immediate Space must not spend its correction
+deadline waiting for Chinese search or bilingual ranking. When a joined request
+is unfinished, cancel it and request the English decision using independent
+native inference state and a separate worker. Retain the 40 ms English deadline,
+literal fallback, two-letter Chinese priority, queued key ordering, and rejection
+of late results. A completed joined decision is reused. The exact reported
+`do you kniw whay you are talking about` sentence is replayed through the real
+JNI and production controller with all keys queued without pauses and the
+suggestion worker occupied. This verifies scheduling and output, not phone latency.
+
+Rapid-typing follow-up (2026-10-23): publish the current literal immediately on
+each key, then publish a bounded fast preview from independent native inference
+state and a separate worker. Full bilingual ranking refines that row afterward.
+Short-code previews retain all matching Chinese characters; longer codes use a
+greedy character path with last-segment alternatives until full phrase search
+finishes. Previews use the same English scorer and correction decision. New keys
+cancel both stages; guard all publications by request, context and composition.
+Late previews cannot replace a completed full row, and old candidates cannot be
+selected. The literal stage does not assert that Chinese dictionary coverage is
+complete. Rapid-typing scenarios hold the full worker occupied while verifying
+successive visible previews, current composing/editor text, toolbar and selection.
+`ScenarioUnifiedCandidatesUpdating` and `ScenarioUnifiedCandidatesPending` cover
+the preview and current-literal states. This updates D-24's earlier single-row
+publication and previous-row retention behavior at the user's request.
 
 Emoji follow-up (2026-10-22): the retained search receiver reads current Compose state
 after layout/session changes. Regression coverage exercises layout change → search

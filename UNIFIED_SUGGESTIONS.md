@@ -87,3 +87,34 @@ python3 scripts/verify_unified_suggestions.py \
 The report binds the model and probe hashes. Rebuild the ARM64 library using the
 LM build section in `deploy.sh` before APK assembly; host JNI tests do not verify
 an older packaged `.so`.
+
+## Immediate Space correction (2026-10-23)
+
+The user reports that correction requires a pause after the last letter.
+The composing request collects Chinese candidates and ranks the bilingual row
+before returning English evidence. The boundary's existing 40 ms wait therefore
+includes unrelated work; on expiry it cancels inference and commits literally.
+Word-decision F₀.₅ does not exercise this application deadline.
+
+When Space encounters an unfinished joined request, cancel it and request only
+the English decision on a separate worker and the existing independent native
+English inference state. Completed joined decisions are reused. The new JNI
+entry point participates in native request cancellation. Model weights, spelling
+scores, acceptance policy, the 40 ms deadline, two-letter Chinese priority, Undo,
+and rejection of stale post-boundary results are preserved.
+
+The exact sentence `do you kniw whay you are talking about` corrects to
+`do you know what you are talking about` through real JNI and the production
+controller on English and both Quick versions. Every key and Space is sent
+without advancing the test scheduler, with the composing worker occupied.
+Separate regressions cover following-key ordering, immediate Undo/literal
+recommit, and independent-boundary timeout with late-result rejection. Native
+boundary candidates and correction decisions match the shared English scorer
+on the existing context/word panel.
+
+Verification: 239 unit/scenario tests, with no failures or skips, screenshot
+validation and debug assembly pass through `:app:verifyKeyboard`. Host and ARM64
+libraries were rebuilt; the APK contains the new boundary JNI export. No physical
+device is connected, so this is controller/native verification, not measured
+phone input-to-display latency or an installed-phone fix. English inference
+itself can still exceed its unchanged deadline.

@@ -24,6 +24,22 @@ class UnifiedSuggestionScenarioTest {
         override fun ensureActive() { if (cancelled) throw CancellationException() }
     }
     private class Engine : UnifiedSuggestionEngine {
+        var previewResult: ((String) -> JoinedSuggestions)? = null
+        val previewCalls = mutableListOf<String>()
+        override val supportsPreview get() = previewResult != null
+        override fun preview(request: SuggestionRequest, version: Int, code: String, left: String, right: String,
+            englishEnabled: Boolean): JoinedSuggestions {
+            request.ensureActive(); previewCalls += code
+            return checkNotNull(previewResult)(code)
+        }
+        var boundaryResult: ((String) -> EnglishPrediction)? = null
+        val boundaryCalls = mutableListOf<Pair<String, String>>()
+        override val supportsIndependentBoundary get() = boundaryResult != null
+        override fun boundary(request: SuggestionRequest, code: String, left: String): EnglishPrediction {
+            request.ensureActive()
+            boundaryCalls += code to left
+            return checkNotNull(boundaryResult)(code)
+        }
         val tokens = mutableListOf<Token>()
         val calls = mutableListOf<String>()
         var duringLookup: (String) -> Unit = {}
@@ -47,7 +63,7 @@ class UnifiedSuggestionScenarioTest {
         }
     }
 
-    @Test fun rapidTypingCancelsObsoleteJobsAndReplacesTheRowOnceWithoutAnEmptyFrame() = runTest {
+    @Test fun rapidTypingShowsCurrentLiteralAndRejectsStaleRowsWithoutAnEmptyFrame() = runTest {
         for (mode in listOf(KeyboardInputMode.Quick, KeyboardInputMode.AlphaNum)) {
             val engine = Engine(); val worker = Worker()
             KeyboardScenario(initialMode = mode, clipboardText = null,
@@ -62,9 +78,9 @@ class UnifiedSuggestionScenarioTest {
                 val previous = observed.value.map { it.text }
                 rows.clear()
                 s.type("bc"); runCurrent()
-                assertEquals(previous, observed.value.map { it.text })
+                assertEquals(listOf("abc"), observed.value.map { it.text })
                 assertTrue(engine.tokens.dropLast(1).all { it.cancelled })
-                // Old labels may stay visible while work is pending, but cannot commit.
+                // Previous labels cannot commit after the current literal appears.
                 s.choose(previous.first())
                 assertEquals("", s.editor.text); assertEquals("abc", s.editor.composing)
                 worker.drain(testScheduler)
@@ -91,6 +107,55 @@ class UnifiedSuggestionScenarioTest {
             assertEquals("", s.editor.text); assertEquals("ab", s.editor.composing)
             assertEquals(listOf("ab候選", "ab"), s.snapshot().quickCandidates.map { it.text })
             assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+        }
+    }
+
+    @Test fun fastPreviewsUpdateThroughoutTypingWhileFullRankingCannotRun() = runTest {
+        for (mode in listOf(KeyboardInputMode.Quick, KeyboardInputMode.AlphaNum)) {
+            val ui = StandardTestDispatcher(testScheduler); val worker = Worker()
+            val engine = Engine().apply { previewResult = { code -> JoinedSuggestions(
+                chinese = listOf("${code}預覽"), display = listOf("${code}預覽", code),
+                english = EnglishPrediction(candidates = listOf(EnglishCandidate("${code}preview", 0.0, 0.0, 0, 1))),
+                codeLength = code.length) } }
+            KeyboardScenario(initialMode = mode, clipboardText = null,
+                scope = CoroutineScope(SupervisorJob() + ui), englishDispatcher = worker,
+                previewDispatcher = ui, unifiedEngine = engine).use { s ->
+                s.start()
+                var code = ""
+                for (char in "hion") {
+                    val stale = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates.map { it.text }
+                        else s.snapshot().englishCandidates.map { it.text }
+                    code += char; s.type(char.toString())
+                    val literal = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates
+                        else s.snapshot().englishCandidates
+                    assertEquals(listOf(code), literal.map { it.text })
+                    stale.firstOrNull()?.let(s::choose)
+                    assertEquals("", s.editor.text); assertEquals(code, s.editor.composing)
+                    runCurrent()
+                    val displayed = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates
+                        else s.snapshot().englishCandidates
+                    assertTrue(displayed.any { it.text == if (mode == KeyboardInputMode.Quick) "${code}預覽" else "${code}preview" })
+                    assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                }
+                assertEquals(listOf("h", "hi", "hio", "hion"), engine.previewCalls)
+                assertTrue(engine.calls.isEmpty())
+                worker.drain(testScheduler)
+                assertEquals(listOf("hion"), engine.calls)
+                assertEquals("", s.editor.text); assertEquals("hion", s.editor.composing)
+            }
+        }
+    }
+
+    @Test fun latePreviewCannotReplaceFinishedRanking() = runTest {
+        val ui = StandardTestDispatcher(testScheduler); val worker = Worker()
+        val engine = Engine().apply { previewResult = { code -> JoinedSuggestions(display = listOf("late", code)) } }
+        KeyboardScenario(clipboardText = null, scope = CoroutineScope(SupervisorJob() + ui),
+            englishDispatcher = ui, previewDispatcher = worker, unifiedEngine = engine).use { s ->
+            s.start(); s.type("hion"); runCurrent()
+            val final = s.snapshot().quickCandidates
+            worker.drain(testScheduler)
+            assertEquals(final, s.snapshot().quickCandidates)
+            assertFalse(s.snapshot().quickCandidates.any { it.text == "late" })
         }
     }
 
@@ -160,6 +225,70 @@ class UnifiedSuggestionScenarioTest {
         }
     }
 
+    @Test fun immediateSpaceUsesIndependentEnglishWhileUnifiedWorkerIsOccupied() = runTest {
+        for (mode in listOf(KeyboardInputMode.Quick, KeyboardInputMode.AlphaNum)) for (version in listOf(3, 5)) {
+            val engine = Engine().apply {
+                boundaryResult = { word -> EnglishPrediction(
+                    candidates = listOf(EnglishCandidate("know", 0.0, 0.0, 1, 0)),
+                    correction = if (word == "kniw") "know" else null, replaceBefore = word.length) }
+            }
+            val worker = Worker()
+            val ui = StandardTestDispatcher(testScheduler)
+            KeyboardScenario(initialText = "do you ", initialMode = mode, clipboardText = null,
+                scope = CoroutineScope(SupervisorJob() + ui), englishDispatcher = worker,
+                boundaryDispatcher = ui, unifiedEngine = engine).use { s ->
+                s.quickVersion = version
+                s.start(); s.type("kniw"); runCurrent()
+                val abandoned = engine.tokens.last()
+                s.press(KeyboardKeyKind.Space); s.type("whay"); runCurrent()
+                assertTrue(abandoned.cancelled)
+                assertEquals(listOf("kniw" to "do you "), engine.boundaryCalls)
+                assertEquals("do you know ", s.editor.text)
+                assertEquals("whay", s.editor.composing)
+                assertTrue(engine.calls.isEmpty())
+                worker.drain(testScheduler)
+                assertEquals("do you know ", s.editor.text)
+                assertEquals("whay", s.editor.composing)
+            }
+        }
+    }
+
+    @Test fun independentBoundaryStillTimesOutAndCannotRewriteFollowingInput() = runTest {
+        val engine = Engine().apply { boundaryResult = { EnglishPrediction(correction = "know") } }
+        val worker = Worker(); val boundaryWorker = Worker()
+        KeyboardScenario(initialMode = KeyboardInputMode.Quick, clipboardText = null,
+            scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler)),
+            englishDispatcher = worker, boundaryDispatcher = boundaryWorker, unifiedEngine = engine).use { s ->
+            s.start(); s.type("kniw"); runCurrent()
+            s.press(KeyboardKeyKind.Space); s.type("x"); runCurrent()
+            val token = engine.tokens.last()
+            advanceTimeBy(41); runCurrent()
+            assertTrue(token.cancelled)
+            assertEquals("kniw ", s.editor.text); assertEquals("x", s.editor.composing)
+            boundaryWorker.drain(testScheduler); worker.drain(testScheduler)
+            assertTrue(engine.boundaryCalls.isEmpty())
+            assertEquals("kniw ", s.editor.text); assertEquals("x", s.editor.composing)
+        }
+    }
+
+    @Test fun independentBoundaryCorrectionSupportsImmediateUndoAndLiteralRecommit() = runTest {
+        for (mode in listOf(KeyboardInputMode.Quick, KeyboardInputMode.AlphaNum)) {
+            val engine = Engine().apply { boundaryResult = { word -> EnglishPrediction(
+                correction = "know", replaceBefore = word.length) } }
+            val ui = StandardTestDispatcher(testScheduler)
+            KeyboardScenario(initialText = "do you ", initialMode = mode, clipboardText = null,
+                scope = CoroutineScope(SupervisorJob() + ui), englishDispatcher = Worker(),
+                boundaryDispatcher = ui, unifiedEngine = engine).use { s ->
+                s.start(); s.type("kniw"); s.press(KeyboardKeyKind.Space); runCurrent()
+                assertEquals("do you know ", s.editor.text)
+                s.press(KeyboardKeyKind.Delete); runCurrent()
+                assertEquals("do you ", s.editor.text); assertEquals("kniw", s.editor.composing)
+                s.press(KeyboardKeyKind.Space); runCurrent()
+                assertEquals("do you kniw ", s.editor.text)
+            }
+        }
+    }
+
     @Test fun layoutRoundTripRestartsCancelledIdleLookupEvenWithUnchangedContext() = runTest {
         val engine = Engine(); val worker = Worker()
         KeyboardScenario(clipboardText = null,
@@ -201,6 +330,12 @@ class UnifiedSuggestionScenarioTest {
             for (left in listOf("", "I ", "let me know if ")) {
                 for (typed in listOf("gwme", "teh", "hou", "dont", "continue", "exmaole", "inthe", "tyoes")) {
                     val expected = legacy.predictObserved(typed, floatArrayOf(), floatArrayOf(), left, "")
+                    engine.newRequest().use { token ->
+                        assertEquals("$left/$typed preview", expected, engine.preview(token, 0, typed, left, "", true).english)
+                    }
+                    engine.newRequest().use { token ->
+                        assertEquals("$left/$typed boundary", expected, engine.boundary(token, typed, left))
+                    }
                     engine.newRequest().use { token ->
                         val result = engine.compose(token, 0, typed, left, "", true)
                         assertEquals("$left/$typed correction", expected.correction, result.english.correction)
@@ -249,6 +384,37 @@ class UnifiedSuggestionScenarioTest {
                 s.type("thinl")
                 s.press(KeyboardKeyKind.Space)
                 assertEquals("think ", s.editor.text)
+            }
+        }
+    }
+
+    @Test fun reportedSentenceCorrectsWithoutPausesWhileSuggestionWorkerIsOccupiedThroughJni() = runTest {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for (mode in listOf(KeyboardInputMode.Quick, KeyboardInputMode.AlphaNum)) for (version in listOf(3, 5)) {
+            val worker = Worker(); val ui = StandardTestDispatcher(testScheduler)
+            val quick = NativeQuickEngine.fromAssets({ File("src/main/assets/$it").readBytes() })
+            val native = NativeSharedSuggestions(quick::englishContextHandle)
+            val decisions = mutableListOf<String>()
+            val observed = object : UnifiedSuggestionEngine by native {
+                override fun boundary(request: SuggestionRequest, code: String, left: String) =
+                    native.boundary(request, code, left).also { decisions += "$left|$code -> ${it.correction}" }
+            }
+            KeyboardScenario(initialMode = mode, clipboardText = null, quickEngine = quick,
+                scope = CoroutineScope(SupervisorJob() + ui), englishDispatcher = worker, boundaryDispatcher = ui,
+                englishEngine = SharedLmEnglishEngine(quick::englishContextHandle),
+                unifiedEngine = observed).use { s ->
+                s.quickVersion = version
+                s.start()
+                for (word in "do you kniw whay you are talking about".split(' ')) {
+                    s.type(word); s.press(KeyboardKeyKind.Space)
+                }
+                runCurrent()
+                assertEquals("$mode Quick$version $decisions", "do you know what you are talking about ", s.editor.text)
+                assertEquals("", s.editor.composing)
+                worker.drain(testScheduler)
+                assertEquals("do you know what you are talking about ", s.editor.text)
             }
         }
     }

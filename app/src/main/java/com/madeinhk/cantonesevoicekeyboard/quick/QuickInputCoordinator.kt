@@ -55,6 +55,12 @@ internal class QuickInputCoordinator(
     private var displayedRequest: Long? = null
     private var joinedInput: QuickSuggestionInput? = null
     fun canSelectJoined(text: String) = displayedRequest == requestId && _joinedCandidates.value.any { it.text == text }
+    fun publishLiteral(input: QuickSuggestionInput) {
+        if (closed || requestId != input.id || composingText != input.code || currentVersion != input.version) return
+        // Do not mark Chinese coverage complete until the native preview arrives.
+        displayedRequest = input.id
+        _joinedCandidates.value = listOf(QuickCandidate(input.code, 0))
+    }
     fun publishJoined(input: QuickSuggestionInput, result: com.madeinhk.cantonesevoicekeyboard.english.JoinedSuggestions) {
         if (closed || requestId != input.id || composingText != input.code || currentVersion != input.version) return
         _candidates.value = result.chinese.mapIndexed { i, text -> QuickCandidate(text, i) }

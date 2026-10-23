@@ -385,3 +385,29 @@ phrases for `humo` in English context on each Quick version; top-eight results i
 those cases remain unchanged. Phrase candidate coverage is therefore explicitly
 not identical. The full panel and exact changed candidates are retained in
 [the report](config/pipeline_audit/2026-10-22/unified-suggestions.json).
+
+## Rapid-typing previews and handwriting priors (2026-10-23)
+
+Current-input literals publish immediately; an independent fast preview precedes
+the unchanged full composing result. The 208-request host panel covers both
+Quick versions, four contexts, seven short codes and six word/phrase codes, in
+two alternating process runs. Every final candidate list and English decision
+matches the rebuilt before binary. Short-preview Chinese coverage and all preview
+English decisions match their final results. Long-code preview phrases use a
+greedy path and are approximate until full ranking finishes.
+
+Host median/p95 is 2.720/295.665 ms for the former full request,
+2.764/296.601 ms for the current full request, and 1.832/5.566 ms for the new
+preview. These timings exclude initialization, Android scheduling and rendering;
+they do not establish phone input-to-display latency. No acceptance fitting or
+model changes were made; this panel supplements the frozen F₀.₅ protocol.
+
+Handwriting fusion now assigns an unsupported class the weakest supported
+neural prior when no finite count prior exists. Previously the missing negative
+prior was skipped, giving unsupported alternatives an advantage. On all 181
+existing exposed captures with their original empty context, top-1/4/10 changes
+110/125/134 → 126/145/156; 16 first choices improve and none of the previously
+correct first choices are lost. Missing model targets remain misses. This is a
+development replay, not fresh evaluation or a contextual handwriting benchmark.
+Inputs, native binaries and raw scores are bound in the
+[report](config/pipeline_audit/2026-10-23/rapid-candidates-and-handwriting.json).

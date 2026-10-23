@@ -26,6 +26,8 @@ internal class KeyboardScenario(
     voiceFactory: ((KeyboardEditor) -> VoiceSession)? = null,
     englishDispatcher: CoroutineDispatcher? = null,
     unifiedEngine: com.madeinhk.cantonesevoicekeyboard.english.UnifiedSuggestionEngine? = null,
+    boundaryDispatcher: CoroutineDispatcher? = null,
+    previewDispatcher: CoroutineDispatcher? = null,
 ) : AutoCloseable {
     val editor = MemoryKeyboardEditor(initialText)
     val engine = ScenarioQuickEngine()
@@ -43,7 +45,9 @@ internal class KeyboardScenario(
             scope ?: CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Unconfined),
             englishDispatcher ?: if (scope == null) kotlinx.coroutines.Dispatchers.Unconfined else lookupDispatcher,
             sharedSuggestions = unifiedEngine != null || engine is com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine,
-            unifiedEngine = unifiedEngine)
+            unifiedEngine = unifiedEngine,
+            boundaryWorker = boundaryDispatcher ?: englishDispatcher ?: if (scope == null) kotlinx.coroutines.Dispatchers.Unconfined else lookupDispatcher,
+            previewWorker = previewDispatcher ?: englishDispatcher ?: if (scope == null) kotlinx.coroutines.Dispatchers.Unconfined else lookupDispatcher)
     }
     val controller = KeyboardSessionController(
         editor,
@@ -349,9 +353,49 @@ internal object KeyboardScenarios {
             scenario.start(); scenario.type("of")
             while (queue.isNotEmpty()) queue.removeFirst().run()
             scenario.type("h")
-            // The completed row remains visible while the new request is queued.
+            // Current literal replaces the old row while both native stages are pending.
             scenario.snapshot()
         }
+    }
+
+    fun unifiedCandidatesUpdating(): KeyboardRenderState {
+        val worker = object : CoroutineDispatcher() {
+            override fun dispatch(context: kotlin.coroutines.CoroutineContext, block: Runnable) = Unit
+        }
+        val backend = object : com.madeinhk.cantonesevoicekeyboard.english.UnifiedSuggestionEngine {
+            override val supportsPreview = true
+            override fun newRequest() = object : com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest {
+                private var cancelled = false
+                override fun cancel() { cancelled = true }
+                override fun ensureActive() { if (cancelled) throw kotlinx.coroutines.CancellationException() }
+            }
+            override fun preview(request: com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest,
+                version: Int, code: String, left: String, right: String, englishEnabled: Boolean) =
+                com.madeinhk.cantonesevoicekeyboard.english.JoinedSuggestions(
+                    chinese = if (code == "hion") listOf("我們", "我今") else emptyList(),
+                    display = if (code == "hion") listOf("我們", "我今", code) else listOf(code), codeLength = code.length)
+            override fun compose(request: com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest,
+                version: Int, code: String, left: String, right: String, englishEnabled: Boolean) =
+                error("Full worker deliberately occupied")
+        }
+        return KeyboardScenario(clipboardText = null, unifiedEngine = backend,
+            scope = CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Unconfined),
+            englishDispatcher = worker, previewDispatcher = kotlinx.coroutines.Dispatchers.Unconfined).use { s ->
+            s.start(); s.type("hion")
+            check(s.editor.composing == "hion" && s.editor.text.isEmpty())
+            check(s.snapshot().quickCandidates.map { it.text } == listOf("我們", "我今", "hion"))
+            s.snapshot()
+        }
+    }
+
+    // Recorded native output for the existing captured 不 trajectory, after OOV-prior repair.
+    val capturedHandwritingAlternatives = listOf("不", "下", "一", "可", "元", "又", "你", "、", "正", ".")
+    fun handwritingAlternatives() = KeyboardScenario(initialMode = KeyboardInputMode.Handwriting,
+        clipboardText = null).use { s ->
+        s.start(); s.controller.onHandwritingStrokeStarted(true)
+        s.editor.setComposingText("不")
+        s.handwriting.candidates.value = capturedHandwritingAlternatives.mapIndexed { i, text -> HandwritingCandidate(text, i) }
+        s.snapshot()
     }
 
     fun shortCodePreviewCandidates(): KeyboardRenderState {

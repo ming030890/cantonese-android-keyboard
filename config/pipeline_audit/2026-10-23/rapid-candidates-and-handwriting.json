@@ -1,0 +1,81 @@
+{
+  "candidate_panel": {
+    "full_output_changes": [],
+    "timing": {
+      "before": {
+        "calls": 208,
+        "median_ms": 2.720229,
+        "p95_ms": 295.665209
+      },
+      "after": {
+        "calls": 208,
+        "median_ms": 2.764021,
+        "p95_ms": 296.60091700000004
+      },
+      "preview": {
+        "calls": 208,
+        "median_ms": 1.8321044999999998,
+        "p95_ms": 5.566167
+      }
+    },
+    "short_preview_coverage_mismatches": 0,
+    "preview_english_decision_mismatches": 0,
+    "limitations": "Host native requests; excludes model loading, Android scheduling and rendering. Greedy phrase previews are approximate; final rankings retain their candidate pools."
+  },
+  "handwriting_panel": {
+    "cases": 181,
+    "context": "empty, as originally captured; exposed development diagnostic",
+    "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "unsupported_before": 185,
+    "unsupported_after": 0,
+    "before": {
+      "top1": 110,
+      "top4": 125,
+      "top10": 134
+    },
+    "after": {
+      "top1": 126,
+      "top4": 145,
+      "top10": 156
+    },
+    "correct_top1_lost": 0,
+    "correct_top1_gained": 16
+  },
+  "handwriting_example": {
+    "target": "不",
+    "before": [
+      "不",
+      "ā",
+      "a",
+      "３",
+      "z",
+      "Z",
+      "m",
+      "ū",
+      "i",
+      "ㄡ"
+    ],
+    "after": [
+      "不",
+      "下",
+      "一",
+      "可",
+      "元",
+      "又",
+      "你",
+      "、",
+      "正",
+      "."
+    ]
+  },
+  "bindings": {
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "acceptance_policy": "06b745551df255ea5d4c7896aab663e2dae4f77f93791816034cc6dbc6595a63",
+    "handwriting_model": "b6916eacca94eeeaafd6d3c4b957e218a5681b55e8374f98d9109bfefa98af26",
+    "labels": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",
+    "capture_trajectories": "e2a834b5130652d30919c612a007e1e95b833dfe660488e0d035f2fbf9fa7d31",
+    "raw_visual_scores": "d9355bc3883c429825edb1568e63a0a24ffdd4bf3a60734e01fa90ab0d8bb7ff",
+    "before_probe": "93aa8e73132faded2fb81d8e35d370c73e909f426fc71c9930411ee9845be155",
+    "after_probe": "8da5010560e91fd66736a70d03381b41abf78adfba67940ef66d66ecb4a8e9c4"
+  }
+}

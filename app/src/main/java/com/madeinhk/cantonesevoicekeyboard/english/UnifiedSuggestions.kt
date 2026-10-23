@@ -20,7 +20,13 @@ internal data class JoinedSuggestions(
 )
 
 internal interface UnifiedSuggestionEngine {
+    val supportsPreview: Boolean get() = false
+    fun preview(request: SuggestionRequest, version: Int, code: String, left: String, right: String,
+                englishEnabled: Boolean): JoinedSuggestions = error("Preview unavailable")
+    val supportsIndependentBoundary: Boolean get() = false
     fun newRequest(): SuggestionRequest
+    fun boundary(request: SuggestionRequest, code: String, left: String): EnglishPrediction =
+        error("Independent boundary inference unavailable")
     fun compose(request: SuggestionRequest, version: Int, code: String, left: String, right: String,
                 englishEnabled: Boolean): JoinedSuggestions
 }
@@ -39,7 +45,26 @@ internal class NativeSuggestionRequest : SuggestionRequest {
 }
 
 internal class NativeSharedSuggestions(private val contextHandle: () -> Long) : UnifiedSuggestionEngine {
+    override val supportsPreview = true
+    override fun preview(request: SuggestionRequest, version: Int, code: String, left: String, right: String,
+                         englishEnabled: Boolean): JoinedSuggestions {
+        request.ensureActive()
+        val json = try {
+            nativePreview(contextHandle(), (request as NativeSuggestionRequest).id, version, code, left, right, englishEnabled)
+        } catch (error: Exception) { request.ensureActive(); throw error }
+        request.ensureActive()
+        return parseJoinedSuggestions(JSONObject(checkNotNull(json)), code)
+    }
+    override val supportsIndependentBoundary = true
     override fun newRequest() = NativeSuggestionRequest()
+    override fun boundary(request: SuggestionRequest, code: String, left: String): EnglishPrediction {
+        request.ensureActive()
+        val json = try {
+            nativeBoundary(contextHandle(), (request as NativeSuggestionRequest).id, code, left)
+        } catch (error: Exception) { request.ensureActive(); throw error }
+        request.ensureActive()
+        return parseSharedPrediction(JSONObject(checkNotNull(json)), code)
+    }
     override fun compose(request: SuggestionRequest, version: Int, code: String, left: String, right: String,
                          englishEnabled: Boolean): JoinedSuggestions {
         request.ensureActive()
@@ -47,7 +72,18 @@ internal class NativeSharedSuggestions(private val contextHandle: () -> Long) : 
             nativeCompose(contextHandle(), (request as NativeSuggestionRequest).id, version, code, left, right, englishEnabled)
         } catch (error: Exception) { request.ensureActive(); throw error }
         request.ensureActive()
-        val result = JSONObject(checkNotNull(json))
+        return parseJoinedSuggestions(JSONObject(checkNotNull(json)), code)
+    }
+    companion object {
+        @JvmStatic private external fun nativePreview(handle: Long, request: Long, version: Int, code: String,
+                                                      left: String, right: String, englishEnabled: Boolean): String?
+        @JvmStatic private external fun nativeBoundary(handle: Long, request: Long, code: String, left: String): String?
+        @JvmStatic private external fun nativeCompose(handle: Long, request: Long, version: Int, code: String,
+                                                      left: String, right: String, englishEnabled: Boolean): String?
+    }
+}
+
+private fun parseJoinedSuggestions(result: JSONObject, code: String): JoinedSuggestions {
         fun strings(name: String) = result.getJSONArray(name).let { rows -> (0 until rows.length()).map(rows::getString) }
         val prediction = parseSharedPrediction(result.getJSONObject("english"), code)
         val evidence = if (result.isNull("evidence")) null else result.getJSONObject("evidence").let {
@@ -55,11 +91,6 @@ internal class NativeSharedSuggestions(private val contextHandle: () -> Long) : 
                 it.getDouble("englishSupport").toFloat(), it.getDouble("chineseSupport").toFloat())
         }
         return JoinedSuggestions(strings("chinese"), strings("display"), prediction, evidence, result.getInt("codeLength"))
-    }
-    companion object {
-        @JvmStatic private external fun nativeCompose(handle: Long, request: Long, version: Int, code: String,
-                                                      left: String, right: String, englishEnabled: Boolean): String?
-    }
 }
 
 internal fun parseSharedPrediction(result: JSONObject, typed: String): EnglishPrediction {

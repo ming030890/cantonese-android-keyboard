@@ -19,12 +19,16 @@ internal class EnglishInputCoordinator(
     private val onError: (Throwable) -> Unit = {},
     val sharedSuggestions: Boolean = false,
     val unifiedEngine: UnifiedSuggestionEngine? = null,
+    private val boundaryWorker: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
+    private val previewWorker: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
 ) : AutoCloseable {
     private var engine: EnglishCandidateEngine? = null
     private var request = 0L
     private var pending: Deferred<EnglishPrediction?>? = null
     private var nextWordsJob: Job? = null
     private var nativeRequest: SuggestionRequest? = null
+    private var previewRequest: SuggestionRequest? = null
+    private var previewJob: Deferred<JoinedSuggestions?>? = null
     private var candidateRequest: Long? = null
     private var joinedQuick: QuickInputCoordinator? = null
     private var quickSnapshot: QuickSuggestionInput? = null
@@ -70,6 +74,8 @@ internal class EnglishInputCoordinator(
     }
 
     private fun cancelSuggestionWork() {
+        previewRequest?.cancel(); previewRequest = null
+        previewJob?.cancel(); previewJob = null
         nativeRequest?.cancel(); nativeRequest = null
         nextWordsJob?.cancel(); nextWordsJob = null
         pending?.cancel(); pending = null
@@ -81,8 +87,12 @@ internal class EnglishInputCoordinator(
         cancelSuggestionWork()
         if (closed) return
         val id = ++request
-        candidateRequest = null
+        candidateRequest = if (text.isNotEmpty()) id else null
         resultWord = null; prediction = EnglishPrediction()
+        if (text.isNotEmpty()) {
+            _candidates.value = listOf(HandwritingCandidate(text, 0))
+            if (input != null) joinedQuick?.publishLiteral(input)
+        }
         val token = backend.newRequest()
         nativeRequest = token
         val allowEnglish = if (input != null) quickEnglishEnabled() && eligible() else eligible()
@@ -101,19 +111,44 @@ internal class EnglishInputCoordinator(
         pending = lookup
         // A queued lookup may be cancelled before entering its body/finally.
         lookup.invokeOnCompletion { token.close() }
+        if (text.isNotEmpty() && backend.supportsPreview && !lookup.isCompleted) {
+            val previewToken = backend.newRequest()
+            previewRequest = previewToken
+            val preview = scope.async(previewWorker) {
+                try {
+                    previewToken.ensureActive()
+                    backend.preview(previewToken, input?.version ?: 0, text, left, right, allowEnglish)
+                        .also { previewToken.ensureActive() }
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (error: Exception) { previewToken.ensureActive(); onError(error); null }
+                finally { previewToken.close() }
+            }
+            previewJob = preview
+            preview.invokeOnCompletion { previewToken.close() }
+            scope.launch {
+                val result = preview.await() ?: return@launch
+                if (closed || request != id || word != text || lookup.isCompleted) return@launch
+                publishUnified(id, text, result.english, result, input)
+            }
+        }
         scope.launch {
             val result = lookup.await()
             if (closed || request != id || word != text) return@launch
-            resultWord = text; prediction = result ?: EnglishPrediction()
-            val combined = joined ?: JoinedSuggestions(codeLength = text.take(12).length)
+            val combined = joined ?: JoinedSuggestions(display = listOf(text).filter(String::isNotEmpty), codeLength = text.take(12).length)
+            publishUnified(id, text, result ?: EnglishPrediction(), combined, input)
+        }
+    }
+
+    private fun publishUnified(id: Long, text: String, result: EnglishPrediction,
+        combined: JoinedSuggestions, input: QuickSuggestionInput?) {
+            resultWord = text; prediction = result
             if (input != null) joinedQuick?.publishJoined(input, combined)
             val words = if (text.isEmpty()) {
                 if (input == null) combined.display else emptyList()
             } else
-                listOf(text) + result?.candidates.orEmpty().map { caseWord(it.word, text) }.filter { it != text }.distinct().take(8)
+                listOf(text) + result.candidates.map { caseWord(it.word, text) }.filter { it != text }.distinct().take(8)
             candidateRequest = id
             _candidates.value = words.mapIndexed { i, candidate -> HandwritingCandidate(candidate, i) }
-        }
     }
 
     fun reloadBackend() {
@@ -131,6 +166,27 @@ internal class EnglishInputCoordinator(
     }
     suspend fun settleBoundary() {
         val id=request;val text=word
+        val backend = unifiedEngine
+        if (boundaryPending() && pending?.isCompleted == false && eligible() &&
+            backend?.supportsIndependentBoundary == true) {
+            // Space needs only the English decision, not Chinese search or bilingual ranking.
+            // Cancel that work and use its independent native state and worker.
+            val left = quickSnapshot?.takeIf { quick && it.code == text }?.left
+                ?: editor.getTextBeforeCursor(512).orEmpty().removeSuffix(text)
+            cancelSuggestionWork()
+            val token = backend.newRequest()
+            nativeRequest = token
+            val lookup = scope.async(boundaryWorker) {
+                try {
+                    token.ensureActive()
+                    backend.boundary(token, text, left).also { token.ensureActive() }
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (error: Exception) { token.ensureActive(); onError(error); null }
+                finally { token.close() }
+            }
+            pending = lookup
+            lookup.invokeOnCompletion { token.close() }
+        }
         val result=withTimeoutOrNull(40L) { pending?.await() }
         if(id!=request || text!=word) return
         if(result!=null) { prediction=result;resultWord=text }
