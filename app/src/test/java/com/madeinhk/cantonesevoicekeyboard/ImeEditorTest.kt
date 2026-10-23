@@ -94,6 +94,17 @@ class ImeEditorTest {
     fun editorInputTypesSelectExpectedKeyboard() {
         assertEquals(
             KeyboardInputMode.Number,
+            keyboardInputModeForInputType(
+                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD,
+            ),
+        )
+        // Variation values are scoped to their input class: 0x10 is also text URI.
+        assertEquals(
+            KeyboardInputMode.Handwriting,
+            keyboardInputModeForInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI),
+        )
+        assertEquals(
+            KeyboardInputMode.Number,
             keyboardInputModeForInputType(InputType.TYPE_CLASS_NUMBER),
         )
         assertEquals(

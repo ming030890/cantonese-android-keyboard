@@ -119,7 +119,6 @@ internal fun keyboardInputModeForInputType(inputType: Int?): KeyboardInputMode {
     val inputClass = inputType and InputType.TYPE_MASK_CLASS
     val inputVariation = inputType and InputType.TYPE_MASK_VARIATION
     return when {
-        inputVariation == InputType.TYPE_NUMBER_VARIATION_PASSWORD -> KeyboardInputMode.AlphaNum
         inputClass == InputType.TYPE_CLASS_NUMBER ||
             inputClass == InputType.TYPE_CLASS_PHONE ||
             inputClass == InputType.TYPE_CLASS_DATETIME -> KeyboardInputMode.Number

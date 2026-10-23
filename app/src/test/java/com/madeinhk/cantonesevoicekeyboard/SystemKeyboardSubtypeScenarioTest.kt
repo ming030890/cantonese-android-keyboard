@@ -7,6 +7,33 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SystemKeyboardSubtypeScenarioTest {
+    @Test fun pinEditorUsesNumbersAcrossReopenAndReturnsToSelectedTextLayout() {
+        KeyboardScenario(clipboardText = null).use { s ->
+            val pin = EditorInfo().apply {
+                inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                imeOptions = EditorInfo.IME_ACTION_DONE
+            }
+            s.start()
+            s.controller.onStartInput(pin, false, KeyboardSubtypes.QUICK)
+            s.controller.onStartInputView(pin)
+            assertEquals(KeyboardInputMode.Number, s.snapshot().inputMode)
+            assertEquals(KeyboardToolbarContent.Empty, s.snapshot().toolbar())
+            s.type("1234")
+            assertEquals("1234", s.editor.text)
+            assertEquals("", s.editor.composing)
+            assertTrue(s.snapshot().englishCandidates.isEmpty())
+            assertEquals(KeyboardToolbarContent.Empty, s.snapshot().toolbar())
+            s.hide()
+            s.controller.onStartInput(pin, true, KeyboardSubtypes.QUICK)
+            s.controller.onStartInputView(pin)
+            assertEquals(KeyboardInputMode.Number, s.snapshot().inputMode)
+            s.hide(); s.start()
+            assertEquals(KeyboardInputMode.Quick, s.snapshot().inputMode)
+            assertEquals("1234", s.editor.text)
+            assertEquals("", s.editor.composing)
+        }
+    }
+
     @Test fun globeSelectionsSwitchAllLayoutsWithoutTypingAndSurviveReopen() {
         KeyboardScenario().use { s ->
             s.start()

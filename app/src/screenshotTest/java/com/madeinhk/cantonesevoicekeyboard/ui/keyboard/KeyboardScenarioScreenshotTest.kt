@@ -3,11 +3,28 @@ package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import com.android.tools.screenshot.PreviewTest
 import com.madeinhk.cantonesevoicekeyboard.KeyboardScenario
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSubtypes
 import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
+
+@PreviewTest
+@Preview(name = "PIN editor number layout", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioPinEditor() = ScenarioScreen(remember {
+    KeyboardScenario(clipboardText = null).use { scenario ->
+        val pin = EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            imeOptions = EditorInfo.IME_ACTION_DONE
+        }
+        scenario.controller.onStartInput(pin, false, KeyboardSubtypes.QUICK)
+        scenario.controller.onStartInputView(pin)
+        scenario.snapshot()
+    }
+})
 
 @PreviewTest
 @Preview(name = "Candidates retained during rapid typing", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
