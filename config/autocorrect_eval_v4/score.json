@@ -1,0 +1,26 @@
+{
+  "score": 0.7976108686803339,
+  "objective": {
+    "schema": "autocorrect-objective-v1",
+    "metric": "equal_weight_mean_f05",
+    "weights": {
+      "historical_full_mobile": 0.3333333333333333,
+      "real_touch_observed": 0.3333333333333333,
+      "authored_hard": 0.3333333333333333
+    },
+    "direction": "maximize",
+    "clean_controls": 46,
+    "hard_errors": 46,
+    "clean_selection": "Seeded domain round robin without model predictions",
+    "status": "Exposed development objective for hill climbing; not population accuracy or independent confirmation"
+  },
+  "components": {
+    "historical_full_mobile": 0.8665749656121046,
+    "real_touch_observed": 0.8913370055082624,
+    "authored_hard": 0.6349206349206349
+  },
+  "manifest_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+  "detailed_report_sha256": "f230fd4db7deccfd5f8ec74b16abe4df8d40f3866f231917257128e8137f4f61",
+  "baseline_score": 0.7976108686803339,
+  "delta": 0.0
+}

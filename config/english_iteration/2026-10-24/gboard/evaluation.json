@@ -1,0 +1,195 @@
+{
+  "frozen_policy_sha256": "8f28ca239913750dccbec6164c4290c972308fedeca1e5aa3b44d7cf91584842",
+  "baseline_policy_sha256": "06b745551df255ea5d4c7896aab663e2dae4f77f93791816034cc6dbc6595a63",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "candidate_probe_sha256": "0664b94a22ec1ff31c4c15716ac3ee76b4e3ea2a76a56d87668b51ddf7b977a3",
+  "native_parity_cases": 11261,
+  "native_parity_mismatches": 0,
+  "changed_candidate_lists": 0,
+  "evaluation": {
+    "baseline": {
+      "cases": 2042,
+      "typos": 744,
+      "controls": 1298,
+      "correct": 502,
+      "wrong": 48,
+      "missed": 242,
+      "false_changes": 8,
+      "precision": 0.9127272727272727,
+      "recall": 0.6747311827956989,
+      "f05": 0.8525815217391305
+    },
+    "candidate": {
+      "cases": 2042,
+      "typos": 744,
+      "controls": 1298,
+      "correct": 504,
+      "wrong": 37,
+      "missed": 240,
+      "false_changes": 6,
+      "precision": 0.9316081330868762,
+      "recall": 0.6774193548387096,
+      "f05": 0.8665749656121046
+    }
+  },
+  "selection": {
+    "baseline": {
+      "cases": 1949,
+      "typos": 700,
+      "controls": 1249,
+      "correct": 453,
+      "wrong": 37,
+      "missed": 247,
+      "false_changes": 4,
+      "precision": 0.9244897959183673,
+      "recall": 0.6471428571428571,
+      "f05": 0.8515037593984962
+    },
+    "candidate": {
+      "cases": 1949,
+      "typos": 700,
+      "controls": 1249,
+      "correct": 449,
+      "wrong": 32,
+      "missed": 251,
+      "false_changes": 2,
+      "precision": 0.9334719334719335,
+      "recall": 0.6414285714285715,
+      "f05": 0.8555640243902439
+    }
+  },
+  "new_development": {
+    "baseline": {
+      "cases": 94,
+      "typos": 65,
+      "controls": 29,
+      "correct": 29,
+      "wrong": 1,
+      "missed": 36,
+      "false_changes": 0,
+      "precision": 0.9666666666666667,
+      "recall": 0.4461538461538462,
+      "f05": 0.7837837837837838
+    },
+    "candidate": {
+      "cases": 94,
+      "typos": 65,
+      "controls": 29,
+      "correct": 44,
+      "wrong": 0,
+      "missed": 21,
+      "false_changes": 0,
+      "precision": 1.0,
+      "recall": 0.676923076923077,
+      "f05": 0.9128630705394191
+    }
+  },
+  "evaluation_slices": {
+    "short_2_3": {
+      "baseline": {
+        "cases": 751,
+        "typos": 216,
+        "controls": 535,
+        "correct": 149,
+        "wrong": 13,
+        "missed": 67,
+        "false_changes": 2,
+        "precision": 0.9197530864197531,
+        "recall": 0.6898148148148148,
+        "f05": 0.8622685185185185
+      },
+      "candidate": {
+        "cases": 751,
+        "typos": 216,
+        "controls": 535,
+        "correct": 146,
+        "wrong": 9,
+        "missed": 70,
+        "false_changes": 1,
+        "precision": 0.9419354838709677,
+        "recall": 0.6759259259259259,
+        "f05": 0.8732057416267942
+      }
+    },
+    "length_4_5": {
+      "baseline": {
+        "cases": 708,
+        "typos": 282,
+        "controls": 426,
+        "correct": 180,
+        "wrong": 18,
+        "missed": 102,
+        "false_changes": 1,
+        "precision": 0.9090909090909091,
+        "recall": 0.6382978723404256,
+        "f05": 0.8379888268156425
+      },
+      "candidate": {
+        "cases": 708,
+        "typos": 282,
+        "controls": 426,
+        "correct": 179,
+        "wrong": 13,
+        "missed": 103,
+        "false_changes": 1,
+        "precision": 0.9322916666666666,
+        "recall": 0.6347517730496454,
+        "f05": 0.8523809523809524
+      }
+    },
+    "osa_distance_2_plus": {
+      "baseline": {
+        "cases": 231,
+        "typos": 231,
+        "controls": 0,
+        "correct": 77,
+        "wrong": 30,
+        "missed": 154,
+        "false_changes": 0,
+        "precision": 0.719626168224299,
+        "recall": 0.3333333333333333,
+        "f05": 0.5842185128983308
+      },
+      "candidate": {
+        "cases": 231,
+        "typos": 231,
+        "controls": 0,
+        "correct": 76,
+        "wrong": 26,
+        "missed": 155,
+        "false_changes": 0,
+        "precision": 0.7450980392156863,
+        "recall": 0.329004329004329,
+        "f05": 0.594679186228482
+      }
+    },
+    "clean_controls": {
+      "baseline": {
+        "cases": 1298,
+        "typos": 0,
+        "controls": 1298,
+        "correct": 0,
+        "wrong": 8,
+        "missed": 0,
+        "false_changes": 8,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f05": 0.0
+      },
+      "candidate": {
+        "cases": 1298,
+        "typos": 0,
+        "controls": 1298,
+        "correct": 0,
+        "wrong": 6,
+        "missed": 0,
+        "false_changes": 6,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f05": 0.0
+      }
+    }
+  },
+  "note": "One frozen comparison on the existing historically exposed development evaluation; not fresh production qualification.",
+  "quality_improves": true
+}

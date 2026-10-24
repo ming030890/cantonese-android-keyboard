@@ -1,0 +1,27 @@
+{
+  "scope": "Release host English suggestion calls including acceptance; same 512 selection cases, 16 warmups, two alternating process pairs. Excludes model load, Android UI/rendering and phone input-to-display.",
+  "baseline": {
+    "count": 1024,
+    "median_ms": 2.5435,
+    "p95_ms": 4.698
+  },
+  "candidate": {
+    "count": 1024,
+    "median_ms": 2.536,
+    "p95_ms": 4.721
+  },
+  "first_call_internal_ms": {
+    "baseline": [
+      2.341,
+      2.328
+    ],
+    "candidate": [
+      3.864,
+      3.931
+    ]
+  },
+  "binary_sha256": {
+    "baseline": "64e282460a3d14ab1245dc1026ac3086723952c49dea37fc8e58bb865269f4b2",
+    "candidate": "0664b94a22ec1ff31c4c15716ac3ee76b4e3ea2a76a56d87668b51ddf7b977a3"
+  }
+}

@@ -9,6 +9,7 @@ def sha(path):
     return h.hexdigest()
 
 def verify(project):
+    project=project.resolve()
     assets=project/'app/src/main/assets';model=assets/'language_model/model.cng'
     with model.open('rb') as stream:
         if stream.read(8)==b'KBCNN01\0':return verify_shared(project)
@@ -59,6 +60,21 @@ def verify_shared(project):
     if selected['model_sha256']!=sha(model) or selected['model_bytes']!=len(raw):raise ValueError('Selected CNN mismatch')
     if selected['config']!={k:meta[k] for k in selected['config']}:raise ValueError('Selected CNN configuration mismatch')
     native=project.parent/'QwenASR/crates/cantonese-ngram/src'
+    acceptance_file=native/'english_acceptance.json'
+    acceptance=json.loads(acceptance_file.read_text())
+    if acceptance['model_sha256']!=sha(model):raise ValueError('English acceptance model requires recalibration')
+    if selected['english_policy']['acceptance_sha256']!=sha(acceptance_file):raise ValueError('Selected acceptance policy mismatch')
+    dictionary_bytes=0
+    if acceptance.get('schema')=='shared-english-acceptance-v4-dictionary-ffn':
+        dictionary=native/'english_valid_words.txt'
+        if acceptance['dictionary']['filtered_sorted_sha256']!=sha(dictionary):raise ValueError('Acceptance dictionary mismatch')
+        notice=assets/'licenses/SCOWL.txt'
+        if acceptance['dictionary']['notice_sha256']!=sha(notice):raise ValueError('Dictionary notice mismatch')
+        library=project/'app/src/main/jniLibs/arm64-v8a/libcantonese_engine.so'
+        binary=library.read_bytes()
+        if acceptance_file.read_bytes() not in binary or dictionary.read_bytes() not in binary:
+            raise ValueError('Rebuild native library for the selected acceptance policy/dictionary')
+        dictionary_bytes=dictionary.stat().st_size
     apostrophe=json.loads((native/'english_apostrophe_acceptance.json').read_text())
     if apostrophe['model_sha256']!=sha(model):raise ValueError('Apostrophe model requires recalibration')
     if apostrophe['forms_sha256']!=sha(native/'english_apostrophe_forms.json'):raise ValueError('Apostrophe forms require recalibration')
@@ -76,13 +92,15 @@ def verify_shared(project):
     if fusion['inputs']['counts_sha256']!=hashlib.sha256(b'').hexdigest():raise ValueError('Count table must be absent')
     paths=['language_model/model.cng','language_model/handwriting_fusion.json','quick/quick3.bin','quick/quick5.bin','handwriting/labels.txt']
     total=sum((assets/p).stat().st_size for p in paths)
-    if total>=30_000_000:raise ValueError('Shared prediction resources exceed30MB')
+    if total+dictionary_bytes>=30_000_000:raise ValueError('Shared prediction resources exceed30MB')
     if not selected['experimental'] or selected['production_approved']:raise ValueError('V2 has not passed production qualification')
     return dict(passed=True,format=meta['format'],model_sha256=sha(model),bytes=len(raw),
-                prediction_resource_bytes=total,one_shared_lm=True,english_spelling_assets=False,
+                prediction_resource_bytes=total,embedded_dictionary_bytes=dictionary_bytes,
+                prediction_data_with_dictionary_bytes=total+dictionary_bytes,one_shared_lm=True,english_spelling_assets=False,
                 right_context_tokens=0,experimental=True,production_approved=False)
 
 def verify_package(project, package):
+    project=project.resolve(); package=package.resolve()
     bundle=package.suffix=='.aab'
     if package.suffix not in {'.apk','.aab'}:raise ValueError('Expected APK or AAB')
     prefix='base/' if bundle else ''
@@ -107,6 +125,7 @@ def verify_package(project, package):
         count_asset=assets/'handwriting/lm_csr.bin'
         if count_asset.exists():files.append('handwriting/lm_csr.bin')
         elif prefix+'assets/handwriting/lm_csr.bin' in archive.namelist():raise ValueError('Obsolete count table packaged')
+        if (assets/'licenses/SCOWL.txt').is_file():files.append('licenses/SCOWL.txt')
         for file in files:check(archive,prefix+'assets/'+file,assets/file)
         for library in ['libcantonese_engine.so', 'libqwen_asr.so']:
             stripped=project/f'app/build/intermediates/stripped_native_libs/{variant}/strip{variant.capitalize()}DebugSymbols/out/lib/arm64-v8a'/library

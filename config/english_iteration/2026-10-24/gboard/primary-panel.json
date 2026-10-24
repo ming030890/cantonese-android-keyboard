@@ -1,0 +1,84 @@
+{
+  "scope": "Fixed historical synthetic word-group evaluation, lexically unambiguous neighboring replacements plus all existing controls; no fit or threshold change",
+  "primary_with_controls": {
+    "baseline": {
+      "cases": 1425,
+      "typos": 617,
+      "controls": 808,
+      "correct": 493,
+      "wrong": 12,
+      "missed": 124,
+      "false_changes": 7,
+      "precision": 0.9762376237623762,
+      "recall": 0.7990275526742301,
+      "f05": 0.9347743648084945
+    },
+    "candidate": {
+      "cases": 1425,
+      "typos": 617,
+      "controls": 808,
+      "correct": 525,
+      "wrong": 7,
+      "missed": 92,
+      "false_changes": 6,
+      "precision": 0.9868421052631579,
+      "recall": 0.8508914100486223,
+      "f05": 0.9562841530054644
+    }
+  },
+  "typos_only": {
+    "baseline": {
+      "cases": 617,
+      "typos": 617,
+      "controls": 0,
+      "correct": 493,
+      "wrong": 5,
+      "missed": 124,
+      "false_changes": 0,
+      "precision": 0.9899598393574297,
+      "recall": 0.7990275526742301,
+      "f05": 0.9448064392487543
+    },
+    "candidate": {
+      "cases": 617,
+      "typos": 617,
+      "controls": 0,
+      "correct": 525,
+      "wrong": 1,
+      "missed": 92,
+      "false_changes": 0,
+      "precision": 0.9980988593155894,
+      "recall": 0.8508914100486223,
+      "f05": 0.9647188533627343
+    }
+  },
+  "short_4_5_typos": {
+    "baseline": {
+      "cases": 63,
+      "typos": 63,
+      "controls": 0,
+      "correct": 23,
+      "wrong": 0,
+      "missed": 40,
+      "false_changes": 0,
+      "precision": 1.0,
+      "recall": 0.36507936507936506,
+      "f05": 0.7419354838709677
+    },
+    "candidate": {
+      "cases": 63,
+      "typos": 63,
+      "controls": 0,
+      "correct": 27,
+      "wrong": 0,
+      "missed": 36,
+      "false_changes": 0,
+      "precision": 1.0,
+      "recall": 0.42857142857142855,
+      "f05": 0.7894736842105263
+    }
+  },
+  "source_lexicon_sha256": "346323cd605464785e631af886877ef9d1bd12bc8d583dfb55253a44f291fab6",
+  "new_teacher_fit_target_word_overlap": 12,
+  "limitation": "New contextual/word teacher data can share target word types with this historical synthetic cohort; it is not a fresh type-disjoint test. Exact editor-input duplicates were excluded from the fit."
+}

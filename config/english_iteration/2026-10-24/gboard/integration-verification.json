@@ -1,0 +1,19 @@
+{
+  "native_unit_tests": 30,
+  "android_unit_tests": {
+    "tests": 243,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "jni_controller_tests": 19,
+  "jni_controller_skipped": 0,
+  "full_gate": ":app:verifyKeyboard :app:compileDebugAndroidTestKotlin with rebuilt englishNativeLibrary: PASS",
+  "screenshot_baseline": "New contextual short-word presentation fixture rendered, visually inspected, then verified separately.",
+  "arm64_library_sha256": "4be742d04ac75343c5d56126bb5308451f94873de34b01d2a6e72ac6a1406a81",
+  "host_library_sha256": "09561150770c7858951cbf8e44a6d2d1d535926735b157d032ff8adcf15b9abf",
+  "apk_sha256": "a08369b5caa479ce5420960dded5b074c80b47c4bfb19af60e58d1ddd8b56cc0",
+  "artifact": "app/build/outputs/apk/debug/app-debug.apk",
+  "device_installation": false,
+  "publication": false
+}

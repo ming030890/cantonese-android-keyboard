@@ -1,0 +1,20 @@
+{
+  "evaluation_tests": 8,
+  "existing_touch_tests": 10,
+  "whole_trial_parity": 480,
+  "historical_mobile_cases": 2042,
+  "historical_mobile_tp": 504,
+  "historical_mobile_fp": 37,
+  "embedded_current_acceptance_policy": true,
+  "embedded_current_dictionary": true,
+  "accepted_policy_sha256": "8f28ca239913750dccbec6164c4290c972308fedeca1e5aa3b44d7cf91584842",
+  "manifest_sha256": "d16b9ef44ba92fa268b5803d11efeba52b7730ae859486e6c124fa66aa359727",
+  "report_sha256": "23bcd7c26bbcc4d60b1d506976ea94cb63631a89e66f5a2fd81cd84ad72b12da",
+  "model_changed": false,
+  "android_changed": false,
+  "integrity_checks": [
+    "Freeze refuses existing suite",
+    "Scorer refuses existing report",
+    "Tampered frozen cases rejected before inference"
+  ]
+}

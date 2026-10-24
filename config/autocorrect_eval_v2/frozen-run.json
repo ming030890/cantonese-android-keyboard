@@ -1,0 +1,8 @@
+{
+  "manifest_sha256": "d16b9ef44ba92fa268b5803d11efeba52b7730ae859486e6c124fa66aa359727",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "probe_sha256": "f3225a7e41946e2d398d3aa6d3516bbd526c02021f24131c4ad45dcd9f9fdf60",
+  "baseline_probe_sha256": null,
+  "scorer_sha256": "06fbe3f810359e9caa3ca6173effcda9018069acfcab52a7bf9ca5bd23d2babc",
+  "parameters_selected_in_this_run": false
+}

@@ -1,8 +1,10 @@
 # Cantonese Voice Keyboard
 
-For candidate/autocorrect changes, read `TYPING_EVALUATION.md` first. It records
-the frozen evaluation cohort, current baseline, and the user's acceptance metrics:
-latency and F₀.₅. Accept F₀.₅ improvements without a separate 95% precision cutoff.
+For candidate/autocorrect changes, follow `AUTOCORRECT_OBJECTIVE.md`: it defines
+the datasets, scoring command and acceptance gate. Report one aggregate score
+and its baseline delta. Use a freshly built native probe and the frozen suite;
+keep evaluation examples out of training. Quality changes must improve the
+accepted aggregate score and pass required checks. Report latency tradeoffs.
 
 ## Repository scope
 

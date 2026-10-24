@@ -1,0 +1,111 @@
+domain	left	target	errors
+short_words	Please send it to 	me	mw;mr
+short_words	Can you pick 	up	ip;uo
+short_words	Put the parcel 	on	om;oj
+short_words	Leave it with 	us	ua;ux
+short_words	The key is 	in	ib;im
+short_words	I will wait 	at	ar;ay
+short_words	This is just 	my	mt;mu
+short_words	Would you like tea 	or	ot;oe
+short_words	I have a cup 	of	og;od
+short_words	We should leave 	by	bt;bu
+short_words	Please say 	no	np;nk
+short_words	I think 	so	si;sp
+short_words	We can still 	go	gp;gi
+short_words	I did not see 	it	iy;ir
+short_words	The person outside is 	he	hw;hr
+short_words	Please ask 	her	hee;hwr
+short_words	The ticket is 	for	fir;foe
+short_words	I hope you 	are	arr;afe
+short_words	Tell me 	why	wht;whu
+short_words	What did you 	say	sau;sqy
+short_words	I will be there 	too	toi;top
+short_words	I am on my 	way	wau;wqy
+short_words	Come over 	now	nlw;niw
+short_words	Can you open the 	box	bix;boz
+short_words	Please bring the 	key	kwy;keu
+short_words	I need a new 	bag	bsg;bah
+short_words	I caught the last 	bus	bua;bux
+short_words	We could take a 	cab	cqb;cav
+short_words	The restaurant is 	far	fqr;fae
+short_words	This road is 	wet	wrt;wey
+short_words	That makes me 	sad	sqd;saf
+short_words	The weather is 	hot	hpt;hoy
+short_words	I thought we 	had	hqd;haf
+short_words	Can you see the 	sun	sum;suj
+short_words	I need a short 	nap	nqp;nao
+short_words	I have already 	paid	pqid;paod
+short_words	Please give me 	some	somr;spme
+short_words	I will call you 	soon	soom;soob
+short_words	Let's meet over 	here	herr;heree
+short_words	I am staying 	home	hpme;hime
+large_distance	Please send the final 	document	dpcumrnt;docmnt
+large_distance	Thanks for the quick 	response	rrspknse;respnse
+large_distance	I cannot find my 	umbrella	unbrwlla;umrella
+large_distance	Please confirm the 	reservation	resrvtion;reseravtion
+large_distance	I forgot my account 	password	psswrd;passwrod
+large_distance	I need to reschedule the 	appointment	appintmnt;appoitnment
+large_distance	Please check the delivery 	address	addesss;adres
+large_distance	That is a useful 	suggestion	sugestionn;suggesiton
+large_distance	I will send it 	tomorrow	tomoroww;tmrrw
+large_distance	Thank you for your 	patience	patincee;pateince
+large_distance	Could you explain the 	difference	diffrnce;differnece
+large_distance	The train leaves in the 	afternoon	aftwrnoom;afternon
+large_distance	We need a stable internet 	connection	conecton;conncetion
+large_distance	This is a great 	opportunity	opprtunity;opportnuity
+large_distance	I need the original 	receipt	recieptt;receept
+large_distance	Can you check the 	availability	availablty;avaialbility
+large_distance	Please ask the building 	management	mangemnt;managmeent
+large_distance	I will check my 	schedule	scedulee;scheudle
+large_distance	Let me know when it is 	convenient	convenintt;conveinent
+large_distance	I need more 	information	infrmtion;informaiton
+chat	omg I almost 	forgot	forgit;forgto
+chat	yeah that sounds 	awesome	awesme;awsome
+chat	lol I am still 	waiting	waitign;wqiting
+chat	thanks for checking 	again	agian;agqin
+chat	just text me when you 	arrive	arrivr;arirve
+chat	sorry running a bit 	late	lqte;ltae
+chat	btw are you free 	tonight	tonihgt;tonigt
+chat	no worries take your 	time	tiem;timr
+work	Could you review the latest 	proposal	proposla;propsoal
+work	Please attach the 	invoice	invoiec;invioce
+work	The meeting starts in ten 	minutes	minutrs;minuets
+work	Can we move the 	deadline	deadlien;dealdine
+travel	Which platform is the next 	train	trian;trqin
+travel	Please meet me at the 	station	staiton;ststion
+travel	I have already booked the 	hotel	htoel;hotwl
+travel	We should leave for the 	airport	airprot;airpirt
+food	Can we order some 	noodles	nodoles;noodlws
+food	Please make mine without 	onions	oinons;oninos
+food	Do you want another 	coffee	coffre;cofee
+food	Let's book a table for 	dinner	dinnwr;dinmer
+mixed_cantonese	今晚食完飯先 	call	cqll;clal
+mixed_cantonese	我而家去緊 	work	wrok;wprk
+mixed_cantonese	可唔可以幫我 	check	chekc;chdck
+mixed_cantonese	記得帶個 	charger	chager;chargwr
+mixed_cantonese	嗰個file要再 	upload	uplaod;uplpad
+mixed_cantonese	你有冇睇個 	message	messgae;mesage
+mixed_cantonese	等我send個 	location	locaiton;locarion
+mixed_cantonese	我想改個 	booking	bookign;boojing
+emoji_punctuation	Thanks!! 🙏 really 	appreciate	apprecaite;apprwciate
+emoji_punctuation	😂 that was so 	funny	fumny;funyn
+emoji_punctuation	On my way... see you 	soon	soob;soom
+emoji_punctuation	Re: tomorrow's meeting — please 	confirm	confrim;confurm
+apostrophes	Sorry I 	can't	cant;can,t
+apostrophes	I think she 	doesn't	doesnt;deosnt
+apostrophes	Please 	don't	dont;don,t
+apostrophes	I 	won't	wont;won,t
+apostrophes	They said 	they're	theyre;theyrw
+apostrophes	I know 	we're	were;we,re
+word_boundaries	I missed the bus and now I am 	running late	runninglate
+word_boundaries	Please call me when you get 	back home	backhome
+word_boundaries	We should meet at the 	train station	trainstation
+word_boundaries	I will send the file after 	the meeting	themeeting
+real_word_intent	Please put the milk 	in	on
+real_word_intent	She arrived an hour 	ago	age
+real_word_intent	I need to catch the last 	bus	but
+real_word_intent	We will meet at half 	past	post
+real_word_intent	Could you turn off the 	light	night
+real_word_intent	The soup needs a little 	salt	sale
+real_word_intent	Please send the file to 	me	my
+real_word_intent	She has already 	left	felt

@@ -134,7 +134,7 @@ internal class EnglishInputCoordinator(
         scope.launch {
             val result = lookup.await()
             if (closed || request != id || word != text) return@launch
-            val combined = joined ?: JoinedSuggestions(display = listOf(text).filter(String::isNotEmpty), codeLength = text.take(12).length)
+            val combined = joined ?: JoinedSuggestions(display = listOf(text).filter(String::isNotEmpty), codeLength = text.length)
             publishUnified(id, text, result ?: EnglishPrediction(), combined, input)
         }
     }

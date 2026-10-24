@@ -78,15 +78,15 @@ class EnglishAutocorrectScenarioTest {
         }
     }
 
-    @Test fun quickKeepsLongEnglishButConvertsNonEnglishPhrases() {
-        for ((typed, expectedPrefix) in listOf("keyboard" to "", "zzzzzzz" to "中文中文中文")) {
+    @Test fun quickKeepsLongEnglishAndChineseCompositionsUntilSelection() {
+        for (typed in listOf("keyboard", "zzzzzzz")) {
             KeyboardScenario(englishEngine = ScenarioEnglishEngine()).use { s ->
                 s.engine.lookup = { _, code, _, _ -> if (code.length == 6) listOf(QuickCandidate("中文中文中文", 0)) else emptyList() }
                 s.engine.classify = { code, _, _, _ -> if (code == "zzzzzz")
                     com.madeinhk.cantonesevoicekeyboard.quick.QuickLanguageEvidence(0.001f, 0.999f, 0.0001f, 0.1f) else null }
                 s.start(); s.type(typed)
-                assertEquals(expectedPrefix, s.editor.text)
-                assertEquals(if (expectedPrefix.isEmpty()) typed else "z", s.editor.composing)
+                assertEquals("", s.editor.text)
+                assertEquals(typed, s.editor.composing)
             }
         }
     }

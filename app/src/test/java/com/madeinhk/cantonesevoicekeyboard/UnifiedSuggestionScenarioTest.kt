@@ -42,11 +42,13 @@ class UnifiedSuggestionScenarioTest {
         }
         val tokens = mutableListOf<Token>()
         val calls = mutableListOf<String>()
+        val contexts = mutableListOf<String>()
         var duringLookup: (String) -> Unit = {}
         override fun newRequest() = Token().also(tokens::add)
         override fun compose(request: SuggestionRequest, version: Int, code: String, left: String, right: String,
                              englishEnabled: Boolean): JoinedSuggestions {
             calls += code
+            contexts += left
             duringLookup(code)
             val alternative = if (code.isEmpty()) "next" else "${code}候選"
             return JoinedSuggestions(chinese = if (version == 0) emptyList() else listOf(alternative),
@@ -92,6 +94,21 @@ class UnifiedSuggestionScenarioTest {
                 assertEquals("abc候選", s.editor.text); assertEquals("", s.editor.composing)
                 collector.cancel()
             }
+        }
+    }
+
+    @Test fun longCompositionDoesNotLeakIntoTheLeftContextWindow() = runTest {
+        val engine = Engine(); val worker = Worker()
+        val raw = "hion".repeat(150)
+        KeyboardScenario(initialText = "我想", clipboardText = null,
+            scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler)),
+            englishDispatcher = worker, unifiedEngine = engine).use { s ->
+            s.start(); s.type(raw); runCurrent(); worker.drain(testScheduler)
+            assertEquals(listOf(raw), engine.calls)
+            assertEquals(listOf("我想"), engine.contexts)
+            assertEquals("我想", s.editor.text); assertEquals(raw, s.editor.composing)
+            s.choose(raw)
+            assertEquals("我想$raw", s.editor.text); assertEquals("", s.editor.composing)
         }
     }
 
@@ -416,6 +433,95 @@ class UnifiedSuggestionScenarioTest {
                 worker.drain(testScheduler)
                 assertEquals("do you know what you are talking about ", s.editor.text)
             }
+        }
+    }
+
+    @Test fun nativePreviewAndFullRowsRankProblemWithChineseFromTheFirstPublication() = runTest {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for (version in listOf(3, 5)) {
+            val ui = StandardTestDispatcher(testScheduler); val worker = Worker()
+            val quick = NativeQuickEngine.fromAssets({ File("src/main/assets/$it").readBytes() })
+            KeyboardScenario(clipboardText = null, quickEngine = quick,
+                scope = CoroutineScope(SupervisorJob() + ui), englishDispatcher = worker, previewDispatcher = ui,
+                unifiedEngine = NativeSharedSuggestions(quick::englishContextHandle)).use { s ->
+                s.quickVersion = version; s.start(); s.type("problem"); runCurrent()
+                val preview = s.snapshot().quickCandidates.map { it.text }
+                assertEquals("Quick$version $preview", "problem", preview.first())
+                assertTrue(preview.any { word -> word.any { it.code > 127 } })
+                assertEquals("", s.editor.text); assertEquals("problem", s.editor.composing)
+                assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                worker.drain(testScheduler)
+                assertEquals("problem", s.snapshot().quickCandidates.first().text)
+                s.choose("problem"); runCurrent()
+                assertEquals("problem", s.editor.text); assertEquals("", s.editor.composing)
+            }
+        }
+    }
+
+    @Test fun nativeCompositionHasNoLeftover128KeyBridgeLimit() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        NativeQuickEngine.fromAssets({ File("src/main/assets/$it").readBytes() }).use { quick ->
+            val engine = NativeSharedSuggestions(quick::englishContextHandle)
+            val code = "z".repeat(129)
+            for (version in listOf(3, 5)) {
+                engine.newRequest().use { request ->
+                    val preview = engine.preview(request, version, code, "", "", true)
+                    assertEquals(code.length, preview.codeLength)
+                    assertTrue(code in preview.display)
+                }
+                engine.newRequest().use { request ->
+                    val result = engine.compose(request, version, code, "", "", true)
+                    assertEquals(code.length, result.codeLength)
+                    assertTrue(code in result.display)
+                }
+            }
+        }
+    }
+
+    @Test fun nativeLongChineseSelectionConsumesAllKeysOnBothQuickVersions() = runTest {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for (version in listOf(3, 5)) {
+            val ui = StandardTestDispatcher(testScheduler); val worker = Worker()
+            val quick = NativeQuickEngine.fromAssets({ File("src/main/assets/$it").readBytes() })
+            KeyboardScenario(clipboardText = null, quickEngine = quick,
+                scope = CoroutineScope(SupervisorJob() + ui), englishDispatcher = worker, previewDispatcher = ui,
+                unifiedEngine = NativeSharedSuggestions(quick::englishContextHandle)).use { s ->
+                s.quickVersion = version; s.start(); s.type("hion".repeat(4)); runCurrent()
+                assertEquals("", s.editor.text); assertEquals("hion".repeat(4), s.editor.composing)
+                assertTrue(s.quick.candidates.value.any { it.text.codePointCount(0, it.text.length) == 8 })
+                worker.drain(testScheduler)
+                val phrase = s.quick.candidates.value.first { it.text.codePointCount(0, it.text.length) == 8 }.text
+                assertEquals("", s.editor.text); assertEquals("hion".repeat(4), s.editor.composing)
+                s.choose(phrase); runCurrent()
+                assertEquals(phrase, s.editor.text); assertEquals("", s.editor.composing)
+            }
+        }
+    }
+
+    @Test fun joinedChineseCompositionBeyondSixCharactersStaysWholeAndSelectable() = runTest {
+        val ui = StandardTestDispatcher(testScheduler); val worker = Worker()
+        val raw = "hionhionhionhionhion"
+        val phrase = "我們我們我們我們我們"
+        val engine = Engine().apply { previewResult = { code -> JoinedSuggestions(
+            chinese = listOf(phrase), display = listOf(phrase, code),
+            codeLength = code.length) } }
+        KeyboardScenario(clipboardText = null, scope = CoroutineScope(SupervisorJob() + ui),
+            englishDispatcher = worker, previewDispatcher = ui, unifiedEngine = engine).use { s ->
+            s.start()
+            raw.forEach { s.type(it.toString()); runCurrent() }
+            assertEquals("", s.editor.text); assertEquals(raw, s.editor.composing)
+            assertEquals(listOf(phrase, raw), s.snapshot().quickCandidates.map { it.text })
+            assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+            s.choose(phrase); runCurrent()
+            assertEquals(phrase, s.editor.text); assertEquals("", s.editor.composing)
+            worker.drain(testScheduler)
+            assertEquals(phrase, s.editor.text)
         }
     }
 

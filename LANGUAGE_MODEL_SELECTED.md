@@ -3,8 +3,8 @@
 The app stages `cnn_repair_002` at its selected 35M-exposure checkpoint as one
 INT8 causal CNN for Cantonese, English, mixed Quick ranking and handwriting
 language priors. The model includes its exact canonical vocabulary and a list
-of TRAIN-attested English output token IDs. It does not require an English
-spelling dictionary or a second English LM.
+of TRAIN-attested English output token IDs. Its acceptance network also uses a pinned SCOWL spelling-validity dictionary
+as learned evidence; no second English LM is loaded.
 
 English shows prefix completions, next-word suggestions and spelling alternatives.
 Spelling candidates come from the model's existing TRAIN-attested English tokens,
@@ -14,12 +14,14 @@ correction on Space; Backspace restores the original. Original-word evidence
 helps preserve intentional words while allowing contextual mistaps. No old dictionary/model is restored.
 The native implementation currently uses length-dependent edit limits, keyboard
 neighbour/edit penalties and split-word proposals. Acceptance
-now uses a fitted six-feature logistic rule with original-word evidence compiled from
+now uses a trained 22-input neural acceptance rule with original-word and
+dictionary evidence compiled from
 `../QwenASR/crates/cantonese-ngram/src/english_acceptance.json`.
-On the aligned mobile development evaluation it reduces wrong replacements from
-112 to 23, while correct replacements fall from 399 to 361. F₀.₅ improves from
-0.7156 originally and 0.7636 in the previous rule to 0.7917; precision is 94.0%
-and typo recall is 48.5%. The score is a learned
+The current update improves the freshly rebuilt starting FFN on the aligned
+mobile development evaluation: wrong replacements 48 → 37, correct replacements
+502 → 504, F₀.₅ 0.85258 → 0.86657, precision 93.16% and recall 67.74%. See
+[Gboard-supported training](GBOARD_ACCEPTANCE_TRAINING.md) for the current
+comparison and retained historical baselines. The score is a learned
 decision value, not a per-user correctness guarantee. Prefix completion no longer
 pays a spelling-error penalty. See [ENGLISH_TYPING_ITERATION.md](ENGLISH_TYPING_ITERATION.md)
 for provenance, tradeoffs and the remaining heuristic constants.
@@ -30,7 +32,7 @@ model's English token set cannot be proposed by this generator.
 The packed model is 12,675,264 bytes, SHA-256
 `915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322`.
 Prediction resources including Quick dictionaries and handwriting labels total
-13,395,704 bytes. Quick dictionaries still map codes to candidates; the handwriting
+13,395,704 bytes, plus 1,173,178 bytes of embedded SCOWL validity data. Quick dictionaries still map codes to candidates; the handwriting
 visual model still maps strokes to characters. Their language scores come from
 the shared CNN. Quick and handwriting share immutable native CNN weights while
 maintaining separate context caches.

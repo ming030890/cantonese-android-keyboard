@@ -333,7 +333,7 @@ class QuickInputCoordinatorTest {
     }
 
     @Test
-    fun sixCharactersRemainSelectableUntilNextKey() {
+    fun sixCharactersDoNotCommitOnTheNextKey() {
         for (targetCode in listOf("hionhionhion", "qqqqqq", "qhionqhion")) {
             val committed = mutableListOf<String>()
             val targetBackend = object : QuickCandidateEngine {
@@ -357,8 +357,8 @@ class QuickInputCoordinatorTest {
             assertTrue(committed.isEmpty())
             assertEquals(targetCode, c.getComposingText())
             c.onKey("q")
-            assertEquals(listOf("𠮷們手我們手"), committed)
-            assertEquals("q", c.getComposingText())
+            assertTrue(committed.isEmpty())
+            assertEquals(targetCode + "q", c.getComposingText())
             c.close()
         }
     }

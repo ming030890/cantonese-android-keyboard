@@ -104,21 +104,21 @@ class QuickLanguageScenarioTest {
     private val english = QuickLanguageEvidence(0.99f, 0.01f, 0.1f, 0.001f)
     private val uncertain = QuickLanguageEvidence(0.45f, 0.55f, 0.03f, 0.04f)
 
-    @Test fun lmEvidenceReplacesDictionaryProtectionAndLengthAlone() {
+    @Test fun languageEvidenceNeverAutoCommitsAtTheFormerLengthLimit() {
         for (evidence in listOf(chinese, english, uncertain, null)) {
             KeyboardScenario(englishEngine = ScenarioEnglishEngine()).use { s ->
                 s.engine.lookup = { _, code, _, _ -> listOf(QuickCandidate(if (code.length >= 6) "我哋去食飯啦" else "你", 0)) }
                 s.engine.classify = { _, _, _, _ -> evidence }
                 s.start(); s.type("keyboard")
-                assertEquals(if (evidence == chinese) "我哋去食飯啦" else "", s.editor.text)
-                assertEquals(if (evidence == chinese) "rd" else "keyboard", s.editor.composing)
+                assertEquals("", s.editor.text)
+                assertEquals("keyboard", s.editor.composing)
                 assertFalse(s.snapshot().quickCandidates.isEmpty())
                 assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
             }
         }
     }
 
-    @Test fun unknownEnglishBeyondTwelveKeysAndChineseSelectionKeepEveryKey() {
+    @Test fun selectionConsumesTheWholeUnboundedComposition() {
         val raw = "tonysunusualname"
         KeyboardScenario(englishEngine = ScenarioEnglishEngine()).use { s ->
             s.engine.lookup = { _, _, _, _ -> listOf(QuickCandidate("我哋去食飯啦", 0)) }
@@ -128,9 +128,9 @@ class QuickLanguageScenarioTest {
             assertTrue(s.snapshot().quickCandidates.any { it.text == raw })
             s.choose("我哋去食飯啦")
             assertEquals("我哋去食飯啦", s.editor.text)
-            assertEquals(raw.drop(12), s.editor.composing)
+            assertEquals("", s.editor.composing)
             s.press(KeyboardKeyKind.Space)
-            assertEquals("我哋去食飯啦${raw.drop(12)} ", s.editor.text)
+            assertEquals("我哋去食飯啦 ", s.editor.text)
         }
     }
 
@@ -148,7 +148,7 @@ class QuickLanguageScenarioTest {
         }
     }
 
-    @Test fun confidentChineseAfterPendingLookupRetainsUnconsumedSuffix() = runTest {
+    @Test fun confidentChineseAfterPendingLookupStillWaitsForExplicitSelection() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         KeyboardScenario(englishEngine = ScenarioEnglishEngine(), scope = CoroutineScope(SupervisorJob() + dispatcher),
             lookupDispatcher = dispatcher).use { s ->
@@ -157,9 +157,9 @@ class QuickLanguageScenarioTest {
             s.start(); s.type("abcdefghijklmn")
             assertEquals("", s.editor.text); advanceUntilIdle()
             s.type("o"); advanceUntilIdle()
-            assertEquals("我哋去食飯啦", s.editor.text); assertEquals("mno", s.editor.composing)
+            assertEquals("", s.editor.text); assertEquals("abcdefghijklmno", s.editor.composing)
             s.press(KeyboardKeyKind.Space); advanceUntilIdle()
-            assertEquals("我哋去食飯啦mno ", s.editor.text)
+            assertEquals("abcdefghijklmno ", s.editor.text)
         }
     }
 

@@ -31,14 +31,15 @@
   "english_policy": {
     "candidate_source": "TRAIN-attested English model vocabulary",
     "implementation": "../QwenASR/crates/cantonese-ngram/src/cnn.rs::english_suggestions",
-    "parameter_source": "Native fitted six-feature english_acceptance.json; candidate edit costs remain heuristic",
+    "parameter_source": "Native trained 22-24-1 acceptance FFN with SCOWL dictionary evidence",
     "backspace_undo": true,
-    "qualification_report": "config/english_iteration/2026-10-20/literal-native-verification.json",
+    "qualification_report": "config/english_iteration/2026-10-24/gboard/evaluation.json",
     "production_qualified": false,
     "acceptance_source": "../QwenASR/crates/cantonese-ngram/src/english_acceptance.json",
-    "acceptance_sha256": "d97608cbbbd36bc257858760c3e70ed38269efae9efb9c16e0a236fe73947ffd",
+    "acceptance_sha256": "703e390ba0d38faa8a5f54268a557e48329377a2d98cc7a5f5cc1517cf3d3390",
     "touch_evidence_used": false,
     "primary_metric": "f0.5",
-    "known_word_policy": "Learned original-word versus replacement evidence"
+    "known_word_policy": "Learned original-word versus replacement evidence",
+    "dictionary_provenance": "config/english_iteration/2026-10-24/gboard/dictionary-provenance.json"
   }
 }

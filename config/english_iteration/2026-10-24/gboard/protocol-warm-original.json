@@ -1,0 +1,14 @@
+{
+  "objective": "Improve the current shared English autocorrection acceptance network using teacher-supported Gboard spelling examples and original TRAIN replay.",
+  "scope": "Keep shared LM, candidate generation/ranking, network architecture and runtime features unchanged. Train the existing 20-24-1 acceptance FFN with exact current-runtime features.",
+  "new_data": ["../data/teacher-agreement-subset.jsonl", "../diverse-v2/teacher-supported-training.jsonl"],
+  "teacher_semantics": "Gboard spelling support is candidate evidence, not autocorrect action labels or calibrated probabilities. Independent synthetic intended targets define supervised labels.",
+  "baseline": "Rebuild a source snapshot of the current native engine before training. Bind model, policy, source and probe hashes. Preserve existing repo changes.",
+  "partitions": "Existing prompt TRAIN/selection/evaluation split remains frozen. Split TRAIN into fit/calibration using its existing hash rule. New contextual artifact split is group-based. Original word-only examples are grouped by intended word into fit/calibration/development before fitting. No evaluation labels fit parameters or thresholds.",
+  "objective_loss": "Weighted binary cross entropy for correctness of the existing top candidate. Warm start current policy, replay original TRAIN cases and clean controls, anchor toward parent logits on replay.",
+  "grid": {"learning_rate": [0.0001, 0.0005, 0.001], "new_data_relative_weight": [0.25, 0.75, 1.5], "epochs": [20, 60]},
+  "selection": "Fit weights on fit groups. For each frozen checkpoint calibrate one global cutoff using original TRAIN calibration groups plus new calibration groups. Select by original real selection F0.5; break exact ties using new-data development F0.5, then smaller weight change. Report short-word, larger-edit and clean-control results separately. No fixed precision gate is added.",
+  "evaluation": "Freeze selected checkpoint and threshold before one evaluation comparison. Report TP, FP, FN, precision, recall, F0.5, clean changes and latency against the actual rebuilt current baseline. Do not alter cohort membership or remove missing targets.",
+  "integration": "Integrate only an improving candidate after native parity, relevant regression checks and latency verification. No publication or physical-phone installation.",
+  "limitations": ["The Gboard interface supplies no touch coordinates or keyboard-action labels.", "Candidate ranking/generation misses cannot be repaired by acceptance alone.", "Original development benchmark has historical exposure; new synthetic examples are not deployment accuracy qualification."]
+}

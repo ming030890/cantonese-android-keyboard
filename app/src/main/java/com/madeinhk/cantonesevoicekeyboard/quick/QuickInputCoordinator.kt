@@ -15,12 +15,10 @@ internal class QuickInputCoordinator(
     initialVersion: Int = 3,
     private val scope: CoroutineScope? = null,
     private val lookupDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
-    private val onLanguageError: (Throwable) -> Unit = {},
 ) : AutoCloseable {
     companion object {
         // Match the native engine's maximum so next-word candidates can be paged.
         private const val PREDICTION_LIMIT = 100
-        private const val MAX_COMPOSING_CHARACTERS = 6
     }
 
     constructor(
@@ -32,7 +30,6 @@ internal class QuickInputCoordinator(
         editor = editor,
         initialVersion = initialVersion,
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
-        onLanguageError = { Log.e("QuickInputCoordinator", "Quick language assessment failed", it) },
     )
 
     private var engine: QuickCandidateEngine? = null
@@ -44,7 +41,6 @@ internal class QuickInputCoordinator(
     private var composingText = ""
     private var candidatesForCode: String? = null
     private var candidateCodeLength = 0
-    private var languageEvidence: QuickLanguageEvidence? = null
     private val _candidates = MutableStateFlow<List<QuickCandidate>>(emptyList())
     val candidates = _candidates.asStateFlow()
     private val _joinedCandidates = MutableStateFlow<List<QuickCandidate>>(emptyList())
@@ -66,7 +62,6 @@ internal class QuickInputCoordinator(
         _candidates.value = result.chinese.mapIndexed { i, text -> QuickCandidate(text, i) }
         candidatesForCode = input.code
         candidateCodeLength = result.codeLength
-        languageEvidence = result.evidence
         displayedRequest = input.id
         _joinedCandidates.value = result.display.mapIndexed { i, text -> QuickCandidate(text, i) }
     }
@@ -103,18 +98,6 @@ internal class QuickInputCoordinator(
             accept()
             editor.commitText(char)
             return
-        }
-        if (composingText.length >= MAX_COMPOSING_CHARACTERS && candidatesForCode == composingText &&
-            languageEvidence?.shouldCommitChinese == true) {
-            // A pending/failed/uncertain LM decision never forces conversion.
-            val top = _candidates.value.firstOrNull()
-            if (top != null && top.text.codePointCount(0, top.text.length) >= MAX_COMPOSING_CHARACTERS &&
-                editor.getTextBeforeCursor(composingText.length)?.endsWith(composingText) == true) {
-                val remainder = composingText.drop(candidateCodeLength)
-                editor.commitText(top.text)
-                clearComposingState()
-                composingText = remainder
-            }
         }
         composingText += char
         editor.setComposingText(composingText)
@@ -202,7 +185,7 @@ internal class QuickInputCoordinator(
     private fun refreshCandidates() {
         val code = composingText
         val version = currentVersion
-        val before = if (onCandidateRequest != null) editor.getTextBeforeCursor(512).orEmpty() else ""
+        val before = if (onCandidateRequest != null) editor.getTextBeforeCursor(code.length + 512).orEmpty() else ""
         val after = if (onCandidateRequest != null) editor.getTextAfterCursor(256).orEmpty() else ""
         val previous = joinedInput
         if (onCandidateRequest != null && previous != null && previous.code == code && previous.version == version &&
@@ -212,7 +195,6 @@ internal class QuickInputCoordinator(
         val id = ++requestId
         onCandidateRequest?.let { request ->
             candidatesForCode = null
-            languageEvidence = null
             displayedRequest = null
             if (!closed) {
                 val input = QuickSuggestionInput(id, code, version, before.removeSuffix(code), after)
@@ -223,13 +205,11 @@ internal class QuickInputCoordinator(
         }
         _candidates.value = emptyList()
         candidatesForCode = null
-        languageEvidence = null
         if (closed) return
         val lookup = candidateLookup(code, version)
         if (scope == null) {
             val result = lookup()
             _candidates.value = result.candidates
-            languageEvidence = result.evidence
             candidateCodeLength = result.codeLength
             candidatesForCode = code
             return
@@ -247,36 +227,31 @@ internal class QuickInputCoordinator(
             val result = withContext(lookupDispatcher) { lookup() }
             if (!closed && requestId == id && composingText == code && currentVersion == version) {
                 _candidates.value = result.candidates
-                languageEvidence = result.evidence
                 candidateCodeLength = result.codeLength
                 candidatesForCode = code
             }
         }
     }
 
-    private data class LookupResult(val candidates: List<QuickCandidate>, val evidence: QuickLanguageEvidence?, val codeLength: Int)
+    private data class LookupResult(val candidates: List<QuickCandidate>, val codeLength: Int)
 
     private fun candidateLookup(code: String, version: Int, preview: Boolean = false): () -> LookupResult {
         // InputConnection includes the composing code before the cursor.
-        val before = editor.getTextBeforeCursor(512).orEmpty()
+        val before = editor.getTextBeforeCursor(code.length + 512).orEmpty()
         val left = before.removeSuffix(code)
         val right = editor.getTextAfterCursor(256).orEmpty()
-        val lookupCode = code.take(MAX_COMPOSING_CHARACTERS * 2)
+        val lookupCode = code
         return {
             runCatching {
                 backend()?.let {
                     val words = if (preview) it.previewCandidates(version, lookupCode, left, right)
                         else if (code.isEmpty()) it.predictions(left, right, PREDICTION_LIMIT)
                         else it.candidates(version, lookupCode, left, right)
-                    val top = words.firstOrNull()?.text
-                    val evidence = if (top != null && lookupCode.length >= MAX_COMPOSING_CHARACTERS &&
-                        top.codePointCount(0, top.length) >= MAX_COMPOSING_CHARACTERS)
-                        runCatching { it.languageEvidence(code, left, right, top) }.onFailure(onLanguageError).getOrNull() else null
-                    LookupResult(words, evidence, lookupCode.length)
-                } ?: LookupResult(emptyList(), null, lookupCode.length)
+                    LookupResult(words, lookupCode.length)
+                } ?: LookupResult(emptyList(), lookupCode.length)
             }.onFailure {
                 Log.e("QuickInputCoordinator", "Quick inference failed", it)
-            }.getOrDefault(LookupResult(emptyList(), null, lookupCode.length))
+            }.getOrDefault(LookupResult(emptyList(), lookupCode.length))
         }
     }
 
@@ -288,7 +263,6 @@ internal class QuickInputCoordinator(
         ++requestId
         composingText = ""
         candidatesForCode = null
-        languageEvidence = null
         candidateCodeLength = 0
         _candidates.value = emptyList()
     }

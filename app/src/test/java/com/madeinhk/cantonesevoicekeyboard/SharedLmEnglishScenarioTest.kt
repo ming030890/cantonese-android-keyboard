@@ -42,6 +42,32 @@ class SharedLmEnglishScenarioTest {
         }
     }
 
+    @Test fun gboardSupportedShortWordCorrectsAtSpaceAndUndoThroughJni() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        // Source group was held out of this acceptance fit and cutoff calibration.
+        val left = "The first three filters all refer to the Notes "
+        for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+            KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+            val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            assertEquals("tab", english.predict("qtab", floatArrayOf(), floatArrayOf(), left, "").correction)
+            KeyboardScenario(initialText=left, initialMode=mode, clipboardText=null,
+                quickEngine=quick, englishEngine=english).use { scenario ->
+                scenario.quickVersion=version
+                scenario.start(); scenario.type("qtab")
+                scenario.press(KeyboardKeyKind.Space)
+                assertEquals(left + "tab ", scenario.editor.text)
+                scenario.press(KeyboardKeyKind.Delete)
+                assertEquals(left, scenario.editor.text)
+                assertEquals("qtab", scenario.editor.composing)
+                scenario.press(KeyboardKeyKind.Space)
+                assertEquals(left + "qtab ", scenario.editor.text)
+            }
+        }
+    }
+
     @Test fun mixedRankingReceivesObservedKeysAndCandidatesBeyondTheOldEightItemCutoff() {
         var observedKeys: String? = null
         val phrases=(1..12).map { "候選$it" }
@@ -451,13 +477,15 @@ class SharedLmEnglishScenarioTest {
             for(word in listOf("wastg","bokeh","Alstom","Xentara")) {
                 assertNull("Unexpected automatic correction: $word",english.predict(word,floatArrayOf(),floatArrayOf(),"","").correction)
             }
+            // The trained rule now accepts exmaole -> example; the other
+            // uncertain/proper-name decisions retain their previous behavior.
             // The learned rule deliberately abstains on uncertain proposals.
             // Suggested alternatives remain available for explicit selection.
             for ((typed, target, automatic) in listOf(
                 Triple("hwllo", "hello", true), Triple("helo", "hello", true),
                 Triple("helllo", "hello", true), Triple("teh", "the", true),
                 Triple("lokk", "look", true), Triple("thses", "these", false),
-                Triple("exmaole", "example", false), Triple("tyoes", "types", true),
+                Triple("exmaole", "example", true), Triple("tyoes", "types", true),
                 Triple("sjre", "sure", true), Triple("varely", "barely", true),
                 Triple("engloaj", "english", true), Triple("troggee", "trigger", true),
                 Triple("mwrge", "merge", false), Triple("wrror", "error", true),

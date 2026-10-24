@@ -1,0 +1,28 @@
+{
+  "cases": 26554,
+  "sources": {
+    "real": 9728,
+    "generated": 14289,
+    "blank": 1004,
+    "gboard_word": 748,
+    "gboard_context": 785
+  },
+  "splits": {
+    "evaluation": 2042,
+    "fit": 18071,
+    "selection": 1949,
+    "calibration": 4398,
+    "development": 94
+  },
+  "removed_duplicate_inputs": {
+    "generated": 141,
+    "blank": 1044,
+    "gboard_word": 203,
+    "gboard_context": 19
+  },
+  "binding": {
+    "probe": "64e282460a3d14ab1245dc1026ac3086723952c49dea37fc8e58bb865269f4b2",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "cases": "94461d99d33f9408d7acd97e81b67cbbd9b6569eb7d79cde92f1b3c225c4a29c"
+  }
+}

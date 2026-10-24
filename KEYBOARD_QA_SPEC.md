@@ -51,14 +51,14 @@ model quality or a requirement that real models return this exact ranking.
 | ID | Given / event sequence | Expected behavior | Status / coverage |
 | --- | --- | --- | --- |
 | QK-01 | Type Quick letters `o`, then `f` | Editor composes `o`, then `of`; no committed letters yet; show candidates for the current code. Lookup receives surrounding text with the composing code removed. | Baseline; `qk01` |
-| QK-02 | Choose a displayed Quick candidate | Commit the chosen Chinese text once. Preserve unconsumed keys beyond the decoded twelve-key prefix; otherwise clear composition and request/show next-word predictions using the updated context. | Agreed; `qk02`, next-word screenshot, long-word selection scenario |
+| QK-02 | Choose a displayed Quick candidate | Commit the chosen Chinese text once. Decode the entire composition, clear it on selection and request/show next-word predictions using the updated context. There is no twelve-key prefix limit. | Agreed; `qk02`, next-word screenshot, long-word selection scenario |
 | QK-03 | Choose a displayed next-word prediction | Append that prediction once; remain out of composition; refresh next-word predictions again. | Baseline; `qk03` |
 | QK-04 | Cursor/selection callback while a code is active | Keep composing text and code candidates; do not replace them with idle predictions. | Baseline; `qk04` |
 | QK-05 | Backspace with an active code and previously committed text | Remove one composing letter per press. Preserve committed text until composition is empty; a subsequent Backspace edits committed text. | Baseline; `qk05`; deleting all input alone does not restore clipboard |
 | QK-06 | Rapid code changes while lookup is pending | Cancel superseded requests, including inside native inference. Only the latest code/version/context may publish; cancelled work must not restore older candidates or corrupt the next CNN context. | Agreed 2026-10-22; `UnifiedSuggestionScenarioTest` queued/running/native cancellation cases |
 | QK-07 | Insert a whole English next-word prediction between English words | Add the needed left/right word separators; do not add separators to ordinary Chinese Quick selection. | Baseline; `qk07`, existing coordinator tests |
 | QK-08 | Space, Enter, or switch layout while composing Quick letters | Space/Enter preserve literal letters when autocorrect is disabled or no confident English correction exists. Enabled autocorrect follows AC-01. Layout switches remain literal. Never choose Chinese implicitly at these boundaries. | D-01 amended by D-07; `qk08`, autocorrect scenarios |
-| QK-09 | Compose more than a single two-letter code | Continue phrase lookup. Following input may commit a resolved six-character Chinese phrase only with fresh, strong LM Chinese evidence. Missing, pending or uncertain evidence preserves raw composition and unconsumed suffixes. Dictionary prefix membership does not decide the language. | D-09; `QuickLanguageScenarioTest`, native real-model regression, length/cap tests |
+| QK-09 | Compose more than a single two-letter code | Continue phrase lookup for the entire input with no fixed character/key limit. Never automatically convert at a length boundary, even with confident Chinese evidence. Explicit candidate selection commits the complete phrase. | D-09; `QuickLanguageScenarioTest`, native real-model regression, length/cap tests |
 | QK-10 | Paste, press Record, or enter punctuation while a Quick code is unfinished | Commit literal letters first. Paste inserts copied text once and clears Quick composition, then refreshes predictions. Record transitions to voice; punctuation follows the literal letters. Chinese conversion requires explicit candidate selection at these boundaries. | Rule D-05 derived from confirmed literal policies; `qk10` |
 | QK-11 | Type a complete two-letter Quick code such as `df`, including in English context | Keep all Chinese code matches in their Quick ranking ahead of English suggestions. Retain literal English for explicit selection. Longer input continues bilingual ranking. | Agreed 2026-10-19; `twoLetterQuickCodeKeepsChineseBeforeEnglishInEnglishContext`, two-letter scenario screenshot |
 | QK-12 | Type while suggestions are pending | One shared composing request owns Quick and English results. Short codes filter the full next-token score table before selecting matches; dictionary-only characters follow in frequency order. Publish one completed row. Retain the previous row while its replacement is pending, but reject selections from it. Two-letter codes keep Chinese ahead of English. | Agreed 2026-10-22, supersedes the preview/full/mixed publication sequence; `UnifiedSuggestionScenarioTest`, retained-row screenshot |
@@ -519,3 +519,57 @@ The final real-service check typed `heart` through Android hardware key events:
 46 results appeared in the picker while the host EditText stayed empty. Closing
 the IME with the system hide control and tapping the editor restored the English
 keyboard, with emoji search closed. Both expanded views cleared navigation controls.
+
+
+### 2026-10-24: Gboard-supported acceptance training
+
+The native replacement FFN uses two additional learned SCOWL validity features
+and newly fitted weights. The existing candidate pool and ranking remain.
+The exact integrated source improves fixed mobile F₀.₅ 0.85258 → 0.86657,
+correct fixes 502 → 504, wrong fixes 48 → 37 and clean changes 8 → 6.
+`exmaole → example` now accepts in the empty-context native characterization.
+A new real-JNI held-out-source example `qtab → tab` verifies Space, Backspace
+restoration and rejection persistence on English and Quick3/Quick5. The matching
+screenshot is a presentation fixture; the JNI scenario establishes inference.
+Full methods, short-word recall tradeoffs, dictionary provenance and evidence:
+[GBOARD_ACCEPTANCE_TRAINING.md](GBOARD_ACCEPTANCE_TRAINING.md).
+
+### 2026-10-24: Rank both languages in previews; remove the composition limit
+
+The user reported Cantonese appearing before English for `problem`. Greedy Chinese
+preview candidates and English alternatives now pass through the same bilingual
+ranking function as full results before publication. Two-letter Quick codes retain
+Chinese priority. The current literal still appears immediately while inference is
+pending; full phrase search can refine the jointly ranked preview later.
+
+Remove the six-character/twelve-key decoder limit from both native searches and
+Kotlin bookkeeping, and remove length-triggered automatic Chinese conversion.
+Keep the complete composition until explicit selection or the existing literal
+boundary actions. This supersedes QK-09/D-09's automatic six-character conversion.
+Native regressions cover both Quick versions, `problem` in the preview and full
+row, eight-character selection with every key consumed, and root-only phrases
+beyond twelve keys. Presentation fixtures show the ranked preview and ten-character
+composition; they do not assert model quality.
+
+### 2026-10-24: Suggestion latency follow-up
+
+Keep bilingual preview/full ranking and unlimited composition semantics. Reuse
+exact bounded CNN prefix/normalized-output state to reduce repeated inference.
+Real-model parity covers 540 timing requests and the fixed 5,261-case objective.
+The 128-key composing/preview JNI guards are removed; both Quick versions accept
+129-key input. `nativeCompositionHasNoLeftover128KeyBridgeLimit` checks the native
+boundary; longer composition/selection screenshots remain unchanged.
+See `UNIFIED_SUGGESTIONS.md` for timing, memory bounds, same-policy baseline and
+verification evidence. These host checks do not establish Android phone latency.
+
+### 2026-10-24: Candidate generation before ranking
+
+Generate the English spelling pool (shared prefix/OSA trie) and complete Quick
+code lattice before any model inference. Keep original preview/beam candidate
+coverage and bilingual publication rules; no Chinese composition-length cap.
+Generation counters must report completion with zero forwards. Exact parity
+checks cover frozen English evaluation plus bilingual full/preview cohorts;
+bitwise batch-vs-scalar tests protect scoring. Full phrase ranking still uses
+multiple conditional contexts. See `UNIFIED_SUGGESTIONS.md` for final score,
+cold timings, packaged-engine evidence and the baseline-reproduced opt-in
+`exmaole` acceptance assertion mismatch.

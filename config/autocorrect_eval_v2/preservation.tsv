@@ -1,0 +1,95 @@
+domain	left	target
+slang	lol that was 	sus
+slang	I will be there 	tmr
+slang	just checking 	btw
+slang	that is a big 	bruh
+slang	I am busy 	rn
+slang	will message you 	laterzz
+slang	thanks 	thx
+slang	I honestly 	idk
+slang	cannot talk 	atm
+slang	see you 	tmrw
+slang	one moment 	brb
+slang	that looks 	fab
+slang	we should 	chill
+slang	thanks 	bestie
+slang	this is 	lowkey
+slang	feeling 	meh
+names	Can you ask 	Aoife
+names	The booking is under 	Siobhan
+names	Please email 	Kwok
+names	I am meeting 	Cheuk
+names	The parcel belongs to 	Sze
+names	I spoke to 	Ng
+names	Please send it to 	Niamh
+names	Can you call 	Xinyi
+names	Meet us in 	ShamShuiPo
+names	The address is in 	TsuenWan
+names	The order is for 	Aarav
+names	The contact is 	Zainab
+names	The meeting is with 	O'Connor
+names	The client is 	D'Angelo
+names	Please ask 	McKay
+names	I am waiting for 	Yuen
+identifiers	The branch is 	fix_typo_v2
+identifiers	Please open 	README.md
+identifiers	The config key is 	auto_correct
+identifiers	The device is 	Pixel9a
+identifiers	The ticket is 	ABC-123
+identifiers	The account is 	user42
+identifiers	The version is 	v2.1.0
+identifiers	The password hint is 	xqzv
+identifiers	The promo code is 	SAVE20
+identifiers	The filename is 	qtab.csv
+identifiers	Set the value to 	false
+identifiers	The variable is 	camelCase
+identifiers	The package is 	org.example.app
+identifiers	The command is 	kubectl
+identifiers	Use the flag 	--offline
+identifiers	The hostname is 	devbox
+urls_email	Send it to 	aoife@example.org
+urls_email	Visit 	https://example.org/a?q=teh
+urls_email	My handle is 	@cheuk_dev
+urls_email	The link is 	example.hk
+urls_email	Tag it 	#hkfood
+urls_email	Reply to 	ng+work@example.com
+dialect	My favourite 	colour
+dialect	I will ask the 	neighbour
+dialect	Please check the 	centre
+dialect	I have already 	organised
+dialect	That is my favorite 	color
+dialect	Please visit the 	center
+dialect	We already 	organized
+dialect	The car needs 	petrol
+dialect	I left it in the 	boot
+dialect	Please use the 	lift
+mixed_cantonese	我等緊 	MTR
+mixed_cantonese	今晚去 	KTV
+mixed_cantonese	幫我買杯 	latte
+mixed_cantonese	佢話 	ok
+mixed_cantonese	個friend叫 	Cheuk
+mixed_cantonese	今晚食 	phở
+mixed_cantonese	想買個 	bánh
+mixed_cantonese	放喺 	屋企
+emoji_punctuation	I said 	“okay”
+emoji_punctuation	Thanks 	🙏
+emoji_punctuation	That was 	😂
+emoji_punctuation	It says 	N/A
+emoji_punctuation	Use 	C++
+emoji_punctuation	Read 	Q&A
+real_word_preservation	Please put the book 	on
+real_word_preservation	I am staying 	in
+real_word_preservation	We can go there 	too
+real_word_preservation	Please send it 	to
+real_word_preservation	I need a cup 	of
+real_word_preservation	Can you turn it 	off
+real_word_preservation	The train goes 	by
+real_word_preservation	I need to 	buy
+real_word_preservation	She is sitting over 	there
+real_word_preservation	I picked up 	their
+real_word_preservation	The key is with 	us
+real_word_preservation	Please ask 	me
+real_word_preservation	The soup needs more 	salt
+real_word_preservation	I saw a bright 	light
+real_word_preservation	I have already 	left
+real_word_preservation	I got on the 	bus

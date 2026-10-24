@@ -37,6 +37,16 @@ fun ScenarioUnifiedCandidatesPending() = ScenarioScreen(remember { KeyboardScena
 fun ScenarioUnifiedCandidatesUpdating() = ScenarioScreen(remember { KeyboardScenarios.unifiedCandidatesUpdating() })
 
 @PreviewTest
+@Preview(name = "Bilingual problem preview", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioBilingualProblemPreview() = ScenarioScreen(remember { KeyboardScenarios.bilingualProblemPreview() })
+
+@PreviewTest
+@Preview(name = "Chinese composition beyond six characters", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioUnboundedChinesePreview() = ScenarioScreen(remember { KeyboardScenarios.unboundedChinesePreview() })
+
+@PreviewTest
 @Preview(name = "Handwriting visual alternatives", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioHandwritingAlternatives() = ScenarioScreen(remember { KeyboardScenarios.handwritingAlternatives() })
@@ -75,6 +85,11 @@ fun ScenarioUnambiguousNeighborCorrection() = ScenarioScreen(remember { Keyboard
 @Preview(name = "Known word contextual correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioSharedLmKnownWordCorrection() = ScenarioScreen(remember { KeyboardScenarios.sharedLmKnownWordCorrection() })
+
+@PreviewTest
+@Preview(name = "Contextual short word correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioGboardSupportedShortWordCorrection() = ScenarioScreen(remember { KeyboardScenarios.gboardSupportedShortWordCorrection() })
 
 @PreviewTest
 @Preview(name = "Uncertain spelling remains selectable", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)

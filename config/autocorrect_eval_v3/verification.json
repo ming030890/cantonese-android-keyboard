@@ -1,0 +1,14 @@
+{
+  "evaluation_tests": 13,
+  "removed_errors": 162,
+  "retained_errors": 46,
+  "retained_clean": 204,
+  "natural_cases_unchanged": 5169,
+  "historical_mobile_results_identical": true,
+  "whole_trial_touch_results_identical": true,
+  "all_authored_clean_ids_preserved": true,
+  "model_changed": false,
+  "scorer_changed": false,
+  "manifest_sha256": "c8d649d9675b0f9ec7f3348687711711deca46482363b70f061edc32f4d3743d",
+  "report_sha256": "25fc7e5635996d25b63133dfd68e95fca0530dc6dfca5203db02b5e7ae6c60dc"
+}

@@ -1,0 +1,78 @@
+{
+  "authored_hard": {
+    "scope": "Known acceptance replay only. No claim of disjointness from shared LM pretraining or every historical experiment.",
+    "normalization": "Unicode casefold; context whitespace collapsed; typed spelling unchanged",
+    "overlaps": {
+      "acceptance_fit_and_calibration": {
+        "rows": 22469,
+        "exact_input_overlap": 1,
+        "target_type_overlap": 50,
+        "nonempty_context_overlap": 10
+      },
+      "selection_and_development_exposure": {
+        "rows": 2043,
+        "exact_input_overlap": 0,
+        "target_type_overlap": 28,
+        "nonempty_context_overlap": 9
+      }
+    },
+    "action": "Annotate every case; retain original cohorts, never remove failures based on overlap"
+  },
+  "mobile_observed": {
+    "scope": "Known acceptance replay only. No claim of disjointness from shared LM pretraining or every historical experiment.",
+    "normalization": "Unicode casefold; context whitespace collapsed; typed spelling unchanged",
+    "overlaps": {
+      "acceptance_fit_and_calibration": {
+        "rows": 22469,
+        "exact_input_overlap": 15,
+        "target_type_overlap": 590,
+        "nonempty_context_overlap": 151
+      },
+      "selection_and_development_exposure": {
+        "rows": 2043,
+        "exact_input_overlap": 15,
+        "target_type_overlap": 455,
+        "nonempty_context_overlap": 124
+      }
+    },
+    "action": "Annotate every case; retain original cohorts, never remove failures based on overlap"
+  },
+  "mobile_source_copy": {
+    "scope": "Known acceptance replay only. No claim of disjointness from shared LM pretraining or every historical experiment.",
+    "normalization": "Unicode casefold; context whitespace collapsed; typed spelling unchanged",
+    "overlaps": {
+      "acceptance_fit_and_calibration": {
+        "rows": 22469,
+        "exact_input_overlap": 176,
+        "target_type_overlap": 1046,
+        "nonempty_context_overlap": 198
+      },
+      "selection_and_development_exposure": {
+        "rows": 2043,
+        "exact_input_overlap": 134,
+        "target_type_overlap": 850,
+        "nonempty_context_overlap": 146
+      }
+    },
+    "action": "Annotate every case; retain original cohorts, never remove failures based on overlap"
+  },
+  "real_touch_observed": {
+    "scope": "Known acceptance replay only. No claim of disjointness from shared LM pretraining or every historical experiment.",
+    "normalization": "Unicode casefold; context whitespace collapsed; typed spelling unchanged",
+    "overlaps": {
+      "acceptance_fit_and_calibration": {
+        "rows": 22469,
+        "exact_input_overlap": 708,
+        "target_type_overlap": 2556,
+        "nonempty_context_overlap": 820
+      },
+      "selection_and_development_exposure": {
+        "rows": 2043,
+        "exact_input_overlap": 452,
+        "target_type_overlap": 2244,
+        "nonempty_context_overlap": 547
+      }
+    },
+    "action": "Annotate every case; retain original cohorts, never remove failures based on overlap"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/LibreOffice/dictionaries",
+  "revision": "4fa94195b8136364dd40bf2b0366a0fe32058899",
+  "dictionary_version": "SCOWL en_US Hunspell 2020.12.07",
+  "form_source": "Existing affix-expanded v77 valid_words.txt; no frequencies or user messages",
+  "forms": 121182,
+  "source_sha256": "2678a569587c202916113dc8408180fa1676c65adadb4b492d67f124cbdd2c7b",
+  "filtered_sorted_sha256": "84d3368de928b6f03f7cafb030ebcee14b04a65b88ffe82563e33dfa93abcd73",
+  "notice_sha256": "168b4c01cb841f766a72f310b065c04d09cff46376c37a81d799593ce751c371",
+  "usage": "Two learned validity features, not a categorical preservation veto or replacement dictionary"
+}

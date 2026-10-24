@@ -1,0 +1,53 @@
+{
+  "schema": "autocorrect-eval-v3-hard",
+  "frozen_before_inference": true,
+  "cases_sha256": "ef8d8f17a1141a6794c24fc94af6b467fab1dc6c9789c76aa5244160de0f4563",
+  "trials_sha256": "9ebb1d2657baf45ebfb91e48a7b14e05d37e81ac81ec9178c35bd7e895941f06",
+  "overlap_sha256": "31d3a5ebb7a0d854394177e461ecff6d242441e43bcc4b6b6fa256a294b0e686",
+  "source_hashes": {
+    "mobile": "94461d99d33f9408d7acd97e81b67cbbd9b6569eb7d79cde92f1b3c225c4a29c",
+    "acceptance_replay": "94461d99d33f9408d7acd97e81b67cbbd9b6569eb7d79cde92f1b3c225c4a29c",
+    "touch_manifest": "b4024cefdd45fda53726f9da04a026d99e8a13f20d99450b5129a1ea0d6e4cf5",
+    "authored_scenarios": "d951c3aaf44eb73ab188da2b935ce55abb298dae2d7c2fdaefe0f9a6f5116910",
+    "authored_preservation": "f59efb746d7b442959fb7b241cee4847f1f5d8df57dce4f0f5640d76cda7d88b"
+  },
+  "scoring_code_sha256": {
+    "autocorrect_eval_v2.py": "06fbe3f810359e9caa3ca6173effcda9018069acfcab52a7bf9ca5bd23d2babc",
+    "align_mobile_targets.py": "3240a34c9cd46eab5ce4c9036ab928e499e67f7f833c003da511b71c8aeb5bb4",
+    "iterate_english_policy.py": "f5ad493abdc219fa3fd2ed9ccffd6e5e557ce6c282baf83f751e85a45f3ec63c"
+  },
+  "panels": {
+    "mobile_observed": 788,
+    "mobile_source_copy": 1254,
+    "real_touch_observed": 3127,
+    "authored_hard": 250
+  },
+  "scoring": "Case-insensitive exact intended replacement; wrong fix contributes FP and FN; missing targets stay in denominator",
+  "inference_fields": [
+    "left",
+    "typed"
+  ],
+  "no_product_population_weights": true,
+  "limits": [
+    "All natural panels have historical exposure; no fresh confirmation claim",
+    "Aalto AC events are selected events, not a natural stream; source copies are separate",
+    "Authored challenge cases specify intent, including intrinsically ambiguous real-word errors; no natural frequency claim",
+    "Current model is text-only. Touch coordinates are retained but not supplied to this scorer",
+    "Touch replay is open loop, not Android controller or input-to-display testing",
+    "Overlap audit covers available acceptance replay, not complete LM training history",
+    "User-requested redesign after v2 results were exposed; not independent confirmation",
+    "Hard authored error cohort is small and no longer covers ordinary short-word single-edit errors; historical v2 remains available"
+  ],
+  "parent_manifest_sha256": "d16b9ef44ba92fa268b5803d11efeba52b7730ae859486e6c124fa66aa359727",
+  "builder_sha256": "744a26250d449a81aea9695a4158f65f86af9a843a421e39948ac3e1dea38a6e",
+  "cohort_rule": {
+    "schema": "authored-hard-v1",
+    "retain_errors": "OSA distance >= 2 OR domain in apostrophes, word_boundaries, real_word_intent",
+    "retain_clean": "All original authored clean controls",
+    "remove_errors": "Other single-edit authored errors, irrespective of model correctness",
+    "natural_panels": "Retain every original natural observation and source-copy control",
+    "exposure": "User-requested redesign after v2 results were exposed; not independent confirmation"
+  },
+  "removed_authored": 162,
+  "removed_authored_sha256": "c009106405c2400054a56a0c72e10d264d7e1b928554ec185f36e443db57463f"
+}

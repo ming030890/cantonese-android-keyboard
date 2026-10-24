@@ -262,6 +262,17 @@ internal object KeyboardScenarios {
                     correction="you",known=true,reason="shared_lm_spelling")
             })).use { it.start();it.type("hou");it.snapshot() }
 
+    // Presentation fixture for the independently JNI-verified qtab -> tab decision.
+    fun gboardSupportedShortWordCorrection() = KeyboardScenario(
+        initialText="The first three filters all refer to the Notes ",
+        initialMode=KeyboardInputMode.AlphaNum, clipboardText=null,
+        englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
+            {1L},{_,_,_->emptyList()},{_,_,_,words,_->words},{_,_,_->
+                com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                    candidates=listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate("tab",-4.0,1.0,1,0)),
+                    correction="tab",reason="shared_lm_spelling")
+            })).use { it.start();it.type("qtab");it.snapshot() }
+
     fun uncertainSharedLmSpelling() = KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,
         clipboardText=null,
         englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
@@ -384,6 +395,37 @@ internal object KeyboardScenarios {
             s.start(); s.type("hion")
             check(s.editor.composing == "hion" && s.editor.text.isEmpty())
             check(s.snapshot().quickCandidates.map { it.text } == listOf("我們", "我今", "hion"))
+            s.snapshot()
+        }
+    }
+
+    // Presentation fixtures; native ranking and unbounded decoding have separate assertions.
+    fun bilingualProblemPreview() = joinedPreviewSnapshot("problem", listOf("problem", "problems", "people", "句倫被一"))
+    fun unboundedChinesePreview() = joinedPreviewSnapshot("hionhionhionhionhion", listOf("我們我們我們我們我們", "hionhionhionhionhion"))
+
+    private fun joinedPreviewSnapshot(typed: String, row: List<String>): KeyboardRenderState {
+        val worker = object : CoroutineDispatcher() {
+            override fun dispatch(context: kotlin.coroutines.CoroutineContext, block: Runnable) = Unit
+        }
+        val backend = object : com.madeinhk.cantonesevoicekeyboard.english.UnifiedSuggestionEngine {
+            override val supportsPreview = true
+            override fun newRequest() = object : com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest {
+                override fun cancel() = Unit
+                override fun ensureActive() = Unit
+            }
+            override fun preview(request: com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest,
+                version: Int, code: String, left: String, right: String, englishEnabled: Boolean) =
+                com.madeinhk.cantonesevoicekeyboard.english.JoinedSuggestions(
+                    chinese = row.filter { word -> word.any { it.code > 127 } }, display = row, codeLength = code.length)
+            override fun compose(request: com.madeinhk.cantonesevoicekeyboard.english.SuggestionRequest,
+                version: Int, code: String, left: String, right: String, englishEnabled: Boolean) = error("Occupied full worker")
+        }
+        return KeyboardScenario(clipboardText = null, unifiedEngine = backend,
+            scope = CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Unconfined),
+            englishDispatcher = worker, previewDispatcher = kotlinx.coroutines.Dispatchers.Unconfined).use { s ->
+            s.start(); s.type(typed)
+            check(s.editor.text.isEmpty() && s.editor.composing == typed)
+            check(s.snapshot().quickCandidates.map { it.text } == row)
             s.snapshot()
         }
     }

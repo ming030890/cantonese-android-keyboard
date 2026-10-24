@@ -1,0 +1,11 @@
+{
+  "evaluation_tests": 17,
+  "all_46_error_ids_preserved": true,
+  "clean_controls": 46,
+  "clean_domains": 17,
+  "natural_panels_unchanged": true,
+  "identical_binary_comparison_delta": 0.0,
+  "headline_score": 0.7976108686803339,
+  "manifest_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+  "score_sha256": "816462e8257e0b55bd3976d8c7c9eb7878a2546101d632c07ed6126fcc1eae38"
+}
