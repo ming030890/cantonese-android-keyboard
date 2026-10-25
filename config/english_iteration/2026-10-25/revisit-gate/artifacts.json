@@ -1,0 +1,40 @@
+{
+  "unpopulated_candidate_fields_omitted": [
+    "miss_absent_from_top8",
+    "miss_ranking_or_acceptance",
+    "target_in_top8",
+    "target_top1"
+  ],
+  "artifacts": {
+    "protocol.json": {
+      "raw_path": "build/revisit-gate-20261025/run2/protocol.json",
+      "raw_sha256": "4141cff9414736ed03759b91a71e10ac4ecb2eb9381caa2b13168474e1975127",
+      "export_sha256": "4141cff9414736ed03759b91a71e10ac4ecb2eb9381caa2b13168474e1975127"
+    },
+    "selection.json": {
+      "raw_path": "build/revisit-gate-20261025/run2/selection.json",
+      "raw_sha256": "79f78b539acabbe84bbf2f953889364b45587ad1e7ee6bae92a5734ac4c3fef6",
+      "export_sha256": "79f78b539acabbe84bbf2f953889364b45587ad1e7ee6bae92a5734ac4c3fef6"
+    },
+    "report.json": {
+      "raw_path": "build/revisit-gate-20261025/run2/report.json",
+      "raw_sha256": "f0fda6d4a6c954a799652db9c207d2414d212d31ddf10f5cfe8aea0b08ee88ca",
+      "export_sha256": "1c61ace74b48d1adafa009f4fbc73596c3bcd972b7867de5764926cd0e45b9f8"
+    },
+    "native-cost.json": {
+      "raw_path": "build/revisit-gate-20261025/timing1/report.json",
+      "raw_sha256": "9f73077d89670def2585036e804a1bd3f320ddc968d288753134e9a34986f64d",
+      "export_sha256": "9f73077d89670def2585036e804a1bd3f320ddc968d288753134e9a34986f64d"
+    },
+    "build/revisit-gate-20261025/run2/calibration.json": {
+      "sha256": "361d1ea242605411d53a8bf3eace508af1879677d925b98f8feeae67059e4cf9"
+    },
+    "build/revisit-gate-20261025/run2/native-cache.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "scripts/test_revisit_gate.py": {
+      "sha256": "01ac6ead2117c45e3f161d2956c7e25ddfa47577c9491e1ef75e91c9ec624d0e"
+    }
+  },
+  "native_request_rows_audited": 15841
+}

@@ -1,0 +1,2839 @@
+{
+  "winner": {
+    "gate": {
+      "band_width": 4.0,
+      "minimum_length": null,
+      "maximum_length": 5,
+      "dictionary_required": false
+    },
+    "family": "base + maximum length + dictionary=False",
+    "calibration": {
+      "distance": 1,
+      "metrics": {
+        "cases": 343,
+        "clean": 241,
+        "tp": 63,
+        "fp": 4,
+        "clean_changes": 1,
+        "typos": 89,
+        "unlabelled": 13,
+        "fn": 26,
+        "f05": 0.8823529411764706,
+        "precision": 0.9402985074626866,
+        "recall": 0.7078651685393258,
+        "clean_changes_per_1000": 4.149377593360996
+      },
+      "requests": {
+        "spelling": 343,
+        "revisit": 6
+      },
+      "revisions": 1,
+      "revision_lags": {
+        "1": 1
+      }
+    },
+    "selection": {
+      "distance": 1,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 2,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9183673469387755,
+        "precision": 0.9782608695652174,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 13
+      },
+      "revisions": 3,
+      "revision_lags": {
+        "1": 3
+      }
+    }
+  },
+  "pareto": [
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null,
+        "off": true
+      },
+      "family": "off",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": null
+      },
+      "family": "confidence",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "known_required": false
+      },
+      "family": "base + maximum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 5
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 89,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 33,
+          "f05": 0.9156378600823045,
+          "precision": 0.978021978021978,
+          "recall": 0.7295081967213115,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 10
+        },
+        "revisions": 2,
+        "revision_lags": {
+          "1": 2
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "dictionary_required": false
+      },
+      "family": "base + maximum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 6
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 90,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 32,
+          "f05": 0.9183673469387755,
+          "precision": 0.9782608695652174,
+          "recall": 0.7377049180327869,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 13
+        },
+        "revisions": 3,
+        "revision_lags": {
+          "1": 3
+        }
+      }
+    }
+  ],
+  "trials": [
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null
+      },
+      "family": "base",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 25
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 90,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 32,
+          "f05": 0.9183673469387755,
+          "precision": 0.9782608695652174,
+          "recall": 0.7377049180327869,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 32
+        },
+        "revisions": 3,
+        "revision_lags": {
+          "1": 3
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": null,
+        "dictionary_required": false
+      },
+      "family": "confidence + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": null,
+        "dictionary_required": false
+      },
+      "family": "confidence + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 7,
+        "maximum_length": null,
+        "known_required": false
+      },
+      "family": "base + minimum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 4
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 5,
+        "maximum_length": null,
+        "known_required": false
+      },
+      "family": "base + minimum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 3
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 10
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": 1,
+        "maximum_length": null,
+        "known_required": false
+      },
+      "family": "confidence + minimum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": 1,
+        "maximum_length": null,
+        "known_required": false
+      },
+      "family": "confidence + minimum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "known_required": true
+      },
+      "family": "base + maximum length + known=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 6,
+        "maximum_length": null,
+        "dictionary_required": false
+      },
+      "family": "base + minimum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 6
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 5,
+        "maximum_length": null,
+        "dictionary_required": false
+      },
+      "family": "base + minimum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 9
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": 1,
+        "maximum_length": null,
+        "dictionary_required": false
+      },
+      "family": "confidence + minimum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": 1,
+        "maximum_length": null,
+        "dictionary_required": false
+      },
+      "family": "confidence + minimum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": 1
+      },
+      "family": "confidence + maximum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": 5
+      },
+      "family": "confidence + maximum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": null,
+        "known_required": true
+      },
+      "family": "confidence + known=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "dictionary_required": false
+      },
+      "family": "base + maximum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "dictionary_required": false
+      },
+      "family": "base + maximum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 6
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 90,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 32,
+          "f05": 0.9183673469387755,
+          "precision": 0.9782608695652174,
+          "recall": 0.7377049180327869,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 13
+        },
+        "revisions": 3,
+        "revision_lags": {
+          "1": 3
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 1
+      },
+      "family": "base + maximum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 5
+      },
+      "family": "base + maximum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 23
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 90,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 32,
+          "f05": 0.9183673469387755,
+          "precision": 0.9782608695652174,
+          "recall": 0.7377049180327869,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 25
+        },
+        "revisions": 3,
+        "revision_lags": {
+          "1": 3
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "dictionary_required": false
+      },
+      "family": "confidence + maximum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "dictionary_required": false
+      },
+      "family": "confidence + maximum length + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": 1,
+        "maximum_length": null,
+        "dictionary_required": true
+      },
+      "family": "confidence + minimum length + dictionary=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "known_required": false
+      },
+      "family": "confidence + maximum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "known_required": false
+      },
+      "family": "confidence + maximum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "dictionary_required": true
+      },
+      "family": "confidence + maximum length + dictionary=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null,
+        "known_required": false
+      },
+      "family": "base + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 7
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 89,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 33,
+          "f05": 0.9156378600823045,
+          "precision": 0.978021978021978,
+          "recall": 0.7295081967213115,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 17
+        },
+        "revisions": 2,
+        "revision_lags": {
+          "1": 2
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null,
+        "dictionary_required": true
+      },
+      "family": "base + dictionary=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 19
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 13
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 7,
+        "maximum_length": null,
+        "dictionary_required": true
+      },
+      "family": "base + minimum length + dictionary=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 6,
+        "maximum_length": null,
+        "known_required": true
+      },
+      "family": "base + minimum length + known=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "known_required": false
+      },
+      "family": "base + maximum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "known_required": false
+      },
+      "family": "base + maximum length + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 5
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 89,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 33,
+          "f05": 0.9156378600823045,
+          "precision": 0.978021978021978,
+          "recall": 0.7295081967213115,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 10
+        },
+        "revisions": 2,
+        "revision_lags": {
+          "1": 2
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": null
+      },
+      "family": "confidence",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": null
+      },
+      "family": "confidence",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null,
+        "dictionary_required": false
+      },
+      "family": "base + dictionary=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 6
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 90,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 32,
+          "f05": 0.9183673469387755,
+          "precision": 0.9782608695652174,
+          "recall": 0.7377049180327869,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 19
+        },
+        "revisions": 3,
+        "revision_lags": {
+          "1": 3
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "known_required": true
+      },
+      "family": "confidence + maximum length + known=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null,
+        "known_required": true
+      },
+      "family": "base + known=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 18
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 15
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": 1,
+        "maximum_length": null,
+        "known_required": true
+      },
+      "family": "confidence + minimum length + known=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": null,
+        "dictionary_required": true
+      },
+      "family": "confidence + dictionary=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 1,
+        "dictionary_required": true
+      },
+      "family": "base + maximum length + dictionary=True",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 7,
+        "maximum_length": null
+      },
+      "family": "base + minimum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 4
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": 5,
+        "maximum_length": null
+      },
+      "family": "base + minimum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 4
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 13
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": 1,
+        "maximum_length": null
+      },
+      "family": "confidence + minimum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": 1,
+        "maximum_length": null
+      },
+      "family": "confidence + minimum length",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null,
+        "off": true
+      },
+      "family": "off",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.0033434347122238695,
+        "minimum_length": null,
+        "maximum_length": null,
+        "known_required": false
+      },
+      "family": "confidence + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 86,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 36,
+          "f05": 0.9071729957805907,
+          "precision": 0.9772727272727273,
+          "recall": 0.7049180327868853,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348
+        },
+        "revisions": 0,
+        "revision_lags": {}
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": null,
+        "known_required": false
+      },
+      "family": "confidence + known=False",
+      "calibration": {
+        "distance": 1,
+        "metrics": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 63,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "unlabelled": 13,
+          "fn": 26,
+          "f05": 0.8823529411764706,
+          "precision": 0.9402985074626866,
+          "recall": 0.7078651685393258,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "requests": {
+          "spelling": 343,
+          "revisit": 1
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      },
+      "selection": {
+        "distance": 1,
+        "metrics": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 87,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "unlabelled": 4,
+          "fn": 35,
+          "f05": 0.9100418410041841,
+          "precision": 0.9775280898876404,
+          "recall": 0.7131147540983607,
+          "clean_changes_per_1000": 0.0
+        },
+        "requests": {
+          "spelling": 348,
+          "revisit": 2
+        },
+        "revisions": 1,
+        "revision_lags": {
+          "1": 1
+        }
+      }
+    }
+  ],
+  "evaluation_used": false
+}

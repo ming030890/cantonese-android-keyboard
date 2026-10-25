@@ -1,0 +1,170 @@
+{
+  "source_report_sha256": "f0fda6d4a6c954a799652db9c207d2414d212d31ddf10f5cfe8aea0b08ee88ca",
+  "script_sha256": "1b106d98b3c4ff5eaffbf20192770096bd6c229714eecc59e4391827c0aee73e",
+  "scope": "Fresh native processes, no Python query cache; Mac CPU work, not phone key latency",
+  "results": [
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null,
+        "off": true
+      },
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 387,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 138,
+        "f05": 0.9123055162659123,
+        "precision": 0.9699248120300752,
+        "recall": 0.7371428571428571,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 0,
+        "sequence_calls": 0,
+        "refresh_calls": 0,
+        "median_extra_ms": 0.0,
+        "p95_extra_ms": 0.0,
+        "max_extra_ms": 0.0,
+        "mean_extra_ms": 0.0,
+        "over_40ms": 0
+      }
+    },
+    {
+      "gate": {
+        "band_width": 0.034237688298147884,
+        "minimum_length": null,
+        "maximum_length": null
+      },
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 390,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 135,
+        "f05": 0.9142053445850914,
+        "precision": 0.9701492537313433,
+        "recall": 0.7428571428571429,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 3,
+        "sequence_calls": 3,
+        "refresh_calls": 0,
+        "median_extra_ms": 3.937,
+        "p95_extra_ms": 4.5328,
+        "max_extra_ms": 4.599,
+        "mean_extra_ms": 0.0035673169171730095,
+        "over_40ms": 0
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "known_required": false
+      },
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 398,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 127,
+        "f05": 0.9191685912240185,
+        "precision": 0.9707317073170731,
+        "recall": 0.758095238095238,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 39,
+        "sequence_calls": 39,
+        "refresh_calls": 0,
+        "median_extra_ms": 4.478,
+        "p95_extra_ms": 18.0595,
+        "max_extra_ms": 27.244,
+        "mean_extra_ms": 0.09005980172689479,
+        "over_40ms": 0
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": 5,
+        "dictionary_required": false
+      },
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 396,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 129,
+        "f05": 0.9179415855354659,
+        "precision": 0.9705882352941176,
+        "recall": 0.7542857142857143,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 40,
+        "sequence_calls": 40,
+        "refresh_calls": 0,
+        "median_extra_ms": 4.454,
+        "p95_extra_ms": 18.00575,
+        "max_extra_ms": 27.203,
+        "mean_extra_ms": 0.09146786056923568,
+        "over_40ms": 0
+      }
+    },
+    {
+      "gate": {
+        "band_width": 4.0,
+        "minimum_length": null,
+        "maximum_length": null
+      },
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 401,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 124,
+        "f05": 0.9209921910886542,
+        "precision": 0.9709443099273608,
+        "recall": 0.7638095238095238,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 124,
+        "sequence_calls": 124,
+        "refresh_calls": 0,
+        "median_extra_ms": 2.731,
+        "p95_extra_ms": 17.731849999999998,
+        "max_extra_ms": 27.243,
+        "mean_extra_ms": 0.1851295171090502,
+        "over_40ms": 0
+      }
+    }
+  ]
+}

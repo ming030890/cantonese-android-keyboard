@@ -1,0 +1,21 @@
+{
+  "schema": "revisit-eligibility-cost-v1",
+  "script_sha256": "2e60c7fa7f1c645ccc8defb5eefada2de9a71e70b0ad6ad6b81d206676be8200",
+  "data_manifest_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f",
+  "source_hashes": {
+    "probe": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "policy": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a"
+  },
+  "fixed_policy": {
+    "band_width": 4.0,
+    "future_weight": 0.25,
+    "max_following": 2,
+    "revision_margin": 1.0
+  },
+  "distance": 1,
+  "parameter_values": "Confidence cutoffs from actual calibration seeds; length boundaries from observed TRAIN/calibration lengths",
+  "candidate_selection": "Calibration Pareto frontier per gate family plus baseline/off; full closed-loop selection F0.5, ties fewer revisit requests then fewer parameters",
+  "scope": "Only already-available confidence, typed length, known-word and dictionary flags; no extra inference for gating, no learned model, no invented quality-cost coefficient",
+  "production_changed": false
+}

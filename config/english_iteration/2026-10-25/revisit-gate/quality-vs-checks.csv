@@ -1,0 +1,6 @@
+gate,selected_on_development,checks,net_extra_tp,net_extra_fp,overall_f05,mean_extra_native_ms_per_word
+"{""band_width"": 4.0, ""maximum_length"": null, ""minimum_length"": null, ""off"": true}",False,0,0,0,0.8657359136504034,0.0
+"{""band_width"": 0.034237688298147884, ""maximum_length"": null, ""minimum_length"": null}",False,3,3,0,0.8663691897567964,0.0035673169171730095
+"{""band_width"": 4.0, ""known_required"": false, ""maximum_length"": 5, ""minimum_length"": null}",False,39,11,0,0.8680236053031054,0.09005980172689479
+"{""band_width"": 4.0, ""dictionary_required"": false, ""maximum_length"": 5, ""minimum_length"": null}",True,40,9,0,0.8676146034069212,0.09146786056923568
+"{""band_width"": 4.0, ""maximum_length"": null, ""minimum_length"": null}",False,124,14,0,0.8686314719246506,0.1851295171090502

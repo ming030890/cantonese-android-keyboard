@@ -5,6 +5,10 @@ earlier recommendation to retain candidates for two following words. This is a
 small-data recommendation, not proof of a universally optimal distance. Live
 revisiting remains disabled.
 
+Follow-up: [eligibility gates and the short-word check audit](REVISIT_ELIGIBILITY.md)
+quantify quality versus inference calls. Cheaper gates exist, but each loses
+some of the original control's extra correct decisions on evaluation.
+
 ## Isolated comparison
 
 The existing conservative admission and acceptance policy is held fixed:

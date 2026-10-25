@@ -1,0 +1,65 @@
+{
+  "scope": "Distance-one control, 65 checks for 2-3-character inputs, labels used only after inference",
+  "counts": {
+    "rejected:correct": 34,
+    "rejected:correct:known": 34,
+    "rejected:typo": 22,
+    "rejected:typo:known": 14,
+    "rejected:typo:target_present": 15,
+    "approved:typo": 6,
+    "approved:typo:known": 3,
+    "rejected:ambiguous": 3,
+    "rejected:ambiguous:unknown": 2,
+    "rejected:typo:unknown": 8,
+    "rejected:typo:target_missing": 7,
+    "approved:typo:unknown": 3,
+    "rejected:ambiguous:known": 1
+  },
+  "by_length": {
+    "2": {
+      "checks": 37,
+      "rejected_correct": 25,
+      "rejected_typo": 7,
+      "approved_typo": 3,
+      "rejected_ambiguous": 2
+    },
+    "3": {
+      "checks": 28,
+      "rejected_correct": 9,
+      "rejected_typo": 15,
+      "approved_typo": 3,
+      "rejected_ambiguous": 1
+    },
+    "4": {
+      "checks": 29,
+      "rejected_typo": 10,
+      "approved_typo": 4,
+      "rejected_correct": 14,
+      "rejected_ambiguous": 1
+    },
+    "5": {
+      "checks": 18,
+      "rejected_correct": 8,
+      "rejected_typo": 7,
+      "approved_typo": 3
+    },
+    "6": {
+      "checks": 4,
+      "rejected_typo": 2,
+      "rejected_correct": 1,
+      "rejected_ambiguous": 1
+    },
+    "7": {
+      "checks": 5,
+      "rejected_typo": 2,
+      "rejected_ambiguous": 2,
+      "approved_typo": 1
+    },
+    "8": {
+      "checks": 3,
+      "rejected_typo": 3
+    }
+  },
+  "source_native_cache_sha256": "b2d394c6d0d2a8aef4c1eb0b625daafd30b3ff59cf7a4d6f9d704243a64df560",
+  "source_revisions_sha256": "84f8e46b95fcc0a5b1cd01f5e63c9b5cad0dbf1d38892810117988826429203f"
+}
