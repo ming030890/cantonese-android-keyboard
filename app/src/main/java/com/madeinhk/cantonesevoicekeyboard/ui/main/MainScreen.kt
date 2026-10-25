@@ -50,6 +50,7 @@ import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingSettings
 import com.madeinhk.cantonesevoicekeyboard.PromptedHandwriting
 import com.madeinhk.cantonesevoicekeyboard.Settings as KeyboardSettingsNavKey
 import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.madeinhk.cantonesevoicekeyboard.theme.*
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.SettingsIcon
@@ -63,6 +64,12 @@ fun MainScreen(
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
 
+  var enabledLayouts by remember {
+    mutableStateOf(KeyboardSettings.getEnabledLayouts(context))
+  }
+  var quickVersion by remember {
+    mutableIntStateOf(KeyboardSettings.getQuickVersion(context))
+  }
   var permissionGranted by remember { mutableStateOf(false) }
   var keyboardEnabled by remember { mutableStateOf(false) }
   var keyboardSelected by remember { mutableStateOf(false) }
@@ -87,6 +94,8 @@ fun MainScreen(
     keyboardSelected = currentIme?.contains(context.packageName) == true
     storeDebugAudio = DebugAudioSettings.isStoreDebugAudioEnabled(context)
     storeDebugHandwriting = DebugHandwritingSettings.isStoreDebugHandwritingEnabled(context)
+    enabledLayouts = KeyboardSettings.getEnabledLayouts(context)
+    quickVersion = KeyboardSettings.getQuickVersion(context)
   }
 
   // Refresh status when window gains focus (e.g. returning from system dialog overlays like the IME picker)
@@ -123,6 +132,16 @@ fun MainScreen(
     permissionGranted = permissionGranted,
     keyboardEnabled = keyboardEnabled,
     keyboardSelected = keyboardSelected,
+    enabledLayouts = enabledLayouts,
+    onToggleLayout = { layoutId ->
+      enabledLayouts = KeyboardSettings.handleLayoutToggle(context, enabledLayouts, layoutId)
+    },
+    quickVersion = quickVersion,
+    onQuickVersionChange = { ver ->
+      KeyboardSettings.setQuickVersion(context, ver)
+      quickVersion = ver
+    },
+    inferredReason = if (!KeyboardSettings.hasUserConfiguredLayouts(context)) context.getString(R.string.setup_step_layout_inferred) else null,
     modelStatus = modelStatus,
     onGrantPermission = { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
     onEnableKeyboard = { context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) },
@@ -158,6 +177,11 @@ fun MainScreenContent(
   permissionGranted: Boolean,
   keyboardEnabled: Boolean,
   keyboardSelected: Boolean,
+  enabledLayouts: Set<String> = KeyboardSettings.DEFAULT_LAYOUTS,
+  onToggleLayout: (String) -> Unit = {},
+  quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
+  onQuickVersionChange: (Int) -> Unit = {},
+  inferredReason: String? = null,
   modelStatus: ModelDownloadStatus,
   onGrantPermission: () -> Unit,
   onEnableKeyboard: () -> Unit,
@@ -188,44 +212,45 @@ fun MainScreenContent(
     ) {
       AppHeader(onOpenSettings = onOpenSettings)
 
-      // Quick Setup Walkthrough Cards
-      SetupStepCard(
-        stepNumber = 1,
-        title = stringResource(id = R.string.setup_step_1_title),
-        description = stringResource(id = R.string.setup_step_1_desc),
-        isCompleted = permissionGranted,
-        actionText = stringResource(id = R.string.setup_step_1_action),
-        onActionClick = onGrantPermission
+      // Layout Selection (inferred by default from existing keyboards)
+      SetupLayoutStepCard(
+        title = stringResource(id = R.string.setup_step_layout_title),
+        description = stringResource(id = R.string.setup_step_layout_desc),
+        inferredReason = inferredReason,
+        enabledLayouts = enabledLayouts,
+        onToggleLayout = onToggleLayout,
+        quickVersion = quickVersion,
+        onQuickVersionChange = onQuickVersionChange
       )
 
-      SetupStepCard(
-        stepNumber = 2,
-        title = stringResource(id = R.string.setup_step_2_title),
-        description = stringResource(id = R.string.setup_step_2_desc),
-        isCompleted = keyboardEnabled,
-        actionText = stringResource(id = R.string.setup_step_2_action),
-        onActionClick = onEnableKeyboard
-      )
+      val allCompleted = keyboardEnabled && keyboardSelected && permissionGranted
 
-      SetupStepCard(
-        stepNumber = 3,
-        title = stringResource(id = R.string.setup_step_3_title),
-        description = stringResource(id = R.string.setup_step_3_desc),
-        isCompleted = keyboardSelected,
-        actionText = stringResource(id = R.string.setup_step_3_action),
-        onActionClick = onPickKeyboard
-      )
+      if (allCompleted) {
+        // Celebratory "Ready to type" card
+        KeyboardReadyCard()
+      } else {
+        // Streamlined, sequential 3-step setup flow
+        KeyboardSetupFlowCard(
+          keyboardEnabled = keyboardEnabled,
+          keyboardSelected = keyboardSelected,
+          permissionGranted = permissionGranted,
+          onEnableKeyboard = onEnableKeyboard,
+          onPickKeyboard = onPickKeyboard,
+          onGrantPermission = onGrantPermission
+        )
+      }
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      // Interactive Test Sandbox (front and center!)
+      TestSandboxCard()
+
+      // Model Sync Status (compact when ready)
+      ModelStatusCard(status = modelStatus, onRetry = onModelRetry)
 
       Spacer(modifier = Modifier.height(6.dp))
 
-      // Model Sync Status
-      ModelStatusCard(status = modelStatus, onRetry = onModelRetry)
-
-      Spacer(modifier = Modifier.height(12.dp))
-
-      // Interactive Test Sandbox
-      TestSandboxCard()
-
+      // Collapsible developer tools at bottom
       DeveloperOptionsCard(
         storeDebugAudio = storeDebugAudio,
         onStoreDebugAudioChange = onStoreDebugAudioChange,
@@ -395,6 +420,345 @@ fun MicLogo(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun SetupLayoutStepCard(
+  title: String,
+  description: String,
+  enabledLayouts: Set<String>,
+  onToggleLayout: (String) -> Unit,
+  stepNumber: Int = 1,
+  quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
+  onQuickVersionChange: (Int) -> Unit = {},
+  inferredReason: String? = null,
+  modifier: Modifier = Modifier,
+) {
+  KeyboardLayoutsSelectorCard(
+    enabledLayouts = enabledLayouts,
+    onToggleLayout = onToggleLayout,
+    quickVersion = quickVersion,
+    onQuickVersionChange = onQuickVersionChange,
+    title = title,
+    description = description,
+    inferredReason = inferredReason,
+    modifier = modifier
+  )
+}
+
+@Composable
+fun KeyboardReadyCard(
+  modifier: Modifier = Modifier,
+) {
+  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+  val primaryColor = MaterialTheme.colorScheme.primary
+
+  Card(
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(vertical = 6.dp),
+    shape = RoundedCornerShape(16.dp),
+    colors = CardDefaults.cardColors(
+      containerColor = MaterialTheme.colorScheme.surface
+    ),
+    border = BorderStroke(1.5.dp, SuccessGreen.copy(alpha = 0.5f))
+  ) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)
+    ) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Box(
+          modifier = Modifier
+            .size(42.dp)
+            .clip(CircleShape)
+            .background(SuccessGreen.copy(alpha = 0.15f))
+            .border(2.dp, SuccessGreen, CircleShape),
+          contentAlignment = Alignment.Center
+        ) {
+          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Black, fontSize = 20.sp)
+        }
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+            text = stringResource(id = R.string.setup_all_done_title),
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.Bold
+          )
+          Spacer(modifier = Modifier.height(2.dp))
+          Text(
+            text = stringResource(id = R.string.setup_all_done_desc),
+            color = textVariantColor,
+            fontSize = 12.sp,
+            lineHeight = 16.sp
+          )
+        }
+      }
+
+      Spacer(modifier = Modifier.height(12.dp))
+
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Surface(
+          shape = RoundedCornerShape(12.dp),
+          color = primaryColor.copy(alpha = 0.12f),
+          border = BorderStroke(1.dp, primaryColor.copy(alpha = 0.3f))
+        ) {
+          Text(
+            text = "🎤 " + stringResource(R.string.settings_feature_voice_typing),
+            color = primaryColor,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+          )
+        }
+
+        Surface(
+          shape = RoundedCornerShape(12.dp),
+          color = SuccessGreen.copy(alpha = 0.12f),
+          border = BorderStroke(1.dp, SuccessGreen.copy(alpha = 0.3f))
+        ) {
+          Text(
+            text = "✓ " + stringResource(R.string.setup_step_completed),
+            color = SuccessGreen,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+          )
+        }
+      }
+    }
+  }
+}
+
+@Composable
+fun KeyboardSetupFlowCard(
+  keyboardEnabled: Boolean,
+  keyboardSelected: Boolean,
+  permissionGranted: Boolean,
+  onEnableKeyboard: () -> Unit,
+  onPickKeyboard: () -> Unit,
+  onGrantPermission: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val outlineColor = MaterialTheme.colorScheme.outline
+  val primaryColor = MaterialTheme.colorScheme.primary
+
+  val completedCount = (if (keyboardEnabled) 1 else 0) +
+                       (if (keyboardSelected) 1 else 0) +
+                       (if (permissionGranted) 1 else 0)
+  val activeStepIndex = when {
+    !keyboardEnabled -> 1
+    !keyboardSelected -> 2
+    else -> 3
+  }
+
+  Card(
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(vertical = 6.dp),
+    shape = RoundedCornerShape(16.dp),
+    colors = CardDefaults.cardColors(
+      containerColor = MaterialTheme.colorScheme.surface
+    ),
+    border = BorderStroke(1.dp, outlineColor)
+  ) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)
+    ) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        Text(
+          text = stringResource(id = R.string.setup_flow_title),
+          color = MaterialTheme.colorScheme.onSurface,
+          fontSize = 16.sp,
+          fontWeight = FontWeight.Bold
+        )
+        Text(
+          text = stringResource(id = R.string.setup_step_progress, activeStepIndex, 3),
+          color = primaryColor,
+          fontSize = 13.sp,
+          fontWeight = FontWeight.Bold
+        )
+      }
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      LinearProgressIndicator(
+        progress = { completedCount / 3f },
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(4.dp)
+          .clip(RoundedCornerShape(2.dp)),
+        color = primaryColor,
+        trackColor = outlineColor.copy(alpha = 0.2f)
+      )
+
+      Spacer(modifier = Modifier.height(16.dp))
+
+      // Step 1: Turn on keyboard
+      SetupStepRow(
+        stepNumber = 1,
+        title = stringResource(id = R.string.setup_step_enable_title),
+        description = stringResource(id = R.string.setup_step_enable_desc),
+        isCompleted = keyboardEnabled,
+        isActive = !keyboardEnabled,
+        actionText = stringResource(id = R.string.setup_step_enable_action),
+        onActionClick = onEnableKeyboard
+      )
+
+      HorizontalDivider(
+        modifier = Modifier.padding(vertical = 12.dp),
+        color = outlineColor.copy(alpha = 0.2f)
+      )
+
+      // Step 2: Set as default keyboard
+      SetupStepRow(
+        stepNumber = 2,
+        title = stringResource(id = R.string.setup_step_switch_title),
+        description = if (!keyboardEnabled) stringResource(id = R.string.setup_step_locked_hint)
+                      else stringResource(id = R.string.setup_step_switch_desc),
+        isCompleted = keyboardSelected,
+        isActive = keyboardEnabled && !keyboardSelected,
+        actionText = stringResource(id = R.string.setup_step_switch_action),
+        onActionClick = onPickKeyboard
+      )
+
+      HorizontalDivider(
+        modifier = Modifier.padding(vertical = 12.dp),
+        color = outlineColor.copy(alpha = 0.2f)
+      )
+
+      // Step 3: Enable voice typing
+      SetupStepRow(
+        stepNumber = 3,
+        title = stringResource(id = R.string.setup_step_voice_title),
+        description = if (!keyboardSelected) stringResource(id = R.string.setup_step_locked_hint)
+                      else stringResource(id = R.string.setup_step_voice_desc),
+        isCompleted = permissionGranted,
+        isActive = keyboardSelected && !permissionGranted,
+        actionText = stringResource(id = R.string.setup_step_voice_action),
+        onActionClick = onGrantPermission
+      )
+    }
+  }
+}
+
+@Composable
+fun SetupStepRow(
+  stepNumber: Int,
+  title: String,
+  description: String,
+  isCompleted: Boolean,
+  isActive: Boolean,
+  actionText: String,
+  onActionClick: () -> Unit,
+  modifier: Modifier = Modifier
+) {
+  val outlineColor = MaterialTheme.colorScheme.outline
+  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+  val primaryColor = MaterialTheme.colorScheme.primary
+
+  Row(
+    modifier = modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.SpaceBetween
+  ) {
+    Row(
+      modifier = Modifier.weight(1f),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Box(
+        modifier = Modifier
+          .size(32.dp)
+          .clip(CircleShape)
+          .background(
+            when {
+              isCompleted -> SuccessGreen.copy(alpha = 0.15f)
+              isActive -> primaryColor.copy(alpha = 0.15f)
+              else -> outlineColor.copy(alpha = 0.2f)
+            }
+          )
+          .border(
+            width = 1.5.dp,
+            color = when {
+              isCompleted -> SuccessGreen
+              isActive -> primaryColor
+              else -> textVariantColor.copy(alpha = 0.3f)
+            },
+            shape = CircleShape
+          ),
+        contentAlignment = Alignment.Center
+      ) {
+        if (isCompleted) {
+          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        } else {
+          Text(
+            stepNumber.toString(),
+            color = if (isActive) primaryColor else textVariantColor.copy(alpha = 0.5f),
+            fontWeight = FontWeight.Bold,
+            fontSize = 13.sp
+          )
+        }
+      }
+
+      Spacer(modifier = Modifier.width(12.dp))
+
+      Column {
+        Text(
+          text = title,
+          color = when {
+            isActive || isCompleted -> MaterialTheme.colorScheme.onSurface
+            else -> textVariantColor.copy(alpha = 0.6f)
+          },
+          fontSize = 14.sp,
+          fontWeight = if (isActive) FontWeight.Bold else FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+          text = description,
+          color = if (isActive) textVariantColor else textVariantColor.copy(alpha = 0.5f),
+          fontSize = 11.sp,
+          lineHeight = 15.sp
+        )
+      }
+    }
+
+    Spacer(modifier = Modifier.width(8.dp))
+
+    if (isCompleted) {
+      Text(
+        text = stringResource(id = R.string.setup_step_completed),
+        color = SuccessGreen,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(horizontal = 4.dp)
+      )
+    } else if (isActive) {
+      Button(
+        onClick = onActionClick,
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+      ) {
+        Text(text = actionText, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+      }
+    }
+  }
+}
+
+@Composable
 fun SetupStepCard(
   stepNumber: Int,
   title: String,
@@ -431,7 +795,6 @@ fun SetupStepCard(
         modifier = Modifier.weight(1f),
         verticalAlignment = Alignment.CenterVertically
       ) {
-        // Circular Badge
         Box(
           modifier = Modifier
             .size(36.dp)
@@ -453,10 +816,9 @@ fun SetupStepCard(
             Text(stepNumber.toString(), color = textVariantColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
           }
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
-        // Text Area
+
         Column {
           Text(
             text = title,
@@ -473,10 +835,9 @@ fun SetupStepCard(
           )
         }
       }
-      
+
       Spacer(modifier = Modifier.width(12.dp))
-      
-      // Action button or Status indicator
+
       if (isCompleted) {
         Text(
           text = stringResource(id = R.string.setup_step_completed),
@@ -517,6 +878,45 @@ fun ModelStatusCard(
     isReady -> SuccessGreen
     isError -> AlertAmber
     else -> primaryColor
+  }
+
+  // When model is ready, show a compact and clean status indicator
+  if (isReady) {
+    Card(
+      modifier = modifier
+        .fillMaxWidth()
+        .padding(vertical = 4.dp),
+      shape = RoundedCornerShape(12.dp),
+      colors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
+      ),
+      border = BorderStroke(1.dp, SuccessGreen.copy(alpha = 0.25f))
+    ) {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Box(
+          modifier = Modifier
+            .size(24.dp)
+            .clip(CircleShape)
+            .background(SuccessGreen.copy(alpha = 0.15f)),
+          contentAlignment = Alignment.Center
+        ) {
+          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+          text = stringResource(id = R.string.model_status_compact_ready),
+          color = textVariantColor,
+          fontSize = 12.sp,
+          fontWeight = FontWeight.Medium
+        )
+      }
+    }
+    return
   }
 
   val subtitle = when (status) {
@@ -625,7 +1025,9 @@ fun DeveloperOptionsCard(
   onOpenPromptedHandwriting: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
+  var expanded by remember { mutableStateOf(false) }
   val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+  val outlineColor = MaterialTheme.colorScheme.outline
 
   Card(
     modifier = modifier
@@ -633,94 +1035,113 @@ fun DeveloperOptionsCard(
       .padding(vertical = 6.dp),
     shape = RoundedCornerShape(16.dp),
     colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface
+      containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
     ),
-    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    border = BorderStroke(1.dp, outlineColor.copy(alpha = 0.4f))
   ) {
     Column(
       modifier = Modifier.padding(16.dp)
     ) {
-      Text(
-        text = stringResource(id = R.string.developer_options_title),
-        color = MaterialTheme.colorScheme.onSurface,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold
-      )
-      Spacer(modifier = Modifier.height(12.dp))
       Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+          .fillMaxWidth()
+          .clickable { expanded = !expanded },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
-        Column(modifier = Modifier.weight(1f)) {
-          Text(
-            text = stringResource(id = R.string.developer_store_audio_title),
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold
-          )
-          Spacer(modifier = Modifier.height(2.dp))
-          Text(
-            text = stringResource(id = R.string.developer_store_audio_desc),
-            color = textVariantColor,
-            fontSize = 12.sp,
-            lineHeight = 16.sp
-          )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Switch(
-          checked = storeDebugAudio,
-          onCheckedChange = onStoreDebugAudioChange
+        Text(
+          text = stringResource(id = R.string.developer_tools_title),
+          color = textVariantColor,
+          fontSize = 13.sp,
+          fontWeight = FontWeight.SemiBold
+        )
+        Text(
+          text = if (expanded) "▲" else "▼",
+          color = textVariantColor,
+          fontSize = 12.sp
         )
       }
-      Spacer(modifier = Modifier.height(8.dp))
-      TextButton(
-        onClick = onOpenDebugAudio,
-        enabled = storeDebugAudio,
-        modifier = Modifier.align(Alignment.End)
-      ) {
-        Text(stringResource(R.string.developer_manage_audio))
-      }
-      Spacer(modifier = Modifier.height(12.dp))
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-      ) {
-        Column(modifier = Modifier.weight(1f)) {
-          Text(
-            text = stringResource(id = R.string.developer_store_handwriting_title),
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold
-          )
-          Spacer(modifier = Modifier.height(2.dp))
-          Text(
-            text = stringResource(id = R.string.developer_store_handwriting_desc),
-            color = textVariantColor,
-            fontSize = 12.sp,
-            lineHeight = 16.sp
+
+      if (expanded) {
+        Spacer(modifier = Modifier.height(14.dp))
+        HorizontalDivider(color = outlineColor.copy(alpha = 0.2f))
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+          Column(modifier = Modifier.weight(1f)) {
+            Text(
+              text = stringResource(id = R.string.developer_store_audio_title),
+              color = MaterialTheme.colorScheme.onSurface,
+              fontSize = 14.sp,
+              fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+              text = stringResource(id = R.string.developer_store_audio_desc),
+              color = textVariantColor,
+              fontSize = 12.sp,
+              lineHeight = 16.sp
+            )
+          }
+          Spacer(modifier = Modifier.width(16.dp))
+          Switch(
+            checked = storeDebugAudio,
+            onCheckedChange = onStoreDebugAudioChange
           )
         }
-        Spacer(modifier = Modifier.width(16.dp))
-        Switch(
-          checked = storeDebugHandwriting,
-          onCheckedChange = onStoreDebugHandwritingChange
-        )
-      }
-      Spacer(modifier = Modifier.height(8.dp))
-      TextButton(
-        onClick = onOpenDebugHandwriting,
-        enabled = storeDebugHandwriting,
-        modifier = Modifier.align(Alignment.End)
-      ) {
-        Text(stringResource(R.string.developer_manage_handwriting))
-      }
-      Button(
-        onClick = onOpenPromptedHandwriting,
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-      ) {
-        Text(stringResource(R.string.challenge_open))
+        Spacer(modifier = Modifier.height(8.dp))
+        TextButton(
+          onClick = onOpenDebugAudio,
+          enabled = storeDebugAudio,
+          modifier = Modifier.align(Alignment.End)
+        ) {
+          Text(stringResource(R.string.developer_manage_audio))
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+          Column(modifier = Modifier.weight(1f)) {
+            Text(
+              text = stringResource(id = R.string.developer_store_handwriting_title),
+              color = MaterialTheme.colorScheme.onSurface,
+              fontSize = 14.sp,
+              fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+              text = stringResource(id = R.string.developer_store_handwriting_desc),
+              color = textVariantColor,
+              fontSize = 12.sp,
+              lineHeight = 16.sp
+            )
+          }
+          Spacer(modifier = Modifier.width(16.dp))
+          Switch(
+            checked = storeDebugHandwriting,
+            onCheckedChange = onStoreDebugHandwritingChange
+          )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        TextButton(
+          onClick = onOpenDebugHandwriting,
+          enabled = storeDebugHandwriting,
+          modifier = Modifier.align(Alignment.End)
+        ) {
+          Text(stringResource(R.string.developer_manage_handwriting))
+        }
+        Button(
+          onClick = onOpenPromptedHandwriting,
+          modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        ) {
+          Text(stringResource(R.string.challenge_open))
+        }
       }
     }
   }

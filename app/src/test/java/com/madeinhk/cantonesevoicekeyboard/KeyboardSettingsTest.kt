@@ -46,4 +46,11 @@ class KeyboardSettingsTest {
         val resultHandwriting = KeyboardSettings.computeToggle(onlyHandwriting, KeyboardSettings.LAYOUT_HANDWRITING)
         assertEquals(setOf(KeyboardSettings.LAYOUT_HANDWRITING), resultHandwriting)
     }
+
+    @Test
+    fun autocorrectIsAlwaysOn() {
+        val dummyContext = android.content.ContextWrapper(null)
+        assertTrue(KeyboardSettings.isAutocorrectEnabled(dummyContext, KeyboardSettings.LAYOUT_ENGLISH))
+        assertTrue(KeyboardSettings.isAutocorrectEnabled(dummyContext, KeyboardSettings.LAYOUT_QUICK))
+    }
 }

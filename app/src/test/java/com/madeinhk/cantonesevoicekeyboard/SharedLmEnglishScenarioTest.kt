@@ -11,6 +11,37 @@ import org.junit.Test
 import java.io.File
 
 class SharedLmEnglishScenarioTest {
+    @Test fun noisyContextAcceptanceAndUndoAcrossLayoutsThroughJni() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        // A frozen evaluation context variant, excluded from this policy's fit/calibration.
+        val left = "Let me know if yyou "
+        for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+            KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+            val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            assertEquals("have", english.predict("heve", floatArrayOf(), floatArrayOf(), left, "").correction)
+            KeyboardScenario(initialText=left, initialMode=mode, clipboardText=null,
+                quickEngine=quick, englishEngine=english).use { scenario ->
+                scenario.quickVersion=version
+                scenario.start(); scenario.type("heve")
+                val candidates = if (mode==KeyboardInputMode.Quick) scenario.snapshot().quickCandidates
+                    else scenario.snapshot().englishCandidates
+                assertTrue(candidates.any { it.text=="have" })
+                assertEquals(KeyboardToolbarContent.Candidates, scenario.snapshot().toolbar())
+                scenario.press(KeyboardKeyKind.Space)
+                assertEquals(left + "have ", scenario.editor.text)
+                assertEquals("", scenario.editor.composing)
+                scenario.press(KeyboardKeyKind.Delete)
+                assertEquals(left, scenario.editor.text)
+                assertEquals("heve", scenario.editor.composing)
+                scenario.press(KeyboardKeyKind.Space)
+                assertEquals(left + "heve ", scenario.editor.text)
+            }
+        }
+    }
+
     @Test fun refittedAcceptanceCorrectsAtSpaceAndUndoAcrossLayoutsThroughJni() {
         val library = System.getProperty("english.native.library")
         assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
@@ -485,10 +516,12 @@ class SharedLmEnglishScenarioTest {
                 Triple("hwllo", "hello", true), Triple("helo", "hello", true),
                 Triple("helllo", "hello", true), Triple("teh", "the", true),
                 Triple("lokk", "look", true), Triple("thses", "these", false),
-                Triple("exmaole", "example", true), Triple("tyoes", "types", true),
+                // Both the saved starting policy and this fit abstain on tyoes/wrror.
+                Triple("exmaole", "example", true), Triple("tyoes", "types", false),
                 Triple("sjre", "sure", true), Triple("varely", "barely", true),
                 Triple("engloaj", "english", true), Triple("troggee", "trigger", true),
-                Triple("mwrge", "merge", false), Triple("wrror", "error", true),
+                // The accepted fit now fixes mwrge as well as offering merge.
+                Triple("mwrge", "merge", true), Triple("wrror", "error", false),
                 Triple("inthe", "in the", false))) {
                 val prediction = english.predict(typed, floatArrayOf(), floatArrayOf(), "", "")
                 assertTrue("$typed still offers $target", prediction.candidates.any { it.word.equals(target, true) })
@@ -539,13 +572,14 @@ class SharedLmEnglishScenarioTest {
                 s.type("thses");s.press(KeyboardKeyKind.Space)
                 assertEquals("keyboard barely look thses ",s.editor.text)
                 s.type("exmaole");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look thses exmaole ",s.editor.text)
+                // This contextual correction also occurs with the saved starting policy.
+                assertEquals("keyboard barely look thses example ",s.editor.text)
                 s.type("mwrge");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look thses exmaole merge ",s.editor.text)
+                assertEquals("keyboard barely look thses example merge ",s.editor.text)
                 s.type("wrror");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look thses exmaole merge error ",s.editor.text)
+                assertEquals("keyboard barely look thses example merge error ",s.editor.text)
                 s.type("youbsupport");s.press(KeyboardKeyKind.Space)
-                assertEquals("keyboard barely look thses exmaole merge error you support ",s.editor.text)
+                assertEquals("keyboard barely look thses example merge error you support ",s.editor.text)
             }
             KeyboardScenario(initialMode=KeyboardInputMode.Quick,quickEngine=quick,englishEngine=english).use { s ->
                 s.start();s.type("df")

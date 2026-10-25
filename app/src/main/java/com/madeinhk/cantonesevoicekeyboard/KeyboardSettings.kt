@@ -21,17 +21,17 @@ object KeyboardSettings {
     const val DEFAULT_QUICK_VERSION = QUICK_VERSION_3
 
     fun isAutocorrectEnabled(context: Context, layout: String): Boolean {
-        return layout in setOf(LAYOUT_ENGLISH, LAYOUT_QUICK) && context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getBoolean("autocorrect_$layout", true)
+        // Autocorrect is always on
+        return true
     }
 
     fun setAutocorrectEnabled(context: Context, layout: String, enabled: Boolean) {
-        require(layout == LAYOUT_ENGLISH || layout == LAYOUT_QUICK)
+        // Autocorrect is always on; setting is preserved for API compatibility
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
-            .putBoolean("autocorrect_$layout", enabled).apply()
+            .putBoolean("autocorrect_$layout", true).apply()
     }
 
-    val DEFAULT_LAYOUTS = setOf(LAYOUT_ENGLISH, LAYOUT_QUICK, LAYOUT_HANDWRITING)
+    val DEFAULT_LAYOUTS = setOf(LAYOUT_QUICK, LAYOUT_ENGLISH, LAYOUT_HANDWRITING)
 
     private val _enabledLayoutsFlow = MutableStateFlow<Set<String>>(DEFAULT_LAYOUTS)
     val enabledLayoutsFlow: StateFlow<Set<String>> = _enabledLayoutsFlow.asStateFlow()
@@ -62,7 +62,16 @@ object KeyboardSettings {
     fun getEnabledLayouts(context: Context): Set<String> {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val set = prefs.getStringSet(KEY_ENABLED_LAYOUTS, null)
-        return if (set.isNullOrEmpty()) DEFAULT_LAYOUTS else set
+        if (!set.isNullOrEmpty()) return set
+        val inferred = KeyboardLayoutInference.inferFromSystem(context)
+        val safeLayouts = if (inferred.isEmpty()) DEFAULT_LAYOUTS else inferred
+        prefs.edit().putStringSet(KEY_ENABLED_LAYOUTS, safeLayouts).apply()
+        return safeLayouts
+    }
+
+    fun hasUserConfiguredLayouts(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.contains(KEY_ENABLED_LAYOUTS)
     }
 
     fun setEnabledLayouts(context: Context, layouts: Set<String>) {
@@ -96,6 +105,18 @@ object KeyboardSettings {
         val updated = computeToggle(current, layoutId)
         setEnabledLayouts(context, updated)
         return updated
+    }
+
+    fun handleLayoutToggle(context: Context, currentLayouts: Set<String>, layoutId: String): Set<String> {
+        if (currentLayouts.contains(layoutId) && currentLayouts.size <= 1) {
+            android.widget.Toast.makeText(
+                context,
+                context.getString(R.string.settings_at_least_one_layout),
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            return currentLayouts
+        }
+        return toggleLayout(context, layoutId)
     }
 
     fun isMultilingualTypingEnabled(context: Context): Boolean =

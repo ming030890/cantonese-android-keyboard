@@ -1,0 +1,647 @@
+{
+  "protocol": {
+    "schema": "revisit-distance-ablation-v1",
+    "script_sha256": "6cbc2c578e4812fda74846cb4c7540c976de2df57a3c6c9b704c3ccac0982545",
+    "data_manifest_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f",
+    "fixed_policy": {
+      "band_width": 4.0,
+      "future_weight": 0.25,
+      "max_following": 2,
+      "revision_margin": 1.0
+    },
+    "fixed_pending_capacity": 2,
+    "distances": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      null
+    ],
+    "source_hashes": {
+      "probe": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+      "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+      "policy": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a"
+    },
+    "selection": "Existing real recorded selection split; max F0.5 then fewer sequence requests then shorter distance",
+    "frozen_diagnostics": [
+      1,
+      2,
+      3,
+      null
+    ],
+    "scope": "Only distance changes. No synthetic future. Mobile/hard frozen decisions unchanged. Unbounded still respects sentence/cursor scope and two pending candidates.",
+    "production_changed": false
+  },
+  "selected_distance": 1,
+  "selection": [
+    {
+      "distance": 1,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 2,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9183673469387755,
+        "precision": 0.9782608695652174,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 32
+      },
+      "revisions": 3,
+      "revision_lags": {
+        "1": 3
+      }
+    },
+    {
+      "distance": 2,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 2,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9183673469387755,
+        "precision": 0.9782608695652174,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 56
+      },
+      "revisions": 3,
+      "revision_lags": {
+        "1": 3
+      }
+    },
+    {
+      "distance": 3,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 75
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 4,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 88
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 5,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 95
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 6,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 100
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 7,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 103
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 8,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 104
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 9,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 104
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": null,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 104
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    }
+  ],
+  "baseline": {
+    "score": 0.8657359136504034,
+    "panels": {
+      "historical_full_mobile": {
+        "cases": 2042,
+        "typos": 744,
+        "tp": 512,
+        "fp": 45,
+        "clean_changes": 7,
+        "clean": 1298,
+        "fn": 232,
+        "unlabelled": 0,
+        "f05": 0.8613728129205922,
+        "precision": 0.9192100538599641,
+        "recall": 0.6881720430107527,
+        "clean_changes_per_1000": 5.3929121725731894
+      },
+      "real_touch_observed": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 387,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 138,
+        "f05": 0.9123055162659123,
+        "precision": 0.9699248120300752,
+        "recall": 0.7371428571428571,
+        "clean_changes_per_1000": 0.0
+      },
+      "authored_hard": {
+        "cases": 92,
+        "clean": 46,
+        "tp": 28,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 46,
+        "fn": 18,
+        "unlabelled": 0,
+        "f05": 0.8235294117647058,
+        "precision": 0.9032258064516129,
+        "recall": 0.6086956521739131,
+        "clean_changes_per_1000": 0.0
+      }
+    }
+  },
+  "evaluation": [
+    {
+      "distance": 1,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 401,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 124,
+        "f05": 0.9209921910886542,
+        "precision": 0.9709443099273608,
+        "recall": 0.7638095238095238,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 3127,
+        "revisit": 124
+      },
+      "revisions": 14,
+      "revision_lags": {
+        "1": 14
+      },
+      "overall": {
+        "score": 0.8686314719246506,
+        "panels": {
+          "historical_full_mobile": {
+            "cases": 2042,
+            "typos": 744,
+            "tp": 512,
+            "fp": 45,
+            "clean_changes": 7,
+            "clean": 1298,
+            "fn": 232,
+            "unlabelled": 0,
+            "f05": 0.8613728129205922,
+            "precision": 0.9192100538599641,
+            "recall": 0.6881720430107527,
+            "clean_changes_per_1000": 5.3929121725731894
+          },
+          "real_touch_observed": {
+            "cases": 3127,
+            "clean": 2556,
+            "tp": 401,
+            "fp": 12,
+            "clean_changes": 0,
+            "unlabelled": 46,
+            "typos": 525,
+            "fn": 124,
+            "f05": 0.9209921910886542,
+            "precision": 0.9709443099273608,
+            "recall": 0.7638095238095238,
+            "clean_changes_per_1000": 0.0
+          },
+          "authored_hard": {
+            "cases": 92,
+            "clean": 46,
+            "tp": 28,
+            "fp": 3,
+            "clean_changes": 0,
+            "typos": 46,
+            "fn": 18,
+            "unlabelled": 0,
+            "f05": 0.8235294117647058,
+            "precision": 0.9032258064516129,
+            "recall": 0.6086956521739131,
+            "clean_changes_per_1000": 0.0
+          }
+        }
+      },
+      "delta_vs_no_revisit": 0.0028955582742472563
+    },
+    {
+      "distance": 2,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 402,
+        "fp": 13,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 123,
+        "f05": 0.919908466819222,
+        "precision": 0.9686746987951808,
+        "recall": 0.7657142857142857,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 3127,
+        "revisit": 200
+      },
+      "revisions": 16,
+      "revision_lags": {
+        "1": 14,
+        "2": 2
+      },
+      "overall": {
+        "score": 0.8682702305015066,
+        "panels": {
+          "historical_full_mobile": {
+            "cases": 2042,
+            "typos": 744,
+            "tp": 512,
+            "fp": 45,
+            "clean_changes": 7,
+            "clean": 1298,
+            "fn": 232,
+            "unlabelled": 0,
+            "f05": 0.8613728129205922,
+            "precision": 0.9192100538599641,
+            "recall": 0.6881720430107527,
+            "clean_changes_per_1000": 5.3929121725731894
+          },
+          "real_touch_observed": {
+            "cases": 3127,
+            "clean": 2556,
+            "tp": 402,
+            "fp": 13,
+            "clean_changes": 0,
+            "unlabelled": 46,
+            "typos": 525,
+            "fn": 123,
+            "f05": 0.919908466819222,
+            "precision": 0.9686746987951808,
+            "recall": 0.7657142857142857,
+            "clean_changes_per_1000": 0.0
+          },
+          "authored_hard": {
+            "cases": 92,
+            "clean": 46,
+            "tp": 28,
+            "fp": 3,
+            "clean_changes": 0,
+            "typos": 46,
+            "fn": 18,
+            "unlabelled": 0,
+            "f05": 0.8235294117647058,
+            "precision": 0.9032258064516129,
+            "recall": 0.6086956521739131,
+            "clean_changes_per_1000": 0.0
+          }
+        }
+      },
+      "delta_vs_no_revisit": 0.00253431685110328
+    },
+    {
+      "distance": 3,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 402,
+        "fp": 13,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 123,
+        "f05": 0.919908466819222,
+        "precision": 0.9686746987951808,
+        "recall": 0.7657142857142857,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 3127,
+        "revisit": 254
+      },
+      "revisions": 16,
+      "revision_lags": {
+        "1": 14,
+        "2": 2
+      },
+      "overall": {
+        "score": 0.8682702305015066,
+        "panels": {
+          "historical_full_mobile": {
+            "cases": 2042,
+            "typos": 744,
+            "tp": 512,
+            "fp": 45,
+            "clean_changes": 7,
+            "clean": 1298,
+            "fn": 232,
+            "unlabelled": 0,
+            "f05": 0.8613728129205922,
+            "precision": 0.9192100538599641,
+            "recall": 0.6881720430107527,
+            "clean_changes_per_1000": 5.3929121725731894
+          },
+          "real_touch_observed": {
+            "cases": 3127,
+            "clean": 2556,
+            "tp": 402,
+            "fp": 13,
+            "clean_changes": 0,
+            "unlabelled": 46,
+            "typos": 525,
+            "fn": 123,
+            "f05": 0.919908466819222,
+            "precision": 0.9686746987951808,
+            "recall": 0.7657142857142857,
+            "clean_changes_per_1000": 0.0
+          },
+          "authored_hard": {
+            "cases": 92,
+            "clean": 46,
+            "tp": 28,
+            "fp": 3,
+            "clean_changes": 0,
+            "typos": 46,
+            "fn": 18,
+            "unlabelled": 0,
+            "f05": 0.8235294117647058,
+            "precision": 0.9032258064516129,
+            "recall": 0.6086956521739131,
+            "clean_changes_per_1000": 0.0
+          }
+        }
+      },
+      "delta_vs_no_revisit": 0.00253431685110328
+    },
+    {
+      "distance": null,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 403,
+        "fp": 13,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 122,
+        "f05": 0.9205116491548653,
+        "precision": 0.96875,
+        "recall": 0.7676190476190476,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 3127,
+        "revisit": 343
+      },
+      "revisions": 17,
+      "revision_lags": {
+        "8": 1,
+        "1": 14,
+        "2": 2
+      },
+      "overall": {
+        "score": 0.8684712912800544,
+        "panels": {
+          "historical_full_mobile": {
+            "cases": 2042,
+            "typos": 744,
+            "tp": 512,
+            "fp": 45,
+            "clean_changes": 7,
+            "clean": 1298,
+            "fn": 232,
+            "unlabelled": 0,
+            "f05": 0.8613728129205922,
+            "precision": 0.9192100538599641,
+            "recall": 0.6881720430107527,
+            "clean_changes_per_1000": 5.3929121725731894
+          },
+          "real_touch_observed": {
+            "cases": 3127,
+            "clean": 2556,
+            "tp": 403,
+            "fp": 13,
+            "clean_changes": 0,
+            "unlabelled": 46,
+            "typos": 525,
+            "fn": 122,
+            "f05": 0.9205116491548653,
+            "precision": 0.96875,
+            "recall": 0.7676190476190476,
+            "clean_changes_per_1000": 0.0
+          },
+          "authored_hard": {
+            "cases": 92,
+            "clean": 46,
+            "tp": 28,
+            "fp": 3,
+            "clean_changes": 0,
+            "typos": 46,
+            "fn": 18,
+            "unlabelled": 0,
+            "f05": 0.8235294117647058,
+            "precision": 0.9032258064516129,
+            "recall": 0.6086956521739131,
+            "clean_changes_per_1000": 0.0
+          }
+        }
+      },
+      "delta_vs_no_revisit": 0.002735377629651037
+    }
+  ],
+  "production_changed": false
+}

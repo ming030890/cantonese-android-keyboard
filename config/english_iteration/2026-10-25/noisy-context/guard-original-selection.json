@@ -1,0 +1,453 @@
+{
+  "trials": [
+    {
+      "id": "parent",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 461,
+          "wrong": 33,
+          "missed": 239,
+          "false_changes": 2,
+          "precision": 0.9331983805668016,
+          "recall": 0.6585714285714286,
+          "f05": 0.8613602391629297
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1239,
+          "wrong": 95,
+          "missed": 1089,
+          "false_changes": 5,
+          "precision": 0.9287856071964018,
+          "recall": 0.5322164948453608,
+          "f05": 0.8083246346555324
+        },
+        "selection_mean_f05": 0.8348424369092311,
+        "preservation_pass": true
+      },
+      "squared_weight_change": 0.0
+    },
+    {
+      "id": "lr0.0001-noise0.25-e20",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 461,
+          "wrong": 34,
+          "missed": 239,
+          "false_changes": 2,
+          "precision": 0.9313131313131313,
+          "recall": 0.6585714285714286,
+          "f05": 0.8600746268656716
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1246,
+          "wrong": 97,
+          "missed": 1082,
+          "false_changes": 6,
+          "precision": 0.9277736411020104,
+          "recall": 0.5352233676975945,
+          "f05": 0.8090909090909091
+        },
+        "selection_mean_f05": 0.8345827679782903,
+        "preservation_pass": true
+      },
+      "squared_weight_change": 0.023849812412669782
+    },
+    {
+      "id": "lr0.0001-noise0.25-e60",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 461,
+          "wrong": 34,
+          "missed": 239,
+          "false_changes": 2,
+          "precision": 0.9313131313131313,
+          "recall": 0.6585714285714286,
+          "f05": 0.8600746268656716
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1251,
+          "wrong": 98,
+          "missed": 1077,
+          "false_changes": 6,
+          "precision": 0.927353595255745,
+          "recall": 0.5373711340206185,
+          "f05": 0.8098135680994304
+        },
+        "selection_mean_f05": 0.834944097482551,
+        "preservation_pass": true
+      },
+      "squared_weight_change": 0.09586838802942364
+    },
+    {
+      "id": "lr0.0001-noise0.5-e20",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 459,
+          "wrong": 33,
+          "missed": 241,
+          "false_changes": 2,
+          "precision": 0.9329268292682927,
+          "recall": 0.6557142857142857,
+          "f05": 0.8601949025487257
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1245,
+          "wrong": 96,
+          "missed": 1083,
+          "false_changes": 6,
+          "precision": 0.9284116331096197,
+          "recall": 0.5347938144329897,
+          "f05": 0.8092823712948518
+        },
+        "selection_mean_f05": 0.8347386369217887,
+        "preservation_pass": true
+      },
+      "squared_weight_change": 0.028079756309856294
+    },
+    {
+      "id": "lr0.0001-noise0.5-e60",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 466,
+          "wrong": 35,
+          "missed": 234,
+          "false_changes": 2,
+          "precision": 0.9301397205588823,
+          "recall": 0.6657142857142857,
+          "f05": 0.8616863905325444
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1264,
+          "wrong": 108,
+          "missed": 1064,
+          "false_changes": 8,
+          "precision": 0.9212827988338192,
+          "recall": 0.5429553264604811,
+          "f05": 0.8085977482088025
+        },
+        "selection_mean_f05": 0.8351420693706735,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.11430810080356785
+    },
+    {
+      "id": "lr0.0001-noise1.0-e20",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 492,
+          "wrong": 47,
+          "missed": 208,
+          "false_changes": 4,
+          "precision": 0.9128014842300557,
+          "recall": 0.7028571428571428,
+          "f05": 0.8613445378151261
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1373,
+          "wrong": 166,
+          "missed": 955,
+          "false_changes": 8,
+          "precision": 0.8921377517868746,
+          "recall": 0.5897766323024055,
+          "f05": 0.8091702027345592
+        },
+        "selection_mean_f05": 0.8352573702748427,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.040377383389324416
+    },
+    {
+      "id": "lr0.0001-noise1.0-e60",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 494,
+          "wrong": 49,
+          "missed": 206,
+          "false_changes": 4,
+          "precision": 0.9097605893186004,
+          "recall": 0.7057142857142857,
+          "f05": 0.8600278551532033
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1385,
+          "wrong": 171,
+          "missed": 943,
+          "false_changes": 10,
+          "precision": 0.8901028277634961,
+          "recall": 0.5949312714776632,
+          "f05": 0.8097521047708138
+        },
+        "selection_mean_f05": 0.8348899799620086,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.16012071052192137
+    },
+    {
+      "id": "lr0.0003-noise0.25-e20",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 460,
+          "wrong": 34,
+          "missed": 240,
+          "false_changes": 2,
+          "precision": 0.9311740890688259,
+          "recall": 0.6571428571428571,
+          "f05": 0.85949177877429
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1249,
+          "wrong": 98,
+          "missed": 1079,
+          "false_changes": 6,
+          "precision": 0.9272457312546399,
+          "recall": 0.5365120274914089,
+          "f05": 0.8093571798859512
+        },
+        "selection_mean_f05": 0.8344244793301205,
+        "preservation_pass": true
+      },
+      "squared_weight_change": 0.09574477185213129
+    },
+    {
+      "id": "lr0.0003-noise0.25-e60",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 460,
+          "wrong": 35,
+          "missed": 240,
+          "false_changes": 2,
+          "precision": 0.9292929292929293,
+          "recall": 0.6571428571428571,
+          "f05": 0.8582089552238806
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1251,
+          "wrong": 100,
+          "missed": 1077,
+          "false_changes": 7,
+          "precision": 0.9259807549962991,
+          "recall": 0.5373711340206185,
+          "f05": 0.8089756854630109
+        },
+        "selection_mean_f05": 0.8335923203434458,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.4398387054040088
+    },
+    {
+      "id": "lr0.0003-noise0.5-e20",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 465,
+          "wrong": 35,
+          "missed": 235,
+          "false_changes": 2,
+          "precision": 0.93,
+          "recall": 0.6642857142857143,
+          "f05": 0.8611111111111112
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1266,
+          "wrong": 109,
+          "missed": 1062,
+          "false_changes": 8,
+          "precision": 0.9207272727272727,
+          "recall": 0.5438144329896907,
+          "f05": 0.8086356668369954
+        },
+        "selection_mean_f05": 0.8348733889740533,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.11409255435961363
+    },
+    {
+      "id": "lr0.0003-noise0.5-e60",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 466,
+          "wrong": 36,
+          "missed": 234,
+          "false_changes": 3,
+          "precision": 0.9282868525896414,
+          "recall": 0.6657142857142857,
+          "f05": 0.8604135893648449
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1267,
+          "wrong": 109,
+          "missed": 1061,
+          "false_changes": 8,
+          "precision": 0.9207848837209303,
+          "recall": 0.5442439862542955,
+          "f05": 0.8088610827374872
+        },
+        "selection_mean_f05": 0.8346373360511661,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.5145163615958626
+    },
+    {
+      "id": "lr0.0003-noise1.0-e20",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 494,
+          "wrong": 49,
+          "missed": 206,
+          "false_changes": 4,
+          "precision": 0.9097605893186004,
+          "recall": 0.7057142857142857,
+          "f05": 0.8600278551532033
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1383,
+          "wrong": 170,
+          "missed": 945,
+          "false_changes": 10,
+          "precision": 0.8905344494526722,
+          "recall": 0.5940721649484536,
+          "f05": 0.8097189695550351
+        },
+        "selection_mean_f05": 0.8348734123541193,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.16312120542242567
+    },
+    {
+      "id": "lr0.0003-noise1.0-e60",
+      "metrics": {
+        "original": {
+          "cases": 1949,
+          "typos": 700,
+          "controls": 1249,
+          "correct": 468,
+          "wrong": 37,
+          "missed": 232,
+          "false_changes": 3,
+          "precision": 0.9267326732673268,
+          "recall": 0.6685714285714286,
+          "f05": 0.8602941176470589
+        },
+        "noisy": {
+          "cases": 6416,
+          "typos": 2328,
+          "controls": 4088,
+          "correct": 1280,
+          "wrong": 110,
+          "missed": 1048,
+          "false_changes": 8,
+          "precision": 0.920863309352518,
+          "recall": 0.5498281786941581,
+          "f05": 0.8113590263691683
+        },
+        "selection_mean_f05": 0.8358265720081136,
+        "preservation_pass": false
+      },
+      "squared_weight_change": 0.6603941098014379
+    }
+  ],
+  "winner": {
+    "id": "parent",
+    "metrics": {
+      "original": {
+        "cases": 1949,
+        "typos": 700,
+        "controls": 1249,
+        "correct": 461,
+        "wrong": 33,
+        "missed": 239,
+        "false_changes": 2,
+        "precision": 0.9331983805668016,
+        "recall": 0.6585714285714286,
+        "f05": 0.8613602391629297
+      },
+      "noisy": {
+        "cases": 6416,
+        "typos": 2328,
+        "controls": 4088,
+        "correct": 1239,
+        "wrong": 95,
+        "missed": 1089,
+        "false_changes": 5,
+        "precision": 0.9287856071964018,
+        "recall": 0.5322164948453608,
+        "f05": 0.8083246346555324
+      },
+      "selection_mean_f05": 0.8348424369092311,
+      "preservation_pass": true
+    },
+    "squared_weight_change": 0.0
+  },
+  "evaluation_used": false
+}

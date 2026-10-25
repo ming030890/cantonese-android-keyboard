@@ -1,0 +1,28 @@
+{
+  "verify_keyboard": true,
+  "actual_jni_enabled": true,
+  "unit_scenario_tests": 249,
+  "unit_scenario_failures": 0,
+  "unit_scenario_skipped": 0,
+  "native_tests": 38,
+  "native_failures": 0,
+  "native_ignored": 0,
+  "python_tests": 13,
+  "screenshot_baseline": "ScenarioNoisyContextCorrection",
+  "screenshot_inspected": true,
+  "screenshot_verification": true,
+  "android_test_compilation": true,
+  "debug_assembly": true,
+  "phone_installation": false,
+  "source_commits": {
+    "keyboard": "607ac9cad36ea5601fb6659ee52afb8f385fe011",
+    "native": "da34c100e38a8bc561ae21b361fc1673cd002e50"
+  },
+  "script_hashes": {
+    "scripts/experiment_noisy_acceptance.py": "b5b8caf0b59ba195e3e92b9bc3a62cddd5304ef047bc75ec89e3a6cf0adcfef5",
+    "scripts/audit_noisy_context.py": "d26d27d6bb5acb0b25978d47115957f6967079154c3a3ae441b741e62c69b134",
+    "scripts/test_experiment_noisy_acceptance.py": "afd57e6845ddec7b5c78b8bdbd03a108c79609489bbad9eebed0699c7b87c326"
+  },
+  "policy_sha256": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+  "logs": "build/noisy-acceptance-20261025/{verify-keyboard-final,native-tests-final}.log"
+}

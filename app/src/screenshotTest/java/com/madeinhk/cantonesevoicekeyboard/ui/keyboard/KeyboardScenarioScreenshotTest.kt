@@ -92,6 +92,11 @@ fun ScenarioSharedLmKnownWordCorrection() = ScenarioScreen(remember { KeyboardSc
 fun ScenarioGboardSupportedShortWordCorrection() = ScenarioScreen(remember { KeyboardScenarios.gboardSupportedShortWordCorrection() })
 
 @PreviewTest
+@Preview(name = "Correction after prior typo", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioNoisyContextCorrection() = ScenarioScreen(remember { KeyboardScenarios.noisyContextCorrection() })
+
+@PreviewTest
 @Preview(name = "Uncertain spelling remains selectable", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioUncertainSharedLmSpelling() = ScenarioScreen(remember { KeyboardScenarios.uncertainSharedLmSpelling() })

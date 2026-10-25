@@ -1,0 +1,24 @@
+{
+  "schema": "adjacent-revision-stress-v1",
+  "parent_report_sha256": "2e24f0cda984113f60de41648a1b556330cdd7dfc17f99e53efbd1c35ca4b1e4",
+  "pairs_sha256": "cf4d497c3906158e4712b9825058975c1951e97c31f7a9c672f71d613e411529",
+  "script_sha256": "b0220d43afca9ad3d897079bc2b9d87d62a8fd8136a72db0a2ef310505b1b2c8",
+  "replay_sha256": "fa98f566eb6e7bcb6e4f8ce66f73e7b3ff84790305e7f19d83a9a20ce030d047",
+  "cases": 1000,
+  "selection": "Development focal seed exists, input alignment and ASCII prefix, deterministic hash order, max two per prompt; no outcome selection",
+  "limitation": "Enriched uncertain-focal cohort with synthetic prior typo and clean prompt future. Not recorded whole trajectories or population prevalence. No parameter tuning.",
+  "rules": {
+    "incumbent": {
+      "band_width": 4.0,
+      "future_weight": 0.25,
+      "max_following": 2,
+      "revision_margin": 1.0
+    },
+    "retuned": {
+      "band_width": 1.0,
+      "future_weight": 0.5,
+      "max_following": 2,
+      "revision_margin": 2.0
+    }
+  }
+}

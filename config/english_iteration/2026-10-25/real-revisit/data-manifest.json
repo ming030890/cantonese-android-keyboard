@@ -1,0 +1,64 @@
+{
+  "schema": "real-revisit-streams-v1",
+  "script_sha256": "baefe026ca94e463acafa3b5f8a1bec5adf6d28022772c0df81be8baa26e0151",
+  "source_hashes": {
+    "velocitap_archive": "76d9cc798b5694686333da8baec46ce025174068bbfef909a31fe01e67dcdf5d",
+    "google_manifest": "9d65e23b6bdb51e704f95563a6acc3173197f35d4190246c130a49be9808367d"
+  },
+  "cases_sha256": "a8d9096487700ae707929a788aabaa91ff48fa0e97131e5aed3d7bf9bb009398",
+  "trials_sha256": "d782fa9f160dd517696a44e73dbdf99c15342b212a176f6f6ecb614534cadb38",
+  "counts": {
+    "velocitap_source_trials": 405,
+    "velocitap_excluded_participant_prompt_intersection": 270,
+    "google_source_taps": 43735,
+    "google_deleted_taps_not_reconstructable": 2598,
+    "google_phrase_source_trials": 1280,
+    "google_excluded_participant_prompt_intersection": 720
+  },
+  "participants": {
+    "d2": "fit",
+    "d1": "calibration",
+    "d3": "selection"
+  },
+  "fold_counts": {
+    "fit": {
+      "trials": 569,
+      "words": 2963,
+      "typos": 742,
+      "clean": 2212,
+      "ambiguous": 9
+    },
+    "calibration": {
+      "trials": 53,
+      "words": 343,
+      "typos": 89,
+      "clean": 241,
+      "ambiguous": 13
+    },
+    "selection": {
+      "trials": 53,
+      "words": 348,
+      "typos": 122,
+      "clean": 222,
+      "ambiguous": 4
+    },
+    "evaluation": {
+      "trials": 20,
+      "words": 107,
+      "typos": 22,
+      "clean": 85,
+      "ambiguous": 0
+    }
+  },
+  "future": "Observed subsequent words in the same recorded trial; never prompt continuation",
+  "inference": "Raw coordinates and observed input only; labels/reference/upstream LM are excluded",
+  "split": "Participant and normalized prompt disjoint; frozen touch evaluation prompt overlap removed from development",
+  "limitations": [
+    "Copy typing, not spontaneous chat",
+    "VelociTap edits applied to reconstruct final observed stream; interactive response to our corrections not known",
+    "Google retained aligned taps omit deleted/unaligned input; not a raw backspace/cursor replay",
+    "Centroid hit test reconstructs observed keys, not unavailable original Gboard hit-target expansion",
+    "Small development participant count; Google source has historical exposure"
+  ],
+  "production_changed": false
+}

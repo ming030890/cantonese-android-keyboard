@@ -1,0 +1,74 @@
+{
+  "incumbent:clean:drop": {
+    "predict": 6745,
+    "evidence": 1749,
+    "refresh_predictions": 0,
+    "words": 6745
+  },
+  "incumbent:clean:strict": {
+    "predict": 6750,
+    "evidence": 1750,
+    "refresh_predictions": 5,
+    "words": 6745
+  },
+  "incumbent:clean:ordinary": {
+    "predict": 6750,
+    "evidence": 1750,
+    "refresh_predictions": 5,
+    "words": 6745
+  },
+  "incumbent:noisy:drop": {
+    "predict": 6745,
+    "evidence": 1853,
+    "refresh_predictions": 0,
+    "words": 6745
+  },
+  "incumbent:noisy:strict": {
+    "predict": 6750,
+    "evidence": 1858,
+    "refresh_predictions": 5,
+    "words": 6745
+  },
+  "incumbent:noisy:ordinary": {
+    "predict": 6750,
+    "evidence": 1858,
+    "refresh_predictions": 5,
+    "words": 6745
+  },
+  "retuned:clean:drop": {
+    "predict": 6745,
+    "evidence": 525,
+    "refresh_predictions": 0,
+    "words": 6745
+  },
+  "retuned:clean:strict": {
+    "predict": 6745,
+    "evidence": 525,
+    "refresh_predictions": 0,
+    "words": 6745
+  },
+  "retuned:clean:ordinary": {
+    "predict": 6745,
+    "evidence": 525,
+    "refresh_predictions": 0,
+    "words": 6745
+  },
+  "retuned:noisy:drop": {
+    "predict": 6745,
+    "evidence": 608,
+    "refresh_predictions": 0,
+    "words": 6745
+  },
+  "retuned:noisy:strict": {
+    "predict": 6746,
+    "evidence": 610,
+    "refresh_predictions": 1,
+    "words": 6745
+  },
+  "retuned:noisy:ordinary": {
+    "predict": 6746,
+    "evidence": 610,
+    "refresh_predictions": 1,
+    "words": 6745
+  }
+}

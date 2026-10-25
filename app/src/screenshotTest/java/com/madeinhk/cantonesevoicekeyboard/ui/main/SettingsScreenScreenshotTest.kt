@@ -14,25 +14,12 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
-@Preview(name="Typing settings",widthDp=360,heightDp=680)
+@Preview(name = "Haptic feedback setting", widthDp = 360, heightDp = 200)
 @Composable
-fun TypingSettingsScreenshot() = TypingSettingsPreview(false)
-
-@PreviewTest
-@Preview(name="Typing suggestions narrow large text",widthDp=320,heightDp=1050,fontScale=1.3f)
-@Composable
-fun TypingSettingsDiagnosticsScreenshot() = TypingSettingsPreview(true)
-
-@PreviewTest
-@Preview(name="Typing suggestions disabled",widthDp=360,heightDp=820)
-@Composable
-fun InternalTypingSettingsScreenshot() = TypingSettingsPreview(false,true)
-
-@Composable
-private fun TypingSettingsPreview(diagnostics:Boolean,trial:Boolean=false) {
-    CantoneseVoiceKeyboardTheme(darkTheme=true,dynamicColor=false) {
+fun HapticFeedbackScreenshot() {
+    CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
         Box(Modifier.fillMaxSize().background(Color(0xFF121714)).padding(16.dp)) {
-            TypingSettingsCard(english=!trial,onEnglish={},quick=!trial,onQuick={})
+            HapticFeedbackCard(checked = true, onCheckedChange = {})
         }
     }
 }
@@ -156,14 +143,11 @@ private fun SettingsScreenScreenshotContent(
     enabledLayouts: Set<String>,
     quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
     darkTheme: Boolean = true,
-    multilingualTyping: Boolean = false,
 ) {
     CantoneseVoiceKeyboardTheme(darkTheme = darkTheme, dynamicColor = false) {
         SettingsScreenContent(
             enabledLayouts = enabledLayouts,
             onToggleLayout = {},
-            multilingualTyping = multilingualTyping,
-            onMultilingualTypingChange = {},
             quickVersion = quickVersion,
             onQuickVersionChange = {},
             onBack = {}
@@ -179,8 +163,6 @@ fun SettingsLegacySystemLayoutsScreenshot() {
         SettingsScreenContent(
             enabledLayouts = KeyboardSettings.DEFAULT_LAYOUTS,
             onToggleLayout = {},
-            multilingualTyping = false,
-            onMultilingualTypingChange = {},
             onBack = {},
             onConfigureSystemLayouts = {},
         )

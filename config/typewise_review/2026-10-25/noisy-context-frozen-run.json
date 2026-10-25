@@ -1,0 +1,21 @@
+{
+  "schema": "noisy-context-audit-v1",
+  "seed": "noisy-context-20261025-v1",
+  "source_manifest_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+  "source_cases_sha256": "3a7dcff3415a6df849e6d73ebe2e3d84b8f401f09948944b3d4471cf5bf9abef",
+  "pairs_sha256": "6b7c6813505b69ca7da65bcad5e43c5902a47887f9db919826ac7e95f71ad826",
+  "script_sha256": "d26d27d6bb5acb0b25978d47115957f6967079154c3a3ae441b741e62c69b134",
+  "metrics_code_sha256": "06fbe3f810359e9caa3ca6173effcda9018069acfcab52a7bf9ca5bd23d2babc",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "probe_sha256": "4711feae42832ba5d3f31476abe395daa7dbf708ae4a3edf286953714066c2c5",
+  "source_cases": 5261,
+  "paired_cases": 16580,
+  "eligible_source_cases": 4145,
+  "parameters_selected_in_this_run": false,
+  "inference_fields": [
+    "left",
+    "typed",
+    "spelling_limit",
+    "timing"
+  ]
+}

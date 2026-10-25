@@ -1,0 +1,65 @@
+{
+  "schema": "context-revision-replay-v1",
+  "grid": {
+    "band_width": [
+      1.0,
+      2.0,
+      4.0
+    ],
+    "future_weight": [
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "max_following": [
+      1,
+      2,
+      3
+    ],
+    "revision_margin": [
+      0.0,
+      1.0,
+      2.0,
+      4.0,
+      8.0
+    ]
+  },
+  "max_pending": 2,
+  "alternatives": 3,
+  "selection": "Calibrate revision margin on original real TRAIN-calibration; select band/weight/lag on original real selection F0.5; parent eligible; ties fewer revisions then smaller workload",
+  "objective": {
+    "schema": "autocorrect-objective-v1",
+    "metric": "equal_weight_mean_f05",
+    "weights": {
+      "historical_full_mobile": 0.3333333333333333,
+      "real_touch_observed": 0.3333333333333333,
+      "authored_hard": 0.3333333333333333
+    },
+    "direction": "maximize",
+    "clean_controls": 46,
+    "hard_errors": 46,
+    "clean_selection": "Seeded domain round robin without model predictions",
+    "status": "Exposed development objective for hill climbing; not population accuracy or independent confirmation"
+  },
+  "frozen_suite_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+  "script_sha256": "1141a686de9a9c9aa2672abcb256167d2ac41f50aadc40437d8a664e2e412d02",
+  "probe_sha256": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "policy_sha256": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+  "replay_source_sha256": "1906d43e123f09bdf6f85841d1e8bf28c5b59920d6bc24d7077b1ba8a7872c7f",
+  "sentence_source_sha256": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+  "future_sources": {
+    "mobile": "Explicitly simulated clean prompt continuation after the aligned focal span",
+    "touch": "Recorded observed words, never the reference",
+    "authored": "No following text; keep initial decision"
+  },
+  "boundaries": "Completed words including simulated final-word completion; no wall-clock deadline or editor integration simulated",
+  "revision_score": "initial_acceptance_logit - immediate_threshold + candidate_initial_score_gap + fitted_weight * following_words_log_likelihood_gain_over_original",
+  "limitations": [
+    "Development data has historical exposure; no fresh test claim",
+    "Mobile continuation is simulated clean typing, not recorded future keystrokes",
+    "Word-boundary replay does not simulate deletion/undo, cursor moves, wall-clock cancellation, or phone latency",
+    "Known misspellings outside the near-threshold band, absent alternatives and multiword revisions are not recovered"
+  ]
+}

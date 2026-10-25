@@ -1,0 +1,37 @@
+{
+  "native_request_rows_audited": 13584,
+  "unpopulated_candidate_coverage_omitted": [
+    "miss_absent_from_top8",
+    "miss_ranking_or_acceptance",
+    "target_in_top8",
+    "target_top1"
+  ],
+  "artifacts": {
+    "protocol.json": {
+      "raw_path": "build/revisit-distance-20261025/run1/protocol.json",
+      "raw_sha256": "30fb1ff108e70141799e8554e278636b3eb562e65962fb9869b0396e5d763540",
+      "export_sha256": "30fb1ff108e70141799e8554e278636b3eb562e65962fb9869b0396e5d763540"
+    },
+    "selection.json": {
+      "raw_path": "build/revisit-distance-20261025/run1/selection.json",
+      "raw_sha256": "60d1b5506147929d899d998d26b6dc7be86f0c4c3e22c9b1cc345b308f42d592",
+      "export_sha256": "60d1b5506147929d899d998d26b6dc7be86f0c4c3e22c9b1cc345b308f42d592"
+    },
+    "report.json": {
+      "raw_path": "build/revisit-distance-20261025/run1/report.json",
+      "raw_sha256": "c48c403855758fec0c680b12afb8cd9f085b9cef9dfc216875c7b41bb8bd588d",
+      "export_sha256": "9ee55e883d30d2efe2860b24d2b03b407b1ea4e33a1cc2a523d77cdafca2f744"
+    },
+    "native-cost.json": {
+      "raw_path": "build/revisit-distance-20261025/timing1/report.json",
+      "raw_sha256": "d1a202cae63c8606836c015d79d708f4e2070467cf92c1a320ead8a80a3f4166",
+      "export_sha256": "d1a202cae63c8606836c015d79d708f4e2070467cf92c1a320ead8a80a3f4166"
+    },
+    "build/revisit-distance-20261025/run1/native-cache.jsonl": {
+      "sha256": "05c7706ef9c18a1292c9d8b093991564e14d338dbfd78e1103f345abd43546d8"
+    },
+    "scripts/test_revisit_distance.py": {
+      "sha256": "e5fa845266026bf6271bd1676330d679686977984a8f02c68eb51459b1c8474d"
+    }
+  }
+}

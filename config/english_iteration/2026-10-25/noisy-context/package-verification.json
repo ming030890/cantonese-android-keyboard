@@ -1,0 +1,18 @@
+{
+  "apk": "app/build/outputs/apk/debug/app-debug.apk",
+  "packaged_native_sha256": "a7a9f0bb9ab2913f1df35d433bb55c814f797d34bde0b66f8029820e3c3516a9",
+  "rebuilt_stripped_native_sha256": "a7a9f0bb9ab2913f1df35d433bb55c814f797d34bde0b66f8029820e3c3516a9",
+  "policy_sha256": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "dictionary_sha256": "84d3368de928b6f03f7cafb030ebcee14b04a65b88ffe82563e33dfa93abcd73",
+  "notice_sha256": "168b4c01cb841f766a72f310b065c04d09cff46376c37a81d799593ce751c371",
+  "policy_embedded": true,
+  "dictionary_embedded": true,
+  "unit_scenario": {
+    "tests": 249,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "phone_installed": false
+}

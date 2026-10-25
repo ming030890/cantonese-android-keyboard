@@ -59,6 +59,8 @@ object ModelAssetPack {
     const val PACK_E = "model_pack_e"
     const val MODEL_DIR_NAME = "qwen-asr-m4-lmhead-int8"
     private val PACKS = listOf(PACK_A, PACK_B, PACK_C, PACK_D, PACK_E)
+    private val REQUIRED_MODEL_FILES = (1..5).map { "model-%05d-of-00005.safetensors".format(it) } +
+        listOf("vocab.json", "merges.txt")
     private const val TAG = "ModelAssetPack"
 
 
@@ -113,60 +115,124 @@ object ModelAssetPack {
     }
 
     /**
-     * Returns the staged model directory, fetching both asset packs first if
-     * necessary. Suspends until both packs finish downloading. Returns `null`
-     * if either pack could not be made available.
+     * Returns the staged model directory, fetching asset packs if
+     * necessary. Suspends until all packs are available. Returns `null`
+     * if any pack could not be made available.
      */
     suspend fun resolveModelDir(context: Context, onDownloadStarted: () -> Unit = {}): File? {
-        stageModelDir(context)?.let {
+        val appContext = context.applicationContext
+        stageModelDir(appContext)?.let {
             Log.i(TAG, "resolveModelDir: staged model already available at ${it.absolutePath}")
             return it
         }
 
-        onDownloadStarted()
-        val manager = AssetPackManagerFactory.getInstance(context.applicationContext)
-        val ready = awaitBothPacks(manager)
-        Log.i(TAG, "resolveModelDir: awaitBothPacks ready=$ready")
+        val manager = AssetPackManagerFactory.getInstance(appContext)
+        val ready = awaitAllPacks(manager, onDownloadStarted)
+        Log.i(TAG, "resolveModelDir: awaitAllPacks ready=$ready")
         if (!ready) return null
-        return stageModelDir(context).also {
+        return stageModelDir(appContext).also {
             Log.i(TAG, "resolveModelDir: stage after fetch result=${it?.absolutePath}")
         }
     }
 
-    private suspend fun awaitBothPacks(manager: AssetPackManager): Boolean =
-        suspendCancellableCoroutine { cont ->
-            val completed = HashSet<String>()
-            val listener = object : AssetPackStateUpdateListener {
-                override fun onStateUpdate(state: AssetPackState) {
-                    if (state.name() !in PACKS || cont.isCompleted) return
-                    when (state.status()) {
-                        AssetPackStatus.COMPLETED -> {
-                            Log.i(TAG, "awaitBothPacks completed: ${describeState(state)}")
-                            completed.add(state.name())
-                            if (completed.containsAll(PACKS)) {
-                                manager.unregisterListener(this)
-                                cont.resume(true)
-                            }
-                        }
-                        AssetPackStatus.FAILED, AssetPackStatus.CANCELED -> {
-                            Log.e(TAG, "Pack '${state.name()}' ended: status=${state.status()}, errorCode=${state.errorCode()}")
+    private suspend fun awaitAllPacks(
+        manager: AssetPackManager,
+        onDownloadStarted: () -> Unit = {},
+    ): Boolean = suspendCancellableCoroutine { cont ->
+        val completed = HashSet<String>()
+        var notifiedDownloadStarted = false
+
+        fun notifyDownloadIfNeeded() {
+            if (!notifiedDownloadStarted) {
+                notifiedDownloadStarted = true
+                onDownloadStarted()
+            }
+        }
+
+        fun tryComplete(): Boolean {
+            if (completed.containsAll(PACKS)) {
+                if (!cont.isCompleted) {
+                    cont.resume(true)
+                }
+                return true
+            }
+            return false
+        }
+
+        val listener = object : AssetPackStateUpdateListener {
+            override fun onStateUpdate(state: AssetPackState) {
+                if (state.name() !in PACKS || cont.isCompleted) return
+                when (state.status()) {
+                    AssetPackStatus.COMPLETED -> {
+                        Log.i(TAG, "awaitAllPacks completed update: ${describeState(state)}")
+                        completed.add(state.name())
+                        if (tryComplete()) {
                             manager.unregisterListener(this)
-                            cont.resume(false)
                         }
-                        else -> Log.i(TAG, "awaitBothPacks update: ${describeState(state)}")
                     }
+                    AssetPackStatus.DOWNLOADING, AssetPackStatus.TRANSFERRING -> {
+                        notifyDownloadIfNeeded()
+                    }
+                    AssetPackStatus.FAILED, AssetPackStatus.CANCELED -> {
+                        Log.e(TAG, "Pack '${state.name()}' ended: status=${state.status()}, errorCode=${state.errorCode()}")
+                        manager.unregisterListener(this)
+                        if (!cont.isCompleted) cont.resume(false)
+                    }
+                    else -> Log.i(TAG, "awaitAllPacks update: ${describeState(state)}")
                 }
             }
-            manager.registerListener(listener)
-            cont.invokeOnCancellation { manager.unregisterListener(listener) }
-            manager.fetch(PACKS).addOnFailureListener { e ->
+        }
+
+        manager.registerListener(listener)
+        cont.invokeOnCancellation { manager.unregisterListener(listener) }
+
+        // Fast-path 1: Query existing pack states. If Google Play already downloaded the packs
+        // during app install / update, they are already COMPLETED and will not emit onStateUpdate.
+        manager.getPackStates(PACKS)
+            .addOnSuccessListener { states ->
+                if (cont.isCompleted) return@addOnSuccessListener
+                var hasActiveDownload = false
+                states.packStates().forEach { (name, state) ->
+                    if (state.status() == AssetPackStatus.COMPLETED) {
+                        completed.add(name)
+                    } else if (state.status() == AssetPackStatus.DOWNLOADING || state.status() == AssetPackStatus.TRANSFERRING) {
+                        hasActiveDownload = true
+                    }
+                }
+                if (hasActiveDownload) notifyDownloadIfNeeded()
+                if (tryComplete()) {
+                    manager.unregisterListener(listener)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "getPackStates in awaitAllPacks failed", e)
+            }
+
+        // Fast-path 2: Start fetch and inspect immediate result.
+        manager.fetch(PACKS)
+            .addOnSuccessListener { states ->
+                if (cont.isCompleted) return@addOnSuccessListener
+                var hasActiveDownload = false
+                states.packStates().forEach { (name, state) ->
+                    if (state.status() == AssetPackStatus.COMPLETED) {
+                        completed.add(name)
+                    } else if (state.status() == AssetPackStatus.DOWNLOADING || state.status() == AssetPackStatus.TRANSFERRING) {
+                        hasActiveDownload = true
+                    }
+                }
+                if (hasActiveDownload) notifyDownloadIfNeeded()
+                if (tryComplete()) {
+                    manager.unregisterListener(listener)
+                }
+            }
+            .addOnFailureListener { e ->
                 if (!cont.isCompleted) {
                     Log.e(TAG, "Failed to start asset pack fetch", e)
                     manager.unregisterListener(listener)
                     cont.resume(false)
                 }
             }
-        }
+    }
 
     /**
      * If both packs are extracted on disk, builds (or refreshes) a single
@@ -179,8 +245,9 @@ object ModelAssetPack {
         val appContext = context.applicationContext
         val manager = AssetPackManagerFactory.getInstance(appContext)
 
+        val allLocations = runCatching { manager.packLocations }.getOrNull() ?: emptyMap()
         val packDirs = PACKS.map { pack ->
-            val location = manager.getPackLocation(pack)
+            val location = manager.getPackLocation(pack) ?: allLocations[pack]
             val assetsPath = location?.assetsPath()
             Log.i(TAG, "stageModelDir: pack=$pack location=${location != null} assetsPath=$assetsPath")
             if (assetsPath == null) return null
@@ -225,6 +292,18 @@ object ModelAssetPack {
                 }
             }
         }
+
+        // Verify every required model shard and metadata file is present,
+        // resolves to a real target, and is non-empty.
+        val missingOrEmpty = REQUIRED_MODEL_FILES.filter { filename ->
+            val file = File(staged, filename)
+            !file.exists() || file.length() <= 0L
+        }
+        if (missingOrEmpty.isNotEmpty()) {
+            Log.w(TAG, "stageModelDir: incomplete or invalid model parts: $missingOrEmpty")
+            return null
+        }
+
         return staged
     }
 

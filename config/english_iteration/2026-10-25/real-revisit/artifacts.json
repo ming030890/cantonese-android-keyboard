@@ -1,0 +1,79 @@
+{
+  "request_rows_audited": 19744,
+  "candidate_coverage_fields_omitted": [
+    "miss_absent_from_top8",
+    "miss_ranking_or_acceptance",
+    "target_in_top8",
+    "target_top1"
+  ],
+  "artifacts": {
+    "data-manifest.json": {
+      "raw_path": "build/real-revisit-20261025/data3/manifest.json",
+      "raw_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f",
+      "export_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f"
+    },
+    "protocol.json": {
+      "raw_path": "build/real-revisit-20261025/run2/protocol.json",
+      "raw_sha256": "c065f9f91062c638cdf0f0af0dadd1854521153e872da4465a0006d6deae482a",
+      "export_sha256": "c065f9f91062c638cdf0f0af0dadd1854521153e872da4465a0006d6deae482a"
+    },
+    "selection.json": {
+      "raw_path": "build/real-revisit-20261025/run2/selection.json",
+      "raw_sha256": "e19c4b7d918441c146d4f93a96db00340e8d4ad6d7baa6a5c17b19672dc30699",
+      "export_sha256": "e19c4b7d918441c146d4f93a96db00340e8d4ad6d7baa6a5c17b19672dc30699"
+    },
+    "rejected-simple-policy.json": {
+      "raw_path": "build/real-revisit-20261025/run2/frozen-policy.json",
+      "raw_sha256": "ee0fdf7c9b53d3928567e14295469b056cefee301bb603171ae14abc938e3d7e",
+      "export_sha256": "ee0fdf7c9b53d3928567e14295469b056cefee301bb603171ae14abc938e3d7e"
+    },
+    "report.json": {
+      "raw_path": "build/real-revisit-20261025/run2/report.json",
+      "raw_sha256": "59ce97a3c4315a09b653b298197c6a81a27341f37ea221a86226dfccdc494ff8",
+      "export_sha256": "8792ecd853b4a952e595a4af74bd36f611943b709a58be56e121e620efb455ac"
+    },
+    "native-cost.json": {
+      "raw_path": "build/real-revisit-20261025/timing1/report.json",
+      "raw_sha256": "29ec62c750fe615f389fec28feea86eaa6e3d5b8f7e331f99cbaa0fb8c388cb3",
+      "export_sha256": "29ec62c750fe615f389fec28feea86eaa6e3d5b8f7e331f99cbaa0fb8c388cb3"
+    },
+    "rejected-correction-event-learner.json": {
+      "raw_path": "build/revisit-policy-20261025/run1/report.json",
+      "raw_sha256": "ef3adfe0d2b719d080d8a58ebaec9edc87e538f2e9bbee5956d1be2bb7a7fb65",
+      "export_sha256": "2a107a0597cfcab4ebdfd0320f8566806d89cadbdfbb056d772b2057bd47b642"
+    },
+    "build/real-revisit-20261025/data3/cases.jsonl": {
+      "raw_sha256": "a8d9096487700ae707929a788aabaa91ff48fa0e97131e5aed3d7bf9bb009398"
+    },
+    "build/real-revisit-20261025/data3/trials.jsonl": {
+      "raw_sha256": "d782fa9f160dd517696a44e73dbdf99c15342b212a176f6f6ecb614534cadb38"
+    },
+    "build/real-revisit-20261025/run2/development-episodes.jsonl": {
+      "raw_sha256": "305269bb69d413f770c2da8766dece768cec4914343f72f0b983440a4937738f"
+    },
+    "build/real-revisit-20261025/run2/native-cache.jsonl": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build/real-revisit-20261025/run1/native-cache.jsonl": {
+      "raw_sha256": "188d7db1f8113e5564497166e664df1c5bd5e3602f46297c36ac04516f53e50b"
+    },
+    "scripts/prepare_real_revisit_streams.py": {
+      "source_sha256": "baefe026ca94e463acafa3b5f8a1bec5adf6d28022772c0df81be8baa26e0151"
+    },
+    "scripts/experiment_real_revisit.py": {
+      "source_sha256": "6c8b49c8c9fe439abc16c91be47d5b0bd1bf3f64092110ae7f0517b8a2b91db8"
+    },
+    "scripts/benchmark_real_revisit.py": {
+      "source_sha256": "b25f1ba420105ec405c35e38a44854c6749fcba70bdb952c8d5c93d9ae61bdff"
+    },
+    "scripts/experiment_revisit_policy.py": {
+      "source_sha256": "a284c28a2c4cbec85a006464af784826f572758fcf26c576d2348156ffa099bb"
+    },
+    "scripts/test_real_revisit.py": {
+      "source_sha256": "d5f0f45367c0cbd582326880f99ed262ceadf5a30065ac10a58a1929db4e732a"
+    },
+    "scripts/test_experiment_revisit_policy.py": {
+      "source_sha256": "e5588e1d58ceec768541d0c23f97ae14de63b53d40597b941663a7c73e947bb7"
+    }
+  }
+}

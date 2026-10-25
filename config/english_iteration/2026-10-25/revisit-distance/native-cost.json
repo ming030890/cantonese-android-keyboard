@@ -1,0 +1,119 @@
+{
+  "source_report_sha256": "c48c403855758fec0c680b12afb8cd9f085b9cef9dfc216875c7b41bb8bd588d",
+  "script_sha256": "dca9ad82f6888280c7c0b5e033a302491f7d19f909413f5f7130af451e368698",
+  "scope": "Fresh native process per distance; no Python query cache; Mac CPU work, not phone key latency",
+  "results": [
+    {
+      "distance": 1,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 401,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 124,
+        "f05": 0.9209921910886542,
+        "precision": 0.9709443099273608,
+        "recall": 0.7638095238095238,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 124,
+        "sequence_calls": 124,
+        "refresh_calls": 0,
+        "median_extra_ms": 2.847,
+        "p95_extra_ms": 18.513849999999998,
+        "max_extra_ms": 28.58,
+        "mean_extra_ms": 0.19323632874960026,
+        "over_40ms": 0
+      }
+    },
+    {
+      "distance": 2,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 402,
+        "fp": 13,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 123,
+        "f05": 0.919908466819222,
+        "precision": 0.9686746987951808,
+        "recall": 0.7657142857142857,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 198,
+        "sequence_calls": 200,
+        "refresh_calls": 0,
+        "median_extra_ms": 2.801,
+        "p95_extra_ms": 18.198649999999997,
+        "max_extra_ms": 28.058,
+        "mean_extra_ms": 0.27386056923568913,
+        "over_40ms": 0
+      }
+    },
+    {
+      "distance": 3,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 402,
+        "fp": 13,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 123,
+        "f05": 0.919908466819222,
+        "precision": 0.9686746987951808,
+        "recall": 0.7657142857142857,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 250,
+        "sequence_calls": 254,
+        "refresh_calls": 0,
+        "median_extra_ms": 2.823,
+        "p95_extra_ms": 11.916899999999991,
+        "max_extra_ms": 28.218,
+        "mean_extra_ms": 0.32675535657179405,
+        "over_40ms": 0
+      }
+    },
+    {
+      "distance": null,
+      "metrics": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 403,
+        "fp": 13,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "fn": 122,
+        "f05": 0.9205116491548653,
+        "precision": 0.96875,
+        "recall": 0.7676190476190476,
+        "clean_changes_per_1000": 0.0
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 330,
+        "sequence_calls": 343,
+        "refresh_calls": 0,
+        "median_extra_ms": 2.911,
+        "p95_extra_ms": 10.812150000000022,
+        "max_extra_ms": 27.882,
+        "mean_extra_ms": 0.4269318835944995,
+        "over_40ms": 0
+      }
+    }
+  ]
+}

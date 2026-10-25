@@ -32,7 +32,9 @@ each run. Omit `--baseline-probe` to score one binary.
 The command prints one number:
 `score = (mobile F₀.₅ + touch F₀.₅ + hard-set F₀.₅) / 3`.
 Higher is better. `score.json` contains the score and baseline delta;
-`report.json` contains diagnostics. Current accepted baseline: **0.797611**.
+`report.json` contains diagnostics. Current accepted baseline: **0.857561**
+(exact score and previous-baseline delta in the
+[2026-10-25 acceptance report](config/english_iteration/2026-10-25/noisy-context/objective-score.json)).
 
 ## Acceptance gate
 
@@ -42,3 +44,26 @@ Higher is better. `score.json` contains the score and baseline delta;
 
 No separate precision cutoff or per-dataset score gate. Use this aggregate for
 hill climbing and model selection; it is a development score, not a fresh test.
+
+## Supplemental context robustness audit
+
+When changing context training or scoring, also run the paired prior-typo audit:
+
+```sh
+python3 scripts/audit_noisy_context.py \
+  --suite build/autocorrect-eval-v4/frozen \
+  --probe ../QwenASR/crates/cantonese-ngram/target/release/ngram_probe \
+  --output build/noisy-context-UNIQUE-RUN
+```
+
+It freezes synthetic perturbations before inference and reports damage to clean
+words, lost fixes and recovered fixes for each noise operation. Only left context
+changes; the current input and intended target stay fixed. These are diagnostics
+on exposed development cases, not an additional acceptance score. Do not train
+on these variants or alter the frozen objective's cases or weights. See
+[the Typewise review](TYPEWISE_TAKEAWAYS.md) for the implementation audit and results.
+
+Delayed correction has a separate [word-boundary replay experiment](CONTEXT_REVISION_REPLAY.md).
+Its closed-loop baseline feeds earlier corrections into later touch context;
+mobile continuations are simulated clean prompt typing. Those replay scores do
+not replace the static native objective or establish production editor behavior.

@@ -7,9 +7,35 @@
 
     <!-- Setup Main Screen Strings -->
     <string name="app_header_title">Cantonese Voice Keyboard</string>
-    <string name="app_header_subtitle">Fast, on-device Cantonese voice typing</string>
+    <string name="app_header_subtitle">Cantonese &amp; English keyboard • Voice typing included</string>
 
     <string name="setup_step_completed">Ready</string>
+
+    <string name="setup_step_layout_title">Choose keyboard layout</string>
+    <string name="setup_step_layout_desc">Select your preferred layouts. All layouts include voice typing.</string>
+    <string name="setup_step_layout_inferred">Inferred from your existing keyboards</string>
+    <string name="setup_step_layout_action">Customize</string>
+
+    <string name="setup_step_enable_title">Turn on the keyboard</string>
+    <string name="setup_step_enable_desc">In system settings, switch on "Cantonese Voice Keyboard".</string>
+    <string name="setup_step_enable_action">Turn on</string>
+
+    <string name="setup_step_switch_title">Set as your default keyboard</string>
+    <string name="setup_step_switch_desc">Tap to pick "Cantonese Voice Keyboard" as your default input method.</string>
+    <string name="setup_step_switch_action">Switch</string>
+
+    <string name="setup_step_voice_title">Enable voice typing</string>
+    <string name="setup_step_voice_desc">Microphone permission is needed for voice typing across all layouts.</string>
+    <string name="setup_step_voice_action">Allow</string>
+
+    <string name="setup_flow_title">Keyboard setup</string>
+    <string name="setup_step_progress">Step %1$d of %2$d</string>
+    <string name="setup_all_done_title">Keyboard is ready!</string>
+    <string name="setup_all_done_desc">Cantonese Voice Keyboard is active. Try typing below!</string>
+    <string name="setup_step_locked_hint">Complete the previous step first</string>
+    <string name="setup_details_button">Setup details</string>
+    <string name="developer_tools_title">Developer tools</string>
+    <string name="model_status_compact_ready">Offline speech model: Ready</string>
 
     <string name="setup_step_1_title">Allow microphone access</string>
     <string name="setup_step_1_desc">Voice typing needs access to your microphone.</string>
@@ -33,8 +59,8 @@
 
     <!-- Try-it-out Strings -->
     <string name="sandbox_title">Try it out</string>
-    <string name="sandbox_desc">Tap the box below, then hold the blue mic button and speak Cantonese:</string>
-    <string name="sandbox_placeholder">Try voice typing here… (e.g. say "Today's weather is so nice")</string>
+    <string name="sandbox_desc">Tap the box below to try typing or voice input in your selected layout:</string>
+    <string name="sandbox_placeholder">Try typing or voice input here…</string>
     <string name="sandbox_clear">Clear</string>
 
     <!-- Developer Options -->
@@ -167,12 +193,20 @@
     <string name="error_failed_access_microphone">Can\'t access the microphone.</string>
 
     <!-- New Settings Screen Strings -->
-    <string name="settings_screen_title">English (UK)</string>
+    <string name="settings_screen_title">Settings</string>
     <string name="settings_screen_label">Settings</string>
     <string name="settings_keyboard_layouts_section">Keyboard layouts</string>
-    <string name="settings_layout_qwerty">QWERTY</string>
+    <string name="settings_layout_settings_header">Layout settings</string>
+    <string name="settings_layout_qwerty">English</string>
     <string name="settings_layout_handwriting">Handwriting</string>
-    <string name="settings_layout_quick">Quick</string>
+    <string name="settings_layout_quick">Quick (with English)</string>
+    <string name="settings_all_layouts_voice">All layouts include voice typing</string>
+    <string name="settings_layout_specific_header">%1$s settings</string>
+    <string name="settings_feature_voice_typing">Voice typing included</string>
+    <string name="settings_feature_quick_mixed">Cantonese Quick + English typing</string>
+    <string name="settings_feature_autocorrect_on">Autocorrect always enabled</string>
+    <string name="settings_feature_handwriting">On-device handwriting recognition</string>
+    <string name="settings_layout_disabled_hint">This layout is currently disabled. Tap above to enable it.</string>
     <string name="settings_language_settings_header">Language settings</string>
     <string name="settings_quick_version_title">Quick method version</string>
     <string name="settings_quick_version_desc">Choose Cangjie standard version for Quick input</string>
@@ -201,7 +235,7 @@
     <string name="typing_diagnostics">Local typing diagnostics</string>
     <string name="typing_diagnostics_desc">Shows correction status without recording words or touch coordinates. Sharing happens only when you tap Export.</string>
     <string name="typing_export">Export typing diagnostics</string>
-    <string name="subtype_quick">Cantonese — Quick</string>
+    <string name="subtype_quick">Cantonese — Quick (with English)</string>
     <string name="subtype_handwriting">Cantonese — Handwriting</string>
     <string name="settings_system_layouts">Enable layouts in Android</string>
     <string name="settings_system_layouts_description">Enable the same layouts in Android settings to use the navigation-bar keyboard switcher.</string>

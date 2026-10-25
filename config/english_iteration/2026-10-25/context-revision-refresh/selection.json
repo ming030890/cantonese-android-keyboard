@@ -1,0 +1,1482 @@
+{
+  "winner": {
+    "rule": {
+      "band_width": 1.0,
+      "future_weight": 0.5,
+      "max_following": 2,
+      "revision_margin": 2.0
+    },
+    "fit": {
+      "cases": 25132,
+      "typos": 21811,
+      "tp": 14791,
+      "fp": 1213,
+      "clean_changes": 8,
+      "clean": 3321,
+      "fn": 7020,
+      "unlabelled": 0,
+      "f05": 0.8616752304053503,
+      "precision": 0.924206448387903,
+      "recall": 0.6781440557516849,
+      "clean_changes_per_1000": 2.408912978018669,
+      "revisions": 558
+    },
+    "selection": {
+      "cases": 9168,
+      "typos": 8000,
+      "tp": 5282,
+      "fp": 493,
+      "clean_changes": 4,
+      "clean": 1168,
+      "fn": 2718,
+      "unlabelled": 0,
+      "f05": 0.8491961414790997,
+      "precision": 0.9146320346320347,
+      "recall": 0.66025,
+      "clean_changes_per_1000": 3.4246575342465753,
+      "revisions": 210
+    }
+  },
+  "trials": [
+    {
+      "rule": null,
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14372,
+        "fp": 1074,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7439,
+        "unlabelled": 0,
+        "f05": 0.8596207907171481,
+        "precision": 0.9304674349346109,
+        "recall": 0.6589335656320205,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 0
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5122,
+        "fp": 443,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2878,
+        "unlabelled": 0,
+        "f05": 0.8463317911434236,
+        "precision": 0.9203953279424978,
+        "recall": 0.64025,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 0
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 0.25,
+        "max_following": 2,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14730,
+        "fp": 1197,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7081,
+        "unlabelled": 0,
+        "f05": 0.8612121282989745,
+        "precision": 0.9248446035034846,
+        "recall": 0.6753473018201824,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 481
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5261,
+        "fp": 494,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2739,
+        "unlabelled": 0,
+        "f05": 0.8480012894906512,
+        "precision": 0.9141615986099044,
+        "recall": 0.657625,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 190
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 0.25,
+        "max_following": 1,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14633,
+        "fp": 1159,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7178,
+        "unlabelled": 0,
+        "f05": 0.8609774179503171,
+        "precision": 0.9266084093211753,
+        "recall": 0.6709000045848426,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 346
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5216,
+        "fp": 477,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2784,
+        "unlabelled": 0,
+        "f05": 0.8475237228649422,
+        "precision": 0.9162128930265238,
+        "recall": 0.652,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 128
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 0.25,
+        "max_following": 2,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14689,
+        "fp": 1174,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7122,
+        "unlabelled": 0,
+        "f05": 0.8613935704819207,
+        "precision": 0.9259913005106222,
+        "recall": 0.6734675163908119,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 417
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5241,
+        "fp": 482,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2759,
+        "unlabelled": 0,
+        "f05": 0.8482778712935388,
+        "precision": 0.9157784378822296,
+        "recall": 0.655125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 158
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 0.25,
+        "max_following": 3,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14711,
+        "fp": 1180,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7100,
+        "unlabelled": 0,
+        "f05": 0.8615519765739386,
+        "precision": 0.925744131898559,
+        "recall": 0.6744761817431572,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 445
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5246,
+        "fp": 483,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2754,
+        "unlabelled": 0,
+        "f05": 0.8484279984474059,
+        "precision": 0.9156920928608833,
+        "recall": 0.65575,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 164
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 0.5,
+        "max_following": 1,
+        "revision_margin": 2.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14717,
+        "fp": 1195,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7094,
+        "unlabelled": 0,
+        "f05": 0.8610561789864145,
+        "precision": 0.9248994469582705,
+        "recall": 0.6747512722937967,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 466
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5250,
+        "fp": 485,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2750,
+        "unlabelled": 0,
+        "f05": 0.8484162895927602,
+        "precision": 0.9154315605928509,
+        "recall": 0.65625,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 170
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 0.5,
+        "max_following": 2,
+        "revision_margin": 2.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14791,
+        "fp": 1213,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7020,
+        "unlabelled": 0,
+        "f05": 0.8616752304053503,
+        "precision": 0.924206448387903,
+        "recall": 0.6781440557516849,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 558
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5282,
+        "fp": 493,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2718,
+        "unlabelled": 0,
+        "f05": 0.8491961414790997,
+        "precision": 0.9146320346320347,
+        "recall": 0.66025,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 210
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 0.5,
+        "max_following": 3,
+        "revision_margin": 2.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14818,
+        "fp": 1219,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 6993,
+        "unlabelled": 0,
+        "f05": 0.8619225444688747,
+        "precision": 0.923988277109185,
+        "recall": 0.679381963229563,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 591
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5287,
+        "fp": 498,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2713,
+        "unlabelled": 0,
+        "f05": 0.8489081567116249,
+        "precision": 0.9139152981849611,
+        "recall": 0.660875,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 220
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 1.0,
+        "max_following": 1,
+        "revision_margin": 4.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14774,
+        "fp": 1229,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7037,
+        "unlabelled": 0,
+        "f05": 0.8607249804830873,
+        "precision": 0.9232018996438168,
+        "recall": 0.6773646325248728,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 557
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5272,
+        "fp": 507,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2728,
+        "unlabelled": 0,
+        "f05": 0.8471525903072374,
+        "precision": 0.9122685585741478,
+        "recall": 0.659,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 214
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 1.0,
+        "max_following": 2,
+        "revision_margin": 4.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14847,
+        "fp": 1244,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 6964,
+        "unlabelled": 0,
+        "f05": 0.8614447345517842,
+        "precision": 0.922689702318066,
+        "recall": 0.6807115675576544,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 645
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5297,
+        "fp": 519,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2703,
+        "unlabelled": 0,
+        "f05": 0.8471404810644831,
+        "precision": 0.9107634112792297,
+        "recall": 0.662125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 251
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 1.0,
+        "max_following": 3,
+        "revision_margin": 4.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14873,
+        "fp": 1249,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 6938,
+        "unlabelled": 0,
+        "f05": 0.8617133454617087,
+        "precision": 0.9225282223049249,
+        "recall": 0.6819036266104259,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 676
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5302,
+        "fp": 521,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2698,
+        "unlabelled": 0,
+        "f05": 0.84718138821424,
+        "precision": 0.9105272196462305,
+        "recall": 0.66275,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 258
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 2.0,
+        "max_following": 1,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14807,
+        "fp": 1262,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7004,
+        "unlabelled": 0,
+        "f05": 0.8600020909080349,
+        "precision": 0.9214636878461634,
+        "recall": 0.6788776305533905,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 623
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5284,
+        "fp": 517,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2716,
+        "unlabelled": 0,
+        "f05": 0.8466863222663761,
+        "precision": 0.9108774349250129,
+        "recall": 0.6605,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 236
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 2.0,
+        "max_following": 2,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14886,
+        "fp": 1288,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 6925,
+        "unlabelled": 0,
+        "f05": 0.8603928005826118,
+        "precision": 0.9203660195375294,
+        "recall": 0.6824996561368117,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 728
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5306,
+        "fp": 532,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2694,
+        "unlabelled": 0,
+        "f05": 0.8461980096963511,
+        "precision": 0.9088729016786571,
+        "recall": 0.66325,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 273
+      }
+    },
+    {
+      "rule": {
+        "band_width": 1.0,
+        "future_weight": 2.0,
+        "max_following": 3,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14903,
+        "fp": 1293,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 6908,
+        "unlabelled": 0,
+        "f05": 0.8605000288700272,
+        "precision": 0.9201654729562855,
+        "recall": 0.6832790793636239,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 750
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5313,
+        "fp": 535,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2687,
+        "unlabelled": 0,
+        "f05": 0.8462347094801224,
+        "precision": 0.908515731874145,
+        "recall": 0.664125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 283
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 0.25,
+        "max_following": 1,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14660,
+        "fp": 1177,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7151,
+        "unlabelled": 0,
+        "f05": 0.860742845735624,
+        "precision": 0.925680368756709,
+        "recall": 0.6721379120627207,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 391
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5229,
+        "fp": 480,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2771,
+        "unlabelled": 0,
+        "f05": 0.8478726164223634,
+        "precision": 0.9159222280609564,
+        "recall": 0.653625,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 144
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 0.25,
+        "max_following": 2,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14725,
+        "fp": 1195,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7086,
+        "unlabelled": 0,
+        "f05": 0.8612017639283668,
+        "precision": 0.9249371859296482,
+        "recall": 0.6751180596946494,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 474
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5258,
+        "fp": 492,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2742,
+        "unlabelled": 0,
+        "f05": 0.8480645161290322,
+        "precision": 0.9144347826086957,
+        "recall": 0.65725,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 185
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 0.25,
+        "max_following": 3,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14752,
+        "fp": 1202,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7059,
+        "unlabelled": 0,
+        "f05": 0.8614105363962301,
+        "precision": 0.9246583928795287,
+        "recall": 0.6763559671725277,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 508
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5265,
+        "fp": 494,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2735,
+        "unlabelled": 0,
+        "f05": 0.8482085320273232,
+        "precision": 0.9142212189616253,
+        "recall": 0.658125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 194
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 0.5,
+        "max_following": 1,
+        "revision_margin": 2.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14824,
+        "fp": 1257,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 6987,
+        "unlabelled": 0,
+        "f05": 0.8605096650606606,
+        "precision": 0.9218332193271562,
+        "recall": 0.6796570537802027,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 635
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5283,
+        "fp": 509,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2717,
+        "unlabelled": 0,
+        "f05": 0.8475038501026694,
+        "precision": 0.9121201657458563,
+        "recall": 0.660375,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 227
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 0.5,
+        "max_following": 2,
+        "revision_margin": 2.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14934,
+        "fp": 1295,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6877,
+        "unlabelled": 0,
+        "f05": 0.8609775502438687,
+        "precision": 0.9202045720623575,
+        "recall": 0.6847003805419284,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 783
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5329,
+        "fp": 530,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2671,
+        "unlabelled": 0,
+        "f05": 0.8475951138821733,
+        "precision": 0.9095408772828127,
+        "recall": 0.666125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 294
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 0.5,
+        "max_following": 3,
+        "revision_margin": 2.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14973,
+        "fp": 1307,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6838,
+        "unlabelled": 0,
+        "f05": 0.8612002622769783,
+        "precision": 0.9197174447174448,
+        "recall": 0.6864884691210857,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 834
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5338,
+        "fp": 536,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2662,
+        "unlabelled": 0,
+        "f05": 0.8474091948183896,
+        "precision": 0.9087504256043581,
+        "recall": 0.66725,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 309
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 1.0,
+        "max_following": 1,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14497,
+        "fp": 1118,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7314,
+        "unlabelled": 0,
+        "f05": 0.8601416857519194,
+        "precision": 0.9284021773935318,
+        "recall": 0.6646646187703452,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 169
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5177,
+        "fp": 463,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2823,
+        "unlabelled": 0,
+        "f05": 0.8470222513089005,
+        "precision": 0.9179078014184398,
+        "recall": 0.647125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 75
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 1.0,
+        "max_following": 2,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14554,
+        "fp": 1133,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7257,
+        "unlabelled": 0,
+        "f05": 0.8605825518277179,
+        "precision": 0.9277745904251928,
+        "recall": 0.6672779790014213,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 241
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5194,
+        "fp": 470,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2806,
+        "unlabelled": 0,
+        "f05": 0.8471424843423799,
+        "precision": 0.9170197740112994,
+        "recall": 0.64925,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 99
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 1.0,
+        "max_following": 3,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14571,
+        "fp": 1133,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7240,
+        "unlabelled": 0,
+        "f05": 0.860895458896097,
+        "precision": 0.9278527763627101,
+        "recall": 0.6680574022282335,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 258
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5198,
+        "fp": 472,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2802,
+        "unlabelled": 0,
+        "f05": 0.8471316818774446,
+        "precision": 0.9167548500881835,
+        "recall": 0.64975,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 105
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 2.0,
+        "max_following": 1,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 15051,
+        "fp": 1451,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6760,
+        "unlabelled": 0,
+        "f05": 0.8569330099409012,
+        "precision": 0.9120712640892014,
+        "recall": 0.6900646462794003,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 1056
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5357,
+        "fp": 591,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2643,
+        "unlabelled": 0,
+        "f05": 0.8425075490689482,
+        "precision": 0.9006388702084734,
+        "recall": 0.669625,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 383
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 2.0,
+        "max_following": 2,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 15172,
+        "fp": 1500,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6639,
+        "unlabelled": 0,
+        "f05": 0.8571848269471971,
+        "precision": 0.9100287907869482,
+        "recall": 0.6956123057172986,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 1226
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5397,
+        "fp": 619,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2603,
+        "unlabelled": 0,
+        "f05": 0.8415980538922155,
+        "precision": 0.8971077127659575,
+        "recall": 0.674625,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 451
+      }
+    },
+    {
+      "rule": {
+        "band_width": 2.0,
+        "future_weight": 2.0,
+        "max_following": 3,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 15202,
+        "fp": 1517,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6609,
+        "unlabelled": 0,
+        "f05": 0.8570590954705876,
+        "precision": 0.9092649081882888,
+        "recall": 0.6969877584704965,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 1273
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5407,
+        "fp": 625,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2593,
+        "unlabelled": 0,
+        "f05": 0.8414778386454184,
+        "precision": 0.8963859416445623,
+        "recall": 0.675875,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 467
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 0.25,
+        "max_following": 1,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14663,
+        "fp": 1177,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7148,
+        "unlabelled": 0,
+        "f05": 0.8607976893543577,
+        "precision": 0.9256944444444445,
+        "recall": 0.6722754573380404,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 394
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5231,
+        "fp": 481,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2769,
+        "unlabelled": 0,
+        "f05": 0.8478669605809128,
+        "precision": 0.9157913165266106,
+        "recall": 0.653875,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 147
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 0.25,
+        "max_following": 2,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14730,
+        "fp": 1197,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7081,
+        "unlabelled": 0,
+        "f05": 0.8612121282989745,
+        "precision": 0.9248446035034846,
+        "recall": 0.6753473018201824,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 481
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5261,
+        "fp": 494,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2739,
+        "unlabelled": 0,
+        "f05": 0.8480012894906512,
+        "precision": 0.9141615986099044,
+        "recall": 0.657625,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 190
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 0.25,
+        "max_following": 3,
+        "revision_margin": 1.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14757,
+        "fp": 1205,
+        "clean_changes": 8,
+        "clean": 3321,
+        "fn": 7054,
+        "unlabelled": 0,
+        "f05": 0.8613805904808601,
+        "precision": 0.9245082069916051,
+        "recall": 0.6765852092980607,
+        "clean_changes_per_1000": 2.408912978018669,
+        "revisions": 516
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5268,
+        "fp": 496,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2732,
+        "unlabelled": 0,
+        "f05": 0.848145285935085,
+        "precision": 0.9139486467730743,
+        "recall": 0.6585,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 199
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 0.5,
+        "max_following": 1,
+        "revision_margin": 4.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14463,
+        "fp": 1097,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7348,
+        "unlabelled": 0,
+        "f05": 0.8603704893457543,
+        "precision": 0.9294987146529563,
+        "recall": 0.663105772316721,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 114
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5167,
+        "fp": 455,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2833,
+        "unlabelled": 0,
+        "f05": 0.8473825767515087,
+        "precision": 0.9190679473496977,
+        "recall": 0.645875,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 57
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 0.5,
+        "max_following": 2,
+        "revision_margin": 4.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14512,
+        "fp": 1111,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7299,
+        "unlabelled": 0,
+        "f05": 0.8607048384992231,
+        "precision": 0.9288868975228829,
+        "recall": 0.6653523451469442,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 177
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5183,
+        "fp": 462,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2817,
+        "unlabelled": 0,
+        "f05": 0.8474493132766514,
+        "precision": 0.9181576616474756,
+        "recall": 0.647875,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 80
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 0.5,
+        "max_following": 3,
+        "revision_margin": 4.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14526,
+        "fp": 1116,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7285,
+        "unlabelled": 0,
+        "f05": 0.8607591936382275,
+        "precision": 0.9286536248561565,
+        "recall": 0.6659942230984366,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 196
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5186,
+        "fp": 465,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2814,
+        "unlabelled": 0,
+        "f05": 0.8472748660305842,
+        "precision": 0.9177136789948681,
+        "recall": 0.64825,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 86
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 1.0,
+        "max_following": 1,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14510,
+        "fp": 1134,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7301,
+        "unlabelled": 0,
+        "f05": 0.8597295792005878,
+        "precision": 0.9275121452313986,
+        "recall": 0.665260648296731,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 198
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5185,
+        "fp": 469,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2815,
+        "unlabelled": 0,
+        "f05": 0.8467794617193625,
+        "precision": 0.917049876193845,
+        "recall": 0.648125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 89
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 1.0,
+        "max_following": 2,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14574,
+        "fp": 1152,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7237,
+        "unlabelled": 0,
+        "f05": 0.8601782447028271,
+        "precision": 0.9267455169782526,
+        "recall": 0.6681949475035532,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 280
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5203,
+        "fp": 479,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2797,
+        "unlabelled": 0,
+        "f05": 0.8466219734444155,
+        "precision": 0.9156986976416754,
+        "recall": 0.650375,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 117
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 1.0,
+        "max_following": 3,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 14593,
+        "fp": 1155,
+        "clean_changes": 7,
+        "clean": 3321,
+        "fn": 7218,
+        "unlabelled": 0,
+        "f05": 0.8604058818673868,
+        "precision": 0.9266573533147067,
+        "recall": 0.6690660675805786,
+        "clean_changes_per_1000": 2.1077988557663354,
+        "revisions": 302
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5208,
+        "fp": 482,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2792,
+        "unlabelled": 0,
+        "f05": 0.846553966189857,
+        "precision": 0.9152899824253076,
+        "recall": 0.651,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 125
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 2.0,
+        "max_following": 1,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 15148,
+        "fp": 1680,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6663,
+        "unlabelled": 0,
+        "f05": 0.8498367424794946,
+        "precision": 0.9001663893510815,
+        "recall": 0.6945119435147402,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 1382
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5395,
+        "fp": 666,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2605,
+        "unlabelled": 0,
+        "f05": 0.8365897531323657,
+        "precision": 0.8901171423857449,
+        "recall": 0.674375,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 496
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 2.0,
+        "max_following": 2,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 15292,
+        "fp": 1765,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6519,
+        "unlabelled": 0,
+        "f05": 0.8491875742733704,
+        "precision": 0.8965234214691915,
+        "recall": 0.7011141167300903,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 1611
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5441,
+        "fp": 714,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2559,
+        "unlabelled": 0,
+        "f05": 0.8339975475168608,
+        "precision": 0.8839967506092608,
+        "recall": 0.680125,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 590
+      }
+    },
+    {
+      "rule": {
+        "band_width": 4.0,
+        "future_weight": 2.0,
+        "max_following": 3,
+        "revision_margin": 8.0
+      },
+      "fit": {
+        "cases": 25132,
+        "typos": 21811,
+        "tp": 15328,
+        "fp": 1786,
+        "clean_changes": 9,
+        "clean": 3321,
+        "fn": 6483,
+        "unlabelled": 0,
+        "f05": 0.8490367465408178,
+        "precision": 0.8956409956760547,
+        "recall": 0.7027646600339278,
+        "clean_changes_per_1000": 2.710027100271003,
+        "revisions": 1668
+      },
+      "selection": {
+        "cases": 9168,
+        "typos": 8000,
+        "tp": 5452,
+        "fp": 732,
+        "clean_changes": 4,
+        "clean": 1168,
+        "fn": 2548,
+        "unlabelled": 0,
+        "f05": 0.83272238514174,
+        "precision": 0.8816300129366106,
+        "recall": 0.6815,
+        "clean_changes_per_1000": 3.4246575342465753,
+        "revisions": 619
+      }
+    }
+  ],
+  "evaluation_used": false
+}

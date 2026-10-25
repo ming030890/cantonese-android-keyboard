@@ -1,0 +1,682 @@
+{
+  "binding": {
+    "schema": "context-revision-replay-v1",
+    "grid": {
+      "band_width": [
+        1.0,
+        2.0,
+        4.0
+      ],
+      "future_weight": [
+        0.25,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "max_following": [
+        1,
+        2,
+        3
+      ],
+      "revision_margin": [
+        0.0,
+        1.0,
+        2.0,
+        4.0,
+        8.0
+      ]
+    },
+    "max_pending": 2,
+    "alternatives": 3,
+    "selection": "Calibrate revision margin on original real TRAIN-calibration; select band/weight/lag on original real selection F0.5; parent eligible; ties fewer revisions then smaller workload",
+    "objective": {
+      "schema": "autocorrect-objective-v1",
+      "metric": "equal_weight_mean_f05",
+      "weights": {
+        "historical_full_mobile": 0.3333333333333333,
+        "real_touch_observed": 0.3333333333333333,
+        "authored_hard": 0.3333333333333333
+      },
+      "direction": "maximize",
+      "clean_controls": 46,
+      "hard_errors": 46,
+      "clean_selection": "Seeded domain round robin without model predictions",
+      "status": "Exposed development objective for hill climbing; not population accuracy or independent confirmation"
+    },
+    "frozen_suite_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+    "script_sha256": "1141a686de9a9c9aa2672abcb256167d2ac41f50aadc40437d8a664e2e412d02",
+    "probe_sha256": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+    "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "policy_sha256": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+    "replay_source_sha256": "1906d43e123f09bdf6f85841d1e8bf28c5b59920d6bc24d7077b1ba8a7872c7f",
+    "sentence_source_sha256": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "future_sources": {
+      "mobile": "Explicitly simulated clean prompt continuation after the aligned focal span",
+      "touch": "Recorded observed words, never the reference",
+      "authored": "No following text; keep initial decision"
+    },
+    "boundaries": "Completed words including simulated final-word completion; no wall-clock deadline or editor integration simulated",
+    "revision_score": "initial_acceptance_logit - immediate_threshold + candidate_initial_score_gap + fitted_weight * following_words_log_likelihood_gain_over_original",
+    "limitations": [
+      "Development data has historical exposure; no fresh test claim",
+      "Mobile continuation is simulated clean typing, not recorded future keystrokes",
+      "Word-boundary replay does not simulate deletion/undo, cursor moves, wall-clock cancellation, or phone latency",
+      "Known misspellings outside the near-threshold band, absent alternatives and multiword revisions are not recovered"
+    ]
+  },
+  "selected_rule": {
+    "band_width": 4.0,
+    "future_weight": 0.25,
+    "max_following": 2,
+    "revision_margin": 1.0
+  },
+  "fixed_snapshot_episodes": {
+    "baseline": {
+      "score": 0.857560924437909,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 512,
+          "fp": 45,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 232,
+          "unlabelled": 0,
+          "f05": 0.8613728129205922,
+          "precision": 0.9192100538599641,
+          "recall": 0.6881720430107527,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 356,
+          "fp": 14,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 169,
+          "f05": 0.8877805486284289,
+          "precision": 0.9621621621621622,
+          "recall": 0.6780952380952381,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      }
+    },
+    "candidate": {
+      "score": 0.8618014264960201,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 525,
+          "fp": 48,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 219,
+          "unlabelled": 0,
+          "f05": 0.8646245059288538,
+          "precision": 0.9162303664921466,
+          "recall": 0.7056451612903226,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 372,
+          "fp": 15,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 153,
+          "f05": 0.8972503617945007,
+          "precision": 0.9612403100775194,
+          "recall": 0.7085714285714285,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      }
+    },
+    "delta": 0.004240502058111106
+  },
+  "observed_touch_closed_loop": {
+    "baseline": {
+      "score": 0.8657359136504034,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 512,
+          "fp": 45,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 232,
+          "unlabelled": 0,
+          "f05": 0.8613728129205922,
+          "precision": 0.9192100538599641,
+          "recall": 0.6881720430107527,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 387,
+          "fp": 12,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 138,
+          "f05": 0.9123055162659123,
+          "precision": 0.9699248120300752,
+          "recall": 0.7371428571428571,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      }
+    },
+    "candidate": {
+      "score": 0.8693541281709272,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 525,
+          "fp": 48,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 219,
+          "unlabelled": 0,
+          "f05": 0.8646245059288538,
+          "precision": 0.9162303664921466,
+          "recall": 0.7056451612903226,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 402,
+          "fp": 13,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 123,
+          "f05": 0.919908466819222,
+          "precision": 0.9686746987951808,
+          "recall": 0.7657142857142857,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      }
+    },
+    "delta": 0.003618214520523799,
+    "touch_sentence_cer": {
+      "baseline": {
+        "overall": {
+          "character_errors": 380,
+          "reference_characters": 14869,
+          "exact_trials": 333,
+          "trials": 480,
+          "cer": 0.025556527002488397
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 25,
+            "reference_characters": 665,
+            "exact_trials": 6,
+            "trials": 20,
+            "cer": 0.03759398496240601
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 23,
+            "reference_characters": 642,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03582554517133956
+          },
+          "p14": {
+            "character_errors": 13,
+            "reference_characters": 669,
+            "exact_trials": 12,
+            "trials": 20,
+            "cer": 0.01943198804185351
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 25,
+            "reference_characters": 566,
+            "exact_trials": 12,
+            "trials": 20,
+            "cer": 0.044169611307420496
+          },
+          "p19": {
+            "character_errors": 3,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.005067567567567568
+          },
+          "p1": {
+            "character_errors": 52,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.08280254777070063
+          },
+          "p20": {
+            "character_errors": 35,
+            "reference_characters": 583,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.060034305317324184
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 17,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.026397515527950312
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 28,
+            "reference_characters": 657,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.0426179604261796
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 5,
+            "reference_characters": 636,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.007861635220125786
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "candidate": {
+        "overall": {
+          "character_errors": 360,
+          "reference_characters": 14869,
+          "exact_trials": 341,
+          "trials": 480,
+          "cer": 0.024211446633936377
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 21,
+            "reference_characters": 665,
+            "exact_trials": 7,
+            "trials": 20,
+            "cer": 0.031578947368421054
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 20,
+            "reference_characters": 642,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.03115264797507788
+          },
+          "p14": {
+            "character_errors": 12,
+            "reference_characters": 669,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.017937219730941704
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 24,
+            "reference_characters": 566,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.04240282685512368
+          },
+          "p19": {
+            "character_errors": 2,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033783783783783786
+          },
+          "p1": {
+            "character_errors": 50,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.07961783439490445
+          },
+          "p20": {
+            "character_errors": 32,
+            "reference_characters": 583,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.0548885077186964
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 16,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.024844720496894408
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 26,
+            "reference_characters": 657,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.0395738203957382
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 3,
+            "reference_characters": 636,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0047169811320754715
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      }
+    }
+  },
+  "coverage": {
+    "authored_hard": {
+      "cases": 92,
+      "with_following": 0,
+      "near_threshold": 8
+    },
+    "mobile_observed": {
+      "cases": 788,
+      "with_following": 639,
+      "near_threshold": 145
+    },
+    "mobile_source_copy": {
+      "cases": 1254,
+      "with_following": 1052,
+      "near_threshold": 53
+    },
+    "real_touch_observed": {
+      "cases": 3127,
+      "with_following": 2647,
+      "near_threshold": 185
+    }
+  },
+  "native_latency": {
+    "spelling": {
+      "calls": 8459,
+      "median_ms": 1.267,
+      "p95_ms": 2.899
+    },
+    "revision_sequences": {
+      "calls": 1368,
+      "median_ms": 2.807,
+      "p95_ms": 8.874599999999996
+    }
+  },
+  "changed_cases": 32,
+  "touch_revisions": 16,
+  "production_changed": false,
+  "changes": {
+    "recovered": 28,
+    "wrong_to_different_wrong": 4
+  },
+  "raw_report_sha256": "bd0a5cf996628934151b756443aee2cf6d9898446991c78853309cd807252257",
+  "native_request_validation": {
+    "requests": 9827,
+    "reference_or_target_fields_sent": false
+  },
+  "tests": {
+    "python_regressions": 7,
+    "passed": 7,
+    "production_code_changed": false
+  },
+  "dependency_sha256": {
+    "../gboard-probe/improve-v3/features.py": "da6919569ceb980a3a7f45760e2edad01fa03c0c6d1262dd96722f79427a1ced",
+    "../QwenASR/crates/cantonese-ngram/src/cnn_spelling.rs": "947fb949d934fb32241f62598ea23b4a4c2b5f474c195c3c99d584e6bb21213f"
+  }
+}

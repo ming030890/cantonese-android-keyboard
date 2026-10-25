@@ -1,0 +1,38 @@
+{
+  "schema": "revisit-distance-ablation-v1",
+  "script_sha256": "6cbc2c578e4812fda74846cb4c7540c976de2df57a3c6c9b704c3ccac0982545",
+  "data_manifest_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f",
+  "fixed_policy": {
+    "band_width": 4.0,
+    "future_weight": 0.25,
+    "max_following": 2,
+    "revision_margin": 1.0
+  },
+  "fixed_pending_capacity": 2,
+  "distances": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    null
+  ],
+  "source_hashes": {
+    "probe": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "policy": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a"
+  },
+  "selection": "Existing real recorded selection split; max F0.5 then fewer sequence requests then shorter distance",
+  "frozen_diagnostics": [
+    1,
+    2,
+    3,
+    null
+  ],
+  "scope": "Only distance changes. No synthetic future. Mobile/hard frozen decisions unchanged. Unbounded still respects sentence/cursor scope and two pending candidates.",
+  "production_changed": false
+}

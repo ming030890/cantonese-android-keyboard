@@ -1,0 +1,2030 @@
+{
+  "protocol": {
+    "schema": "context-revision-refresh-v1",
+    "grid": {
+      "band_width": [
+        1.0,
+        2.0,
+        4.0
+      ],
+      "future_weight": [
+        0.25,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "max_following": [
+        1,
+        2,
+        3
+      ],
+      "revision_margin": [
+        0.0,
+        1.0,
+        2.0,
+        4.0,
+        8.0
+      ]
+    },
+    "cap_extra_events_per_prompt": 24,
+    "fit": "Original real fit/calibration plus new aligned raw TRAIN events",
+    "selection": "Original plus new real selection-prompt events; parent and incumbent eligible",
+    "refresh_modes": [
+      "drop",
+      "strict",
+      "ordinary"
+    ],
+    "max_pending": 2,
+    "max_rewrites_per_boundary": 2,
+    "refresh": "After left revision, requery only remaining queued unsure words once. Strict requires positive following evidence and delayed margin; ordinary also allows fresh native immediate acceptance. Never rescore already corrected or confident right words.",
+    "mode_selection": "All predeclared modes reported diagnostically; no selection using evaluation",
+    "source_hashes": {
+      "events": "bbfff38259647e652f350c0c6821029c958adafbe245ece60e888953bcb01cc2",
+      "sentences": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+      "old_development": "1906d43e123f09bdf6f85841d1e8bf28c5b59920d6bc24d7077b1ba8a7872c7f",
+      "probe": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+      "policy": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+      "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322"
+    },
+    "code_hashes": {
+      "experiment_context_revision_refresh.py": "40a52fcc15ef07c6d92f69bcd92f204d0833aa376b62c585cea58f004ed89b97",
+      "replay_context_revision.py": "fa98f566eb6e7bcb6e4f8ce66f73e7b3ff84790305e7f19d83a9a20ce030d047"
+    },
+    "audit": {
+      "source_events": 489414,
+      "excluded_unaligned": 111645,
+      "existing": 6750,
+      "excluded_existing_overlapping_inputs": 883,
+      "excluded_fit_inputs_matching_selection": 53,
+      "added": 27550,
+      "total": 34300,
+      "exact_evaluation_overlap": 0,
+      "evaluation_prompt_overlap": 0,
+      "exact_fit_selection_overlap": 0
+    },
+    "counts": {
+      "fit": 19866,
+      "selection": 9168,
+      "calibration": 5266
+    },
+    "warm_cache_sha256": "3560fa2808aa387dbc2d6a53f28f71165db562df74f8910d543663a2f52e6c21",
+    "limitations": [
+      "Additional events are selected autocorrect events, not natural error prevalence",
+      "Mobile future is simulated clean prompt continuation",
+      "Previously exposed development/evaluation, no fresh test claim",
+      "Native host CPU work only, no phone or editor deadlines"
+    ],
+    "frozen_suite_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+    "production_changed": false
+  },
+  "selected_rule": {
+    "band_width": 1.0,
+    "future_weight": 0.5,
+    "max_following": 2,
+    "revision_margin": 2.0
+  },
+  "incumbent_rule": {
+    "band_width": 4.0,
+    "future_weight": 0.25,
+    "max_following": 2,
+    "revision_margin": 1.0
+  },
+  "results": {
+    "baseline": {
+      "score": 0.8657359136504034,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 512,
+          "fp": 45,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 232,
+          "unlabelled": 0,
+          "f05": 0.8613728129205922,
+          "precision": 0.9192100538599641,
+          "recall": 0.6881720430107527,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 387,
+          "fp": 12,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 138,
+          "f05": 0.9123055162659123,
+          "precision": 0.9699248120300752,
+          "recall": 0.7371428571428571,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "touch_cer": {
+        "overall": {
+          "character_errors": 380,
+          "reference_characters": 14869,
+          "exact_trials": 333,
+          "trials": 480,
+          "cer": 0.025556527002488397
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 25,
+            "reference_characters": 665,
+            "exact_trials": 6,
+            "trials": 20,
+            "cer": 0.03759398496240601
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 23,
+            "reference_characters": 642,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03582554517133956
+          },
+          "p14": {
+            "character_errors": 13,
+            "reference_characters": 669,
+            "exact_trials": 12,
+            "trials": 20,
+            "cer": 0.01943198804185351
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 25,
+            "reference_characters": 566,
+            "exact_trials": 12,
+            "trials": 20,
+            "cer": 0.044169611307420496
+          },
+          "p19": {
+            "character_errors": 3,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.005067567567567568
+          },
+          "p1": {
+            "character_errors": 52,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.08280254777070063
+          },
+          "p20": {
+            "character_errors": 35,
+            "reference_characters": 583,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.060034305317324184
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 17,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.026397515527950312
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 28,
+            "reference_characters": 657,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.0426179604261796
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 5,
+            "reference_characters": 636,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.007861635220125786
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 0,
+        "sequence_calls": 0,
+        "refresh_calls": 0,
+        "median_extra_ms": 0.0,
+        "p95_extra_ms": 0.0,
+        "max_extra_ms": 0.0,
+        "mean_extra_ms": 0.0,
+        "over_40ms": 0
+      },
+      "revisions": 0,
+      "refreshed_revisions": 0,
+      "changed_vs_incumbent": []
+    },
+    "incumbent": {
+      "score": 0.8693541281709272,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 525,
+          "fp": 48,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 219,
+          "unlabelled": 0,
+          "f05": 0.8646245059288538,
+          "precision": 0.9162303664921466,
+          "recall": 0.7056451612903226,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 402,
+          "fp": 13,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 123,
+          "f05": 0.919908466819222,
+          "precision": 0.9686746987951808,
+          "recall": 0.7657142857142857,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "touch_cer": {
+        "overall": {
+          "character_errors": 360,
+          "reference_characters": 14869,
+          "exact_trials": 341,
+          "trials": 480,
+          "cer": 0.024211446633936377
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 21,
+            "reference_characters": 665,
+            "exact_trials": 7,
+            "trials": 20,
+            "cer": 0.031578947368421054
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 20,
+            "reference_characters": 642,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.03115264797507788
+          },
+          "p14": {
+            "character_errors": 12,
+            "reference_characters": 669,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.017937219730941704
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 24,
+            "reference_characters": 566,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.04240282685512368
+          },
+          "p19": {
+            "character_errors": 2,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033783783783783786
+          },
+          "p1": {
+            "character_errors": 50,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.07961783439490445
+          },
+          "p20": {
+            "character_errors": 32,
+            "reference_characters": 583,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.0548885077186964
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 16,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.024844720496894408
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 26,
+            "reference_characters": 657,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.0395738203957382
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 3,
+            "reference_characters": 636,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0047169811320754715
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 198,
+        "sequence_calls": 200,
+        "refresh_calls": 0,
+        "median_extra_ms": 2.7315,
+        "p95_extra_ms": 17.814349999999997,
+        "max_extra_ms": 27.465,
+        "mean_extra_ms": 0.2675785097537576,
+        "over_40ms": 0
+      },
+      "revisions": 16,
+      "refreshed_revisions": 0,
+      "changed_vs_incumbent": []
+    },
+    "retuned": {
+      "score": 0.8688051602306548,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 524,
+          "fp": 49,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 220,
+          "unlabelled": 0,
+          "f05": 0.8629776021080369,
+          "precision": 0.9144851657940664,
+          "recall": 0.7043010752688172,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 402,
+          "fp": 13,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 123,
+          "f05": 0.919908466819222,
+          "precision": 0.9686746987951808,
+          "recall": 0.7657142857142857,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "touch_cer": {
+        "overall": {
+          "character_errors": 360,
+          "reference_characters": 14869,
+          "exact_trials": 340,
+          "trials": 480,
+          "cer": 0.024211446633936377
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 23,
+            "reference_characters": 665,
+            "exact_trials": 6,
+            "trials": 20,
+            "cer": 0.03458646616541353
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 20,
+            "reference_characters": 642,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.03115264797507788
+          },
+          "p14": {
+            "character_errors": 10,
+            "reference_characters": 669,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.014947683109118086
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 25,
+            "reference_characters": 566,
+            "exact_trials": 12,
+            "trials": 20,
+            "cer": 0.044169611307420496
+          },
+          "p19": {
+            "character_errors": 2,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033783783783783786
+          },
+          "p1": {
+            "character_errors": 50,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.07961783439490445
+          },
+          "p20": {
+            "character_errors": 31,
+            "reference_characters": 583,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.05317324185248713
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 16,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.024844720496894408
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 26,
+            "reference_characters": 657,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.0395738203957382
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 3,
+            "reference_characters": 636,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0047169811320754715
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 54,
+        "sequence_calls": 54,
+        "refresh_calls": 0,
+        "median_extra_ms": 3.113,
+        "p95_extra_ms": 7.274649999999982,
+        "max_extra_ms": 20.449,
+        "mean_extra_ms": 0.07131947553565718,
+        "over_40ms": 0
+      },
+      "revisions": 16,
+      "refreshed_revisions": 0,
+      "changed_vs_incumbent": [
+        {
+          "id": "aalto:002c0e8055cfd2f836cd38f16d2de0ef19528a957e7ed357240525bd24f1555b",
+          "typed": "quiy",
+          "target": "quickly",
+          "before": "quiy",
+          "after": "quit"
+        },
+        {
+          "id": "aalto:0030265429320fafd224b09b5023ab681d44f6552f87eae9c75eddf1e7f4b599",
+          "typed": "indentifwd",
+          "target": "identified",
+          "before": "indentifwd",
+          "after": "identified"
+        },
+        {
+          "id": "aalto:007620a3d1eeed72da11c2cacb880c9158c882dfa33b0690ba67d38411bf76bf",
+          "typed": "decise",
+          "target": "decide",
+          "before": "decise",
+          "after": "decide"
+        },
+        {
+          "id": "aalto:00841a628440a2cca89718f5358d5d5fa50a2dc3ed979591bd47b25cb6af7157",
+          "typed": "hioe",
+          "target": "hope",
+          "before": "hope",
+          "after": "hioe"
+        },
+        {
+          "id": "aalto:022fa0af4057c368b50c6f18b54cf179e3ecb4e0901631471d413dd89133dc9b",
+          "typed": "dud",
+          "target": "due",
+          "before": "dud",
+          "after": "due"
+        },
+        {
+          "id": "aalto:0376e389eb0a81e068d405cb72f0f66172d8d1653696f3b98a2709de0782b5b0",
+          "typed": "picn",
+          "target": "pick",
+          "before": "pick",
+          "after": "picn"
+        },
+        {
+          "id": "aalto:03d84ee2193266ed76688c712694eef73cc81dc4bdff040820b7600792f9bae3",
+          "typed": "pless",
+          "target": "please",
+          "before": "please",
+          "after": "pless"
+        },
+        {
+          "id": "aalto:055925b5c33c05541fc0d8e09eba25c876039df69801f759ce80d09c20c43cf5",
+          "typed": "upa",
+          "target": "up",
+          "before": "up",
+          "after": "upa"
+        },
+        {
+          "id": "vt_exp2:p11:mobile290:2",
+          "typed": "coupked",
+          "target": "couple",
+          "before": "couple",
+          "after": "coupked"
+        },
+        {
+          "id": "vt_exp2:p14:mobile128:4",
+          "typed": "tpen",
+          "target": "town",
+          "before": "tpen",
+          "after": "town"
+        },
+        {
+          "id": "vt_exp2:p18:mobile1915:0",
+          "typed": "sre",
+          "target": "are",
+          "before": "are",
+          "after": "sre"
+        },
+        {
+          "id": "vt_exp2:p20:mobile1921:3",
+          "typed": "our",
+          "target": "out",
+          "before": "our",
+          "after": "out"
+        }
+      ]
+    },
+    "retuned_strict_refresh": {
+      "score": 0.8688051602306548,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 524,
+          "fp": 49,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 220,
+          "unlabelled": 0,
+          "f05": 0.8629776021080369,
+          "precision": 0.9144851657940664,
+          "recall": 0.7043010752688172,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 402,
+          "fp": 13,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 123,
+          "f05": 0.919908466819222,
+          "precision": 0.9686746987951808,
+          "recall": 0.7657142857142857,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "touch_cer": {
+        "overall": {
+          "character_errors": 360,
+          "reference_characters": 14869,
+          "exact_trials": 340,
+          "trials": 480,
+          "cer": 0.024211446633936377
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 23,
+            "reference_characters": 665,
+            "exact_trials": 6,
+            "trials": 20,
+            "cer": 0.03458646616541353
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 20,
+            "reference_characters": 642,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.03115264797507788
+          },
+          "p14": {
+            "character_errors": 10,
+            "reference_characters": 669,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.014947683109118086
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 25,
+            "reference_characters": 566,
+            "exact_trials": 12,
+            "trials": 20,
+            "cer": 0.044169611307420496
+          },
+          "p19": {
+            "character_errors": 2,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033783783783783786
+          },
+          "p1": {
+            "character_errors": 50,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.07961783439490445
+          },
+          "p20": {
+            "character_errors": 31,
+            "reference_characters": 583,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.05317324185248713
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 16,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.024844720496894408
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 26,
+            "reference_characters": 657,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.0395738203957382
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 3,
+            "reference_characters": 636,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0047169811320754715
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 54,
+        "sequence_calls": 54,
+        "refresh_calls": 0,
+        "median_extra_ms": 3.2095000000000002,
+        "p95_extra_ms": 7.346249999999982,
+        "max_extra_ms": 20.932,
+        "mean_extra_ms": 0.07179405180684362,
+        "over_40ms": 0
+      },
+      "revisions": 16,
+      "refreshed_revisions": 0,
+      "changed_vs_incumbent": [
+        {
+          "id": "aalto:002c0e8055cfd2f836cd38f16d2de0ef19528a957e7ed357240525bd24f1555b",
+          "typed": "quiy",
+          "target": "quickly",
+          "before": "quiy",
+          "after": "quit"
+        },
+        {
+          "id": "aalto:0030265429320fafd224b09b5023ab681d44f6552f87eae9c75eddf1e7f4b599",
+          "typed": "indentifwd",
+          "target": "identified",
+          "before": "indentifwd",
+          "after": "identified"
+        },
+        {
+          "id": "aalto:007620a3d1eeed72da11c2cacb880c9158c882dfa33b0690ba67d38411bf76bf",
+          "typed": "decise",
+          "target": "decide",
+          "before": "decise",
+          "after": "decide"
+        },
+        {
+          "id": "aalto:00841a628440a2cca89718f5358d5d5fa50a2dc3ed979591bd47b25cb6af7157",
+          "typed": "hioe",
+          "target": "hope",
+          "before": "hope",
+          "after": "hioe"
+        },
+        {
+          "id": "aalto:022fa0af4057c368b50c6f18b54cf179e3ecb4e0901631471d413dd89133dc9b",
+          "typed": "dud",
+          "target": "due",
+          "before": "dud",
+          "after": "due"
+        },
+        {
+          "id": "aalto:0376e389eb0a81e068d405cb72f0f66172d8d1653696f3b98a2709de0782b5b0",
+          "typed": "picn",
+          "target": "pick",
+          "before": "pick",
+          "after": "picn"
+        },
+        {
+          "id": "aalto:03d84ee2193266ed76688c712694eef73cc81dc4bdff040820b7600792f9bae3",
+          "typed": "pless",
+          "target": "please",
+          "before": "please",
+          "after": "pless"
+        },
+        {
+          "id": "aalto:055925b5c33c05541fc0d8e09eba25c876039df69801f759ce80d09c20c43cf5",
+          "typed": "upa",
+          "target": "up",
+          "before": "up",
+          "after": "upa"
+        },
+        {
+          "id": "vt_exp2:p11:mobile290:2",
+          "typed": "coupked",
+          "target": "couple",
+          "before": "couple",
+          "after": "coupked"
+        },
+        {
+          "id": "vt_exp2:p14:mobile128:4",
+          "typed": "tpen",
+          "target": "town",
+          "before": "tpen",
+          "after": "town"
+        },
+        {
+          "id": "vt_exp2:p18:mobile1915:0",
+          "typed": "sre",
+          "target": "are",
+          "before": "are",
+          "after": "sre"
+        },
+        {
+          "id": "vt_exp2:p20:mobile1921:3",
+          "typed": "our",
+          "target": "out",
+          "before": "our",
+          "after": "out"
+        }
+      ]
+    },
+    "retuned_ordinary_refresh": {
+      "score": 0.8688051602306548,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 524,
+          "fp": 49,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 220,
+          "unlabelled": 0,
+          "f05": 0.8629776021080369,
+          "precision": 0.9144851657940664,
+          "recall": 0.7043010752688172,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 402,
+          "fp": 13,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 123,
+          "f05": 0.919908466819222,
+          "precision": 0.9686746987951808,
+          "recall": 0.7657142857142857,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "touch_cer": {
+        "overall": {
+          "character_errors": 360,
+          "reference_characters": 14869,
+          "exact_trials": 340,
+          "trials": 480,
+          "cer": 0.024211446633936377
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 23,
+            "reference_characters": 665,
+            "exact_trials": 6,
+            "trials": 20,
+            "cer": 0.03458646616541353
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 20,
+            "reference_characters": 642,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.03115264797507788
+          },
+          "p14": {
+            "character_errors": 10,
+            "reference_characters": 669,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.014947683109118086
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 25,
+            "reference_characters": 566,
+            "exact_trials": 12,
+            "trials": 20,
+            "cer": 0.044169611307420496
+          },
+          "p19": {
+            "character_errors": 2,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033783783783783786
+          },
+          "p1": {
+            "character_errors": 50,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.07961783439490445
+          },
+          "p20": {
+            "character_errors": 31,
+            "reference_characters": 583,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.05317324185248713
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 16,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.024844720496894408
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 26,
+            "reference_characters": 657,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.0395738203957382
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 3,
+            "reference_characters": 636,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0047169811320754715
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 54,
+        "sequence_calls": 54,
+        "refresh_calls": 0,
+        "median_extra_ms": 3.105,
+        "p95_extra_ms": 7.371999999999982,
+        "max_extra_ms": 20.927,
+        "mean_extra_ms": 0.07191749280460505,
+        "over_40ms": 0
+      },
+      "revisions": 16,
+      "refreshed_revisions": 0,
+      "changed_vs_incumbent": [
+        {
+          "id": "aalto:002c0e8055cfd2f836cd38f16d2de0ef19528a957e7ed357240525bd24f1555b",
+          "typed": "quiy",
+          "target": "quickly",
+          "before": "quiy",
+          "after": "quit"
+        },
+        {
+          "id": "aalto:0030265429320fafd224b09b5023ab681d44f6552f87eae9c75eddf1e7f4b599",
+          "typed": "indentifwd",
+          "target": "identified",
+          "before": "indentifwd",
+          "after": "identified"
+        },
+        {
+          "id": "aalto:007620a3d1eeed72da11c2cacb880c9158c882dfa33b0690ba67d38411bf76bf",
+          "typed": "decise",
+          "target": "decide",
+          "before": "decise",
+          "after": "decide"
+        },
+        {
+          "id": "aalto:00841a628440a2cca89718f5358d5d5fa50a2dc3ed979591bd47b25cb6af7157",
+          "typed": "hioe",
+          "target": "hope",
+          "before": "hope",
+          "after": "hioe"
+        },
+        {
+          "id": "aalto:022fa0af4057c368b50c6f18b54cf179e3ecb4e0901631471d413dd89133dc9b",
+          "typed": "dud",
+          "target": "due",
+          "before": "dud",
+          "after": "due"
+        },
+        {
+          "id": "aalto:0376e389eb0a81e068d405cb72f0f66172d8d1653696f3b98a2709de0782b5b0",
+          "typed": "picn",
+          "target": "pick",
+          "before": "pick",
+          "after": "picn"
+        },
+        {
+          "id": "aalto:03d84ee2193266ed76688c712694eef73cc81dc4bdff040820b7600792f9bae3",
+          "typed": "pless",
+          "target": "please",
+          "before": "please",
+          "after": "pless"
+        },
+        {
+          "id": "aalto:055925b5c33c05541fc0d8e09eba25c876039df69801f759ce80d09c20c43cf5",
+          "typed": "upa",
+          "target": "up",
+          "before": "up",
+          "after": "upa"
+        },
+        {
+          "id": "vt_exp2:p11:mobile290:2",
+          "typed": "coupked",
+          "target": "couple",
+          "before": "couple",
+          "after": "coupked"
+        },
+        {
+          "id": "vt_exp2:p14:mobile128:4",
+          "typed": "tpen",
+          "target": "town",
+          "before": "tpen",
+          "after": "town"
+        },
+        {
+          "id": "vt_exp2:p18:mobile1915:0",
+          "typed": "sre",
+          "target": "are",
+          "before": "are",
+          "after": "sre"
+        },
+        {
+          "id": "vt_exp2:p20:mobile1921:3",
+          "typed": "our",
+          "target": "out",
+          "before": "our",
+          "after": "out"
+        }
+      ]
+    },
+    "incumbent_strict_refresh": {
+      "score": 0.8693541281709272,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 525,
+          "fp": 48,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 219,
+          "unlabelled": 0,
+          "f05": 0.8646245059288538,
+          "precision": 0.9162303664921466,
+          "recall": 0.7056451612903226,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 402,
+          "fp": 13,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 123,
+          "f05": 0.919908466819222,
+          "precision": 0.9686746987951808,
+          "recall": 0.7657142857142857,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "touch_cer": {
+        "overall": {
+          "character_errors": 360,
+          "reference_characters": 14869,
+          "exact_trials": 341,
+          "trials": 480,
+          "cer": 0.024211446633936377
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 21,
+            "reference_characters": 665,
+            "exact_trials": 7,
+            "trials": 20,
+            "cer": 0.031578947368421054
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 20,
+            "reference_characters": 642,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.03115264797507788
+          },
+          "p14": {
+            "character_errors": 12,
+            "reference_characters": 669,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.017937219730941704
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 24,
+            "reference_characters": 566,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.04240282685512368
+          },
+          "p19": {
+            "character_errors": 2,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033783783783783786
+          },
+          "p1": {
+            "character_errors": 50,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.07961783439490445
+          },
+          "p20": {
+            "character_errors": 32,
+            "reference_characters": 583,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.0548885077186964
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 16,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.024844720496894408
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 26,
+            "reference_characters": 657,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.0395738203957382
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 3,
+            "reference_characters": 636,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0047169811320754715
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 198,
+        "sequence_calls": 200,
+        "refresh_calls": 1,
+        "median_extra_ms": 2.7805,
+        "p95_extra_ms": 18.1496,
+        "max_extra_ms": 28.184,
+        "mean_extra_ms": 0.2720191877198593,
+        "over_40ms": 0
+      },
+      "revisions": 16,
+      "refreshed_revisions": 0,
+      "changed_vs_incumbent": []
+    },
+    "incumbent_ordinary_refresh": {
+      "score": 0.8693541281709272,
+      "panels": {
+        "historical_full_mobile": {
+          "cases": 2042,
+          "typos": 744,
+          "tp": 525,
+          "fp": 48,
+          "clean_changes": 7,
+          "clean": 1298,
+          "fn": 219,
+          "unlabelled": 0,
+          "f05": 0.8646245059288538,
+          "precision": 0.9162303664921466,
+          "recall": 0.7056451612903226,
+          "clean_changes_per_1000": 5.3929121725731894
+        },
+        "real_touch_observed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 402,
+          "fp": 13,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "fn": 123,
+          "f05": 0.919908466819222,
+          "precision": 0.9686746987951808,
+          "recall": 0.7657142857142857,
+          "clean_changes_per_1000": 0.0
+        },
+        "authored_hard": {
+          "cases": 92,
+          "clean": 46,
+          "tp": 28,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 46,
+          "fn": 18,
+          "unlabelled": 0,
+          "f05": 0.8235294117647058,
+          "precision": 0.9032258064516129,
+          "recall": 0.6086956521739131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "touch_cer": {
+        "overall": {
+          "character_errors": 360,
+          "reference_characters": 14869,
+          "exact_trials": 341,
+          "trials": 480,
+          "cer": 0.024211446633936377
+        },
+        "participants": {
+          "p10": {
+            "character_errors": 8,
+            "reference_characters": 638,
+            "exact_trials": 15,
+            "trials": 20,
+            "cer": 0.012539184952978056
+          },
+          "p11": {
+            "character_errors": 21,
+            "reference_characters": 665,
+            "exact_trials": 7,
+            "trials": 20,
+            "cer": 0.031578947368421054
+          },
+          "p12": {
+            "character_errors": 2,
+            "reference_characters": 579,
+            "exact_trials": 19,
+            "trials": 20,
+            "cer": 0.0034542314335060447
+          },
+          "p13": {
+            "character_errors": 20,
+            "reference_characters": 642,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.03115264797507788
+          },
+          "p14": {
+            "character_errors": 12,
+            "reference_characters": 669,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.017937219730941704
+          },
+          "p15": {
+            "character_errors": 2,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033112582781456954
+          },
+          "p16": {
+            "character_errors": 7,
+            "reference_characters": 681,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.010279001468428781
+          },
+          "p17": {
+            "character_errors": 3,
+            "reference_characters": 623,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.004815409309791332
+          },
+          "p18": {
+            "character_errors": 24,
+            "reference_characters": 566,
+            "exact_trials": 13,
+            "trials": 20,
+            "cer": 0.04240282685512368
+          },
+          "p19": {
+            "character_errors": 2,
+            "reference_characters": 592,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0033783783783783786
+          },
+          "p1": {
+            "character_errors": 50,
+            "reference_characters": 628,
+            "exact_trials": 8,
+            "trials": 20,
+            "cer": 0.07961783439490445
+          },
+          "p20": {
+            "character_errors": 32,
+            "reference_characters": 583,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.0548885077186964
+          },
+          "p21": {
+            "character_errors": 27,
+            "reference_characters": 618,
+            "exact_trials": 16,
+            "trials": 20,
+            "cer": 0.043689320388349516
+          },
+          "p22": {
+            "character_errors": 5,
+            "reference_characters": 604,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008278145695364239
+          },
+          "p23": {
+            "character_errors": 5,
+            "reference_characters": 583,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.008576329331046312
+          },
+          "p24": {
+            "character_errors": 11,
+            "reference_characters": 594,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.018518518518518517
+          },
+          "p2": {
+            "character_errors": 16,
+            "reference_characters": 644,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.024844720496894408
+          },
+          "p3": {
+            "character_errors": 23,
+            "reference_characters": 622,
+            "exact_trials": 10,
+            "trials": 20,
+            "cer": 0.03697749196141479
+          },
+          "p4": {
+            "character_errors": 26,
+            "reference_characters": 657,
+            "exact_trials": 11,
+            "trials": 20,
+            "cer": 0.0395738203957382
+          },
+          "p5": {
+            "character_errors": 13,
+            "reference_characters": 565,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.023008849557522124
+          },
+          "p6": {
+            "character_errors": 3,
+            "reference_characters": 636,
+            "exact_trials": 18,
+            "trials": 20,
+            "cer": 0.0047169811320754715
+          },
+          "p7": {
+            "character_errors": 8,
+            "reference_characters": 598,
+            "exact_trials": 17,
+            "trials": 20,
+            "cer": 0.013377926421404682
+          },
+          "p8": {
+            "character_errors": 11,
+            "reference_characters": 615,
+            "exact_trials": 14,
+            "trials": 20,
+            "cer": 0.01788617886178862
+          },
+          "p9": {
+            "character_errors": 29,
+            "reference_characters": 663,
+            "exact_trials": 9,
+            "trials": 20,
+            "cer": 0.043740573152337855
+          }
+        }
+      },
+      "cost": {
+        "boundaries": 3127,
+        "checked": 198,
+        "sequence_calls": 200,
+        "refresh_calls": 1,
+        "median_extra_ms": 2.7735,
+        "p95_extra_ms": 18.144849999999995,
+        "max_extra_ms": 27.799,
+        "mean_extra_ms": 0.27087751838823154,
+        "over_40ms": 0
+      },
+      "revisions": 16,
+      "refreshed_revisions": 0,
+      "changed_vs_incumbent": []
+    }
+  },
+  "production_changed": false
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "noisy-acceptance-experiment-v1",
+  "grid": {
+    "learning_rates": [
+      0.0001,
+      0.0003
+    ],
+    "noise_weights": [
+      0.25,
+      0.5,
+      1.0
+    ],
+    "epochs": [
+      20,
+      60
+    ]
+  },
+  "seed": 2026102501,
+  "noise_seed": "noisy-context-20261025-v1",
+  "policy_sha256": "703e390ba0d38faa8a5f54268a557e48329377a2d98cc7a5f5cc1517cf3d3390",
+  "probe_sha256": "4711feae42832ba5d3f31476abe395daa7dbf708ae4a3edf286953714066c2c5",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "source_cases_sha256": "1906d43e123f09bdf6f85841d1e8bf28c5b59920d6bc24d7077b1ba8a7872c7f",
+  "cases_sha256": "2d0f91b3e93d7c057e1d81e8e5c308d821e096c4a539d3baec759f763184b50d",
+  "script_sha256": "b5b8caf0b59ba195e3e92b9bc3a62cddd5304ef047bc75ec89e3a6cf0adcfef5",
+  "features_sha256": "da6919569ceb980a3a7f45760e2edad01fa03c0c6d1262dd96722f79427a1ced",
+  "spelling_source_sha256": "947fb949d934fb32241f62598ea23b4a4c2b5f474c195c3c99d584e6bb21213f",
+  "selection": "Mean original/noisy real selection F0.5, then original selection F0.5, then smaller weight change; parent included",
+  "replay_anchor": 0.2,
+  "preservation_guard": [
+    [
+      "",
+      "butger"
+    ],
+    [
+      "",
+      "wastg"
+    ],
+    [
+      "",
+      "bokeh"
+    ],
+    [
+      "",
+      "Alstom"
+    ],
+    [
+      "",
+      "Xentara"
+    ],
+    [
+      "",
+      "thses"
+    ],
+    [
+      "",
+      "inthe"
+    ],
+    [
+      "I ",
+      "don't"
+    ],
+    [
+      "I said ",
+      "hel"
+    ]
+  ],
+  "fit": "Original fit rows plus noisy real fit rows; BCE with replay-logit anchoring",
+  "calibration": "Original real/new calibration plus noisy real calibration; one global cutoff",
+  "evaluation_used": false,
+  "counts": {
+    "fit:original": 19087,
+    "selection:original": 1949,
+    "calibration:original": 4505,
+    "fit:noisy": 15428,
+    "selection:noisy": 6416,
+    "calibration:noisy": 3864
+  }
+}

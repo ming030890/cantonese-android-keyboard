@@ -7,9 +7,35 @@
 
     <!-- Setup Main Screen Strings -->
     <string name="app_header_title">廣東話語音輸入鍵盤</string>
-    <string name="app_header_subtitle">極速・裝置內語音輸入</string>
+    <string name="app_header_subtitle">粵語及英文鍵盤 • 內置語音輸入</string>
 
     <string name="setup_step_completed">已就緒</string>
+
+    <string name="setup_step_layout_title">選擇鍵盤佈局</string>
+    <string name="setup_step_layout_desc">選擇你常用嘅鍵盤。所有佈局均內置語音輸入。</string>
+    <string name="setup_step_layout_inferred">根據你現有嘅鍵盤推薦</string>
+    <string name="setup_step_layout_action">自訂</string>
+
+    <string name="setup_step_enable_title">在系統開啟鍵盤</string>
+    <string name="setup_step_enable_desc">請去系統設定，開啟「粵語語音輸入法」嘅開關。</string>
+    <string name="setup_step_enable_action">開啟</string>
+
+    <string name="setup_step_switch_title">設為預設鍵盤</string>
+    <string name="setup_step_switch_desc">㩒一下切換，將「粵語語音輸入法」設為預設鍵盤。</string>
+    <string name="setup_step_switch_action">切換</string>
+
+    <string name="setup_step_voice_title">啟用語音輸入</string>
+    <string name="setup_step_voice_desc">需要麥克風權限以喺所有鍵盤使用語音輸入。</string>
+    <string name="setup_step_voice_action">允許</string>
+
+    <string name="setup_flow_title">鍵盤設定精靈</string>
+    <string name="setup_step_progress">步驟 %1$d / %2$d</string>
+    <string name="setup_all_done_title">鍵盤已就緒！</string>
+    <string name="setup_all_done_desc">廣東話語音輸入鍵盤已準備好，即刻喺下方試下打字啦！</string>
+    <string name="setup_step_locked_hint">請先完成上一步</string>
+    <string name="setup_details_button">設定詳細資料</string>
+    <string name="developer_tools_title">開發者工具</string>
+    <string name="model_status_compact_ready">離線語音模型：已就緒</string>
 
     <string name="setup_step_1_title">允許使用麥克風</string>
     <string name="setup_step_1_desc">語音輸入需要使用麥克風。</string>
@@ -33,8 +59,8 @@
 
     <!-- Try-it-out Strings -->
     <string name="sandbox_title">試吓用</string>
-    <string name="sandbox_desc">㩒下面個輸入框叫出鍵盤，再按住藍色嘅咪高峰掣講粵語試吓：</string>
-    <string name="sandbox_placeholder">喺度試下語音輸入啦…（例如講：「今日天氣幾好呀」）</string>
+    <string name="sandbox_desc">點擊下方輸入框試用鍵盤打字，或使用語音輸入：</string>
+    <string name="sandbox_placeholder">喺度試下打字或語音輸入啦…</string>
     <string name="sandbox_clear">清除</string>
 
     <!-- Developer Options -->
@@ -98,12 +124,20 @@
     <string name="error_failed_access_microphone">無法存取麥克風。</string>
 
     <!-- New Settings Screen Strings -->
-    <string name="settings_screen_title">English (UK)</string>
+    <string name="settings_screen_title">設定</string>
     <string name="settings_screen_label">設定</string>
     <string name="settings_keyboard_layouts_section">鍵盤佈局</string>
-    <string name="settings_layout_qwerty">QWERTY</string>
+    <string name="settings_layout_settings_header">佈局設定</string>
+    <string name="settings_layout_qwerty">英文</string>
     <string name="settings_layout_handwriting">手寫</string>
-    <string name="settings_layout_quick">速成</string>
+    <string name="settings_layout_quick">速成（連英文）</string>
+    <string name="settings_all_layouts_voice">所有佈局均支援語音輸入</string>
+    <string name="settings_layout_specific_header">%1$s 設定</string>
+    <string name="settings_feature_voice_typing">內置語音輸入</string>
+    <string name="settings_feature_quick_mixed">粵語速成（首尾碼）連英文輸入</string>
+    <string name="settings_feature_autocorrect_on">自動更正已常開</string>
+    <string name="settings_feature_handwriting">離線手寫文字識別</string>
+    <string name="settings_layout_disabled_hint">此佈局已停用。點擊上方卡片以啟用。</string>
     <string name="settings_language_settings_header">語言設定</string>
     <string name="settings_quick_version_title">速成版本</string>
     <string name="settings_quick_version_desc">選擇速成輸入法嘅倉頡標準版本</string>
@@ -118,7 +152,7 @@
     <string name="settings_open_onboarding_title">設定與新手指南</string>
     <string name="settings_open_onboarding_desc">檢查麥克風權限、系統鍵盤啟用及試用輸入框</string>
     <string name="settings_at_least_one_layout">必須選擇最少一個鍵盤佈局</string>
-    <string name="subtype_quick">粵語 — 速成</string>
+    <string name="subtype_quick">粵語 — 速成（連英文）</string>
     <string name="subtype_handwriting">粵語 — 手寫</string>
     <string name="settings_system_layouts">在 Android 啟用鍵盤配置</string>
     <string name="settings_system_layouts_description">在 Android 設定啟用相同的鍵盤配置，即可使用導覽列的鍵盤切換按鈕。</string>

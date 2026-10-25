@@ -1,0 +1,27 @@
+{
+  "scope": "Paired ABBA release-host native calls, first 16 per process excluded from warm summary; not phone latency",
+  "baseline": {
+    "calls": 2016,
+    "median_ms": 1.547,
+    "p95_ms": 3.0372500000000002
+  },
+  "candidate": {
+    "calls": 2016,
+    "median_ms": 1.5455,
+    "p95_ms": 3.0172499999999998
+  },
+  "first_calls_ms": {
+    "baseline": [
+      5.731,
+      3.589
+    ],
+    "candidate": [
+      6.272,
+      3.482
+    ]
+  },
+  "probe_sha256": {
+    "baseline": "4711feae42832ba5d3f31476abe395daa7dbf708ae4a3edf286953714066c2c5",
+    "candidate": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886"
+  }
+}

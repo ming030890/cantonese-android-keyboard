@@ -273,6 +273,16 @@ internal object KeyboardScenarios {
                     correction="tab",reason="shared_lm_spelling")
             })).use { it.start();it.type("qtab");it.snapshot() }
 
+    // Presentation fixture; the actual noisy-context decision and undo are tested through JNI.
+    fun noisyContextCorrection() = KeyboardScenario(initialText="Let me know if yyou ",
+        initialMode=KeyboardInputMode.AlphaNum, clipboardText=null,
+        englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
+            {1L},{_,_,_->emptyList()},{_,_,_,words,_->words},{_,_,_->
+                com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                    candidates=listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate("have",-6.0,1.0,1,0)),
+                    correction="have",reason="shared_lm_spelling")
+            })).use { it.start();it.type("heve");it.snapshot() }
+
     fun uncertainSharedLmSpelling() = KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,
         clipboardText=null,
         englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(

@@ -1,0 +1,78 @@
+{
+  "schema": "context-revision-refresh-v1",
+  "grid": {
+    "band_width": [
+      1.0,
+      2.0,
+      4.0
+    ],
+    "future_weight": [
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "max_following": [
+      1,
+      2,
+      3
+    ],
+    "revision_margin": [
+      0.0,
+      1.0,
+      2.0,
+      4.0,
+      8.0
+    ]
+  },
+  "cap_extra_events_per_prompt": 24,
+  "fit": "Original real fit/calibration plus new aligned raw TRAIN events",
+  "selection": "Original plus new real selection-prompt events; parent and incumbent eligible",
+  "refresh_modes": [
+    "drop",
+    "strict",
+    "ordinary"
+  ],
+  "max_pending": 2,
+  "max_rewrites_per_boundary": 2,
+  "refresh": "After left revision, requery only remaining queued unsure words once. Strict requires positive following evidence and delayed margin; ordinary also allows fresh native immediate acceptance. Never rescore already corrected or confident right words.",
+  "mode_selection": "All predeclared modes reported diagnostically; no selection using evaluation",
+  "source_hashes": {
+    "events": "bbfff38259647e652f350c0c6821029c958adafbe245ece60e888953bcb01cc2",
+    "sentences": "506741069ee7f2b0238f8e9f4035677d762b6aa119641396af3d1db2dc059d2a",
+    "old_development": "1906d43e123f09bdf6f85841d1e8bf28c5b59920d6bc24d7077b1ba8a7872c7f",
+    "probe": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+    "policy": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322"
+  },
+  "code_hashes": {
+    "experiment_context_revision_refresh.py": "40a52fcc15ef07c6d92f69bcd92f204d0833aa376b62c585cea58f004ed89b97",
+    "replay_context_revision.py": "fa98f566eb6e7bcb6e4f8ce66f73e7b3ff84790305e7f19d83a9a20ce030d047"
+  },
+  "audit": {
+    "source_events": 489414,
+    "excluded_unaligned": 111645,
+    "existing": 6750,
+    "excluded_existing_overlapping_inputs": 883,
+    "excluded_fit_inputs_matching_selection": 53,
+    "added": 27550,
+    "total": 34300,
+    "exact_evaluation_overlap": 0,
+    "evaluation_prompt_overlap": 0,
+    "exact_fit_selection_overlap": 0
+  },
+  "counts": {
+    "fit": 19866,
+    "selection": 9168,
+    "calibration": 5266
+  },
+  "warm_cache_sha256": "3560fa2808aa387dbc2d6a53f28f71165db562df74f8910d543663a2f52e6c21",
+  "limitations": [
+    "Additional events are selected autocorrect events, not natural error prevalence",
+    "Mobile future is simulated clean prompt continuation",
+    "Previously exposed development/evaluation, no fresh test claim",
+    "Native host CPU work only, no phone or editor deadlines"
+  ],
+  "frozen_suite_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+  "production_changed": false
+}

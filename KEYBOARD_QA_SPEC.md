@@ -1,5 +1,16 @@
 # Keyboard QA specification
 
+2026-10-25 acceptance update: the shared native English network is warm-started
+on TRAIN-only prior-context noise with clean replay. Frozen aggregate improves
+0.857262 → 0.857561; candidate generation and ranking are unchanged. The real-JNI
+`noisyContextAcceptanceAndUndoAcrossLayoutsThroughJni` scenario covers
+`Let me know if yyou ` + `heve` → `have` on Space, Backspace restoration and literal
+recommit across English, Quick3 and Quick5. The presentation-only snapshot is
+`ScenarioNoisyContextCorrection`. Existing ambiguous `butger` abstention is retained.
+The model-characterization table reflects newly accepted `mwrge → merge`; stale
+`tyoes`/`wrror` and contextual `exmaole` assertions are aligned with a replay of the
+starting policy. See [methods, tradeoffs and verification](NOISY_CONTEXT_ACCEPTANCE.md).
+
 Version 1, dated 2026-10-13. This is the behavioral contract for regression testing.
 
 ## Status and ownership

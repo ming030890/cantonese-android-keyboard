@@ -1,0 +1,288 @@
+{
+  "trials": [
+    {
+      "distance": 1,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 2,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9183673469387755,
+        "precision": 0.9782608695652174,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 32
+      },
+      "revisions": 3,
+      "revision_lags": {
+        "1": 3
+      }
+    },
+    {
+      "distance": 2,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 2,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9183673469387755,
+        "precision": 0.9782608695652174,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 56
+      },
+      "revisions": 3,
+      "revision_lags": {
+        "1": 3
+      }
+    },
+    {
+      "distance": 3,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 75
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 4,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 88
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 5,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 95
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 6,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 100
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 7,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 103
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 8,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 104
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": 9,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 104
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    },
+    {
+      "distance": null,
+      "metrics": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 90,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "unlabelled": 4,
+        "fn": 32,
+        "f05": 0.9109311740890689,
+        "precision": 0.967741935483871,
+        "recall": 0.7377049180327869,
+        "clean_changes_per_1000": 0.0
+      },
+      "requests": {
+        "spelling": 348,
+        "revisit": 104
+      },
+      "revisions": 4,
+      "revision_lags": {
+        "1": 3,
+        "3": 1
+      }
+    }
+  ],
+  "winner": {
+    "distance": 1,
+    "metrics": {
+      "cases": 348,
+      "clean": 222,
+      "tp": 90,
+      "fp": 2,
+      "clean_changes": 0,
+      "typos": 122,
+      "unlabelled": 4,
+      "fn": 32,
+      "f05": 0.9183673469387755,
+      "precision": 0.9782608695652174,
+      "recall": 0.7377049180327869,
+      "clean_changes_per_1000": 0.0
+    },
+    "requests": {
+      "spelling": 348,
+      "revisit": 32
+    },
+    "revisions": 3,
+    "revision_lags": {
+      "1": 3
+    }
+  },
+  "evaluation_used": false
+}

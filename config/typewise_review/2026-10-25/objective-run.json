@@ -1,0 +1,20 @@
+{
+  "binding": {
+    "manifest_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+    "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "probe_sha256": "4711feae42832ba5d3f31476abe395daa7dbf708ae4a3edf286953714066c2c5",
+    "baseline_probe_sha256": null,
+    "scorer_sha256": "06fbe3f810359e9caa3ca6173effcda9018069acfcab52a7bf9ca5bd23d2babc",
+    "parameters_selected_in_this_run": false
+  },
+  "latency": {
+    "scope": "Single release-host pass including first call, native inference only; not phone input-to-display",
+    "calls": 5261,
+    "median_ms": 1.002,
+    "p95_ms": 2.708
+  },
+  "accepted_documented_baseline": 0.797611,
+  "delta_from_documented_baseline": 0.05965141716198674,
+  "runtime_changed": false,
+  "quality_improvement_claim": false
+}
