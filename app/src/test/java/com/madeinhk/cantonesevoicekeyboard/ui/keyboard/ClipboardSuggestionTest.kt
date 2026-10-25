@@ -142,4 +142,52 @@ class ClipboardSuggestionTest {
 
         assertNull(presentation.secondaryAction)
     }
+
+    @Test
+    fun imageClipboardExposesImageSuggestion() {
+        val suggestion = clipboardSuggestionFor(
+            ClipboardSnapshot(
+                token = 10L,
+                isSensitive = false,
+                items = listOf(
+                    ClipboardItemSnapshot(
+                        mimeTypes = setOf("image/png"),
+                        text = null,
+                        uri = "content://media/external/images/media/1",
+                    )
+                ),
+            ),
+            dismissedToken = null,
+        )
+
+        assertTrue(suggestion != null)
+        assertTrue(suggestion!!.isImage)
+        assertEquals("content://media/external/images/media/1", suggestion.imageUri)
+        assertEquals("image/png", suggestion.mimeType)
+        assertNull(suggestion.preview)
+    }
+
+    @Test
+    fun sensitiveImageClipboardHidesUri() {
+        val suggestion = clipboardSuggestionFor(
+            ClipboardSnapshot(
+                token = 11L,
+                isSensitive = true,
+                items = listOf(
+                    ClipboardItemSnapshot(
+                        mimeTypes = setOf("image/jpeg"),
+                        text = null,
+                        uri = null,
+                    )
+                ),
+            ),
+            dismissedToken = null,
+        )
+
+        assertTrue(suggestion != null)
+        assertTrue(suggestion!!.isImage)
+        assertTrue(suggestion.isSensitive)
+        assertNull(suggestion.imageUri)
+        assertEquals("image/jpeg", suggestion.mimeType)
+    }
 }

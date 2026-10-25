@@ -176,6 +176,7 @@
     <string name="keyboard_toolbar_voice">Voice input</string>
     <string name="keyboard_toolbar_clipboard_preview">Paste %1$s</string>
     <string name="keyboard_toolbar_paste">Paste</string>
+    <string name="keyboard_toolbar_paste_image">Image</string>
     <string name="keyboard_toolbar_autofill">Autofill suggestion</string>
 
     <!-- Input Method Service Error Strings -->

@@ -350,32 +350,42 @@ private fun ClipboardToolbarChip(
     keyboardColors: BrandColors,
     modifier: Modifier = Modifier,
 ) {
-    val description = if (clipboard.isSensitive) {
-        stringResource(R.string.keyboard_toolbar_paste)
-    } else {
-        stringResource(
+    val description = when {
+        clipboard.isSensitive -> stringResource(R.string.keyboard_toolbar_paste)
+        clipboard.isImage -> stringResource(R.string.keyboard_toolbar_paste_image)
+        else -> stringResource(
             R.string.keyboard_toolbar_clipboard_preview,
             clipboard.preview.orEmpty(),
         )
+    }
+    val chipWidth = when {
+        clipboard.isSensitive -> 132.dp
+        clipboard.isImage -> 140.dp
+        else -> 220.dp
     }
     ToolbarChipVisual(
         key = key,
         keyRegistry = keyRegistry,
         accessibilityDescription = description,
-        modifier = modifier.width(
-            if (clipboard.isSensitive) 132.dp else 220.dp,
-        ),
+        modifier = modifier.width(chipWidth),
     ) {
-        ClipboardIcon(
-            modifier = Modifier.size(20.dp),
-            color = keyboardColors.keyboardKeyOnSurface,
-        )
+        if (clipboard.isImage) {
+            ImageIcon(
+                modifier = Modifier.size(20.dp),
+                color = keyboardColors.keyboardKeyOnSurface,
+            )
+        } else {
+            ClipboardIcon(
+                modifier = Modifier.size(20.dp),
+                color = keyboardColors.keyboardKeyOnSurface,
+            )
+        }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = if (clipboard.isSensitive) {
-                stringResource(R.string.keyboard_toolbar_paste)
-            } else {
-                clipboard.preview.orEmpty()
+            text = when {
+                clipboard.isSensitive -> stringResource(R.string.keyboard_toolbar_paste)
+                clipboard.isImage -> stringResource(R.string.keyboard_toolbar_paste_image)
+                else -> clipboard.preview.orEmpty()
             },
             color = keyboardColors.keyboardKeyOnSurface,
             style = KeyboardStatusTextStyle,

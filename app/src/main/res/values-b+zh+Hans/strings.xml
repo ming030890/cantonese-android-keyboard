@@ -107,6 +107,7 @@
     <string name="keyboard_toolbar_voice">语音输入</string>
     <string name="keyboard_toolbar_clipboard_preview">粘贴 %1$s</string>
     <string name="keyboard_toolbar_paste">粘贴</string>
+    <string name="keyboard_toolbar_paste_image">图片</string>
     <string name="keyboard_toolbar_autofill">自动填充建议</string>
 
     <!-- Input Method Service Error Strings -->

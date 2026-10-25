@@ -111,20 +111,35 @@ internal class KeyboardSuggestionCoordinator(
         val manager = clipboardManager ?: return
         val clip = manager.primaryClip
         val description = clip?.description
-        if (
-            clip == null ||
-            description == null ||
-            !description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
-        ) {
+        if (clip == null || description == null) {
             refreshClipboardSuggestion()
             return
         }
-        val text = (0 until clip.itemCount)
-            .asSequence()
-            .mapNotNull { clip.getItemAt(it).text?.toString() }
-            .firstOrNull(String::isNotEmpty)
-        clearAutofill()
-        if (text != null) editor.commitText(text)
+        if (description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+            val text = (0 until clip.itemCount)
+                .asSequence()
+                .mapNotNull { clip.getItemAt(it).text?.toString() }
+                .firstOrNull(String::isNotEmpty)
+            clearAutofill()
+            if (text != null) editor.commitText(text)
+            refreshClipboardSuggestion()
+            return
+        }
+        val hasImage = (0 until description.mimeTypeCount).any {
+            description.getMimeType(it).startsWith("image/")
+        }
+        if (hasImage) {
+            val uri = (0 until clip.itemCount)
+                .asSequence()
+                .mapNotNull { clip.getItemAt(it).uri }
+                .firstOrNull()
+            if (uri != null) {
+                clearAutofill()
+                editor.commitContent(uri, description)
+            }
+            refreshClipboardSuggestion()
+            return
+        }
         refreshClipboardSuggestion()
     }
 
@@ -167,9 +182,11 @@ internal class KeyboardSuggestionCoordinator(
             emptyList()
         } else {
             (0 until clip.itemCount).map {
+                val item = clip.getItemAt(it)
                 ClipboardItemSnapshot(
                     mimeTypes = mimeTypes,
-                    text = if (sensitive) null else clip.getItemAt(it).text?.toString(),
+                    text = if (sensitive) null else item.text?.toString(),
+                    uri = if (sensitive) null else item.uri?.toString(),
                 )
             }
         }

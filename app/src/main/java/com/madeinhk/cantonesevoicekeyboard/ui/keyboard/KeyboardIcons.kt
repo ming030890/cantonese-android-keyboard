@@ -220,6 +220,40 @@ fun ClipboardIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
 }
 
 @Composable
+fun ImageIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val strokePx = 1.8.dp.toPx()
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(w * 0.15f, h * 0.18f),
+            size = Size(w * 0.70f, h * 0.64f),
+            cornerRadius = CornerRadius(w * 0.10f, w * 0.10f),
+            style = Stroke(width = strokePx),
+        )
+        drawCircle(
+            color = color,
+            radius = w * 0.08f,
+            center = Offset(w * 0.35f, h * 0.38f),
+            style = Fill,
+        )
+        val path = Path().apply {
+            moveTo(w * 0.22f, h * 0.72f)
+            lineTo(w * 0.42f, h * 0.52f)
+            lineTo(w * 0.55f, h * 0.65f)
+            lineTo(w * 0.66f, h * 0.56f)
+            lineTo(w * 0.78f, h * 0.72f)
+        }
+        drawPath(
+            path = path,
+            color = color,
+            style = Stroke(width = strokePx, cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+    }
+}
+
+@Composable
 fun KeyboardActionIcon(
     action: KeyboardAction,
     modifier: Modifier = Modifier,

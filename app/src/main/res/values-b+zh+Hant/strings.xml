@@ -107,6 +107,7 @@
     <string name="keyboard_toolbar_voice">語音輸入</string>
     <string name="keyboard_toolbar_clipboard_preview">貼上 %1$s</string>
     <string name="keyboard_toolbar_paste">貼上</string>
+    <string name="keyboard_toolbar_paste_image">圖片</string>
     <string name="keyboard_toolbar_autofill">自動填寫建議</string>
 
     <!-- Input Method Service Error Strings -->

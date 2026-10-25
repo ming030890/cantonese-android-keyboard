@@ -1,5 +1,7 @@
 package com.madeinhk.cantonesevoicekeyboard
 
+import android.content.ClipDescription
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InlineSuggestionsRequest
@@ -15,6 +17,7 @@ internal interface KeyboardEditor {
     fun setComposingText(text: String)
     fun finishComposingText()
     fun commitText(text: String)
+    fun commitContent(contentUri: Uri, description: ClipDescription): Boolean = false
     fun getTextBeforeCursor(length: Int): String?
     fun getTextAfterCursor(length: Int): String?
     fun deleteSelectionOrPreviousCharacter()

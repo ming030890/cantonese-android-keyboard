@@ -1,9 +1,12 @@
 package com.madeinhk.cantonesevoicekeyboard
 
+import android.content.ClipDescription
+import android.net.Uri
 import android.os.Build
 import android.text.InputType
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputContentInfo
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardAction
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 
@@ -21,6 +24,16 @@ internal class ImeEditor(
 
     override fun commitText(text: String) {
         connection()?.commitText(text, 1)
+    }
+
+    override fun commitContent(contentUri: Uri, description: ClipDescription): Boolean {
+        val input = connection() ?: return false
+        val contentInfo = InputContentInfo(contentUri, description, null)
+        return input.commitContent(
+            contentInfo,
+            InputConnection.INPUT_CONTENT_GRANT_READ_URI_PERMISSION,
+            null,
+        )
     }
 
     override fun getTextBeforeCursor(length: Int): String? {
