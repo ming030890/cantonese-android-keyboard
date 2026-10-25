@@ -28,6 +28,7 @@ internal class KeyboardScenario(
     unifiedEngine: com.madeinhk.cantonesevoicekeyboard.english.UnifiedSuggestionEngine? = null,
     boundaryDispatcher: CoroutineDispatcher? = null,
     previewDispatcher: CoroutineDispatcher? = null,
+    var autoCapitalizationEnabled: Boolean = false,
 ) : AutoCloseable {
     val editor = MemoryKeyboardEditor(initialText)
     val engine = ScenarioQuickEngine()
@@ -51,7 +52,7 @@ internal class KeyboardScenario(
     }
     val controller = KeyboardSessionController(
         editor,
-        KeyboardSessionSettings({ enabledLayouts }, { quickVersion }, { it in autocorrectLayouts }),
+        KeyboardSessionSettings({ enabledLayouts }, { quickVersion }, { it in autocorrectLayouts }, { autoCapitalizationEnabled }),
     ) { _, _, _ -> KeyboardSessionDependencies(sessionVoice, quick, handwriting, suggestions, english) }
 
     // The same key receiver handles down/up/cancel in the real screen.
@@ -68,6 +69,7 @@ internal class KeyboardScenario(
         onCandidateTapped = controller::selectCandidate
         onPasteClipboard = controller::pasteClipboard
         onToggleRecording = controller::toggleRecording
+        onToggleUppercase = controller::onToggleShift
     }
 
     private val receiver = EmojiSearchInputReceiver(editorReceiver, { emojiSearch }, { emojiSearch = it })
@@ -120,6 +122,12 @@ internal class MemoryKeyboardEditor(var text: String = "", var right: String = "
         if (!text.endsWith(expected) || composing.isNotEmpty()) return false
         text = text.dropLast(expected.length) + replacement
         return true
+    }
+    var cursorCapsModeOverride: ((Int) -> Int)? = null
+    override fun getCursorCapsMode(reqModes: Int): Int {
+        cursorCapsModeOverride?.let { return it(reqModes) }
+        val before = (text + composing).takeLast(1024)
+        return AutoCapitalization.getCapsMode(before, before.length, reqModes)
     }
 }
 

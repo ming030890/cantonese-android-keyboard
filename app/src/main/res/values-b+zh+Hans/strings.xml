@@ -148,6 +148,8 @@
     <string name="settings_preferences_header">偏好设置</string>
     <string name="settings_haptic_title">按键震动反馈</string>
     <string name="settings_haptic_desc">按键时震动</string>
+    <string name="settings_autocap_title">自动大写</string>
+    <string name="settings_autocap_desc">每个句子首个字母自动大写</string>
     <string name="settings_onboarding_header">新手导览</string>
     <string name="settings_open_onboarding_title">设置与新手指南</string>
     <string name="settings_open_onboarding_desc">检查麦克风权限、系统键盘启用及试用输入框</string>

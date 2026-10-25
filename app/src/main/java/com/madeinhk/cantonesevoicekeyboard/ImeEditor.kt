@@ -68,6 +68,8 @@ internal class ImeEditor(
             input.deleteSurroundingText(expected.length, 0) && input.commitText(replacement, 1)
         } finally { input.endBatchEdit() }
     }
+
+    override fun getCursorCapsMode(reqModes: Int): Int = connection()?.getCursorCapsMode(reqModes) ?: 0
 }
 
 internal sealed interface EditorEnterCommand {

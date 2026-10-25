@@ -93,16 +93,18 @@ fun ShiftIcon(
     modifier: Modifier = Modifier,
     color: Color = Color.White,
     filled: Boolean = false,
+    capsLock: Boolean = false,
 ) {
     Canvas(modifier = modifier) {
         val w = size.width
         val h = size.height
+        val arrowBottom = if (capsLock) h * 0.76f else h * 0.82f
         val path = Path().apply {
             moveTo(w * 0.50f, h * 0.14f)
             lineTo(w * 0.18f, h * 0.46f)
             lineTo(w * 0.34f, h * 0.46f)
-            lineTo(w * 0.34f, h * 0.82f)
-            lineTo(w * 0.66f, h * 0.82f)
+            lineTo(w * 0.34f, arrowBottom)
+            lineTo(w * 0.66f, arrowBottom)
             lineTo(w * 0.66f, h * 0.46f)
             lineTo(w * 0.82f, h * 0.46f)
             close()
@@ -110,11 +112,20 @@ fun ShiftIcon(
         drawPath(
             path = path,
             color = color,
-            style = if (filled) Fill else Stroke(
+            style = if (filled || capsLock) Fill else Stroke(
                 width = 2.2.dp.toPx(),
                 join = StrokeJoin.Round,
             ),
         )
+        if (capsLock) {
+            drawLine(
+                color = color,
+                start = Offset(w * 0.30f, h * 0.88f),
+                end = Offset(w * 0.70f, h * 0.88f),
+                strokeWidth = 2.4.dp.toPx(),
+                cap = StrokeCap.Round,
+            )
+        }
     }
 }
 

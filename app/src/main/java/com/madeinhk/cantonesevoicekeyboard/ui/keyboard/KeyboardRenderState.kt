@@ -18,6 +18,7 @@ data class KeyboardRenderState(
     val handwritingSession: Long = 0L,
     val keyboardSession: Long = 0L,
     val chinesePunctuation: Boolean? = null,
+    val shiftState: com.madeinhk.cantonesevoicekeyboard.ShiftState = com.madeinhk.cantonesevoicekeyboard.ShiftState.Off,
 ) {
     internal fun toolbar(mode: KeyboardInputMode = inputMode, hasAutofill: Boolean = false): KeyboardToolbarContent =
         keyboardToolbarContent(

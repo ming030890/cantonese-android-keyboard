@@ -2,6 +2,7 @@ package com.madeinhk.cantonesevoicekeyboard
 
 import android.inputmethodservice.InputMethodService
 import android.os.Bundle
+import android.text.InputType
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InlineSuggestionsRequest
 import android.view.inputmethod.InlineSuggestionsResponse
@@ -31,6 +32,7 @@ internal class KeyboardSessionController(
             enabledLayouts = { KeyboardSettings.getEnabledLayouts(service) },
             quickVersion = { KeyboardSettings.getQuickVersion(service) },
             autocorrectEnabled = { KeyboardSettings.isAutocorrectEnabled(service, it) },
+            autoCapitalizationEnabled = { KeyboardSettings.isAutoCapitalizationEnabled(service) },
         ),
         createDependencies = { editor, currentSession, isVisible ->
             val voice = VoiceInputCoordinator(service, editor, currentSession, isVisible)
@@ -99,11 +101,16 @@ internal class KeyboardSessionController(
     private val _chinesePunctuation = MutableStateFlow(true)
     val chinesePunctuation = _chinesePunctuation.asStateFlow()
 
-    private fun refreshPunctuation() {
+    private fun refreshPunctuation(textBefore: String? = null) {
+        if (english?.word?.isNotEmpty() == true) {
+            _chinesePunctuation.value = false
+            return
+        }
+        val text = textBefore ?: editor.getTextBeforeCursor(64)
         _chinesePunctuation.value = SmartPunctuation.isChineseContext(
-            editor.getTextBeforeCursor(64), _keyboardInputMode.value,
+            text, _keyboardInputMode.value,
             isComposingQuick = quick.hasActiveInput(),
-            isComposingEnglish = english?.word?.isNotEmpty() == true,
+            isComposingEnglish = false,
         )
     }
 
@@ -149,12 +156,19 @@ internal class KeyboardSessionController(
     private val _keyboardAction = MutableStateFlow(KeyboardAction.Enter)
     val keyboardAction = _keyboardAction.asStateFlow()
 
+    private val _shiftState = MutableStateFlow(ShiftState.Off)
+    val shiftState = _shiftState.asStateFlow()
+    private var lastShiftTapTime = 0L
+    private var manualShift = false
+    private var currentEditorInfo: EditorInfo? = null
+
     /** Read after an event or after advancing the test scheduler for asynchronous work. */
     fun renderState() = KeyboardRenderState(
         voice = uiState.value,
         volume = volumeLevel.value,
         action = keyboardAction.value,
         inputMode = keyboardInputMode.value,
+        shiftState = _shiftState.value,
         clipboard = clipboardSuggestion.value,
         handwritingCandidates = handwritingCandidates.value,
         quickCandidates = quickCandidates.value,
@@ -165,6 +179,57 @@ internal class KeyboardSessionController(
         handwritingSession = handwritingSession.value,
         keyboardSession = keyboardSession.value,
     )
+
+    fun onToggleShift(now: Long = System.currentTimeMillis()) {
+        when (_shiftState.value) {
+            ShiftState.CapsLock -> {
+                _shiftState.value = ShiftState.Off
+                manualShift = false
+                lastShiftTapTime = 0L
+            }
+            ShiftState.Shifted -> {
+                if (now - lastShiftTapTime in 1 until 400L) {
+                    _shiftState.value = ShiftState.CapsLock
+                    manualShift = true
+                } else {
+                    _shiftState.value = ShiftState.Off
+                    manualShift = false
+                }
+                lastShiftTapTime = now
+            }
+            ShiftState.Off -> {
+                _shiftState.value = ShiftState.Shifted
+                manualShift = true
+                lastShiftTapTime = now
+            }
+        }
+    }
+
+    fun refreshAutoCapitalization(textBefore: String? = null) {
+        if (_shiftState.value == ShiftState.CapsLock) return
+        if (_keyboardInputMode.value != KeyboardInputMode.AlphaNum) {
+            if (!manualShift) _shiftState.value = ShiftState.Off
+            return
+        }
+        val isAllCharacters = (currentEditorInfo?.inputType ?: 0) and InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS != 0
+        if (!isAllCharacters && english?.word?.isNotEmpty() == true) {
+            // Mid-word typing in sentence/words mode is always lowercase; skip IPC
+            if (!manualShift) _shiftState.value = ShiftState.Off
+            return
+        }
+        val shouldCap = AutoCapitalization.shouldCapitalize(
+            editor = editor,
+            editorInfo = currentEditorInfo,
+            autoCapEnabled = settings.autoCapitalizationEnabled(),
+            textBefore = textBefore,
+        )
+        if (shouldCap) {
+            _shiftState.value = ShiftState.Shifted
+            manualShift = false
+        } else if (!manualShift) {
+            _shiftState.value = ShiftState.Off
+        }
+    }
 
     private var lastUserSelectedLayout: KeyboardInputMode? = null
 
@@ -192,6 +257,8 @@ internal class KeyboardSessionController(
     val handwritingSession = _handwritingSession.asStateFlow()
 
     fun onStartInput(info: EditorInfo?, restarting: Boolean, systemSubtypeId: Int? = null) {
+        currentEditorInfo = info
+        manualShift = false
         systemSubtypeId?.let { id ->
             KeyboardSubtypes.mode(id, settings.enabledLayouts())?.let { lastUserSelectedLayout = it }
         }
@@ -203,12 +270,15 @@ internal class KeyboardSessionController(
         handwriting.onInputStarted()
         suggestions.onInputStarted()
         if (!restarting) voice.finish(releaseModel = false, session = inputViewSession)
+        refreshAutoCapitalization()
     }
 
     private val _keyboardSession = MutableStateFlow(0L)
     val keyboardSession = _keyboardSession.asStateFlow()
 
     fun onStartInputView(info: EditorInfo?) {
+        currentEditorInfo = info
+        manualShift = false
         _keyboardSession.value++
         quick.setVersion(settings.quickVersion())
         updateEditorPresentation(info)
@@ -263,7 +333,9 @@ internal class KeyboardSessionController(
     }
 
     private fun refreshPredictions() {
-        refreshPunctuation()
+        val textBefore = editor.getTextBeforeCursor(64)
+        refreshPunctuation(textBefore)
+        refreshAutoCapitalization(textBefore)
         if (!inputViewVisible) return
         when (_keyboardInputMode.value) {
             KeyboardInputMode.AlphaNum -> if(autocorrectActive()) english?.refreshNextWords()
@@ -296,6 +368,7 @@ internal class KeyboardSessionController(
         if (mode == KeyboardInputMode.Number) return
         if (mode != textPanel) { finishEnglishLiteral(); quick.accept() }
         textPanel = mode
+        refreshAutoCapitalization()
     }
 
     private fun finishEnglishLiteral() {
@@ -372,23 +445,34 @@ internal class KeyboardSessionController(
         if (text.length == 1 && (text[0] in ",.!?;:" || text[0] in "，。！？；：") && waitForBoundary { commitText(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
+
+        val charToCommit = if (text.length == 1 && text[0].isLetter() && _shiftState.value.isUppercase && text[0].isLowerCase()) {
+            text.uppercase()
+        } else text
+
+        if (_shiftState.value == ShiftState.Shifted && charToCommit.length == 1 && charToCommit[0].isLetter()) {
+            _shiftState.value = ShiftState.Off
+            manualShift = false
+        }
+
         val evidence = pendingTouch.also { pendingTouch = null }
         if (autocorrectActive(KeyboardInputMode.AlphaNum) && textPanel == KeyboardInputMode.AlphaNum &&
-            text.length == 1 && (text[0].isAsciiLetter() || (text[0] in "'’" && !english!!.word.isEmpty()))) {
+            charToCommit.length == 1 && (charToCommit[0].isAsciiLetter() || (charToCommit[0] in "'’" && !english!!.word.isEmpty()))) {
             handwriting.accept()
-            english!!.type(text, evidence)
+            english!!.type(charToCommit, evidence)
             refreshPunctuation()
+            refreshAutoCapitalization()
             return
         }
-        if (text.length == 1 && text[0] in "'’" && textPanel == KeyboardInputMode.Quick &&
+        if (charToCommit.length == 1 && charToCommit[0] in "'’" && textPanel == KeyboardInputMode.Quick &&
             autocorrectActive() && quick.hasActiveInput()) {
-            quick.restoreComposingText(quick.getComposingText() + text)
+            quick.restoreComposingText(quick.getComposingText() + charToCommit)
             english?.observeQuick(quick.getComposingText(), null)
             refreshPunctuation()
             return
         }
-        val isBoundaryPunctuation = text.length == 1 && !text[0].isLetterOrDigit() && text[0] !in "_@/'’-"
-        val textToCommit = resolvePunctuation(text)
+        val isBoundaryPunctuation = charToCommit.length == 1 && !charToCommit[0].isLetterOrDigit() && charToCommit[0] !in "_@/'’-"
+        val textToCommit = resolvePunctuation(charToCommit)
         if (isBoundaryPunctuation && finishEnglishBoundary(textToCommit)) {
             refreshPredictions()
             return
@@ -464,6 +548,10 @@ internal class KeyboardSessionController(
     }
 
     fun selectCandidate(text: String) {
+        if (_shiftState.value == ShiftState.Shifted) {
+            _shiftState.value = ShiftState.Off
+            manualShift = false
+        }
         if (english?.hasUnifiedSuggestions == true) {
             if (_keyboardInputMode.value == KeyboardInputMode.Quick && !quick.canSelectJoined(text)) return
             if (_keyboardInputMode.value == KeyboardInputMode.AlphaNum && !english.canSelect(text)) return
@@ -500,6 +588,7 @@ internal class KeyboardSessionController(
     fun selectKeyboardInputMode(mode: KeyboardInputMode) {
         flushBoundaryLiteral()
         voice.interrupt()
+        manualShift = false
         // Returning from a temporary symbol panel doesn't end the language's word.
         if (mode == _keyboardInputMode.value && mode == textPanel) {
             lastUserSelectedLayout = mode

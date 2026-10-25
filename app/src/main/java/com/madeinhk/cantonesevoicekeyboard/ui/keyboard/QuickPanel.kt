@@ -40,6 +40,7 @@ fun QuickPanel(
     modifier: Modifier = Modifier,
     keyRegistry: KeyboardKeyRegistry,
     isUppercase: Boolean,
+    isCapsLock: Boolean = false,
     standardKeyTouchWidth: Dp,
 ) {
     Column(
@@ -66,6 +67,7 @@ fun QuickPanel(
         )
         QuickBottomLetterRow(
             isUppercase = isUppercase,
+            isCapsLock = isCapsLock,
             keyRegistry = keyRegistry,
             rowHeight = rowHeight,
         )
@@ -122,6 +124,7 @@ private fun QuickKeyRow(
 private fun QuickBottomLetterRow(
     rowHeight: Dp,
     isUppercase: Boolean,
+    isCapsLock: Boolean = false,
     keyRegistry: KeyboardKeyRegistry,
 ) {
     val keyboardColors = BrandTheme.colors
@@ -150,6 +153,7 @@ private fun QuickBottomLetterRow(
                 modifier = Modifier.size(20.dp),
                 color = keyboardColors.keyboardKeyOnSurface,
                 filled = isUppercase,
+                capsLock = isCapsLock,
             )
         }
         listOf("z", "x", "c", "v", "b", "n", "m").forEachIndexed { index, letter ->

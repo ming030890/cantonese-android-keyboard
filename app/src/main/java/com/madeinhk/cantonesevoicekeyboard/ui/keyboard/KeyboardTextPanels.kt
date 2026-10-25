@@ -70,6 +70,7 @@ fun AlphaNumPanel(
     modifier: Modifier = Modifier,
     keyRegistry: KeyboardKeyRegistry,
     isUppercase: Boolean,
+    isCapsLock: Boolean = false,
     standardKeyTouchWidth: Dp,
 ) {
     Column(
@@ -94,7 +95,12 @@ fun AlphaNumPanel(
             rowId = "alpha.row1",
             standardKeyTouchWidth = standardKeyTouchWidth,
         )
-        BottomLetterRow(isUppercase = isUppercase, keyRegistry = keyRegistry, rowHeight = rowHeight)
+        BottomLetterRow(
+            isUppercase = isUppercase,
+            isCapsLock = isCapsLock,
+            keyRegistry = keyRegistry,
+            rowHeight = rowHeight
+        )
     }
 }
 
@@ -102,6 +108,7 @@ fun AlphaNumPanel(
 private fun BottomLetterRow(
     rowHeight: Dp,
     isUppercase: Boolean,
+    isCapsLock: Boolean = false,
     keyRegistry: KeyboardKeyRegistry,
 ) {
     val keyboardColors = BrandTheme.colors
@@ -126,6 +133,7 @@ private fun BottomLetterRow(
                 modifier = Modifier.size(21.dp),
                 color = keyboardColors.keyboardKeyOnSurface,
                 filled = isUppercase,
+                capsLock = isCapsLock,
             )
         }
         listOf("z", "x", "c", "v", "b", "n", "m").forEach { key ->

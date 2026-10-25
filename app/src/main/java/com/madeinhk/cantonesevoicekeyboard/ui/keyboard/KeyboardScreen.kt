@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.ShiftState
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ fun KeyboardScreen(
     volumeLevel: StateFlow<Float>,
     keyboardAction: StateFlow<KeyboardAction>,
     keyboardInputMode: StateFlow<KeyboardInputMode>,
+    shiftState: StateFlow<ShiftState> = MutableStateFlow(ShiftState.Off),
     autofillSuggestionView: StateFlow<View?>,
     clipboardSuggestion: StateFlow<ClipboardSuggestion?>,
     handwritingCandidates: StateFlow<List<HandwritingCandidate>>,
@@ -47,6 +49,7 @@ fun KeyboardScreen(
     onQuickKey: (String) -> Unit = {},
     onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
     onVisiblePanelChanged: (KeyboardInputMode?) -> Unit = {},
+    onToggleShift: () -> Unit = {},
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
@@ -74,6 +77,7 @@ fun KeyboardScreen(
     val volume by volumeLevel.collectAsState()
     val action by keyboardAction.collectAsState()
     val inputMode by keyboardInputMode.collectAsState()
+    val shift by shiftState.collectAsState()
     val autofillView by autofillSuggestionView.collectAsState()
     val clipboard by clipboardSuggestion.collectAsState()
     val handwritingCandidates by handwritingCandidates.collectAsState()
@@ -90,6 +94,7 @@ fun KeyboardScreen(
             volume = volume,
             action = action,
             inputMode = inputMode,
+            shiftState = shift,
             clipboard = clipboard,
             handwritingCandidates = handwritingCandidates,
             handwritingBusy = handwritingBusy,
@@ -104,6 +109,7 @@ fun KeyboardScreen(
         onQuickKey = onQuickKey,
         onTouchEvidence = onTouchEvidence,
         onVisiblePanelChanged = onVisiblePanelChanged,
+        onToggleShift = onToggleShift,
         onToggleRecording = onToggleRecording,
         onDeleteSurroundingText = onDeleteSurroundingText,
         onCommitText = onCommitText,
@@ -136,6 +142,7 @@ fun KeyboardScreen(
     onQuickKey: (String) -> Unit = {},
     onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
     onVisiblePanelChanged: (KeyboardInputMode?) -> Unit = {},
+    onToggleShift: () -> Unit = {},
     onToggleRecording: () -> Unit,
     onDeleteSurroundingText: () -> Unit,
     onCommitText: (String) -> Unit,
@@ -206,9 +213,16 @@ fun KeyboardScreen(
             }
         )
     }
-    var isUppercase by remember(activePanel, initialUppercase) {
-        mutableStateOf(initialUppercase)
+    var localShiftState by remember(activePanel, initialUppercase, renderState.shiftState) {
+        mutableStateOf(
+            if (renderState.shiftState != ShiftState.Off) renderState.shiftState
+            else if (initialUppercase) ShiftState.Shifted
+            else ShiftState.Off
+        )
     }
+    val effectiveShiftState = if (renderState.shiftState != ShiftState.Off) renderState.shiftState else localShiftState
+    val isUppercase = effectiveShiftState.isUppercase
+    val isCapsLock = effectiveShiftState.isCapsLock
     val punctuationVariant = renderState.chinesePunctuation?.let {
         if (it) SymbolVariant.Chinese else SymbolVariant.English
     } ?: symbolVariant
@@ -280,7 +294,14 @@ fun KeyboardScreen(
             candidatePage++
         }
         inputReceiver.onOpenEmoji = { emojiSearch = emojiSearch.close(); searchSymbols = false; onVisiblePanelChanged(null); activePanel = KeyboardPanel.Emoji }
-        inputReceiver.onToggleUppercase = { isUppercase = !isUppercase }
+        inputReceiver.onToggleUppercase = {
+            localShiftState = when (localShiftState) {
+                ShiftState.Off -> ShiftState.Shifted
+                ShiftState.Shifted -> ShiftState.Off
+                ShiftState.CapsLock -> ShiftState.Off
+            }
+            onToggleShift()
+        }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
         inputReceiver.onModeSwitch = modeSwitch@{ target ->
             if (emojiSearchActive && target in listOf("number.english", "alpha")) {
@@ -476,6 +497,7 @@ fun KeyboardScreen(
                             rowHeight = textRowHeight,
                             modifier = Modifier.fillMaxWidth().height(textRowHeight * 3),
                             keyRegistry = keyRegistry, isUppercase = isUppercase,
+                            isCapsLock = isCapsLock,
                             standardKeyTouchWidth = standardKeyTouchWidth,
                         )
                     }
@@ -500,6 +522,7 @@ fun KeyboardScreen(
                             .height(textRowHeight * 3),
                         keyRegistry = keyRegistry,
                         isUppercase = isUppercase,
+                        isCapsLock = isCapsLock,
                         standardKeyTouchWidth = standardKeyTouchWidth,
                     )
                 }
@@ -511,6 +534,7 @@ fun KeyboardScreen(
                             .height(textRowHeight * 3),
                         keyRegistry = keyRegistry,
                         isUppercase = isUppercase,
+                        isCapsLock = isCapsLock,
                         standardKeyTouchWidth = standardKeyTouchWidth,
                     )
                 }

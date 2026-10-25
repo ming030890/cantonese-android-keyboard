@@ -23,6 +23,7 @@ internal interface KeyboardEditor {
     fun cursorSelection(): Pair<Int, Int>? = null
     /** Guarded undo: never delete through a changed cursor/selection. */
     fun replaceTextBeforeCursor(expected: String, replacement: String): Boolean = false
+    fun getCursorCapsMode(reqModes: Int): Int = 0
 }
 
 internal interface VoiceSession {
@@ -72,6 +73,7 @@ internal data class KeyboardSessionSettings(
     val enabledLayouts: () -> Set<String>,
     val quickVersion: () -> Int,
     val autocorrectEnabled: (String) -> Boolean = { true },
+    val autoCapitalizationEnabled: () -> Boolean = { true },
 )
 
 internal data class KeyboardSessionDependencies(

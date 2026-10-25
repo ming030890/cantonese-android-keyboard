@@ -59,6 +59,9 @@ fun SettingsScreen(
     var hapticFeedback by remember {
         mutableStateOf(KeyboardSettings.isHapticFeedbackEnabled(context))
     }
+    var autoCapitalization by remember {
+        mutableStateOf(KeyboardSettings.isAutoCapitalizationEnabled(context))
+    }
 
     SettingsScreenContent(
         enabledLayouts = enabledLayouts,
@@ -80,6 +83,11 @@ fun SettingsScreen(
             KeyboardSettings.setHapticFeedbackEnabled(context, enabled)
             hapticFeedback = enabled
         },
+        autoCapitalization = autoCapitalization,
+        onAutoCapitalizationChange = { enabled ->
+            KeyboardSettings.setAutoCapitalizationEnabled(context, enabled)
+            autoCapitalization = enabled
+        },
         onBack = onBack,
         modifier = modifier
     )
@@ -94,6 +102,8 @@ fun SettingsScreenContent(
     onQuickVersionChange: (Int) -> Unit = {},
     hapticFeedback: Boolean = true,
     onHapticFeedbackChange: (Boolean) -> Unit = {},
+    autoCapitalization: Boolean = true,
+    onAutoCapitalizationChange: (Boolean) -> Unit = {},
     onConfigureSystemLayouts: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -189,6 +199,13 @@ fun SettingsScreenContent(
             HapticFeedbackCard(
                 checked = hapticFeedback,
                 onCheckedChange = onHapticFeedbackChange
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            AutoCapitalizationCard(
+                checked = autoCapitalization,
+                onCheckedChange = onAutoCapitalizationChange
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -337,6 +354,59 @@ fun HapticFeedbackCard(
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = stringResource(R.string.settings_haptic_desc),
+                    fontSize = 13.sp,
+                    color = SecondaryTextColor,
+                    lineHeight = 17.sp
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MintOnAccentColor,
+                    checkedTrackColor = MintAccentColor,
+                    uncheckedThumbColor = Color(0xFF38433D),
+                    uncheckedTrackColor = Color(0xFF1E2622),
+                    uncheckedBorderColor = Color(0xFF4C5851)
+                )
+            )
+        }
+    }
+}
+
+/**
+ * Auto-capitalization Card under Preferences.
+ */
+@Composable
+fun AutoCapitalizationCard(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        border = BorderStroke(1.dp, CardBorderColor)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.settings_autocap_title),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = PrimaryTextColor
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    text = stringResource(R.string.settings_autocap_desc),
                     fontSize = 13.sp,
                     color = SecondaryTextColor,
                     lineHeight = 17.sp

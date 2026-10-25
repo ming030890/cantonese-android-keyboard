@@ -11,6 +11,8 @@ object KeyboardSettings {
     private const val KEY_MULTILINGUAL = "multilingual_typing"
     private const val KEY_HAPTIC = "haptic_feedback"
     private const val KEY_QUICK_VERSION = "quick_version"
+    private const val KEY_AUTOCAPITALIZATION = "auto_capitalization"
+    const val DEFAULT_AUTOCAPITALIZATION = true
 
     const val LAYOUT_ENGLISH = "english"
     const val LAYOUT_HANDWRITING = "handwriting"
@@ -39,10 +41,14 @@ object KeyboardSettings {
     private val _quickVersionFlow = MutableStateFlow(DEFAULT_QUICK_VERSION)
     val quickVersionFlow: StateFlow<Int> = _quickVersionFlow.asStateFlow()
 
+    private val _autoCapitalizationFlow = MutableStateFlow(DEFAULT_AUTOCAPITALIZATION)
+    val autoCapitalizationFlow: StateFlow<Boolean> = _autoCapitalizationFlow.asStateFlow()
+
     fun init(context: Context) {
         _enabledLayoutsFlow.value = getEnabledLayouts(context)
         KeyboardSubtypes.syncEnabled(context, _enabledLayoutsFlow.value)
         _quickVersionFlow.value = getQuickVersion(context)
+        _autoCapitalizationFlow.value = isAutoCapitalizationEnabled(context)
     }
 
     fun getQuickVersion(context: Context): Int {
@@ -139,5 +145,17 @@ object KeyboardSettings {
             .edit()
             .putBoolean(KEY_HAPTIC, enabled)
             .apply()
+    }
+
+    fun isAutoCapitalizationEnabled(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_AUTOCAPITALIZATION, DEFAULT_AUTOCAPITALIZATION)
+
+    fun setAutoCapitalizationEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_AUTOCAPITALIZATION, enabled)
+            .apply()
+        _autoCapitalizationFlow.value = enabled
     }
 }
