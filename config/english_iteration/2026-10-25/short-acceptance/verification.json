@@ -1,0 +1,13 @@
+{
+  "bindings": {
+    "probe": true,
+    "model": true,
+    "policy": true,
+    "script": true
+  },
+  "source": "build/short-acceptance-20261025/run3",
+  "native_adapter_parity": "Asserted for every unique typed/output pair",
+  "production_changed": false,
+  "extra_lm_calls_per_decision": 0,
+  "phone_latency_measured": false
+}

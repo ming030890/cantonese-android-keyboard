@@ -1,0 +1,13 @@
+{
+  "source_hashes": {
+    "probe": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+    "policy": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322"
+  },
+  "script_sha256": "f450bb19b6bf496efecfd9c6ec8de44c26859d3b8d3ab5ed7249cde840525e4a",
+  "data_manifest_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f",
+  "calibration": "Fit plus calibration recorded cohorts, exact observed cutoffs; shared, separate lengths, or shared plus one existing LM margin cutoff",
+  "selection": "Closed-loop real selection streams; no extra FP or clean damage, no precision loss for short/all; max F0.5, ties simpler then baseline",
+  "evaluation_used_for_tuning": false,
+  "production_changed": false
+}
