@@ -168,3 +168,24 @@ fun SettingsLegacySystemLayoutsScreenshot() {
         )
     }
 }
+
+@PreviewTest
+@Preview(name = "Settings all layouts light theme", widthDp = 412, heightDp = 1050)
+@Composable
+fun SettingsAllLayoutsLightScreenshot() {
+    SettingsScreenScreenshotContent(
+        enabledLayouts = KeyboardSettings.DEFAULT_LAYOUTS + KeyboardSettings.LAYOUT_HANDWRITING,
+        darkTheme = false,
+    )
+}
+
+@PreviewTest
+@Preview(name = "Settings Quick 5 light large text", widthDp = 320, heightDp = 1100, fontScale = 1.3f)
+@Composable
+fun SettingsQuickLightLargeTextScreenshot() {
+    SettingsScreenScreenshotContent(
+        enabledLayouts = setOf(KeyboardSettings.LAYOUT_QUICK),
+        quickVersion = KeyboardSettings.QUICK_VERSION_5,
+        darkTheme = false,
+    )
+}

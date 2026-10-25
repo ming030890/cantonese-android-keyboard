@@ -51,6 +51,14 @@ internal class QuickInputCoordinator(
     private var displayedRequest: Long? = null
     private var joinedInput: QuickSuggestionInput? = null
     fun canSelectJoined(text: String) = displayedRequest == requestId && _joinedCandidates.value.any { it.text == text }
+    /** Committed-word inspection owns the row until composition/predictions resume. */
+    fun publishCursorCandidates(words: List<QuickCandidate>) {
+        if (closed || hasActiveInput()) return
+        ++requestId
+        pending?.cancel(); pending = null
+        displayedRequest = null
+        _joinedCandidates.value = words
+    }
     fun publishLiteral(input: QuickSuggestionInput) {
         if (closed || requestId != input.id || composingText != input.code || currentVersion != input.version) return
         // Do not mark Chinese coverage complete until the native preview arrives.

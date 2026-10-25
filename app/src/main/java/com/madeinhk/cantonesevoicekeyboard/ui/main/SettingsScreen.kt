@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -40,8 +41,6 @@ import androidx.navigation3.runtime.NavKey
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 
-// Material 3 Dynamic Dark Forest Palette matching reference screenshot
-private val ScreenBackground = Color(0xFF121714)
 
 @Composable
 fun SettingsScreen(
@@ -107,69 +106,106 @@ fun SettingsScreenContent(
     onConfigureSystemLayouts: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ScreenBackground)
-    ) {
-        Column(
-            modifier = modifier
+    val lightTheme = MaterialTheme.colorScheme.background.luminance() > 0.5f
+    CompositionLocalProvider(LocalSettingsLightTheme provides lightTheme) {
+        Box(
+            modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .background(if (lightTheme) MaterialTheme.colorScheme.background else Color(0xFF121714))
         ) {
-            // Circular Back Arrow Button
-            SettingsBackButton(onBack = onBack)
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                // Circular Back Arrow Button
+                SettingsBackButton(onBack = onBack)
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Large Title ("Settings" / "鍵盤設定")
-            Text(
-                text = stringResource(R.string.settings_screen_title),
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Normal,
-                color = PrimaryTextColor,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
-            )
-
-            // Subtitle indicating voice typing is included in all layouts
-            Text(
-                text = stringResource(R.string.settings_all_layouts_voice),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                color = MintAccentColor,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Keyboard Layouts Carousel Card
-            KeyboardLayoutsSelectorCard(
-                enabledLayouts = enabledLayouts,
-                onToggleLayout = onToggleLayout,
-                quickVersion = quickVersion,
-                onQuickVersionChange = onQuickVersionChange
-            )
-
-            if (onConfigureSystemLayouts != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                TextButton(onClick = onConfigureSystemLayouts) {
-                    Text(stringResource(R.string.settings_system_layouts), color = MintAccentColor)
-                }
+                // Large Title ("Settings" / "鍵盤設定")
                 Text(
-                    stringResource(R.string.settings_system_layouts_description),
-                    color = SecondaryTextColor,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(horizontal = 12.dp)
+                    text = stringResource(R.string.settings_screen_title),
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = PrimaryTextColor,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
                 )
-            }
 
-            // Layout-specific Settings (Quick 3 and 5 only shown when Quick is enabled)
-            if (enabledLayouts.contains(KeyboardSettings.LAYOUT_QUICK)) {
-                Spacer(modifier = Modifier.height(28.dp))
-
+                // Subtitle indicating voice typing is included in all layouts
                 Text(
-                    text = stringResource(R.string.settings_layout_settings_header),
+                    text = stringResource(R.string.settings_all_layouts_voice),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MintAccentColor,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Keyboard Layouts Carousel Card
+                KeyboardLayoutsSelectorCard(
+                    enabledLayouts = enabledLayouts,
+                    onToggleLayout = onToggleLayout,
+                    quickVersion = quickVersion,
+                    onQuickVersionChange = onQuickVersionChange,
+                    showQuickVersionSelector = false,
+                )
+
+                if (onConfigureSystemLayouts != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextButton(onClick = onConfigureSystemLayouts) {
+                        Text(stringResource(R.string.settings_system_layouts), color = MintAccentColor)
+                    }
+                    Text(
+                        stringResource(R.string.settings_system_layouts_description),
+                        color = SecondaryTextColor,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
+                }
+
+                // Layout-specific Settings (Quick 3 and 5 only shown when Quick is enabled)
+                if (enabledLayouts.contains(KeyboardSettings.LAYOUT_QUICK)) {
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    Text(
+                        text = stringResource(R.string.settings_layout_specific_header, stringResource(R.string.settings_layout_quick)),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MintAccentColor,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    QuickVersionCard(
+                        selectedVersion = quickVersion,
+                        onVersionChange = onQuickVersionChange
+                    )
+                }
+
+                if (enabledLayouts.contains(KeyboardSettings.LAYOUT_ENGLISH)) {
+                    Spacer(modifier = Modifier.height(28.dp))
+                    Text(
+                        text = stringResource(R.string.settings_layout_specific_header, stringResource(R.string.settings_layout_qwerty)),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MintAccentColor,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AutoCapitalizationCard(
+                        checked = autoCapitalization,
+                        onCheckedChange = onAutoCapitalizationChange
+                    )
+                }
+
+                // Preferences Header
+                Spacer(modifier = Modifier.height(28.dp))
+                Text(
+                    text = stringResource(R.string.settings_preferences_header),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MintAccentColor,
@@ -178,49 +214,26 @@ fun SettingsScreenContent(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                QuickVersionCard(
-                    selectedVersion = quickVersion,
-                    onVersionChange = onQuickVersionChange
+                HapticFeedbackCard(
+                    checked = hapticFeedback,
+                    onCheckedChange = onHapticFeedbackChange
                 )
+
+                Spacer(modifier = Modifier.height(48.dp))
             }
-
-            // Preferences Header
-            Spacer(modifier = Modifier.height(28.dp))
-            Text(
-                text = stringResource(R.string.settings_preferences_header),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MintAccentColor,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            HapticFeedbackCard(
-                checked = hapticFeedback,
-                onCheckedChange = onHapticFeedbackChange
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AutoCapitalizationCard(
-                checked = autoCapitalization,
-                onCheckedChange = onAutoCapitalizationChange
-            )
-
-            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
 
 @Composable
 private fun SettingsBackButton(onBack: () -> Unit) {
+    val arrowColor = PrimaryTextColor
     Box(
         modifier = Modifier
             .padding(top = 8.dp)
             .size(40.dp)
             .clip(CircleShape)
-            .background(Color(0xFF1F2723))
+            .background(MiniKeySurface)
             .clickable(onClick = onBack),
         contentAlignment = Alignment.Center
     ) {
@@ -230,21 +243,21 @@ private fun SettingsBackButton(onBack: () -> Unit) {
             val h = size.height
             val midY = h / 2f
             drawLine(
-                color = PrimaryTextColor,
+                color = arrowColor,
                 start = Offset(w * 0.15f, midY),
                 end = Offset(w * 0.85f, midY),
                 strokeWidth = stroke,
                 cap = StrokeCap.Round
             )
             drawLine(
-                color = PrimaryTextColor,
+                color = arrowColor,
                 start = Offset(w * 0.15f, midY),
                 end = Offset(w * 0.5f, midY - h * 0.35f),
                 strokeWidth = stroke,
                 cap = StrokeCap.Round
             )
             drawLine(
-                color = PrimaryTextColor,
+                color = arrowColor,
                 start = Offset(w * 0.15f, midY),
                 end = Offset(w * 0.5f, midY + h * 0.35f),
                 strokeWidth = stroke,
@@ -366,9 +379,9 @@ fun HapticFeedbackCard(
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MintOnAccentColor,
                     checkedTrackColor = MintAccentColor,
-                    uncheckedThumbColor = Color(0xFF38433D),
-                    uncheckedTrackColor = Color(0xFF1E2622),
-                    uncheckedBorderColor = Color(0xFF4C5851)
+                    uncheckedThumbColor = SecondaryTextColor,
+                    uncheckedTrackColor = MiniKeySurface,
+                    uncheckedBorderColor = PillUnselectedBorder
                 )
             )
         }
@@ -419,9 +432,9 @@ fun AutoCapitalizationCard(
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MintOnAccentColor,
                     checkedTrackColor = MintAccentColor,
-                    uncheckedThumbColor = Color(0xFF38433D),
-                    uncheckedTrackColor = Color(0xFF1E2622),
-                    uncheckedBorderColor = Color(0xFF4C5851)
+                    uncheckedThumbColor = SecondaryTextColor,
+                    uncheckedTrackColor = MiniKeySurface,
+                    uncheckedBorderColor = PillUnselectedBorder
                 )
             )
         }

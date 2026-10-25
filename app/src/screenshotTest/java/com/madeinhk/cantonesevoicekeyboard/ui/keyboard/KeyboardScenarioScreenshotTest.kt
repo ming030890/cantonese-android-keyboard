@@ -108,6 +108,11 @@ fun ScenarioGboardSupportedShortWordCorrection() = ScenarioScreen(remember { Key
 fun ScenarioNoisyContextCorrection() = ScenarioScreen(remember { KeyboardScenarios.noisyContextCorrection() })
 
 @PreviewTest
+@Preview(name = "One edit short word correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioOneEditShortWordCorrection() = ScenarioScreen(remember { KeyboardScenarios.oneEditShortWordCorrection() })
+
+@PreviewTest
 @Preview(name = "Uncertain spelling remains selectable", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioUncertainSharedLmSpelling() = ScenarioScreen(remember { KeyboardScenarios.uncertainSharedLmSpelling() })
@@ -249,3 +254,8 @@ fun ScenarioSystemEnglishLayout() = ScenarioScreen(remember {
         scenario.snapshot()
     }
 })
+
+@PreviewTest
+@Preview(name = "Corrections for word under cursor", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioCursorWordCorrections() = ScenarioScreen(remember { KeyboardScenarios.cursorWordCorrections() })

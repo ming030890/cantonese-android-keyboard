@@ -98,6 +98,14 @@ internal class KeyboardScenario(
         keyCancel(kind)
     }
     fun type(text: String) = text.forEach { press(KeyboardKeyKind.Text, it.toString()) }
+    fun moveCursor(position: Int, end: Int = position) {
+        editor.finishComposingText()
+        val full = editor.text + editor.right
+        editor.text = full.take(position)
+        editor.right = full.drop(position)
+        editor.selectionOverride = if (end == position) null else position to end
+        controller.onSelectionChanged(position, end, -1)
+    }
     fun choose(text: String) = press(KeyboardKeyKind.Candidate, text)
     fun snapshot() = controller.renderState()
     override fun close() = controller.destroy()
@@ -121,6 +129,19 @@ internal class MemoryKeyboardEditor(var text: String = "", var right: String = "
     override fun replaceTextBeforeCursor(expected: String, replacement: String): Boolean {
         if (!text.endsWith(expected) || composing.isNotEmpty()) return false
         text = text.dropLast(expected.length) + replacement
+        return true
+    }
+    override fun replaceWordAtCursor(before: String, after: String, replacement: String): Boolean {
+        if (cursorSelection().let { it.first != it.second } || composing.isNotEmpty() ||
+            !text.endsWith(before) || !right.startsWith(after)) return false
+        text = text.dropLast(before.length) + replacement
+        right = right.drop(after.length)
+        return true
+    }
+    override fun restoreComposingText(length: Int, word: String): Boolean {
+        if (composing.isNotEmpty() || text.length < length) return false
+        text = text.dropLast(length)
+        composing = word
         return true
     }
     var cursorCapsModeOverride: ((Int) -> Int)? = null
@@ -291,6 +312,16 @@ internal object KeyboardScenarios {
                     correction="have",reason="shared_lm_spelling")
             })).use { it.start();it.type("heve");it.snapshot() }
 
+    // Presentation fixture; model acceptance and undo are exercised through JNI.
+    fun oneEditShortWordCorrection() = KeyboardScenario(initialText="i may take the oppurtubity to ",
+        initialMode=KeyboardInputMode.AlphaNum, clipboardText=null,
+        englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
+            {1L},{_,_,_->emptyList()},{_,_,_,words,_->words},{_,_,_->
+                com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                    candidates=listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate("run",-5.0,1.0,1,0)),
+                    correction="run",reason="shared_lm_spelling")
+            })).use { it.start();it.type("tun");it.snapshot() }
+
     fun uncertainSharedLmSpelling() = KeyboardScenario(initialMode=KeyboardInputMode.AlphaNum,
         clipboardText=null,
         englishEngine=com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
@@ -335,6 +366,9 @@ internal object KeyboardScenarios {
         clipboardText = null, englishEngine = longWordEngine()).use { it.start(); it.type("keyboadr"); it.snapshot() }
     fun missingFinalLetterCandidates() = KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum,
         clipboardText = null, englishEngine = ScenarioEnglishEngine()).use { it.start(); it.type("keyboar"); it.snapshot() }
+    fun cursorWordCorrections() = KeyboardScenario(initialText = "Fix teh word.",
+        initialMode = KeyboardInputMode.AlphaNum, clipboardText = null,
+        englishEngine = ScenarioEnglishEngine()).use { it.start(); it.moveCursor(5); it.snapshot() }
     fun englishAutocorrectCandidates() = KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum,
         clipboardText = null, englishEngine = ScenarioEnglishEngine()).use { it.start(); it.type("teh"); it.snapshot() }
     fun uncertainCompanyCandidates() = KeyboardScenario(initialText="I work at ",initialMode=KeyboardInputMode.AlphaNum,

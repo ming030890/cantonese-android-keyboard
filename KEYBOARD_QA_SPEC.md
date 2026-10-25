@@ -50,12 +50,13 @@ model quality or a requirement that real models return this exact ranking.
 | CB-02 | Chip visible; enter a letter, number, punctuation, emoji, select a word, or begin a handwriting stroke | Hide the chip when input begins; candidate results and status can occupy the toolbar. | Agreed for typing; baseline for other input; `cb02`, after-typing screenshot |
 | CB-03 | Chip visible; change layout, shift, symbol page, settings, or candidate page; move cursor | These controls must not mark the user as having typed or discard clipboard availability. | Baseline; `cb03`, existing sequence tests |
 | CB-04 | Press a text key, then cancel it without key-up | Do not insert text or dismiss the chip. | Baseline; `cb04` |
-| CB-05 | Clipboard is absent, empty, or has no advertised plain-text version | No clipboard chip; normal candidates/status/empty toolbar remains available. HTML-only and image-only clips do not qualify. | Baseline; `cb05`, `ClipboardSuggestionTest` MIME cases |
+| CB-05 | Clipboard is absent, empty, or has no supported text/image MIME type | No clipboard chip; normal candidates/status/empty toolbar remains available. HTML-only clips do not qualify. | Baseline; `cb05`, `ClipboardSuggestionTest` MIME cases |
 | CB-06 | Clipboard marked sensitive | Show generic Paste without including the sensitive text in preview/accessibility text. Paste inserts the actual clipboard text. | Baseline; `cb06`, existing sensitive screenshot; Android accessibility inspection gap |
 | CB-07 | Press clipboard chip down, then release | Down must preserve its target; up inserts text exactly once and dismisses the chip. | Baseline; existing `pasteKeyDownDoesNotDismissChipBeforePasteKeyUp` |
 | CB-08 | New clipboard text arrives before any input | Update the chip to the new supported text. | Baseline; `cb08` |
 | CB-09 | After input, delete everything or copy new text | Deleting all input alone does not restore the chip. A newly copied supported clip restores it, including copying the same text again. The next input hides it again. | Agreed D-02; `cb09`, restored-by-new-copy screenshot |
 | CB-10 | Copy rich text containing plain-text and HTML versions | Preview and paste the plain-text version; never display or insert HTML markup. | Agreed D-06; `cb10`, rich-clipboard screenshot |
+| CB-11 | Copy a supported image | Show a cropped thumbnail in the image paste chip. Load a bounded image off the UI thread; retain the image icon when unavailable. A new clipboard token clears the previous thumbnail. Sensitive images show generic Paste and never load/display a thumbnail. | Agreed 2026-10-25; `ClipboardImageScreenshotTest` thumbnail, unavailable and sensitive fixtures; real-provider permission integration gap |
 
 ## Quick codes and next-word predictions
 
@@ -157,6 +158,7 @@ with fixed English model results; Rust tests verify the actual search and confid
 | AC-01c | Reported sentence `whrn i tyoe i dont rrally know whay it meant` on Quick3/5, with lookup ready or still pending at Space | Current model commits `when i type i don't really know what it meant ` word by word; ready candidate bars include the literal and accepted replacement. The reported `tyoe → type` repair improves with the shared acceptance refit; the reported sentence stays outside evaluation labels. | `reportedSentenceCorrectsAtSpaceInBothQuickVersions`, real JNI/controller and injected scheduler |
 | AC-01d | English/Quick `I dont` then Space, Backspace, Space | Offer `don't`, commit `I don't `, undo to `dont`, then honor undo suppression and recommit `I dont `. Restoration uses TRAIN-attested forms and a calibrated same-CNN byte-sequence decision. | `dontRestoresApostropheOnSpaceAndUndoInBothLayouts`, real JNI; Quick apostrophe screenshot |
 | AC-01e | English/Quick3/Quick5 `gwme`, Space, Backspace, Space | Offer `game`, commit `game `, undo to `gwme`, then recommit literal `gwme `. The six-feature acceptance rule and five existing edit costs are fitted on TRAIN, with no edit-distance exception, position term, or runtime dictionary. `butger` remains uncorrected under the current fit. | `refittedAcceptanceCorrectsAtSpaceAndUndoAcrossLayoutsThroughJni`, real JNI/controller; unambiguous-neighbour scenario screenshot |
+| AC-01f | English/Quick3/Quick5 short input with one neighboring-key substitution; Space, Backspace, Space | Experimental count-based cutoff recovers contextual `tun → run` and `ny → by`; undo restores the original and suppresses repeat correction. Preserve `tim` after `i hear`, `mo` at sentence start and `bad` after `it`. No extra inference or word-specific rule. | Candidate only; `oneEditShortWordCorrectionAndUndoAcrossLayoutsThroughJni`, actual JNI/controller and one-edit screenshot. Main objective improves, but duplicate-context synthetic stress adds one wrong repair; not promoted to release baseline. |
 | AC-02 | Immediate Backspace after correction | Remove delimiter and restore original composition; recommit without repeating the correction. Guard undo against cursor/selection changes. | boundary and selection scenarios |
 | AC-03 | Type English prefixes in Quick beyond six letters | Protect plausible English from automatic Chinese phrase conversion; preserve conversion for non-English sequences. Chinese and English candidates share LM ranking; selection stays explicit. Exact one/two-root codes remain literal unless tapped. | Quick conversion and selection scenarios |
 | AC-04 | Switch to symbols and return, or enter punctuation there | Keep originating English/Quick word ownership. Punctuation resolves the word; digits and identifiers finish literally. | `numberPanelPreservesWordForPunctuationButDigitsStayLiteral` |
@@ -599,3 +601,51 @@ Verification: `:app:verifyKeyboard` passes, including unit/scenario tests,
 screenshot comparisons and debug assembly. The new plain-text auto-caps screenshot
 was inspected before validation. No device was connected; phone installation and
 real-editor integration remain unverified for this change.
+
+
+### 2026-10-25: Settings themes and layout-specific controls
+
+Settings follows the app/system light or dark theme, including layout previews,
+selection pills, cards, switches and back navigation. Quick version 3/5 is chosen
+once in the Quick settings section; the layout-selection carousel only enables
+or disables layouts. English auto-capitalization appears in the English settings
+section when English is enabled. Haptic feedback remains a shared preference.
+Handwriting has no separate configurable preference at present. Settings previews
+cover enabled-layout combinations, both Quick versions, light/dark themes, and
+narrow large-text rendering. This reorganizes controls without changing typing
+preference persistence or keyboard behavior.
+
+Settings copy follow-up: voice typing is mentioned once above the layout selector,
+with no repeated per-layout captions in Settings or setup. Short layout names
+avoid truncating “Quick”; its version description explains Chinese and English
+support. General controls use plain action labels (“Key vibration”, “Capitalize
+sentences”). English, Traditional Chinese and Simplified Chinese copy stay aligned.
+
+
+### 2026-10-25: Corrections for committed words under the cursor
+
+On English and Quick with autocorrect enabled, moving a collapsed cursor into a
+committed English word shows its literal spelling and correction alternatives.
+Lookup uses the complete word, including letters after the cursor, and surrounding
+context with that word removed. Cursor movement never changes editor text or
+starts composition. Corrections temporarily take precedence over the clipboard
+chip while retaining clipboard availability for subsequent cursor moves. Tapping an alternative replaces the complete word, keeps
+adjacent text and punctuation, and leaves the cursor after the replacement.
+Selections, protected fields and disabled autocorrect do not start lookup.
+Moving or editing invalidates pending results; selection rechecks the cursor and
+both sides before replacement. Space, Enter and Backspace remain literal edits.
+
+`CursorWordCorrectionScenarioTest` exercises the production controller and key
+receiver with injected dispatchers across English/Quick and unified inference.
+`ImeEditorTest` covers guarded, batched InputConnection replacement;
+`ScenarioCursorWordCorrections` renders the inspected word's candidate row.
+This changes lookup routing, without changing native candidate ranking or
+correction thresholds. Device editor behavior and phone inference latency require
+Android integration verification.
+
+Frozen autocorrect aggregate from a clean, freshly built native probe:
+**0.857561**, delta **+0.000000** against the accepted baseline. Report:
+`build/autocorrect-eval-v4/cursor-word-corrections-20261025/score.json`.
+Cursor moves now perform one asynchronous English lookup per changed word/context;
+unchanged snapshots reuse the current result. No phone latency measurement was
+possible because no Android device was connected.

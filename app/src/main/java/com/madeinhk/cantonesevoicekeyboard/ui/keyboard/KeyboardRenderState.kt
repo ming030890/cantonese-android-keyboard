@@ -10,6 +10,7 @@ data class KeyboardRenderState(
     val action: KeyboardAction = KeyboardAction.Enter,
     val inputMode: KeyboardInputMode = KeyboardInputMode.Handwriting,
     val clipboard: ClipboardSuggestion? = null,
+    val inspectingWord: Boolean = false,
     val handwritingCandidates: List<HandwritingCandidate> = emptyList(),
     val quickCandidates: List<HandwritingCandidate> = emptyList(),
     val englishCandidates: List<HandwritingCandidate> = emptyList(),
@@ -23,7 +24,7 @@ data class KeyboardRenderState(
     internal fun toolbar(mode: KeyboardInputMode = inputMode, hasAutofill: Boolean = false): KeyboardToolbarContent =
         keyboardToolbarContent(
             voice = voice,
-            secondaryAction = toolbarPresentation(mode, hasAutofill, clipboard != null).secondaryAction,
+            secondaryAction = toolbarPresentation(mode, hasAutofill, clipboard != null && !inspectingWord).secondaryAction,
             hasCandidates = when (mode) {
                 KeyboardInputMode.Quick -> quickCandidates.isNotEmpty()
                 KeyboardInputMode.Handwriting -> handwritingCandidates.isNotEmpty()

@@ -11,6 +11,37 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ImeEditorTest {
+    @Test fun replaceWordAtCursorGuardsBothSidesAndBatchesWholeWordReplacement() {
+        for (changed in listOf(false, true)) {
+            var left = "Fix t"
+            var right = if (changed) "xx word." else "eh word."
+            val calls = mutableListOf<String>()
+            val input = Proxy.newProxyInstance(InputConnection::class.java.classLoader,
+                arrayOf(InputConnection::class.java)) { _, method, args ->
+                when (method.name) {
+                    "getSelectedText" -> null
+                    "getTextBeforeCursor" -> left.takeLast(args!![0] as Int)
+                    "getTextAfterCursor" -> right.take(args!![0] as Int)
+                    "beginBatchEdit", "endBatchEdit", "finishComposingText" -> { calls += method.name; true }
+                    "deleteSurroundingText" -> {
+                        calls += "delete"
+                        left = left.dropLast(args!![0] as Int)
+                        right = right.drop(args[1] as Int)
+                        true
+                    }
+                    "commitText" -> { calls += "commit"; left += args!![0].toString(); true }
+                    else -> error("Unexpected InputConnection call: ${method.name}")
+                }
+            } as InputConnection
+            val replaced = ImeEditor({ input }, { null }).replaceWordAtCursor("t", "eh", "the")
+            assertEquals(!changed, replaced)
+            if (changed) assertTrue(calls.isEmpty()) else {
+                assertEquals("Fix the word.", left + right)
+                assertEquals(listOf("beginBatchEdit", "finishComposingText", "delete", "commit", "endBatchEdit"), calls)
+            }
+        }
+    }
+
     @Test fun backspaceDeletesWholeEmojiAndPreservesSurroundingText() {
         for (character in listOf("😀", "👍🏽", "👨‍👩‍👧‍👦", "🇭🇰", "❤️", "1️⃣", "e\u0301", "你", "a")) {
             var left = "before$character"

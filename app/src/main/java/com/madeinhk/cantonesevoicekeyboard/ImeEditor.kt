@@ -113,6 +113,18 @@ internal class ImeEditor(
         } finally { input.endBatchEdit() }
     }
 
+    override fun replaceWordAtCursor(before: String, after: String, replacement: String): Boolean {
+        val input = connection() ?: return false
+        if (!input.getSelectedText(0).isNullOrEmpty() ||
+            input.getTextBeforeCursor(before.length, 0)?.toString() != before ||
+            input.getTextAfterCursor(after.length, 0)?.toString() != after) return false
+        input.beginBatchEdit()
+        return try {
+            input.finishComposingText()
+            input.deleteSurroundingText(before.length, after.length) && input.commitText(replacement, 1)
+        } finally { input.endBatchEdit() }
+    }
+
     override fun restoreComposingText(length: Int, word: String): Boolean {
         val input = connection() ?: return false
         if (!input.getSelectedText(0).isNullOrEmpty()) return false

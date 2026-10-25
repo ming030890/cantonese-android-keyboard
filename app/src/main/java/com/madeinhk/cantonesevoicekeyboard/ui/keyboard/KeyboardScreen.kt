@@ -45,6 +45,7 @@ fun KeyboardScreen(
     keyboardSession: StateFlow<Long> = MutableStateFlow(0L),
     quickCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow<List<HandwritingCandidate>>(emptyList()),
     englishCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow(emptyList()),
+    cursorWordActive: StateFlow<Boolean> = MutableStateFlow(false),
     chinesePunctuation: StateFlow<Boolean?> = MutableStateFlow(null),
     onQuickKey: (String) -> Unit = {},
     onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
@@ -87,6 +88,7 @@ fun KeyboardScreen(
     val keyboardSession by keyboardSession.collectAsState()
     val quickCandidates by quickCandidates.collectAsState()
     val englishCandidates by englishCandidates.collectAsState()
+    val inspectingWord by cursorWordActive.collectAsState()
     val chinesePunctuation by chinesePunctuation.collectAsState()
     KeyboardScreen(
         renderState = KeyboardRenderState(
@@ -96,6 +98,7 @@ fun KeyboardScreen(
             inputMode = inputMode,
             shiftState = shift,
             clipboard = clipboard,
+            inspectingWord = inspectingWord,
             handwritingCandidates = handwritingCandidates,
             handwritingBusy = handwritingBusy,
             handwritingError = handwritingError,
@@ -170,7 +173,7 @@ fun KeyboardScreen(
     val volume = renderState.volume
     val action = renderState.action
     val inputMode = renderState.inputMode
-    val clipboard = renderState.clipboard
+    val clipboard = renderState.clipboard.takeUnless { renderState.inspectingWord }
     val candidates = renderState.handwritingCandidates
     val qCandidates = renderState.quickCandidates
     val handwritingBusy = renderState.handwritingBusy

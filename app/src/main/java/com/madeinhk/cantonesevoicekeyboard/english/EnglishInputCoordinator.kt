@@ -35,6 +35,14 @@ internal class EnglishInputCoordinator(
     var quickEnglishEnabled: () -> Boolean = { true }
     val hasUnifiedSuggestions get() = unifiedEngine != null
 
+    private data class CursorWord(val before: String, val after: String, val cursor: Int,
+                                  val left: String, val right: String)
+    private var cursorWord: CursorWord? = null
+    private val _cursorWordActive = MutableStateFlow(false)
+    val cursorWordActive = _cursorWordActive.asStateFlow()
+    val inspectingWord get() = cursorWord != null
+    var onCursorCandidates: (List<HandwritingCandidate>) -> Unit = {}
+
     private var resultWord: String? = null
     private var prediction = EnglishPrediction()
     private var apostropheBase: Pair<String, EnglishPrediction>? = null
@@ -199,15 +207,38 @@ internal class EnglishInputCoordinator(
 
 
     fun type(letter: String, evidence: EnglishTouchEvidence?) {
+        if (inspectingWord) reset()
         contextWindow.onTyping()
         undo = null
-        if (word.isEmpty()) safeStart = safeWordStart(editor.getTextBeforeCursor(256).orEmpty())
+        if (word.isEmpty()) {
+            val selection = editor.cursorSelection()
+            if (selection == null || selection.first == selection.second) {
+                val before = editor.getTextBeforeCursor(64).orEmpty()
+                val existingWord = extractWordBeforeCursor(before)
+                if (existingWord.isNotEmpty()) {
+                    val preceding = before.dropLast(existingWord.length)
+                    if (safeWordStart(preceding)) {
+                        safeStart = true
+                        quick = false
+                        val fullWord = existingWord + letter
+                        if (editor.restoreComposingText(existingWord.length, fullWord)) {
+                            taps.clear()
+                            repeat(existingWord.length) { taps += null }
+                            update(fullWord, evidence)
+                            return
+                        }
+                    }
+                }
+            }
+            safeStart = safeWordStart(editor.getTextBeforeCursor(256).orEmpty())
+        }
         quick = false
         editor.setComposingText(word + letter)
         update(word + letter, evidence)
     }
 
     fun observeQuick(text: String, evidence: EnglishTouchEvidence?) {
+        if (inspectingWord) reset()
         contextWindow.onTyping()
         undo = null
         if (word.isEmpty()) {
@@ -228,6 +259,8 @@ internal class EnglishInputCoordinator(
     }
 
     private fun update(text: String, evidence: EnglishTouchEvidence?) {
+        cursorWord = null
+        _cursorWordActive.value = false
         val old = word
         apostropheBase = if (text.length == old.length + 1 && text.startsWith(old) &&
             text.last() in "'’" && resultWord == old) old to prediction else null
@@ -301,7 +334,7 @@ internal class EnglishInputCoordinator(
             word.drop(1) == word.drop(1).lowercase(Locale.ROOT))
 
     fun refreshNextWords() {
-        if (!sharedSuggestions || word.isNotEmpty() || closed) return
+        if (!sharedSuggestions || word.isNotEmpty() || inspectingWord || closed) return
         val left=editor.getTextBeforeCursor(512).orEmpty()
         val right=editor.getTextAfterCursor(256).orEmpty()
         if (unifiedEngine != null) {
@@ -326,6 +359,13 @@ internal class EnglishInputCoordinator(
 
     fun finish(delimiter: String = "", correct: Boolean = false, chineseMatch: Boolean = false,
                selected: String? = null): Boolean {
+        cursorWord?.let { target ->
+            if (selected == null) { reset(); return false }
+            if (!canSelect(selected) || !cursorWordMatches(target)) { reset(); return false }
+            val replaced = editor.replaceWordAtCursor(target.before, target.after, selected)
+            reset()
+            return replaced
+        }
         if (word.isEmpty()) {
             if(selected!=null && canSelect(selected)) {
                 val left=editor.getTextBeforeCursor(1).orEmpty()
@@ -398,6 +438,7 @@ internal class EnglishInputCoordinator(
     }
 
     fun delete(): Boolean {
+        if (inspectingWord) reset()
         if(contextWindow.undo()) return true
         contextWindow.clear()
         undo?.let { record ->
@@ -415,9 +456,10 @@ internal class EnglishInputCoordinator(
             }
         }
         if (!quick && word.isNotEmpty()) {
-            editor.setComposingText(word.dropLast(1))
-            update(word.dropLast(1), null)
-            if (word.isEmpty()) editor.finishComposingText()
+            val nextWord = word.dropLast(1)
+            editor.setComposingText(nextWord)
+            update(nextWord, null)
+            if (nextWord.isEmpty()) editor.finishComposingText()
             return true
         }
         return false
@@ -426,6 +468,9 @@ internal class EnglishInputCoordinator(
     fun reset(cancelLookup: Boolean = true, preserveContext: Boolean = false, preserveDisplay: Boolean = false) {
         if(!preserveContext) contextWindow.clear()
         if (cancelLookup) cancelSuggestionWork()
+        if (inspectingWord) onCursorCandidates(emptyList())
+        cursorWord = null
+        _cursorWordActive.value = false
         pending = null; ++request; word = ""; taps.clear(); centers = FloatArray(0)
         pendingBoundaryCursor = null
         resultWord = null; prediction = EnglishPrediction()
@@ -453,6 +498,66 @@ internal class EnglishInputCoordinator(
         }
     }
 
+    /** Inspect committed text without acquiring composition or applying automatic correction. */
+    fun inspectWordAtCursor(): Boolean {
+        if (closed || word.isNotEmpty()) return false
+        val selection = editor.cursorSelection()
+        val before = editor.getTextBeforeCursor(512).orEmpty()
+        val after = editor.getTextAfterCursor(256).orEmpty()
+        val chars: (Char) -> Boolean = { it.isAsciiLetter() || it in "'’" }
+        val head = before.takeLastWhile(chars)
+        val tail = after.takeWhile(chars)
+        val text = head + tail
+        val left = before.dropLast(head.length)
+        val right = after.drop(tail.length)
+        if (selection == null || selection.first != selection.second || text.length !in 1..64 ||
+            text.firstOrNull()?.isAsciiLetter() != true || text.lastOrNull()?.isAsciiLetter() != true ||
+            !safeWordStart(left) || right.firstOrNull()?.let(::tokenCharacter) == true) {
+            if (inspectingWord) reset()
+            return false
+        }
+        val target = CursorWord(head, tail, selection.first, left, right)
+        if (cursorWord == target) return true
+        reset()
+        quick = false; quickSnapshot = null
+        cursorWord = target
+        _cursorWordActive.value = true
+        val id = request
+        _candidates.value = listOf(HandwritingCandidate(text, 0))
+        onCursorCandidates(_candidates.value)
+        val token = unifiedEngine?.newRequest()
+        nativeRequest = token
+        val lookup = scope.async(worker) {
+            try {
+                if (token != null) {
+                    token.ensureActive()
+                    unifiedEngine.compose(token, 0, text, left, right, true).english.also { token.ensureActive() }
+                } else {
+                    if (engine == null) engine = loader()
+                    engine?.predictObserved(text, FloatArray(0), FloatArray(text.length * 2) { Float.NaN }, left, right)
+                }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { onError(error); null }
+            finally { token?.close() }
+        }
+        pending = lookup
+        lookup.invokeOnCompletion { token?.close() }
+        scope.launch {
+            val result = lookup.await()
+            if (closed || request != id || cursorWord != target || !cursorWordMatches(target)) return@launch
+            candidateRequest = id
+            _candidates.value = (listOf(text) + result?.candidates.orEmpty().map { caseWord(it.word, text) })
+                .distinct().take(9).mapIndexed { i, candidate -> HandwritingCandidate(candidate, i) }
+            onCursorCandidates(_candidates.value)
+        }
+        return true
+    }
+
+    private fun cursorWordMatches(target: CursorWord) =
+        editor.cursorSelection() == (target.cursor to target.cursor) &&
+            editor.getTextBeforeCursor(512).orEmpty() == target.left + target.before &&
+            editor.getTextAfterCursor(256).orEmpty() == target.after + target.right
+
     override fun close() {
         closed=true;reset()
         // Closing an ONNX session must serialize with in-flight inference.
@@ -461,8 +566,26 @@ internal class EnglishInputCoordinator(
 }
 
 internal fun Char.isAsciiLetter() = this in 'a'..'z' || this in 'A'..'Z'
-private fun tokenCharacter(c: Char) = c.isAsciiLetter() || c.isDigit() || c in "_@/-"
-private fun safeWordStart(before: String): Boolean {
+
+internal fun extractWordBeforeCursor(textBeforeCursor: String?): String {
+    if (textBeforeCursor.isNullOrEmpty()) return ""
+    var i = textBeforeCursor.length - 1
+    if (i < 0 || !textBeforeCursor[i].isAsciiLetter()) return ""
+    while (i >= 0) {
+        val c = textBeforeCursor[i]
+        if (c.isAsciiLetter()) {
+            i--
+        } else if ((c == '\'' || c == '’') && i > 0 && textBeforeCursor[i - 1].isAsciiLetter()) {
+            i--
+        } else {
+            break
+        }
+    }
+    return textBeforeCursor.substring(i + 1)
+}
+
+internal fun tokenCharacter(c: Char) = c.isAsciiLetter() || c.isDigit() || c in "_@/-"
+internal fun safeWordStart(before: String): Boolean {
     if (before.lastOrNull()?.let(::tokenCharacter) == true) return false
     if (before.lastOrNull()?.let { it in "'’" } == true && before.dropLast(1).lastOrNull()?.isAsciiLetter() == true) return false
     val token = before.takeLastWhile { !it.isWhitespace() && it.code < 128 }.lowercase(Locale.ROOT)

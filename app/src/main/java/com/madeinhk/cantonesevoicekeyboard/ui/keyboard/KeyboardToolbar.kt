@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -24,10 +25,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -343,12 +346,13 @@ private fun ToolbarSettingsVisual(
 }
 
 @Composable
-private fun ClipboardToolbarChip(
+internal fun ClipboardToolbarChip(
     key: KeyModel,
     keyRegistry: KeyboardKeyRegistry,
     clipboard: ClipboardSuggestion,
     keyboardColors: BrandColors,
     modifier: Modifier = Modifier,
+    thumbnail: ImageBitmap? = rememberClipboardThumbnail(clipboard),
 ) {
     val description = when {
         clipboard.isSensitive -> stringResource(R.string.keyboard_toolbar_paste)
@@ -369,7 +373,14 @@ private fun ClipboardToolbarChip(
         accessibilityDescription = description,
         modifier = modifier.width(chipWidth),
     ) {
-        if (clipboard.isImage) {
+        if (clipboard.isImage && !clipboard.isSensitive && thumbnail != null) {
+            Image(
+                bitmap = thumbnail,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(32.dp).clip(RoundedCornerShape(6.dp)),
+            )
+        } else if (clipboard.isImage) {
             ImageIcon(
                 modifier = Modifier.size(20.dp),
                 color = keyboardColors.keyboardKeyOnSurface,

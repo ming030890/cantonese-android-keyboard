@@ -85,6 +85,7 @@ class CantoneseInputMethodService :
                         keyboardSession = controller.keyboardSession,
                         quickCandidates = controller.quickCandidates,
                         englishCandidates = controller.englishCandidates,
+                        cursorWordActive = controller.cursorWordActive,
                         chinesePunctuation = controller.chinesePunctuation,
                         onTouchEvidence = controller::onTouchEvidence,
                         onVisiblePanelChanged = controller::onVisiblePanelChanged,

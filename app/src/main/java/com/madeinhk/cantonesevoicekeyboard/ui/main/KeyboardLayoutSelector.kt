@@ -33,22 +33,10 @@ import androidx.compose.ui.unit.sp
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 
-// Material 3 Dynamic Dark Forest Palette shared across settings & onboarding
-internal val CardBackground = Color(0xFF1C231F)
-internal val CardBorderColor = Color(0xFF26302B)
-internal val MiniKeyboardBackground = Color(0xFF141A17)
-internal val MiniKeySurface = Color(0xFF232B27)
-internal val MintAccentColor = Color(0xFF9FD4B3)
-internal val MintOnAccentColor = Color(0xFF0D271A)
-internal val PillUnselectedBorder = Color(0xFF4C5851)
-internal val PillUnselectedIcon = Color(0xFF8E9C94)
-internal val PrimaryTextColor = Color(0xFFDFE5E1)
-internal val SecondaryTextColor = Color(0xFF8E9C94)
-
 /**
  * Shared Keyboard Layouts Selector Card used in both Onboarding and Settings.
  * Displays miniature visual previews for each layout (English, Quick, Handwriting)
- * with interactive selection pills, Cangjie version selector, and voice typing caption.
+ * with interactive selection pills and an optional Quick version selector.
  */
 @Composable
 fun KeyboardLayoutsSelectorCard(
@@ -59,7 +47,8 @@ fun KeyboardLayoutsSelectorCard(
     title: String? = null,
     description: String? = null,
     inferredReason: String? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showQuickVersionSelector: Boolean = true,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -80,7 +69,8 @@ fun KeyboardLayoutsSelectorCard(
                     enabledLayouts = enabledLayouts,
                     onToggleLayout = onToggleLayout,
                     quickVersion = quickVersion,
-                    onQuickVersionChange = onQuickVersionChange
+                    onQuickVersionChange = onQuickVersionChange,
+                    showQuickVersionSelector = showQuickVersionSelector
                 )
             }
         } else {
@@ -150,7 +140,8 @@ fun KeyboardLayoutsSelectorCard(
                         enabledLayouts = enabledLayouts,
                         onToggleLayout = onToggleLayout,
                         quickVersion = quickVersion,
-                        onQuickVersionChange = onQuickVersionChange
+                        onQuickVersionChange = onQuickVersionChange,
+                        showQuickVersionSelector = showQuickVersionSelector
                     )
                 }
             }
@@ -163,7 +154,8 @@ private fun KeyboardLayoutsRowContent(
     enabledLayouts: Set<String>,
     onToggleLayout: (String) -> Unit,
     quickVersion: Int,
-    onQuickVersionChange: (Int) -> Unit
+    onQuickVersionChange: (Int) -> Unit,
+    showQuickVersionSelector: Boolean,
 ) {
     // 1. QWERTY (English)
     val isQwertySelected = enabledLayouts.contains(KeyboardSettings.LAYOUT_ENGLISH)
@@ -181,7 +173,7 @@ private fun KeyboardLayoutsRowContent(
         isSelected = isQuickSelected,
         onToggle = { onToggleLayout(KeyboardSettings.LAYOUT_QUICK) },
         preview = { MiniQuickPreview() },
-        extraContent = if (isQuickSelected) {
+        extraContent = if (isQuickSelected && showQuickVersionSelector) {
             {
                 QuickVersionMiniPills(
                     selectedVersion = quickVersion,
@@ -250,6 +242,8 @@ fun KeyboardLayoutItem(
     extraContent: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val selectionIconColor = MintOnAccentColor
+    val unselectedIconColor = PillUnselectedIcon
     Column(
         modifier = modifier
             .width(148.dp)
@@ -303,7 +297,7 @@ fun KeyboardLayoutItem(
                         }
                         drawPath(
                             path = path,
-                            color = MintOnAccentColor,
+                            color = selectionIconColor,
                             style = Stroke(stroke, cap = StrokeCap.Round)
                         )
                     }
@@ -320,7 +314,7 @@ fun KeyboardLayoutItem(
                     Canvas(modifier = Modifier.size(16.dp)) {
                         val stroke = 1.5.dp.toPx()
                         drawCircle(
-                            color = PillUnselectedIcon,
+                            color = unselectedIconColor,
                             radius = size.width * 0.38f,
                             style = Stroke(stroke)
                         )
@@ -341,14 +335,6 @@ fun KeyboardLayoutItem(
             extraContent()
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = stringResource(R.string.settings_feature_voice_typing),
-            color = if (isSelected) MintAccentColor else SecondaryTextColor,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Normal,
-            maxLines = 1
-        )
     }
 }
 
@@ -623,31 +609,33 @@ fun MiniKeyWithHint(
 
 @Composable
 fun MiniGridIcon() {
+    val iconColor = PrimaryTextColor.copy(alpha = 0.7f)
     Canvas(modifier = Modifier.size(9.dp)) {
         val s = size.width * 0.38f
         val gap = size.width * 0.18f
-        drawRoundRect(PrimaryTextColor.copy(alpha = 0.7f), Offset(0f, 0f), Size(s, s), CornerRadius(1.dp.toPx()))
-        drawRoundRect(PrimaryTextColor.copy(alpha = 0.7f), Offset(s + gap, 0f), Size(s, s), CornerRadius(1.dp.toPx()))
-        drawRoundRect(PrimaryTextColor.copy(alpha = 0.7f), Offset(0f, s + gap), Size(s, s), CornerRadius(1.dp.toPx()))
-        drawRoundRect(PrimaryTextColor.copy(alpha = 0.7f), Offset(s + gap, s + gap), Size(s, s), CornerRadius(1.dp.toPx()))
+        drawRoundRect(iconColor, Offset(0f, 0f), Size(s, s), CornerRadius(1.dp.toPx()))
+        drawRoundRect(iconColor, Offset(s + gap, 0f), Size(s, s), CornerRadius(1.dp.toPx()))
+        drawRoundRect(iconColor, Offset(0f, s + gap), Size(s, s), CornerRadius(1.dp.toPx()))
+        drawRoundRect(iconColor, Offset(s + gap, s + gap), Size(s, s), CornerRadius(1.dp.toPx()))
     }
 }
 
 @Composable
 fun MiniMicIcon() {
+    val iconColor = PrimaryTextColor.copy(alpha = 0.7f)
     Canvas(modifier = Modifier.size(9.dp)) {
         val w = size.width
         val h = size.height
         val micW = w * 0.38f
         val micH = h * 0.52f
         drawRoundRect(
-            color = PrimaryTextColor.copy(alpha = 0.7f),
+            color = iconColor,
             topLeft = Offset((w - micW) / 2f, h * 0.1f),
             size = Size(micW, micH),
             cornerRadius = CornerRadius(micW / 2f, micW / 2f)
         )
         drawLine(
-            color = PrimaryTextColor.copy(alpha = 0.7f),
+            color = iconColor,
             start = Offset(w / 2f, h * 0.65f),
             end = Offset(w / 2f, h * 0.9f),
             strokeWidth = 1.dp.toPx(),

@@ -74,6 +74,9 @@ internal class KeyboardSessionController(
         english?.onContextRevised = { refreshPredictions() }
         english?.quickEnglishEnabled = { autocorrectActive(KeyboardInputMode.Quick) }
         english?.attachQuick(quick)
+        if (english?.hasUnifiedSuggestions == true) english.onCursorCandidates = { words ->
+            quick.publishCursorCandidates(words.map { com.madeinhk.cantonesevoicekeyboard.quick.QuickCandidate(it.text, it.rank) })
+        }
     }
     private var editorAllowsEnglish = true
     private var textPanel = KeyboardInputMode.Quick
@@ -125,13 +128,14 @@ internal class KeyboardSessionController(
         else text
     }
     val handwritingCandidates = handwriting.candidates
+    val cursorWordActive = english?.cursorWordActive ?: MutableStateFlow(false)
     val englishCandidates = english?.candidates ?: MutableStateFlow(emptyList<com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate>())
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val quickCandidates = if (english?.hasUnifiedSuggestions == true) quick.joinedCandidates else if (english == null) quick.candidates else combine(quick.candidates, english.candidates) { chinese, words ->
-        val mix = english.quick && english.word == quick.getComposingText() && autocorrectActive(KeyboardInputMode.Quick)
+        val mix = english.inspectingWord || (english.quick && english.word == quick.getComposingText() && autocorrectActive(KeyboardInputMode.Quick))
         Triple(chinese, if (mix) words else emptyList(), quick.getComposingText())
     }.transformLatest { (chinese, words, code) ->
-        if (words.isEmpty()) emit(chinese) else if (code.length == 2) {
+        if (english.inspectingWord) emit(words) else if (words.isEmpty()) emit(chinese) else if (code.length == 2) {
             // A complete Quick code keeps every Chinese match ahead of English
             // suggestions, even when the surrounding text is English.
             // Also skip mixed ranking while Chinese lookup is pending: ranking
@@ -174,6 +178,7 @@ internal class KeyboardSessionController(
         inputMode = keyboardInputMode.value,
         shiftState = _shiftState.value,
         clipboard = clipboardSuggestion.value,
+        inspectingWord = cursorWordActive.value,
         handwritingCandidates = handwritingCandidates.value,
         quickCandidates = quickCandidates.value,
         englishCandidates = englishCandidates.value,
@@ -346,7 +351,7 @@ internal class KeyboardSessionController(
         val textBefore = cachedTextBefore ?: editor.getTextBeforeCursor(64)
         refreshPunctuation(textBefore)
         refreshAutoCapitalization(textBefore)
-        if (!inputViewVisible) return
+        if (!inputViewVisible || english?.inspectingWord == true) return
         when (_keyboardInputMode.value) {
             KeyboardInputMode.AlphaNum -> if(autocorrectActive()) english?.refreshNextWords()
             KeyboardInputMode.Quick -> quick.refreshPredictions()
@@ -366,6 +371,9 @@ internal class KeyboardSessionController(
         val wasQuick = english?.quick == true && english.word.isNotEmpty()
         english?.onSelectionChanged(newStart, newEnd, composingEnd)
         if (wasQuick && english?.word.isNullOrEmpty()) quick.completeExternalCommit()
+        if (inputViewVisible && autocorrectActive() &&
+            _keyboardInputMode.value in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick) &&
+            !quick.hasActiveInput() && editor.cursorSelection() == (newStart to newEnd)) english?.inspectWordAtCursor()
         onSelectionChanged()
     }
 
@@ -392,6 +400,7 @@ internal class KeyboardSessionController(
 
     private fun finishEnglishBoundary(delimiter: String): Boolean {
         val coordinator = english ?: return false
+        if (coordinator.inspectingWord) coordinator.reset()
         if (coordinator.word.isEmpty()) return false
         val wasQuick = coordinator.quick
         val finished = coordinator.finish(delimiter, correct = autocorrectActive(),
@@ -559,19 +568,20 @@ internal class KeyboardSessionController(
     }
 
     fun selectCandidate(text: String) {
+        if (english != null && (_keyboardInputMode.value == KeyboardInputMode.AlphaNum || english.inspectingWord) &&
+            !english.canSelect(text)) return
         if (_shiftState.value == ShiftState.Shifted) {
             _shiftState.value = ShiftState.Off
             manualShift = false
         }
         if (english?.hasUnifiedSuggestions == true) {
-            if (_keyboardInputMode.value == KeyboardInputMode.Quick && !quick.canSelectJoined(text)) return
-            if (_keyboardInputMode.value == KeyboardInputMode.AlphaNum && !english.canSelect(text)) return
+            if (_keyboardInputMode.value == KeyboardInputMode.Quick && !english.inspectingWord && !quick.canSelectJoined(text)) return
         }
         if (queueEditorAction { selectCandidate(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
         if (english?.canSelect(text) == true &&
-            (textPanel == KeyboardInputMode.AlphaNum || quick.candidates.value.none { it.text == text })) {
+            (english.inspectingWord || textPanel == KeyboardInputMode.AlphaNum || quick.candidates.value.none { it.text == text })) {
             val wasQuick = english.quick
             english.finish(selected = text)
             if (wasQuick) quick.completeExternalCommit()
