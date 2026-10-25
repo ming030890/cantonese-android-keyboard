@@ -4,8 +4,30 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardKeyKind
 import org.junit.Assert.*
 import org.junit.Test
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
 
 class AutoCapitalizationScenarioTest {
+
+    @Test
+    fun ordinaryAndWebTextFieldsUseSettingWithoutHostCapFlags() {
+        for (variation in listOf(InputType.TYPE_TEXT_VARIATION_NORMAL, InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT)) {
+            KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum, autoCapitalizationEnabled = true).use { s ->
+                s.start(EditorInfo().apply { inputType = InputType.TYPE_CLASS_TEXT or variation })
+                assertEquals(ShiftState.Shifted, s.snapshot().shiftState)
+                s.type("hello. ")
+                assertEquals("Hello. ", s.editor.text)
+                assertEquals("", s.editor.composing)
+                assertEquals(ShiftState.Shifted, s.snapshot().shiftState)
+                s.type("world")
+                assertEquals("Hello. World", s.editor.text)
+                assertEquals("", s.editor.composing)
+                assertTrue(s.snapshot().englishCandidates.isEmpty())
+                assertEquals(com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardToolbarContent.Empty, s.snapshot().toolbar())
+                assertEquals(ShiftState.Off, s.snapshot().shiftState)
+            }
+        }
+    }
 
     @Test
     fun startOfTextAutoCapitalizesFirstLetterThenDropsToLowercase() {
@@ -113,7 +135,7 @@ class AutoCapitalizationScenarioTest {
     fun disablingAutoCapitalizationInSettingsKeepsLowercase() {
         KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum).use { s ->
             s.autoCapitalizationEnabled = false
-            s.start()
+            s.start(EditorInfo().apply { inputType = InputType.TYPE_CLASS_TEXT })
 
             // Does not start in Shifted
             assertEquals(ShiftState.Off, s.snapshot().shiftState)

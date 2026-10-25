@@ -52,11 +52,6 @@ internal object AutoCapitalization {
         val variation = inputType and InputType.TYPE_MASK_VARIATION
         if (variation in EXCLUDED_VARIATIONS) return false
 
-        val hasCapFlags = (inputType and (InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS or
-                InputType.TYPE_TEXT_FLAG_CAP_WORDS or
-                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)) != 0
-        if (!hasCapFlags) return false
-
         if (inputType and InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS != 0) return true
 
         val text = textBefore ?: editor?.getTextBeforeCursor(64)
@@ -90,7 +85,9 @@ internal object AutoCapitalization {
         if (inputType and InputType.TYPE_TEXT_FLAG_CAP_SENTENCES != 0) {
             reqModes = reqModes or CAP_MODE_SENTENCES
         }
-        if (reqModes == 0) return 0
+        // The keyboard setting supplies sentence caps for ordinary text fields even
+        // when the host omits capitalization flags. Explicit words/all-caps win.
+        if (reqModes == 0) reqModes = CAP_MODE_SENTENCES
 
         val cs = textBeforeCursor ?: ""
         return getCapsMode(cs, cs.length, reqModes)

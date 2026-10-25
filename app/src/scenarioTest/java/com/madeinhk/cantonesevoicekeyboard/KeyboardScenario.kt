@@ -75,7 +75,7 @@ internal class KeyboardScenario(
     private val receiver = EmojiSearchInputReceiver(editorReceiver, { emojiSearch }, { emojiSearch = it })
 
     init { controller.selectKeyboardInputMode(initialMode) }
-    fun start() { controller.onStartInput(null, false); controller.onStartInputView(null) }
+    fun start(info: android.view.inputmethod.EditorInfo? = null) { controller.onStartInput(info, false); controller.onStartInputView(info) }
     fun hide() = controller.onWindowHidden()
     fun copy(text: String?, sensitive: Boolean = false, mimeTypes: Set<String> = setOf(ClipMimeTypes.TEXT_PLAIN)) =
         suggestions.copy(text, sensitive, mimeTypes)

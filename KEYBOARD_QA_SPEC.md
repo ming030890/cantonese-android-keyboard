@@ -584,3 +584,18 @@ bitwise batch-vs-scalar tests protect scoring. Full phrase ranking still uses
 multiple conditional contexts. See `UNIFIED_SUGGESTIONS.md` for final score,
 cold timings, packaged-engine evidence and the baseline-reproduced opt-in
 `exmaole` acceptance assertion mismatch.
+
+### 2026-10-25: Auto-capitalization in ordinary text fields
+
+With Auto-capitalization enabled, English uses sentence capitalization for normal
+and web text fields even when the host omits capitalization flags. Explicit
+word/all-character flags retain their behavior; password, email, URI, filter and
+non-text fields remain excluded. Quick radical entry remains unchanged.
+`ordinaryAndWebTextFieldsUseSettingWithoutHostCapFlags` drives real field metadata
+through the production controller/key receiver. `ScenarioAutoCapsPlainText`
+renders the shifted keyboard after `Hello. ` in an ordinary text field.
+
+Verification: `:app:verifyKeyboard` passes, including unit/scenario tests,
+screenshot comparisons and debug assembly. The new plain-text auto-caps screenshot
+was inspected before validation. No device was connected; phone installation and
+real-editor integration remain unverified for this change.

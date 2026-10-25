@@ -12,6 +12,17 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
+@Preview(name = "Auto caps in ordinary text field", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioAutoCapsPlainText() = ScenarioScreen(remember {
+    KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum, autoCapitalizationEnabled = true).use { scenario ->
+        scenario.start(EditorInfo().apply { inputType = InputType.TYPE_CLASS_TEXT })
+        scenario.type("hello. ")
+        scenario.snapshot()
+    }
+})
+
+@PreviewTest
 @Preview(name = "PIN editor number layout", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioPinEditor() = ScenarioScreen(remember {

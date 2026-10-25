@@ -63,8 +63,12 @@ class AutoCapitalizationTest {
         TestCase("cap_words_start", "", 8193, true, "CAP_WORDS start"),
         TestCase("cap_words_after_space", "hello ", 8193, true, "CAP_WORDS after word space"),
         TestCase("cap_words_mid_word", "hel", 8193, false, "CAP_WORDS mid word"),
-        TestCase("plain_text_start", "", 1, false, "Plain text (no cap flags)"),
-        TestCase("plain_text_period", "Hello. ", 1, false, "Plain text after period space"),
+        TestCase("plain_text_start", "", 1, true, "Plain text uses sentence caps"),
+        TestCase("plain_text_period", "Hello. ", 1, true, "Plain text after period space"),
+
+        TestCase("plain_text_mid_word", "hel", 1, false, "Plain text mid word"),
+        TestCase("plain_text_mid_sentence", "Hello ", 1, false, "Plain text mid sentence"),
+        TestCase("web_text_start", "", 161, true, "Web text without cap flags"),
 
         // 7. Excluded variations
         TestCase("password_field", "", 129, false, "Password field"),
@@ -73,7 +77,7 @@ class AutoCapitalizationTest {
     )
 
     @Test
-    fun empiricalCasesMatchGboardParity() {
+    fun requestedCapsModesAndKeyboardSentenceFallback() {
         for (c in empiricalCases) {
             val result = AutoCapitalization.resolveCapsMode(c.inputType, c.context)
             val capitalized = result != 0
