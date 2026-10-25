@@ -1,0 +1,26 @@
+{
+  "cases": 5261,
+  "candidate_pool_and_score_mismatches": 0,
+  "changes": [
+    {
+      "id": "vt_exp2:p13:mobile341:6",
+      "typed": "tun",
+      "target": "run",
+      "before": null,
+      "after": "run"
+    },
+    {
+      "id": "vt_exp2:p2:mobile1061:4",
+      "typed": "ny",
+      "target": "by",
+      "before": null,
+      "after": "by"
+    }
+  ],
+  "base_ffn_unchanged": true,
+  "staged_library_matches_build": true,
+  "apk_library_matches_stripped_build": true,
+  "apk_library_sha256": "102a08b86a23f00f4a3692578ea24f8c91ae3e03a00e6f569be78f88b2caed56",
+  "probe_sha256": "90f57a79e5ebdc619f12f807dbc3a3a9ac035d6a3fc8125539ea177d95c73e8c",
+  "policy_sha256": "133864f9259f4bac953de956f75498018bf37af5a779b1501124741ba93e513f"
+}

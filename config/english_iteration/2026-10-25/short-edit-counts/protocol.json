@@ -1,0 +1,15 @@
+{
+  "script_sha256": "965f397bf011d9a6f35a6b923e09879eee67c20ddad150606632a0b0d8fc826e",
+  "source_hashes": {
+    "probe": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+    "policy": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322"
+  },
+  "mobile_source_sha256": "1906d43e123f09bdf6f85841d1e8bf28c5b59920d6bc24d7077b1ba8a7872c7f",
+  "stream_manifest_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f",
+  "fit": "Exact observed cutoffs per count/type bucket; no added FP or clean damage or precision loss",
+  "selection": "Separate mobile and recorded-stream cohorts; no precision loss in either",
+  "objective": "All four frozen families, exposed development comparison; not independent confirmation",
+  "additional_inference": 0,
+  "word_specific_rules": false
+}

@@ -1,0 +1,38 @@
+{
+  "native_tests_passed": 35,
+  "native_model_tests_ignored": 3,
+  "unit_tests": {
+    "tests": 268,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 20
+  },
+  "jni_short_word_test": "oneEditShortWordCorrectionAndUndoAcrossLayoutsThroughJni passed across English/Quick3/Quick5",
+  "keyboard_snapshot": "Rendered, visually inspected, validation passed",
+  "full_gate": "Failed only on seven Settings screenshots missing the auto-capitalization switch",
+  "stress_deltas": {
+    "delete": {
+      "tp": 2,
+      "fp": 0,
+      "clean_changes": 0
+    },
+    "substitute": {
+      "tp": 2,
+      "fp": 0,
+      "clean_changes": 0
+    },
+    "duplicate": {
+      "tp": 2,
+      "fp": 1,
+      "clean_changes": 0
+    },
+    "transpose": {
+      "tp": 2,
+      "fp": 0,
+      "clean_changes": 0
+    }
+  },
+  "accepted_baseline_updated": false,
+  "deployed": false,
+  "status": "Experimental candidate, not release acceptance"
+}

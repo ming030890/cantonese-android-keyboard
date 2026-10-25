@@ -1,0 +1,16 @@
+{
+  "scope": "ABBA native Mac timing, first 16 calls per process excluded; not phone latency",
+  "results": {
+    "baseline": {
+      "calls": 2016,
+      "median_ms": 1.529,
+      "p95_ms": 2.99425
+    },
+    "candidate": {
+      "calls": 2016,
+      "median_ms": 1.5295,
+      "p95_ms": 3.00325
+    }
+  },
+  "extra_model_inferences": 0
+}

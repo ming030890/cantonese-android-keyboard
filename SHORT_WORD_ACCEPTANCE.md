@@ -1,6 +1,10 @@
 # Short-word acceptance experiment — 2026-10-25
 
-**Reject the tested policy.** Lower thresholds recover short typos, but the
+**The initial broad-threshold policy is rejected.** A later one-edit candidate
+below improves the exposed objective, but is experimental and not promoted to
+the accepted baseline or deployed.
+
+Lower thresholds recover short typos, but the
 development-selected rule adds false corrections on the larger frozen suite.
 No native policy, model, Android code or packaged library was changed.
 
@@ -94,3 +98,95 @@ short-word decisions, despite zero added FP during tuning and selection.
 Saved results: [short-acceptance reports](config/english_iteration/2026-10-25/short-acceptance/).
 Script: [experiment_short_acceptance.py](scripts/experiment_short_acceptance.py).
 Raw runs remain under ignored `build/short-acceptance-20261025/`.
+
+## Error analysis and simple edit-count follow-up
+
+The initial sixteen added correct fixes and nine added wrong corrections have
+substantial overlap in edit count:
+
+| Operation | Correct fixes | Wrong corrections |
+| --- | ---: | ---: |
+| Substitution | 14 | 7 |
+| Transposition | 0 | 1 |
+| Deletion | 1 | 1 |
+| Prefix completion | 1 | 0 |
+
+Fifteen of sixteen correct fixes and all nine wrong corrections have native
+edit count one. The remaining correct completion has native count zero and two
+completed characters: effective character edits must include `completedChars`.
+Thus total edit count alone cannot separate these examples. Four of the nine
+wrong observations repeat the same `tim → him` edit and context; they are not
+four independent lexical failure modes. Other wrong repairs include `mo → no`
+when the target is `not`, and `bad → had` when the target is `has`. These are
+wrong repairs of existing typos, not only damage to correctly typed words.
+
+An intermediate experiment used the candidate's context score minus its
+empty-context LM score. Its cached prior table contained model probabilities,
+not word-specific correction rules. That entire CNN/cache integration was
+removed following the user's request for simpler edit features. No new LM prior
+table or prior-scoring inference remains in the candidate implementation.
+
+The replacement experiment compares four general families: a shared cutoff,
+cutoffs by effective edit count, substitution versus other operations, and one
+neighbor substitution versus other operations. It uses 5,418 real fit plus
+calibration words, with 3,316 two/three-character inputs (764 typos, 2,544 clean
+controls and eight ambiguous labels). An exact Pareto search chooses cutoffs
+from observed scores, constrained by native FP, clean-damage and precision
+budgets. It can reject existing risky decisions as well as add corrections.
+No new model weights, dictionary gate, word exceptions or inference are added.
+
+Separate selection has 348 observed-stream words and 714 real mobile short-word
+snapshots. All four fitted families tie native baseline on both selection
+cohorts; selection alone therefore retains baseline. Already-frozen families are
+then compared on the repository's explicitly exposed development objective,
+as allowed by `AUTOCORRECT_OBJECTIVE.md`. This is development hill climbing,
+not independent evidence of generalization. Evaluation labels do not fit the
+cutoffs, but prior evaluation errors motivated feature design.
+
+| Fitted family | Frozen objective F0.5 | Short TP / FP |
+| --- | ---: | ---: |
+| Shared / native baseline | 0.857560924 | 236 / 18 |
+| Effective edit-count buckets | 0.857386339 | 235 / 18 |
+| Substitution bucket | 0.858040765 | 238 / 18 |
+| One-neighbor-substitution bucket | 0.858040765 | 238 / 18 |
+
+The narrow candidate changes just one threshold for two/three-character inputs
+whose existing features report `edits == 1` and `neighbor_replacements == 1`.
+The cutoff is **1.1049790959480634 logit units**, versus the original
+1.152882543391148. Minimum lengths and all other decisions remain unchanged.
+The maximum length three defines this user-requested scope; the cutoff is
+derived from development data. No word text is tested in the new rule.
+
+Fresh native inference adds exactly `tun → run` and `ny → by` on the static
+suite, with zero added FP or clean damage. All 5,261 candidate pools and scores
+are unchanged. The aggregate delta is **+0.00047984030650316534**. Closed-loop
+observed touch replay adds one net TP (387 → 388), retaining twelve FP and zero
+clean damage. The separate 107-word Google cohort remains fifteen TP / one FP;
+it provides no positive gain evidence. The gain is small and uses an exposed
+objective; it does not establish broader coverage or population precision.
+
+The supplemental synthetic prior-typo audit also matters. Relative to the saved
+baseline, noisy-context TP/FP deltas are: deletion +2/0, substitution +2/0,
+duplication +2/+1, transposition +2/0. Clean damage is unchanged in every
+operation. The extra wrong repair under duplicated context is a reason to keep
+this candidate experimental instead of claiming precision is universally
+preserved. Do not tune an exception to that exposed stress case.
+
+The native source contains the optional small count-based branch and its
+candidate policy; the original FFN weights are unchanged. Actual JNI tests pass
+correction, undo and undo suppression across English, Quick 3 and Quick 5,
+including preservation of `tim`, `mo` and `bad`. All 35 ordinary native tests
+pass. The new keyboard screenshot was rendered and visually inspected.
+
+ABBA native Mac timing gives median 1.529 → 1.5295 ms and p95 2.99425 → 3.00325
+ms, with zero extra inference calls. This is effectively unchanged host timing,
+not a phone-latency measurement. The ARM64 library and APK were rebuilt and
+their packaged-library hashes verified. Full `verifyKeyboard` remains red on
+seven unrelated Settings screenshots whose baselines lack the already-added
+auto-capitalization switch; those baselines were not changed. The accepted
+baseline remains 0.857561 and no device installation was performed.
+
+Reproduction: [experiment_short_edit_counts.py](scripts/experiment_short_edit_counts.py).
+Saved [count-experiment reports](config/english_iteration/2026-10-25/short-edit-counts/).
+Raw input-only native caches, prior experiments and source snapshots remain
+under ignored `build/{short-edit-counts,short-error-analysis}-20261025/`.

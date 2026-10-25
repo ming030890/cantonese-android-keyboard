@@ -1,0 +1,252 @@
+[
+  {
+    "id": "aalto:018d47aa0ba4648574883758ccfa801232aa9fec229ee6583bb944e47d73ab1a",
+    "typed": "kn",
+    "target": "in",
+    "candidate": "in",
+    "left": "We will be bringing ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "aalto:02e7d09b0b4e3a38a1bbac1ce5a625fecdf69c2a16fc37c771cc96145004fb35",
+    "typed": "pri",
+    "target": "price",
+    "candidate": "price",
+    "left": "How's the share ",
+    "status": "right",
+    "edit_count": 0.0,
+    "operation": "completion"
+  },
+  {
+    "id": "aalto:038872b03c15d20cb01bf4764a784306f5e9023b41fd2a0c3b0b81cb92784d65",
+    "typed": "iw",
+    "target": "is",
+    "candidate": "is",
+    "left": "He did not return to the contest, and ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "aalto:03ddb34d7e018b3c4cb9f6fd14c885adfc4dd2ba21dd8075f0e417f5ed0c98a9",
+    "typed": "mo",
+    "target": "not",
+    "candidate": "no",
+    "left": "",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "aalto:05e9968a74774bbd6577ea7a86d6590026ac58c925ec6cb2f7f114e32ef1af39",
+    "typed": "mow",
+    "target": "now",
+    "candidate": "now",
+    "left": "Our numbers are correct in the system ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "aalto:06405debf3975b25aed61c8c11674d4b894c0eac40fdd99fed6dc65466cc042b",
+    "typed": "tei",
+    "target": "two",
+    "candidate": "tie",
+    "left": "Louis, posting five catches for 35 yards and ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "transposition"
+  },
+  {
+    "id": "aalto:84cab4988260a4617e9f6b4acbbf892186dcc8b7f4747d2d478b19f01652d8e5",
+    "typed": "KN",
+    "target": "kn",
+    "candidate": "IN",
+    "left": "Megan, we only bought this on ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p10:mobile781:2",
+    "typed": "tim",
+    "target": "tim",
+    "candidate": "him",
+    "left": "i hear ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p11:mobile1439:0",
+    "typed": "ate",
+    "target": "are",
+    "candidate": "are",
+    "left": "",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p11:mobile1704:1",
+    "typed": "ar",
+    "target": "at",
+    "candidate": "at",
+    "left": "meet ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p11:mobile1704:5",
+    "typed": "ar",
+    "target": "at",
+    "candidate": "at",
+    "left": "meet ar arriving passenger area ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p11:mobile781:2",
+    "typed": "tim",
+    "target": "tim",
+    "candidate": "him",
+    "left": "i hear ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p11:mobile830:2",
+    "typed": "fir",
+    "target": "for",
+    "candidate": "for",
+    "left": "thabk yoy ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p12:mobile781:2",
+    "typed": "tim",
+    "target": "tim",
+    "candidate": "him",
+    "left": "i hear ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p13:mobile341:6",
+    "typed": "tun",
+    "target": "run",
+    "candidate": "run",
+    "left": "i may take the oppurtubity to ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p13:mobile1641:4",
+    "typed": "cor",
+    "target": "for",
+    "candidate": "for",
+    "left": "next week soinfs fone ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p18:mobile399:2",
+    "typed": "fir",
+    "target": "for",
+    "candidate": "for",
+    "left": "yhanks agsin ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p1:mobile1550:9",
+    "typed": "zet",
+    "target": "set",
+    "candidate": "set",
+    "left": "how did you make sure it wzd the rigjt ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p20:mobile986:0",
+    "typed": "hw",
+    "target": "he",
+    "candidate": "he",
+    "left": "",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p20:mobile1054:3",
+    "typed": "aeb",
+    "target": "web",
+    "candidate": "web",
+    "left": "she had a ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p21:mobile781:2",
+    "typed": "tim",
+    "target": "tim",
+    "candidate": "him",
+    "left": "i hear ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p2:mobile1061:4",
+    "typed": "ny",
+    "target": "by",
+    "candidate": "by",
+    "left": "fannin is a mess ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p4:mobile700:6",
+    "typed": "omr",
+    "target": "alone",
+    "candidate": "or",
+    "left": "i eisg he woulf leave deerfield ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "deletion"
+  },
+  {
+    "id": "vt_exp2:p4:mobile1553:1",
+    "typed": "bad",
+    "target": "has",
+    "candidate": "had",
+    "left": "it ",
+    "status": "wrong",
+    "edit_count": 1.0,
+    "operation": "substitution"
+  },
+  {
+    "id": "vt_exp2:p5:mobile1117:6",
+    "typed": "usi",
+    "target": "us",
+    "candidate": "us",
+    "left": "pkease send it ti both of ",
+    "status": "right",
+    "edit_count": 1.0,
+    "operation": "deletion"
+  }
+]
