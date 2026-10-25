@@ -32,7 +32,7 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 71
+        versionCode = 72
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
