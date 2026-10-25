@@ -30,3 +30,35 @@ fun performKeyboardHaptic(
         ),
     )
 }
+
+fun performSegmentTickHaptic(
+    view: View,
+    config: KeyboardHapticConfig = KeyboardHapticConfig(),
+) {
+    val hapticConfig = config.clamped()
+    if (!hapticConfig.shouldVibrate()) return
+    if (hapticConfig.respectSystemSettings && !view.isHapticFeedbackEnabled) return
+
+    val feedbackConstant = if (android.os.Build.VERSION.SDK_INT >= 34) {
+        HapticFeedbackConstants.SEGMENT_TICK
+    } else {
+        HapticFeedbackConstants.CLOCK_TICK
+    }
+    view.performHapticFeedback(feedbackConstant)
+}
+
+fun performGestureThresholdHaptic(
+    view: View,
+    config: KeyboardHapticConfig = KeyboardHapticConfig(),
+) {
+    val hapticConfig = config.clamped()
+    if (!hapticConfig.shouldVibrate()) return
+    if (hapticConfig.respectSystemSettings && !view.isHapticFeedbackEnabled) return
+
+    val feedbackConstant = if (android.os.Build.VERSION.SDK_INT >= 34) {
+        HapticFeedbackConstants.GESTURE_THRESHOLD_ACTIVATE
+    } else {
+        HapticFeedbackConstants.KEYBOARD_PRESS
+    }
+    view.performHapticFeedback(feedbackConstant)
+}

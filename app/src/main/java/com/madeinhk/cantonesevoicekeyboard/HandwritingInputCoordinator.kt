@@ -289,17 +289,19 @@ internal class HandwritingInputCoordinator(
                         request.height,
                     )
                 }.getOrNull() ?: ByteArray(48 * 48)
-                val recordingId = context?.let {
-                    DebugHandwritingStore.capture(
-                        it,
-                        request.pixels,
-                        request.width,
-                        request.height,
-                        modelPixels,
-                        48,
-                        48,
-                    )
-                }
+                val recordingId = if (editor.isPersonalizedLearningAllowed()) {
+                    context?.let {
+                        DebugHandwritingStore.capture(
+                            it,
+                            request.pixels,
+                            request.width,
+                            request.height,
+                            modelPixels,
+                            48,
+                            48,
+                        )
+                    }
+                } else null
                 val predictions = if (request.strokes.isNotEmpty() && request.canvasWidth > 0f && request.canvasHeight > 0f) {
                     val prevChar = leftContext.takeLast(1).takeIf { it.isNotBlank() }
                     activeRecognizer.predictStrokes(

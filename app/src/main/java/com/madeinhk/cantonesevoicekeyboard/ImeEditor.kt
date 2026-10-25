@@ -1,5 +1,6 @@
 package com.madeinhk.cantonesevoicekeyboard
 
+import android.os.Build
 import android.text.InputType
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
@@ -55,21 +56,70 @@ internal class ImeEditor(
         return if (resolveEnterCommand(info?.actionId ?: 0, info?.imeOptions) == EditorEnterCommand.CommitNewline) "\n" else null
     }
 
-    override fun cursorSelection(): Pair<Int, Int>? = connection()
-        ?.getExtractedText(android.view.inputmethod.ExtractedTextRequest(), 0)
-        ?.let { (it.startOffset + it.selectionStart) to (it.startOffset + it.selectionEnd) }
+    override fun cursorSelection(): Pair<Int, Int>? {
+        val input = connection() ?: return null
+        if (Build.VERSION.SDK_INT >= 31) {
+            try {
+                val surrounding = input.getSurroundingText(0, 0, 0)
+                if (surrounding != null) {
+                    val start = surrounding.offset + surrounding.selectionStart
+                    val end = surrounding.offset + surrounding.selectionEnd
+                    return start to end
+                }
+            } catch (_: Throwable) {
+                // Fall back to getExtractedText if editor implementation has defects
+            }
+        }
+        return input.getExtractedText(android.view.inputmethod.ExtractedTextRequest(), 0)
+            ?.let { (it.startOffset + it.selectionStart) to (it.startOffset + it.selectionEnd) }
+    }
 
     override fun replaceTextBeforeCursor(expected: String, replacement: String): Boolean {
         val input = connection() ?: return false
         if (!input.getSelectedText(0).isNullOrEmpty() ||
             input.getTextBeforeCursor(expected.length, 0)?.toString() != expected) return false
+
+        if (Build.VERSION.SDK_INT >= 34) {
+            try {
+                val surrounding = input.getSurroundingText(expected.length, 0, 0)
+                if (surrounding != null) {
+                    val cursor = surrounding.offset + surrounding.selectionStart
+                    val start = cursor - expected.length
+                    if (start >= 0 && input.replaceText(start, cursor, replacement, 1, null)) {
+                        return true
+                    }
+                }
+            } catch (_: Throwable) {
+                // Fall back to deleteSurroundingText + commitText
+            }
+        }
+
         input.beginBatchEdit()
         return try {
             input.deleteSurroundingText(expected.length, 0) && input.commitText(replacement, 1)
         } finally { input.endBatchEdit() }
     }
 
+    override fun restoreComposingText(length: Int, word: String): Boolean {
+        val input = connection() ?: return false
+        if (!input.getSelectedText(0).isNullOrEmpty()) return false
+        if (length > 0) {
+            val before = input.getTextBeforeCursor(length, 0)?.toString() ?: return false
+            if (before.length != length) return false
+        }
+        input.beginBatchEdit()
+        return try {
+            val deleted = length == 0 || input.deleteSurroundingText(length, 0)
+            deleted && input.setComposingText(word, 1)
+        } finally { input.endBatchEdit() }
+    }
+
     override fun getCursorCapsMode(reqModes: Int): Int = connection()?.getCursorCapsMode(reqModes) ?: 0
+
+    override fun isPersonalizedLearningAllowed(): Boolean {
+        val info = editorInfo() ?: return true
+        return (info.imeOptions and EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING) == 0
+    }
 }
 
 internal sealed interface EditorEnterCommand {

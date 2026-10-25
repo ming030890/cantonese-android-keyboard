@@ -470,7 +470,7 @@ internal class VoiceInputCoordinator(
         recording = true
         _state.value = KeyboardUiState.Recording
 
-        val debugStore = context?.let { DebugAudioStore.createIfEnabled(it) }
+        val debugStore = if (editor.isPersonalizedLearningAllowed()) context?.let { DebugAudioStore.createIfEnabled(it) } else null
         val debugTranscript = StringBuffer()
         val sessionEditorId = currentSession()
         val voiceGeneration = ++generation

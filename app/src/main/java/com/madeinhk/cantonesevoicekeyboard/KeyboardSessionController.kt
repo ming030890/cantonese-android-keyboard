@@ -1,6 +1,8 @@
 package com.madeinhk.cantonesevoicekeyboard
 
+import android.content.Context
 import android.inputmethodservice.InputMethodService
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.view.inputmethod.EditorInfo
@@ -24,6 +26,7 @@ import com.madeinhk.cantonesevoicekeyboard.english.*
 internal class KeyboardSessionController(
     private val editor: KeyboardEditor,
     private val settings: KeyboardSessionSettings,
+    private val context: Context? = null,
     createDependencies: (KeyboardEditor, () -> Long, () -> Boolean) -> KeyboardSessionDependencies,
 ) {
     constructor(service: InputMethodService) : this(
@@ -34,6 +37,7 @@ internal class KeyboardSessionController(
             autocorrectEnabled = { KeyboardSettings.isAutocorrectEnabled(service, it) },
             autoCapitalizationEnabled = { KeyboardSettings.isAutoCapitalizationEnabled(service) },
         ),
+        context = service,
         createDependencies = { editor, currentSession, isVisible ->
             val voice = VoiceInputCoordinator(service, editor, currentSession, isVisible)
             val quick = QuickInputCoordinator(service, editor, KeyboardSettings.getQuickVersion(service))
@@ -270,7 +274,10 @@ internal class KeyboardSessionController(
         handwriting.onInputStarted()
         suggestions.onInputStarted()
         if (!restarting) voice.finish(releaseModel = false, session = inputViewSession)
-        refreshAutoCapitalization()
+        val initialText = if (Build.VERSION.SDK_INT >= 30) {
+            info?.getInitialTextBeforeCursor(64, 0)?.toString()
+        } else null
+        refreshAutoCapitalization(initialText)
     }
 
     private val _keyboardSession = MutableStateFlow(0L)
@@ -288,7 +295,10 @@ internal class KeyboardSessionController(
         val session = advanceSession()
         voice.onInputViewStarted(session)
         handwriting.onInputViewStarted(session)
-        refreshPredictions()
+        val initialText = if (Build.VERSION.SDK_INT >= 30) {
+            info?.getInitialTextBeforeCursor(64, 0)?.toString()
+        } else null
+        refreshPredictions(initialText)
     }
 
     private fun ensureValidInputMode() {
@@ -332,8 +342,8 @@ internal class KeyboardSessionController(
         finishSession(releaseModel = true)
     }
 
-    private fun refreshPredictions() {
-        val textBefore = editor.getTextBeforeCursor(64)
+    private fun refreshPredictions(cachedTextBefore: String? = null) {
+        val textBefore = cachedTextBefore ?: editor.getTextBeforeCursor(64)
         refreshPunctuation(textBefore)
         refreshAutoCapitalization(textBefore)
         if (!inputViewVisible) return
@@ -607,6 +617,34 @@ internal class KeyboardSessionController(
 
     fun onAutofillTapped() = suggestions.onAutofillTapped()
 
+    private fun inferAppLocaleMode(info: EditorInfo?, enabled: Set<String>): KeyboardInputMode? {
+        val hintLocale = if (Build.VERSION.SDK_INT >= 24) {
+            info?.hintLocales?.takeIf { !it.isEmpty }?.get(0)
+        } else null
+
+        val appLocale = if (hintLocale != null) {
+            hintLocale
+        } else if (Build.VERSION.SDK_INT >= 33 && context != null && !info?.packageName.isNullOrEmpty()) {
+            try {
+                val localeManager = context.getSystemService(android.app.LocaleManager::class.java)
+                localeManager?.getApplicationLocales(info.packageName)?.takeIf { !it.isEmpty }?.get(0)
+            } catch (_: SecurityException) {
+                null
+            }
+        } else null
+
+        val lang = appLocale?.language?.lowercase(java.util.Locale.ROOT) ?: return null
+        return when {
+            lang == "en" && enabled.contains(KeyboardSettings.LAYOUT_ENGLISH) -> KeyboardInputMode.AlphaNum
+            (lang == "zh" || lang == "yue") -> when {
+                enabled.contains(KeyboardSettings.LAYOUT_QUICK) -> KeyboardInputMode.Quick
+                enabled.contains(KeyboardSettings.LAYOUT_HANDWRITING) -> KeyboardInputMode.Handwriting
+                else -> null
+            }
+            else -> null
+        }
+    }
+
     private fun updateEditorPresentation(info: EditorInfo?) {
         editorAllowsEnglish = englishAllowed(info?.inputType)
         if (!editorAllowsEnglish) TypingDiagnostics.update("editor_disallows_correction")
@@ -616,7 +654,8 @@ internal class KeyboardSessionController(
             _keyboardInputMode.value = targetMode
         } else {
             val enabledLayouts = settings.enabledLayouts()
-            val selected = lastUserSelectedLayout
+            val localeInferred = inferAppLocaleMode(info, enabledLayouts)
+            val selected = lastUserSelectedLayout ?: localeInferred
             if (selected != null && isLayoutSupported(selected, enabledLayouts)) {
                 _keyboardInputMode.value = selected
             } else {

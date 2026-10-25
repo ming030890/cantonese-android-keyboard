@@ -23,7 +23,9 @@ internal interface KeyboardEditor {
     fun cursorSelection(): Pair<Int, Int>? = null
     /** Guarded undo: never delete through a changed cursor/selection. */
     fun replaceTextBeforeCursor(expected: String, replacement: String): Boolean = false
+    fun restoreComposingText(length: Int, word: String): Boolean = false
     fun getCursorCapsMode(reqModes: Int): Int = 0
+    fun isPersonalizedLearningAllowed(): Boolean = true
 }
 
 internal interface VoiceSession {
