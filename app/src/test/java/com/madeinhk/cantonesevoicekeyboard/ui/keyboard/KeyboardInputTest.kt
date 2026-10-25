@@ -365,6 +365,61 @@ class KeyboardInputTest {
     }
 
     @Test
+    fun calculateRepeatIntervalAcceleratesSmoothly() {
+        assertEquals(45L, calculateRepeatInterval(0, 45L, 18L))
+        assertEquals(45L, calculateRepeatInterval(5, 45L, 18L))
+        assertEquals(43L, calculateRepeatInterval(6, 45L, 18L))
+        assertEquals(35L, calculateRepeatInterval(10, 45L, 18L))
+        assertEquals(27L, calculateRepeatInterval(14, 45L, 18L))
+        assertEquals(25L, calculateRepeatInterval(15, 45L, 18L))
+        assertEquals(25L, calculateRepeatInterval(29, 45L, 18L))
+        assertEquals(18L, calculateRepeatInterval(30, 45L, 18L))
+        assertEquals(18L, calculateRepeatInterval(100, 45L, 18L))
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test
+    fun continuousRepeatAcceleratesOverTime() = runTest {
+        val timestamps = mutableListOf<Long>()
+        val receiver = object : KeyboardInputReceiver {
+            override fun onKeyDown(data: KeyData) {}
+            override fun onKeyUp(data: KeyData) {}
+            override fun onKeyCancel(data: KeyData) {}
+            override fun onKeyRepeat(data: KeyData) {
+                timestamps += testScheduler.currentTime
+            }
+        }
+        val dispatcher = CoroutineKeyboardInputDispatcher(
+            receiver = receiver,
+            scope = this,
+            longPressDelayMillis = 350L,
+            repeatIntervalMillis = 45L,
+            minRepeatIntervalMillis = 18L,
+            nowMillis = { 0L }
+        )
+        val delete = KeyData("delete", KeyboardKeyKind.Delete)
+        val info = dispatcher.sendDown(delete, onRepeat = {
+            receiver.onKeyRepeat(delete)
+            true
+        })
+
+        // Advance 2 seconds
+        advanceTimeBy(2000L)
+        runCurrent()
+        dispatcher.sendUp(delete, info)
+
+        // Verify that more than 50 repeats happened in 2 seconds (faster than previous ~28)
+        assertTrue("Expected > 50 repeats in 2s, got ${timestamps.size}", timestamps.size > 50)
+
+        // Verify acceleration: earlier intervals are longer, later intervals are shorter
+        val earlyInterval = timestamps[2] - timestamps[1]
+        val lateInterval = timestamps[timestamps.size - 1] - timestamps[timestamps.size - 2]
+        assertEquals(45L, earlyInterval)
+        assertEquals(18L, lateInterval)
+        assertTrue(lateInterval < earlyInterval)
+    }
+
+    @Test
     fun typingKeysTriggerVoiceInterruptionOnKeyDown() {
         val receiver = KeyboardScreenInputReceiver()
         var interruptedCount = 0

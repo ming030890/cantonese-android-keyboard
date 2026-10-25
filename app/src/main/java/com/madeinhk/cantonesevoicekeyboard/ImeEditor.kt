@@ -34,7 +34,7 @@ internal class ImeEditor(
             if (shouldDeleteSelection(getSelectedText(0))) {
                 commitText("", 1)
             } else {
-                val before = getTextBeforeCursor(1024, 0)
+                val before = getTextBeforeCursor(48, 0)
                 deleteSurroundingText(before?.let(::previousCharacterLength) ?: 1, 0)
             }
         }

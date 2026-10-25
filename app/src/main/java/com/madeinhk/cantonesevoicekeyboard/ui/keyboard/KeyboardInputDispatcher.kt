@@ -10,8 +10,23 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence
 
-private const val DefaultLongPressDelayMillis = 450L
-private const val DefaultRepeatIntervalMillis = 55L
+internal const val DefaultLongPressDelayMillis = 350L
+internal const val DefaultRepeatIntervalMillis = 45L
+internal const val DefaultMinRepeatIntervalMillis = 18L
+
+internal fun calculateRepeatInterval(
+    repeatCount: Int,
+    initialInterval: Long = DefaultRepeatIntervalMillis,
+    minInterval: Long = DefaultMinRepeatIntervalMillis,
+): Long {
+    val floor = minOf(initialInterval, minInterval)
+    return when {
+        repeatCount < 6 -> initialInterval
+        repeatCount < 15 -> (initialInterval - (repeatCount - 5) * 2L).coerceAtLeast(floor)
+        repeatCount < 30 -> (initialInterval - 20L).coerceAtLeast(floor)
+        else -> floor
+    }
+}
 
 class PressedKeyInfo(
     val downTimeMillis: Long,
@@ -47,6 +62,7 @@ class CoroutineKeyboardInputDispatcher(
     ),
     private val longPressDelayMillis: Long = DefaultLongPressDelayMillis,
     private val repeatIntervalMillis: Long = DefaultRepeatIntervalMillis,
+    private val minRepeatIntervalMillis: Long = DefaultMinRepeatIntervalMillis,
     private val nowMillis: () -> Long = SystemClock::uptimeMillis,
 ) : KeyboardInputDispatcher {
     override fun sendDown(
@@ -63,8 +79,15 @@ class CoroutineKeyboardInputDispatcher(
                 val consumed = onLongPress()
                 info.blockUp = consumed
                 if (!consumed && data.repeatable) {
+                    var repeatCount = 0
                     while (isActive) {
-                        delay(repeatIntervalMillis)
+                        val interval = calculateRepeatInterval(
+                            repeatCount = repeatCount,
+                            initialInterval = repeatIntervalMillis,
+                            minInterval = minRepeatIntervalMillis,
+                        )
+                        delay(interval)
+                        repeatCount++
                         if (!onRepeat()) break
                     }
                 }

@@ -427,9 +427,11 @@ internal class KeyboardSessionController(
         pendingTouch = null
         if (english?.delete() == true) {
             if (english.quick && english.word.isNotEmpty()) quick.restoreComposingText(english.word)
+            refreshPunctuation()
         } else if (quick.hasActiveInput()) {
             quick.onDelete()
             if (autocorrectActive(KeyboardInputMode.Quick)) english?.observeQuick(quick.getComposingText(), null)
+            refreshPunctuation()
         } else if (handwriting.hasActiveInput()) {
             handwriting.discard()
             refreshPredictions()
@@ -437,7 +439,6 @@ internal class KeyboardSessionController(
             editor.deleteSelectionOrPreviousCharacter()
             refreshPredictions()
         }
-        refreshPunctuation()
     }
 
     fun commitText(text: String) {
