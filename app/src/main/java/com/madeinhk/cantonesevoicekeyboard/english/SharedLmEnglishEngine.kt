@@ -30,6 +30,8 @@ internal class SharedLmEnglishEngine(
     },
 ) : EnglishCandidateEngine {
     override val supportsAutomaticCorrection = true
+    // Native acceptance already decides whether the English repair is confident.
+    override val allowsQuickCodeCorrections = true
     override fun nextWords(left: String, right: String) = complete(contextHandle(), left, "").distinct()
     override fun predict(word: String, centers: FloatArray, points: FloatArray, left: String, right: String): EnglishPrediction =
         predictObserved(word, centers, points, left, right)

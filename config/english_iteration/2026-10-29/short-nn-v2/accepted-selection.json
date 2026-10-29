@@ -1,0 +1,403 @@
+{
+  "variant": "drop_literal_score",
+  "checks": [
+    {
+      "id": "lr0.0001-e30",
+      "passes": false,
+      "decisions": [
+        "burger",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "you",
+        "game",
+        "merge"
+      ],
+      "metrics": {
+        "original": {
+          "cases": 1785,
+          "typos": 685,
+          "controls": 1100,
+          "correct": 465,
+          "wrong": 41,
+          "missed": 220,
+          "false_changes": 2,
+          "precision": 0.9189723320158103,
+          "recall": 0.6788321167883211,
+          "f05": 0.858250276854928
+        },
+        "noisy": {
+          "cases": 6273,
+          "typos": 2311,
+          "controls": 3962,
+          "correct": 1317,
+          "wrong": 150,
+          "missed": 994,
+          "false_changes": 8,
+          "precision": 0.8977505112474438,
+          "recall": 0.569883167459974,
+          "f05": 0.8051106492236215
+        },
+        "natural_short": {
+          "cases": 6413,
+          "typos": 6037,
+          "controls": 376,
+          "correct": 4320,
+          "wrong": 283,
+          "missed": 1717,
+          "false_changes": 1,
+          "precision": 0.9385183575928742,
+          "recall": 0.7155872121914858,
+          "f05": 0.8834717166346272
+        },
+        "synthetic_short": {
+          "cases": 2531,
+          "typos": 661,
+          "controls": 1870,
+          "correct": 366,
+          "wrong": 105,
+          "missed": 295,
+          "false_changes": 105,
+          "precision": 0.7770700636942676,
+          "recall": 0.5537065052950075,
+          "f05": 0.7190569744597249
+        },
+        "selection_f05": 0.8316804630392748
+      }
+    },
+    {
+      "id": "lr0.0001-e100",
+      "passes": false,
+      "decisions": [
+        "burger",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "have",
+        "you",
+        "game",
+        "merge"
+      ],
+      "metrics": {
+        "original": {
+          "cases": 1785,
+          "typos": 685,
+          "controls": 1100,
+          "correct": 458,
+          "wrong": 34,
+          "missed": 227,
+          "false_changes": 1,
+          "precision": 0.9308943089430894,
+          "recall": 0.6686131386861314,
+          "f05": 0.8631737655484357
+        },
+        "noisy": {
+          "cases": 6273,
+          "typos": 2311,
+          "controls": 3962,
+          "correct": 1278,
+          "wrong": 115,
+          "missed": 1033,
+          "false_changes": 7,
+          "precision": 0.9174443646805456,
+          "recall": 0.5530073561228905,
+          "f05": 0.8106050995813776
+        },
+        "natural_short": {
+          "cases": 6413,
+          "typos": 6037,
+          "controls": 376,
+          "correct": 4266,
+          "wrong": 238,
+          "missed": 1771,
+          "false_changes": 1,
+          "precision": 0.9471580817051509,
+          "recall": 0.7066423720390923,
+          "f05": 0.8867916683989523
+        },
+        "synthetic_short": {
+          "cases": 2531,
+          "typos": 661,
+          "controls": 1870,
+          "correct": 336,
+          "wrong": 94,
+          "missed": 325,
+          "false_changes": 94,
+          "precision": 0.7813953488372093,
+          "recall": 0.5083207261724659,
+          "f05": 0.7055858882822343
+        },
+        "selection_f05": 0.8368894325649067
+      }
+    },
+    {
+      "id": "lr0.0003-e30",
+      "passes": false,
+      "decisions": [
+        "burger",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "have",
+        "you",
+        "game",
+        "merge"
+      ],
+      "metrics": {
+        "original": {
+          "cases": 1785,
+          "typos": 685,
+          "controls": 1100,
+          "correct": 457,
+          "wrong": 33,
+          "missed": 228,
+          "false_changes": 1,
+          "precision": 0.9326530612244898,
+          "recall": 0.6671532846715329,
+          "f05": 0.8638941398865785
+        },
+        "noisy": {
+          "cases": 6273,
+          "typos": 2311,
+          "controls": 3962,
+          "correct": 1277,
+          "wrong": 115,
+          "missed": 1034,
+          "false_changes": 7,
+          "precision": 0.9173850574712644,
+          "recall": 0.5525746430116832,
+          "f05": 0.8103820281761644
+        },
+        "natural_short": {
+          "cases": 6413,
+          "typos": 6037,
+          "controls": 376,
+          "correct": 4250,
+          "wrong": 233,
+          "missed": 1787,
+          "false_changes": 1,
+          "precision": 0.9480258755297791,
+          "recall": 0.7039920490309757,
+          "f05": 0.886561809003296
+        },
+        "synthetic_short": {
+          "cases": 2531,
+          "typos": 661,
+          "controls": 1870,
+          "correct": 336,
+          "wrong": 90,
+          "missed": 325,
+          "false_changes": 90,
+          "precision": 0.7887323943661971,
+          "recall": 0.5083207261724659,
+          "f05": 0.7103594080338267
+        },
+        "selection_f05": 0.8371380840313715
+      }
+    },
+    {
+      "id": "lr0.0003-e100",
+      "passes": true,
+      "decisions": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "have",
+        "you",
+        "game",
+        "merge"
+      ],
+      "metrics": {
+        "original": {
+          "cases": 1785,
+          "typos": 685,
+          "controls": 1100,
+          "correct": 455,
+          "wrong": 30,
+          "missed": 230,
+          "false_changes": 1,
+          "precision": 0.9381443298969072,
+          "recall": 0.6642335766423357,
+          "f05": 0.8666666666666667
+        },
+        "noisy": {
+          "cases": 6273,
+          "typos": 2311,
+          "controls": 3962,
+          "correct": 1250,
+          "wrong": 105,
+          "missed": 1061,
+          "false_changes": 7,
+          "precision": 0.922509225092251,
+          "recall": 0.540891389009087,
+          "f05": 0.8084335790971414
+        },
+        "natural_short": {
+          "cases": 6413,
+          "typos": 6037,
+          "controls": 376,
+          "correct": 4217,
+          "wrong": 214,
+          "missed": 1820,
+          "false_changes": 1,
+          "precision": 0.9517039043105394,
+          "recall": 0.6985257578267351,
+          "f05": 0.8873784773368124
+        },
+        "selection_f05": 0.837550122881904
+      }
+    }
+  ],
+  "winner": {
+    "id": "lr0.0003-e100",
+    "passes": true,
+    "decisions": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "have",
+      "you",
+      "game",
+      "merge"
+    ],
+    "metrics": {
+      "original": {
+        "cases": 1785,
+        "typos": 685,
+        "controls": 1100,
+        "correct": 455,
+        "wrong": 30,
+        "missed": 230,
+        "false_changes": 1,
+        "precision": 0.9381443298969072,
+        "recall": 0.6642335766423357,
+        "f05": 0.8666666666666667
+      },
+      "noisy": {
+        "cases": 6273,
+        "typos": 2311,
+        "controls": 3962,
+        "correct": 1250,
+        "wrong": 105,
+        "missed": 1061,
+        "false_changes": 7,
+        "precision": 0.922509225092251,
+        "recall": 0.540891389009087,
+        "f05": 0.8084335790971414
+      },
+      "natural_short": {
+        "cases": 6413,
+        "typos": 6037,
+        "controls": 376,
+        "correct": 4217,
+        "wrong": 214,
+        "missed": 1820,
+        "false_changes": 1,
+        "precision": 0.9517039043105394,
+        "recall": 0.6985257578267351,
+        "f05": 0.8873784773368124
+      },
+      "selection_f05": 0.837550122881904
+    }
+  },
+  "guards": [
+    {
+      "left": "",
+      "typed": "butger",
+      "expected": null
+    },
+    {
+      "left": "",
+      "typed": "wastg",
+      "expected": null
+    },
+    {
+      "left": "",
+      "typed": "bokeh",
+      "expected": null
+    },
+    {
+      "left": "",
+      "typed": "Alstom",
+      "expected": null
+    },
+    {
+      "left": "",
+      "typed": "Xentara",
+      "expected": null
+    },
+    {
+      "left": "",
+      "typed": "thses",
+      "expected": null
+    },
+    {
+      "left": "",
+      "typed": "inthe",
+      "expected": null
+    },
+    {
+      "left": "I ",
+      "typed": "don't",
+      "expected": null
+    },
+    {
+      "left": "I said ",
+      "typed": "hel",
+      "expected": null
+    },
+    {
+      "left": "Let me know if yyou ",
+      "typed": "heve",
+      "expected": "have"
+    },
+    {
+      "left": "let me know if ",
+      "typed": "hou",
+      "expected": "you"
+    },
+    {
+      "left": "",
+      "typed": "gwme",
+      "expected": "game"
+    },
+    {
+      "left": "",
+      "typed": "mwrge",
+      "expected": "merge"
+    }
+  ],
+  "evaluation_used_for_fitting": false,
+  "new_weights_fitted": false,
+  "source_selection_sha256": "5216eaec23dc262ceac9c33e62ff3e0133a25db66bef8aa15d2c5b4946248f97",
+  "fixed_parent_threshold": true,
+  "excluded_observations_sha256": null
+}

@@ -1,0 +1,135 @@
+{
+  "status": "experimental; no model promoted",
+  "baseline_score": 0.857560924437909,
+  "user_cases_excluded_from_training": true,
+  "production_source_restored": true,
+  "trials": [
+    {
+      "id": "context-gain",
+      "score": 0.8447143639130832,
+      "delta": -0.0128465605248258,
+      "tue_passed": 1,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/context-gain-objective/score.json"
+    },
+    {
+      "id": "short-nn",
+      "score": 0.8442291707983941,
+      "delta": -0.013331753639514887,
+      "tue_passed": 1,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/short-nn-objective/score.json"
+    },
+    {
+      "id": "short-focused",
+      "score": 0.8548837355383889,
+      "delta": -0.0026771888995200666,
+      "tue_passed": 1,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/short-focused-objective/score.json"
+    },
+    {
+      "id": "short-context",
+      "score": 0.8575898029861806,
+      "delta": 2.8878548271604743e-05,
+      "tue_passed": 1,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/short-context-objective/score.json"
+    },
+    {
+      "id": "short-expanded",
+      "score": 0.8594664627497364,
+      "delta": 0.0019055383118273816,
+      "tue_passed": 2,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/short-expanded-objective/score.json"
+    },
+    {
+      "id": "short-context-expanded",
+      "score": 0.8533558869848001,
+      "delta": -0.004205037453108851,
+      "tue_passed": 2,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/short-context-expanded-objective/score.json"
+    },
+    {
+      "id": "short-gain-clean-labels",
+      "score": 0.860016675079232,
+      "delta": 0.0024557506413229735,
+      "tue_passed": 4,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/short-gain-clean-labels-objective/score.json"
+    },
+    {
+      "id": "short-gain-guarded",
+      "score": 0.8548414613245892,
+      "delta": -0.002719463113319831,
+      "tue_passed": 3,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/short-gain-guarded-objective/score.json"
+    },
+    {
+      "id": "dictionary-only",
+      "score": 0.8529101498491922,
+      "delta": -0.004650774588716766,
+      "tue_passed": 1,
+      "tue_total": 5,
+      "score_path": "cantonese-voice-keyboard/build/tue-preservation-2026-10-28/dictionary-only-objective/score.json"
+    }
+  ],
+  "best_experimental_tue_cases": [
+    {
+      "left": "",
+      "typed": "tue",
+      "target": "tue",
+      "correction": null,
+      "passed": true
+    },
+    {
+      "left": "on ",
+      "typed": "tue",
+      "target": "tue",
+      "correction": null,
+      "passed": true
+    },
+    {
+      "left": "see you on ",
+      "typed": "tue",
+      "target": "tue",
+      "correction": null,
+      "passed": true
+    },
+    {
+      "left": "next ",
+      "typed": "tue",
+      "target": "tue",
+      "correction": null,
+      "passed": true
+    },
+    {
+      "left": "today is ",
+      "typed": "tue",
+      "target": "tue",
+      "correction": "the",
+      "passed": false
+    }
+  ],
+  "rejection_reasons": {
+    "short-expanded": "Regresses the existing noisy-context heve -> have JNI scenario",
+    "short-gain-clean-labels": "Changes ambiguous butger to burger; existing JNI scenario requires abstention",
+    "short-gain-guarded": "Aggregate below baseline and loses heve -> have",
+    "dictionary-only": "Aggregate below baseline; no improvement on tue audit"
+  },
+  "tests": {
+    "python": 7,
+    "python_passed": true,
+    "native_experimental_passed": 34,
+    "native_experimental_ignored": 3,
+    "verify_keyboard": "Not completed: sandbox denied Gradle cache lock; no Android or production native changes retained"
+  },
+  "restored_native_parity": {
+    "cases": 17,
+    "mismatches": 0,
+    "policy_sha256": "77a874f7140d0d7aa22a15c8b01581306f902aed586be83a41f0f377b940943a"
+  }
+}

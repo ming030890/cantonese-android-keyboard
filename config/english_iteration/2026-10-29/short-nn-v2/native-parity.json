@@ -1,0 +1,8 @@
+{
+  "cases": 5261,
+  "mismatches": [],
+  "cases_sha256": "3a7dcff3415a6df849e6d73ebe2e3d84b8f401f09948944b3d4471cf5bf9abef",
+  "outputs_sha256": "89eaa7e2dd46e5e32d970a505dcf55fa5531e674a0c259c5f00cfa8c74d853ec",
+  "policy_sha256": "107494939b0e175f30618f0a19d522c56dc973d7c099a0cd34f68039b97f3d5c",
+  "script_sha256": "2fc737ada060371d292ec8b116cbc2d3b611247f999c35acadb60a645a905cca"
+}

@@ -1,0 +1,104 @@
+{
+  "schema": "short-feature-study-v2",
+  "cases": 127639,
+  "new_cases": 22879,
+  "extra_features": [
+    "literal_no_lowercase_token",
+    "literal_title_token",
+    "last_substitution",
+    "mean_substitution_position",
+    "horizontal_key_distance",
+    "vertical_key_distance",
+    "context_word_count"
+  ],
+  "variants": {
+    "old_data_control": [
+      [],
+      []
+    ],
+    "data_control": [
+      [],
+      []
+    ],
+    "drop_literal_score": [
+      [],
+      [
+        1
+      ]
+    ],
+    "drop_candidate_score": [
+      [],
+      [
+        0
+      ]
+    ],
+    "drop_raw_runner": [
+      [],
+      [
+        3
+      ]
+    ],
+    "lexical": [
+      [
+        0,
+        1
+      ],
+      []
+    ],
+    "position": [
+      [
+        2,
+        3
+      ],
+      []
+    ],
+    "keyboard": [
+      [
+        4,
+        5
+      ],
+      []
+    ],
+    "context_length": [
+      [
+        6
+      ],
+      []
+    ],
+    "lexical_position": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      []
+    ]
+  },
+  "warm_start": "Existing NN, function-preserving input recentering, zero initial extra weights",
+  "seed": 2026102902,
+  "grid": {
+    "lr": [
+      0.0001,
+      0.0003
+    ],
+    "epochs": [
+      30,
+      100
+    ]
+  },
+  "replay_anchor": 0.2,
+  "calibration": "Original real/teacher cohort; not synthetic prevalence",
+  "selection": "Mean original/noisy real selection F0.5; natural short-word results as tie-break",
+  "holdout_surfaces": [
+    "tue",
+    "ir"
+  ],
+  "baseline_parity_cases": 512,
+  "baseline_parity_mismatches": [],
+  "source_sha256": "ba810f99fd82d56d8504e80de2b1d5e44756532756cc90985cf212760546d9a7",
+  "new_data_sha256": "51435158e168b02d73175534bafad2ee5f45e6a5956187a1f010afd838ffcc2e",
+  "feature_sha256": "919101109c04895a5bc452ae875dced5a9de9c82ebcd4e3063636068bd5ade8a",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "script_sha256": "ce6d65fee5754cbeb4164a26839f2ac04cba86d58c76711ea3d6895873a0b3d1"
+}

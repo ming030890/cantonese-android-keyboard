@@ -13,6 +13,23 @@ starting policy. See [methods, tradeoffs and verification](NOISY_CONTEXT_ACCEPTA
 
 Version 1, dated 2026-10-13. This is the behavioral contract for regression testing.
 
+2026-10-26: Quick now shares the sentence-capitalization setting with English.
+With the setting enabled, literal `hello. world ` becomes `Hello. World `;
+composing input preserves its case and Chinese candidates remain explicitly
+selectable. Deleting the first letter restores Shift, and disabling the setting
+keeps literal lowercase input. The control is under General, including with only
+Quick enabled. `quickCapitalizesLiteralEnglishAndKeepsChineseSelectable`,
+`quickDeleteRestoresFirstLetterCapsAndSettingCanDisableIt`, and
+`quickCapsPreservesModelCorrectionAndChineseChoice` cover the production receiver
+and controller; `ScenarioAutoCapsQuick` renders initial Shift in Quick.
+This enables the existing rule-based sentence-start trigger in Quick. It does
+not train or add model-predicted capitalization; learned candidate ranking and
+correction are unchanged. Real-editor/device integration is not established by
+these scenarios.
+Verification: `:app:verifyKeyboard` passes (unit/scenario tests, screenshot
+comparisons and debug assembly); Quick Shift and changed settings screenshots
+were inspected. This build has not been installed on the user's phone.
+
 ## Status and ownership
 
 - **Agreed**: explicitly requested by the user. Tests must enforce this behavior.
@@ -136,6 +153,34 @@ layouts. Emoji uses its own panel rather than this toolbar.
 | AS-04 | Keyboard closes or focus finishes with unfinished Quick input | Commit literal letters exactly once before session cleanup. Repeated finish/hide callbacks must not duplicate text; reopening predicts from the committed text. Service destruction must not write stale composition into a different editor. | Agreed D-04; `as04`; real editor handoff integration gap |
 
 ## English autocorrect
+
+2026-10-29 short-word NN update: added authentic-context clean controls and
+generated short-word errors, including real-word confusions. The existing
+22-24-1 acceptance NN retains its original threshold and disables the separate
+literal-LM-score input; other literal/replacement evidence remains available.
+There are no new runtime word, dictionary or length rules. Frozen aggregate
+improves 0.857561 → 0.873615. Existing correction, abstention and undo regressions
+remain unchanged and pass. The new real-JNI
+`expandedShortTrainingCorrectsAndUndoesAcrossLayoutsThroughJni` scenario covers
+`I am freaking ` + `oug` → `out`, undo and literal recommit in English, Quick3
+and Quick5; `ScenarioExpandedShortTrainingCorrection` renders its undo state.
+The reported `tue` preservation problem remains unresolved. See
+[SHORT_WORD_NN_V2.md](SHORT_WORD_NN_V2.md) for the ablations, tradeoffs, native
+packaging and verification. The model has not been installed on the user's phone.
+
+2026-10-29: the shared-LM adapter now permits its approved English corrections
+through the existing Quick one/two-letter Chinese-code overlap check. The NN
+already approves `try ` + `ir` → `it`; the adapter previously inherited a veto
+that committed `try ir ` in Quick despite that result. Uncertain model results
+remain literal and explicit Chinese selection wins. Space, Backspace restoration,
+literal recommit, English, Quick3 and Quick5 are covered by
+`SharedLmQuickOverlapScenarioTest` and the real-JNI
+`reportedIrCorrectionUsesNativeDecisionDespiteQuickCodeOverlap` scenario.
+`ScenarioSharedLmQuickOverlapCorrection` renders the restored `ir` with Chinese
+and English alternatives after correction/undo. The NN weights are unchanged.
+The frequency-input ablations and frozen evaluation results are documented in
+[FREQUENCY_ABLATION.md](FREQUENCY_ABLATION.md). `:app:verifyKeyboard` passes with
+the freshly built host JNI library; no phone installation is claimed.
 
 2026-10-16 internal contextual update: short/familiar words are eligible under
 fitted finite thresholds; dictionary membership is evidence, not a veto. The

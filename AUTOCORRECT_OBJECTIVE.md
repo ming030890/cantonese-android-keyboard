@@ -32,9 +32,9 @@ each run. Omit `--baseline-probe` to score one binary.
 The command prints one number:
 `score = (mobile F₀.₅ + touch F₀.₅ + hard-set F₀.₅) / 3`.
 Higher is better. `score.json` contains the score and baseline delta;
-`report.json` contains diagnostics. Current accepted baseline: **0.857561**
+`report.json` contains diagnostics. Current accepted baseline: **0.873615**
 (exact score and previous-baseline delta in the
-[2026-10-25 acceptance report](config/english_iteration/2026-10-25/noisy-context/objective-score.json)).
+[2026-10-29 acceptance report](config/english_iteration/2026-10-29/short-nn-v2/accepted-score.json)).
 
 ## Acceptance gate
 

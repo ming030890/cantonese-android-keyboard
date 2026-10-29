@@ -1,0 +1,30 @@
+{
+  "variant": "drop_literal_score",
+  "extras": [],
+  "disabled_input_indices": [
+    1
+  ],
+  "script_sha256": "70fba0af4d56d1600859c272ba75ceeb72c18a099ae7251e498754cd5a1a2751",
+  "data_protocol_sha256": "eb3540279f60ea440426488b6d8d458e37aa72137523b50aee86f55fc8d1a585",
+  "replay_anchor": 0.2,
+  "seed": 2026102902,
+  "fit_rows": 87543,
+  "source_weights": {
+    "real": 1.0,
+    "generated": 0.25,
+    "blank": 0.1,
+    "gboard_word": 0.1,
+    "gboard_context": 0.16,
+    "gboard_touch": 0.19,
+    "clean_dictionary": 0.25,
+    "clean_dropout": 0.25,
+    "clean_short": 0.1,
+    "generated_short": 0.25,
+    "authentic_short_clean": 0.5,
+    "authentic_short_typo": 0.5,
+    "title_abbreviation_clean": 0.25
+  },
+  "excluded_observations_sha256": null,
+  "excluded_rows": 0,
+  "blocked_by_split": {}
+}

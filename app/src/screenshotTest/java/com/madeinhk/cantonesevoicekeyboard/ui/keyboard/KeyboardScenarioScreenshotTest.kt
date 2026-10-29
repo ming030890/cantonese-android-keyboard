@@ -12,6 +12,16 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
+@Preview(name = "Quick first letter auto caps", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioAutoCapsQuick() = ScenarioScreen(remember {
+    KeyboardScenario(initialMode = KeyboardInputMode.Quick, autoCapitalizationEnabled = true).use { scenario ->
+        scenario.start(EditorInfo().apply { inputType = InputType.TYPE_CLASS_TEXT })
+        scenario.snapshot()
+    }
+})
+
+@PreviewTest
 @Preview(name = "Auto caps in ordinary text field", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioAutoCapsPlainText() = ScenarioScreen(remember {
@@ -106,6 +116,16 @@ fun ScenarioGboardSupportedShortWordCorrection() = ScenarioScreen(remember { Key
 @Preview(name = "Correction after prior typo", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioNoisyContextCorrection() = ScenarioScreen(remember { KeyboardScenarios.noisyContextCorrection() })
+
+@PreviewTest
+@Preview(name = "Quick ir correction and undo", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioSharedLmQuickOverlapCorrection() = ScenarioScreen(remember { KeyboardScenarios.sharedLmQuickOverlapCorrection() })
+
+@PreviewTest
+@Preview(name = "Expanded short-word correction and undo", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioExpandedShortTrainingCorrection() = ScenarioScreen(remember { KeyboardScenarios.expandedShortTrainingCorrection() })
 
 @PreviewTest
 @Preview(name = "One edit short word correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)

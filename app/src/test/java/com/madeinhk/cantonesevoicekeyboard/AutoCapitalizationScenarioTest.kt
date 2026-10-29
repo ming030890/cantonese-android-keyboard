@@ -123,11 +123,68 @@ class AutoCapitalizationScenarioTest {
     }
 
     @Test
-    fun quickModeDoesNotAutoCapitalizeRadicals() {
-        KeyboardScenario(initialMode = KeyboardInputMode.Quick).use { s ->
+    fun quickCapitalizesLiteralEnglishAndKeepsChineseSelectable() {
+        KeyboardScenario(initialMode = KeyboardInputMode.Quick, autoCapitalizationEnabled = true).use { s ->
             s.start()
-            // Quick mode should start in Off (no auto-capitalizing radical entry)
+            assertEquals(ShiftState.Shifted, s.snapshot().shiftState)
+            s.type("hello. world ")
+            assertEquals("Hello. World ", s.editor.text)
+            assertEquals("", s.editor.composing)
             assertEquals(ShiftState.Off, s.snapshot().shiftState)
+            s.type("\n")
+            s.engine.lookup = { _, code, _, _ ->
+                if (code == "Of") listOf(com.madeinhk.cantonesevoicekeyboard.quick.QuickCandidate("你", 0))
+                else emptyList()
+            }
+            // The native engine accepts either case; preserve the observed keys.
+            s.type("of")
+            assertEquals("Of", s.editor.composing)
+            assertEquals(listOf("你"), s.snapshot().quickCandidates.map { it.text })
+            s.choose("你")
+            assertEquals("Hello. World \n你", s.editor.text)
+            assertEquals("", s.editor.composing)
+            assertTrue(s.snapshot().quickCandidates.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun quickDeleteRestoresFirstLetterCapsAndSettingCanDisableIt() {
+        KeyboardScenario(initialMode = KeyboardInputMode.Quick, autoCapitalizationEnabled = true).use { s ->
+            s.start()
+            s.type("h")
+            assertEquals("H", s.editor.composing)
+            assertEquals(ShiftState.Off, s.snapshot().shiftState)
+            s.press(KeyboardKeyKind.Delete)
+            assertEquals("", s.editor.composing)
+            assertEquals(ShiftState.Shifted, s.snapshot().shiftState)
+            s.autoCapitalizationEnabled = false
+            s.start()
+            s.type("hello ")
+            assertEquals("hello ", s.editor.text)
+        }
+    }
+
+    @Test
+    fun quickCapsPreservesModelCorrectionAndChineseChoice() {
+        val backend = ScenarioEnglishEngine()
+        val engine = object : com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidateEngine by backend {
+            override fun predict(word: String, centers: FloatArray, points: FloatArray, left: String, right: String):
+                com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction =
+                backend.predict(word.lowercase(java.util.Locale.ROOT), centers, points, left, right)
+        }
+        KeyboardScenario(initialMode = KeyboardInputMode.Quick, autoCapitalizationEnabled = true,
+            englishEngine = engine).use { s ->
+            s.engine.lookup = { _, _, _, _ ->
+                listOf(com.madeinhk.cantonesevoicekeyboard.quick.QuickCandidate("你", 0))
+            }
+            s.start()
+            s.type("helllo")
+            assertEquals("Helllo", s.editor.composing)
+            assertEquals(ShiftState.Off, s.snapshot().shiftState)
+            assertTrue(s.snapshot().quickCandidates.any { it.text == "你" })
+            s.press(KeyboardKeyKind.Space)
+            assertEquals("Hello ", s.editor.text)
+            assertEquals("", s.editor.composing)
         }
     }
 

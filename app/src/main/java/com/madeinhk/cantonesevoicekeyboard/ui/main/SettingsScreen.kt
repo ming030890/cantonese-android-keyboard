@@ -186,22 +186,6 @@ fun SettingsScreenContent(
                     )
                 }
 
-                if (enabledLayouts.contains(KeyboardSettings.LAYOUT_ENGLISH)) {
-                    Spacer(modifier = Modifier.height(28.dp))
-                    Text(
-                        text = stringResource(R.string.settings_layout_specific_header, stringResource(R.string.settings_layout_qwerty)),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MintAccentColor,
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AutoCapitalizationCard(
-                        checked = autoCapitalization,
-                        onCheckedChange = onAutoCapitalizationChange
-                    )
-                }
-
                 // Preferences Header
                 Spacer(modifier = Modifier.height(28.dp))
                 Text(
@@ -213,6 +197,14 @@ fun SettingsScreenContent(
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
+
+                if (enabledLayouts.any { it == KeyboardSettings.LAYOUT_ENGLISH || it == KeyboardSettings.LAYOUT_QUICK }) {
+                    AutoCapitalizationCard(
+                        checked = autoCapitalization,
+                        onCheckedChange = onAutoCapitalizationChange
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
 
                 HapticFeedbackCard(
                     checked = hapticFeedback,

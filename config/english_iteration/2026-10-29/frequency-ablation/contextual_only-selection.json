@@ -1,0 +1,227 @@
+{
+  "variant": "contextual_only",
+  "disabled_features": [
+    "candidate_raw_lm",
+    "literal_lm",
+    "candidate_minus_literal",
+    "raw_runner_margin",
+    "penalized_runner_margin"
+  ],
+  "trials": [
+    {
+      "id": "lr0.001-epoch30",
+      "metrics": {
+        "original": {
+          "cases": 1946,
+          "typos": 697,
+          "controls": 1249,
+          "correct": 474,
+          "wrong": 68,
+          "missed": 223,
+          "false_changes": 8,
+          "precision": 0.8745387453874539,
+          "recall": 0.6800573888091822,
+          "f05": 0.8272251308900523
+        },
+        "noisy": {
+          "cases": 6404,
+          "typos": 2316,
+          "controls": 4088,
+          "correct": 1418,
+          "wrong": 332,
+          "missed": 898,
+          "false_changes": 56,
+          "precision": 0.8102857142857143,
+          "recall": 0.6122625215889465,
+          "f05": 0.7610562473164448
+        },
+        "short": {
+          "cases": 2534,
+          "typos": 661,
+          "controls": 1873,
+          "correct": 628,
+          "wrong": 19,
+          "missed": 33,
+          "false_changes": 19,
+          "precision": 0.9706336939721792,
+          "recall": 0.9500756429652042,
+          "f05": 0.966451215758695
+        },
+        "selection_f05": 0.7941406891032485
+      },
+      "threshold_logit": 0.3435895318013522
+    },
+    {
+      "id": "lr0.001-epoch100",
+      "metrics": {
+        "original": {
+          "cases": 1946,
+          "typos": 697,
+          "controls": 1249,
+          "correct": 460,
+          "wrong": 65,
+          "missed": 237,
+          "false_changes": 8,
+          "precision": 0.8761904761904762,
+          "recall": 0.6599713055954088,
+          "f05": 0.8223096174472649
+        },
+        "noisy": {
+          "cases": 6404,
+          "typos": 2316,
+          "controls": 4088,
+          "correct": 1374,
+          "wrong": 314,
+          "missed": 942,
+          "false_changes": 50,
+          "precision": 0.8139810426540285,
+          "recall": 0.5932642487046632,
+          "f05": 0.7576091751213057
+        },
+        "short": {
+          "cases": 2534,
+          "typos": 661,
+          "controls": 1873,
+          "correct": 626,
+          "wrong": 13,
+          "missed": 35,
+          "false_changes": 13,
+          "precision": 0.9796557120500783,
+          "recall": 0.9470499243570348,
+          "f05": 0.972956170345042
+        },
+        "selection_f05": 0.7899593962842852
+      },
+      "threshold_logit": 0.6620469376644973
+    },
+    {
+      "id": "lr0.003-epoch30",
+      "metrics": {
+        "original": {
+          "cases": 1946,
+          "typos": 697,
+          "controls": 1249,
+          "correct": 478,
+          "wrong": 69,
+          "missed": 219,
+          "false_changes": 8,
+          "precision": 0.8738574040219378,
+          "recall": 0.6857962697274032,
+          "f05": 0.82842287694974
+        },
+        "noisy": {
+          "cases": 6404,
+          "typos": 2316,
+          "controls": 4088,
+          "correct": 1428,
+          "wrong": 333,
+          "missed": 888,
+          "false_changes": 50,
+          "precision": 0.8109028960817717,
+          "recall": 0.616580310880829,
+          "f05": 0.7628205128205128
+        },
+        "short": {
+          "cases": 2534,
+          "typos": 661,
+          "controls": 1873,
+          "correct": 627,
+          "wrong": 17,
+          "missed": 34,
+          "false_changes": 17,
+          "precision": 0.9736024844720497,
+          "recall": 0.9485627836611196,
+          "f05": 0.9684893419833179
+        },
+        "selection_f05": 0.7956216948851265
+      },
+      "threshold_logit": 0.31809480533282314
+    },
+    {
+      "id": "lr0.003-epoch100",
+      "metrics": {
+        "original": {
+          "cases": 1946,
+          "typos": 697,
+          "controls": 1249,
+          "correct": 466,
+          "wrong": 65,
+          "missed": 231,
+          "false_changes": 8,
+          "precision": 0.8775894538606404,
+          "recall": 0.6685796269727403,
+          "f05": 0.825948245303084
+        },
+        "noisy": {
+          "cases": 6404,
+          "typos": 2316,
+          "controls": 4088,
+          "correct": 1395,
+          "wrong": 334,
+          "missed": 921,
+          "false_changes": 55,
+          "precision": 0.8068247541931752,
+          "recall": 0.6023316062176166,
+          "f05": 0.7555242634315424
+        },
+        "short": {
+          "cases": 2534,
+          "typos": 661,
+          "controls": 1873,
+          "correct": 625,
+          "wrong": 32,
+          "missed": 36,
+          "false_changes": 32,
+          "precision": 0.9512937595129376,
+          "recall": 0.9455370650529501,
+          "f05": 0.9501368197020371
+        },
+        "selection_f05": 0.7907362543673132
+      },
+      "threshold_logit": 0.3527220038338882
+    }
+  ],
+  "winner": {
+    "id": "lr0.003-epoch30",
+    "metrics": {
+      "original": {
+        "cases": 1946,
+        "typos": 697,
+        "controls": 1249,
+        "correct": 478,
+        "wrong": 69,
+        "missed": 219,
+        "false_changes": 8,
+        "precision": 0.8738574040219378,
+        "recall": 0.6857962697274032,
+        "f05": 0.82842287694974
+      },
+      "noisy": {
+        "cases": 6404,
+        "typos": 2316,
+        "controls": 4088,
+        "correct": 1428,
+        "wrong": 333,
+        "missed": 888,
+        "false_changes": 50,
+        "precision": 0.8109028960817717,
+        "recall": 0.616580310880829,
+        "f05": 0.7628205128205128
+      },
+      "short": {
+        "cases": 2534,
+        "typos": 661,
+        "controls": 1873,
+        "correct": 627,
+        "wrong": 17,
+        "missed": 34,
+        "false_changes": 17,
+        "precision": 0.9736024844720497,
+        "recall": 0.9485627836611196,
+        "f05": 0.9684893419833179
+      },
+      "selection_f05": 0.7956216948851265
+    },
+    "threshold_logit": 0.31809480533282314
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "schema": "short-feature-study-clean-v2",
+  "cases": 126522,
+  "new_cases": 22879,
+  "extra_features": [
+    "literal_no_lowercase_token",
+    "literal_title_token",
+    "last_substitution",
+    "mean_substitution_position",
+    "horizontal_key_distance",
+    "vertical_key_distance",
+    "context_word_count",
+    "contextual_log_odds_gain"
+  ],
+  "variants": {
+    "old_data_control": [
+      [],
+      []
+    ],
+    "data_control": [
+      [],
+      []
+    ],
+    "drop_literal_score": [
+      [],
+      [
+        1
+      ]
+    ],
+    "drop_candidate_score": [
+      [],
+      [
+        0
+      ]
+    ],
+    "drop_raw_runner": [
+      [],
+      [
+        3
+      ]
+    ],
+    "lexical": [
+      [
+        0,
+        1
+      ],
+      []
+    ],
+    "position": [
+      [
+        2,
+        3
+      ],
+      []
+    ],
+    "keyboard": [
+      [
+        4,
+        5
+      ],
+      []
+    ],
+    "context_length": [
+      [
+        6
+      ],
+      []
+    ],
+    "lexical_position": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      []
+    ],
+    "context_gain": [
+      [
+        7
+      ],
+      []
+    ],
+    "lexical_gain": [
+      [
+        0,
+        1,
+        7
+      ],
+      []
+    ]
+  },
+  "warm_start": "Existing NN, function-preserving input recentering, zero initial extra weights",
+  "seed": 2026102902,
+  "grid": {
+    "lr": [
+      0.0001,
+      0.0003
+    ],
+    "epochs": [
+      30,
+      100
+    ]
+  },
+  "replay_anchor": 0.2,
+  "calibration": "Original real/teacher cohort; not synthetic prevalence",
+  "selection": "Mean original/noisy real selection F0.5; natural short-word results as tie-break",
+  "holdout_surfaces": [
+    "tue",
+    "ir"
+  ],
+  "baseline_parity_cases": 512,
+  "baseline_parity_mismatches": [],
+  "source_sha256": "ba810f99fd82d56d8504e80de2b1d5e44756532756cc90985cf212760546d9a7",
+  "new_data_sha256": "51435158e168b02d73175534bafad2ee5f45e6a5956187a1f010afd838ffcc2e",
+  "feature_sha256": "e7713705d7bf289b07e578bd23f51747c207360b11130022ec0602dd9a4628b8",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "unconditional_scores_sha256": "6716c9c36770887a8463e8b28897343f5695ff882027b6683c38194b27fa380c",
+  "script_sha256": "4d1310a45473333243d878b54ef24e5b2f51fc5dd13ad7fda6e72b6df4b1d8dc",
+  "evaluation_inputs_excluded": true,
+  "source_protocol_sha256": "6c9fa5ddf9dea7b81370f8f6b3a1b44b4870d15bfe333bf811f811d1084bf137",
+  "source_features_sha256": "d2cb63b4b481c836e1dde322941a6b9e648241e94d2364dbcf3d39bc9b9b45cf",
+  "exclusion": "Input (exact left context, case-folded typed text), independent of target label",
+  "frozen_cases_sha256": "3a7dcff3415a6df849e6d73ebe2e3d84b8f401f09948944b3d4471cf5bf9abef",
+  "quarantined_rows": 1117,
+  "quarantined_by_split": {
+    "fit": 705,
+    "selection": 298,
+    "calibration": 114
+  },
+  "effective_overlap": 0,
+  "baseline_prior_exposure": true
+}

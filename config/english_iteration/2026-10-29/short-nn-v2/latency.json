@@ -1,0 +1,13 @@
+{
+  "baseline": {
+    "calls": 1024,
+    "median_ms": 1.423,
+    "p95_ms": 3.107
+  },
+  "candidate": {
+    "calls": 1024,
+    "median_ms": 1.429,
+    "p95_ms": 3.104
+  },
+  "scope": "Two alternating-order release-host pairs, 16 warmups + 512 calls each; all training/build/QA jobs completed; not phone latency"
+}

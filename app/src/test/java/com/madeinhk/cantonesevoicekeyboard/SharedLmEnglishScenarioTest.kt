@@ -11,6 +11,61 @@ import org.junit.Test
 import java.io.File
 
 class SharedLmEnglishScenarioTest {
+    @Test fun expandedShortTrainingCorrectsAndUndoesAcrossLayoutsThroughJni() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        // Exposed evaluation diagnostic, excluded from fitting the new NN.
+        val left = "I am freaking "
+        for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+            KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+            val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            assertEquals("out", english.predict("oug", floatArrayOf(), floatArrayOf(), left, "").correction)
+            KeyboardScenario(initialText = left, initialMode = mode, clipboardText = null,
+                quickEngine = quick, englishEngine = english).use { s ->
+                s.quickVersion = version
+                s.start(); s.type("oug")
+                val candidates = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                assertTrue(candidates.any { it.text == "out" })
+                assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                s.press(KeyboardKeyKind.Space)
+                assertEquals(left + "out ", s.editor.text)
+                assertEquals("", s.editor.composing)
+                s.press(KeyboardKeyKind.Delete)
+                assertEquals(left, s.editor.text)
+                assertEquals("oug", s.editor.composing)
+                s.press(KeyboardKeyKind.Space)
+                assertEquals(left + "oug ", s.editor.text)
+            }
+        }
+    }
+
+    @Test fun reportedIrCorrectionUsesNativeDecisionDespiteQuickCodeOverlap() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+            KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+            val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            assertEquals("it", english.predict("ir", floatArrayOf(), floatArrayOf(), "try ", " out").correction)
+            KeyboardScenario(initialText = "try ", initialMode = mode, clipboardText = null,
+                quickEngine = quick, englishEngine = english).use { s ->
+                s.quickVersion = version
+                s.start(); s.type("ir")
+                if (mode == KeyboardInputMode.Quick) assertTrue("ir is a real Quick code", s.quick.hasChineseCodeMatch())
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("$mode/$version", "try it ", s.editor.text)
+                s.press(KeyboardKeyKind.Delete)
+                assertEquals("try ", s.editor.text)
+                assertEquals("ir", s.editor.composing)
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("try ir ", s.editor.text)
+            }
+        }
+    }
+
     @Test fun noisyContextAcceptanceAndUndoAcrossLayoutsThroughJni() {
         val library = System.getProperty("english.native.library")
         assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)

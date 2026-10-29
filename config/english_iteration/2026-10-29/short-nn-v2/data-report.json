@@ -1,0 +1,28 @@
+{
+  "schema": "short-context-training-v2",
+  "seed": "short-context-supervision-20261029-v2",
+  "cases": 26132,
+  "counts": {
+    "selection:authentic_short_typo": 6437,
+    "fit:authentic_short_typo": 13236,
+    "calibration:authentic_short_typo": 3315,
+    "fit:authentic_short_clean": 1781,
+    "selection:authentic_short_clean": 851,
+    "selection:title_abbreviation_clean": 17,
+    "calibration:authentic_short_clean": 437,
+    "fit:title_abbreviation_clean": 50,
+    "calibration:title_abbreviation_clean": 8
+  },
+  "real_word_errors": 8001,
+  "source_sha256": "cb32cf4a6ce4aa9c7c5c07933114d45b57769fbaa936578c1cc162353244bbcd",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "dictionary_sha256": "84d3368de928b6f03f7cafb030ebcee14b04a65b88ffe82563e33dfa93abcd73",
+  "probe_sha256": "484850049318a63a8995828af8913b94c65b2a2eb0a7673d452fd164683e7886",
+  "cases_sha256": "51435158e168b02d73175534bafad2ee5f45e6a5956187a1f010afd838ffcc2e",
+  "script_sha256": "0112a9518d3779843205ccf607d0fd8c91ceab808070267a454a8c5537c99f28",
+  "holdout_surfaces": [
+    "ir",
+    "tue"
+  ],
+  "limits": "Synthetic corruptions and abbreviation controls retain known intent; they do not estimate natural typo frequency"
+}

@@ -216,12 +216,12 @@ internal class KeyboardSessionController(
 
     fun refreshAutoCapitalization(textBefore: String? = null) {
         if (_shiftState.value == ShiftState.CapsLock) return
-        if (_keyboardInputMode.value != KeyboardInputMode.AlphaNum) {
+        if (_keyboardInputMode.value !in setOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
             if (!manualShift) _shiftState.value = ShiftState.Off
             return
         }
         val isAllCharacters = (currentEditorInfo?.inputType ?: 0) and InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS != 0
-        if (!isAllCharacters && english?.word?.isNotEmpty() == true) {
+        if (!isAllCharacters && (english?.word?.isNotEmpty() == true || quick.hasActiveInput())) {
             // Mid-word typing in sentence/words mode is always lowercase; skip IPC
             if (!manualShift) _shiftState.value = ShiftState.Off
             return
@@ -458,6 +458,7 @@ internal class KeyboardSessionController(
             editor.deleteSelectionOrPreviousCharacter()
             refreshPredictions()
         }
+        refreshAutoCapitalization()
     }
 
     fun commitText(text: String) {
@@ -509,10 +510,16 @@ internal class KeyboardSessionController(
         if (queueEditorAction { onQuickKey(char) }) return
         voice.interrupt()
         suggestions.onUserTyped()
-        quick.onKey(char)
+        val typed = if (_shiftState.value.isUppercase) char.uppercase() else char
+        quick.onKey(typed)
+        if (_shiftState.value == ShiftState.Shifted) {
+            _shiftState.value = ShiftState.Off
+            manualShift = false
+        }
         val evidence = pendingTouch.also { pendingTouch = null }
         if (autocorrectActive(KeyboardInputMode.Quick)) english?.observeQuick(quick.getComposingText(), evidence)
         refreshPunctuation()
+        refreshAutoCapitalization()
     }
 
     fun sendSpace() {
@@ -524,6 +531,7 @@ internal class KeyboardSessionController(
         if (quick.hasActiveInput()) {
             quick.onSpace()
             refreshPunctuation()
+            refreshAutoCapitalization()
         } else {
             commitText(" ")
         }
