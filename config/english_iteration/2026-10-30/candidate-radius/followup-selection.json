@@ -1,0 +1,87 @@
+{
+  "probe_sha256": "e09b75ef9d09a5a86af89a4d2ad5e50581cf7337a6e44ab5c1491814df637613",
+  "script_sha256": "8b89bfdf9cb6c7d1d4473311c24a185bab201426ca22ddb1fac44102ada3ab54",
+  "pilot_selection_sha256": "2cb14978e65b5c93c195c8e3caf123f68d00b8eeb28b672dd465d043065fe0c8",
+  "profiles": {
+    "parent": {
+      "snapshot": {
+        "cases": 1949,
+        "typos": 700,
+        "tp": 462,
+        "fp": 31,
+        "clean_changes": 1,
+        "target_in_top8": 610,
+        "target_top1": 549,
+        "clean": 1249,
+        "miss_ranking_or_acceptance": 148,
+        "miss_absent_from_top8": 90,
+        "fn": 238,
+        "unlabelled": 0,
+        "f05": 0.8645209580838323,
+        "precision": 0.9371196754563894,
+        "recall": 0.66,
+        "clean_changes_per_1000": 0.800640512409928
+      },
+      "closed_loop": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 91,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "target_in_top8": 113,
+        "target_top1": 107,
+        "miss_ranking_or_acceptance": 22,
+        "miss_absent_from_top8": 9,
+        "unlabelled": 4,
+        "fn": 31,
+        "f05": 0.9136546184738956,
+        "precision": 0.9680851063829787,
+        "recall": 0.7459016393442623,
+        "clean_changes_per_1000": 0.0
+      },
+      "selection_score": 0.8890877882788639
+    },
+    "combined_stable": {
+      "snapshot": {
+        "cases": 1949,
+        "typos": 700,
+        "tp": 468,
+        "fp": 32,
+        "clean_changes": 1,
+        "target_in_top8": 637,
+        "target_top1": 564,
+        "clean": 1249,
+        "miss_ranking_or_acceptance": 169,
+        "miss_absent_from_top8": 63,
+        "fn": 232,
+        "unlabelled": 0,
+        "f05": 0.8666666666666667,
+        "precision": 0.936,
+        "recall": 0.6685714285714286,
+        "clean_changes_per_1000": 0.800640512409928
+      },
+      "closed_loop": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 91,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "target_in_top8": 113,
+        "target_top1": 106,
+        "miss_ranking_or_acceptance": 22,
+        "miss_absent_from_top8": 9,
+        "unlabelled": 4,
+        "fn": 31,
+        "f05": 0.9136546184738956,
+        "precision": 0.9680851063829787,
+        "recall": 0.7459016393442623,
+        "clean_changes_per_1000": 0.0
+      },
+      "selection_score": 0.8901606425702812
+    }
+  },
+  "isolated_parent_parity_mismatches": 0,
+  "winner": "combined_stable"
+}

@@ -1,5 +1,14 @@
 # Keyboard QA specification
 
+2026-10-31: a conservative learned typing channel complements the shared CNN in
+nonempty English contexts. The frozen aggregate improves 0.873615 → 0.893921;
+mixed-language decisions retain the existing policy. The actual JNI test
+`learnedTypingChannelCorrectsAndUndoesAcrossLayoutsThroughJni` covers both
+`tommorow → tomorrow` and `deosnt → doesn't`, candidates, Space, Backspace undo
+and literal recommit in English/Quick3/Quick5. `ScenarioLearnedTypingChannelCorrection`
+is the separately inspected presentation fixture. See
+[evaluation, isolation repair and limitations](ENGLISH_NOISY_CHANNEL_20261031.md).
+
 2026-10-25 acceptance update: the shared native English network is warm-started
 on TRAIN-only prior-context noise with clean replay. Frozen aggregate improves
 0.857262 → 0.857561; candidate generation and ranking are unchanged. The real-JNI

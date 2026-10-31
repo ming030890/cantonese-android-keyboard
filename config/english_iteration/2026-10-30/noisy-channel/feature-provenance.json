@@ -1,0 +1,11 @@
+{
+  "schema": "full-lexicon-channel-evidence-v1",
+  "candidate_limit": 256,
+  "proposal_selection": "Union top64 unigram-minus-channel proposals at four TRAIN-independent scales; never uses labels",
+  "probe_sha256": "0b758a7e495e91541915a016f5788f608d49cd472ede4519f05fd83689f2f34c",
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "lexicon_sha256": "465762ffdb780b169ab021c3e2a2d5b453dae6dafc2befa49d1f4378a70bc6f0",
+  "channel_sha256": "8cf8056a762d8617f97c6b7eba193b851bd5f0890e7683b454fe0f9097a55689",
+  "script_sha256": "9c6effbefc2d46b043059fd2ea40e607bf02de0288d14e303758cc2e48250b30",
+  "confirmation_used": false
+}

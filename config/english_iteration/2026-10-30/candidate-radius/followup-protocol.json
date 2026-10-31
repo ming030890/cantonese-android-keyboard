@@ -1,0 +1,11 @@
+{
+  "reason": "Expanded runner-up changes the acceptance of an unchanged winning proposal",
+  "rule": "Use original-radius runner when winner and score are unchanged; expanded runner for a new winner",
+  "selector": "Same two existing development selection folds; original parent eligible",
+  "source_production_changed": false,
+  "word_specific_rules": false,
+  "weights_fitted": false,
+  "diagnostic_frozen_exposure": "Frozen failure used to diagnose mechanism before this follow-up; this is exposed development, not fresh confirmation",
+  "pilot_selection_report_sha256": "2cb14978e65b5c93c195c8e3caf123f68d00b8eeb28b672dd465d043065fe0c8",
+  "native_source_sha256": "f7e2cc4634af58e1e04694017b1934db17081b75a065d9e8aace66185624d89e"
+}

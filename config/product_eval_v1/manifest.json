@@ -1,0 +1,14 @@
+{
+  "schema": "keyboard-product-eval-v1",
+  "sessions": 72,
+  "independent_authored_groups": 24,
+  "cases_sha256": "a286e091d8b7896dccfde6464acf7a04ee024a9bdbece595604e05903cfe9e2b",
+  "builder_sha256": "ba70913ab0ff7f7904eb626d25eb3cc4135924be5cad6489e353bf36335d6480",
+  "frozen_before_inference": true,
+  "origin": "Authored diagnostic cases, not natural typing, independent confirmation, or usage-weighted data",
+  "labels": "Author-specified exact final editor text and composition; ambiguous real-word intent is explicitly authored",
+  "inference": "Events, layout, initial context and settings only; expected output stays outside the controller",
+  "train_use": "Evaluation only; do not use these sessions, labels or variants for fitting",
+  "grouping": "All English/Quick3/Quick5 variants share a scenario group; never count them as independent samples",
+  "release_status": "Diagnostic dashboard only; no population score or new release threshold"
+}

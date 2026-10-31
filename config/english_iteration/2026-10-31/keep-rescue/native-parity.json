@@ -1,0 +1,27 @@
+{
+  "probe_sha256": "5af0d20b2f4920a5f6e4e37c7997aaf9e89328a013e8a2615ee9f7514e6f65b1",
+  "policy_sha256": "51a22a1b3d692fca87dfef5efa767f73f112aea16d54accc0deedf65ec4e4cff",
+  "cohorts": {
+    "objective": {
+      "cases": 5261,
+      "max_feature_difference": 0.0,
+      "max_probability_difference": 0.0
+    },
+    "development": {
+      "cases": 1413,
+      "max_feature_difference": 0.0,
+      "max_probability_difference": 0.0
+    },
+    "chat_development": {
+      "cases": 2072,
+      "max_feature_difference": 0.0,
+      "max_probability_difference": 0.0
+    },
+    "regressions": {
+      "cases": 10,
+      "max_feature_difference": 0.0,
+      "max_probability_difference": 0.0
+    }
+  },
+  "mismatches": []
+}

@@ -1,0 +1,904 @@
+{
+  "provenance": {
+    "sessions": 72,
+    "groups": 24,
+    "origins": {
+      "authored_diagnostic": 72
+    },
+    "unreviewed": 0,
+    "recorded_chat_confirmation_sessions": 0
+  },
+  "sessions_sha256": "a286e091d8b7896dccfde6464acf7a04ee024a9bdbece595604e05903cfe9e2b",
+  "limitations": [
+    "Authored/synthetic sessions are diagnostic, never representative quality or independent confirmation.",
+    "Layout variants share a scenario group; do not count them as independent observations.",
+    "Virtual scheduling/fake editor do not measure physical phone timing or real InputConnection behavior.",
+    "Intended labels stay outside controller inputs; absence of an undo does not establish correctness."
+  ],
+  "baseline": {
+    "overall_diagnostic_counts": {
+      "sessions": 72,
+      "labelled": 72,
+      "groups": 24,
+      "exact_success": 54,
+      "casefold_success": 54,
+      "capitalization_only_failures": 0,
+      "clean_sessions": 42,
+      "clean_sessions_damaged": 0,
+      "success_fraction": 0.75
+    },
+    "origin": {
+      "authored_diagnostic": {
+        "sessions": 72,
+        "labelled": 72,
+        "groups": 24,
+        "exact_success": 54,
+        "casefold_success": 54,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 42,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.75
+      }
+    },
+    "layout": {
+      "english": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 24,
+        "exact_success": 18,
+        "casefold_success": 18,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 14,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.75
+      },
+      "quick3": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 24,
+        "exact_success": 18,
+        "casefold_success": 18,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 14,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.75
+      },
+      "quick5": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 24,
+        "exact_success": 18,
+        "casefold_success": 18,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 14,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.75
+      }
+    },
+    "language": {
+      "english": {
+        "sessions": 45,
+        "labelled": 45,
+        "groups": 15,
+        "exact_success": 36,
+        "casefold_success": 36,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 27,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.8
+      },
+      "mixed_cantonese_english": {
+        "sessions": 27,
+        "labelled": 27,
+        "groups": 9,
+        "exact_success": 18,
+        "casefold_success": 18,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 15,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.6666666666666666
+      }
+    },
+    "intent": {
+      "correction": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 8,
+        "exact_success": 6,
+        "casefold_success": 6,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.25
+      },
+      "interaction": {
+        "sessions": 6,
+        "labelled": 6,
+        "groups": 2,
+        "exact_success": 6,
+        "casefold_success": 6,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "preservation": {
+        "sessions": 42,
+        "labelled": 42,
+        "groups": 14,
+        "exact_success": 42,
+        "casefold_success": 42,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 42,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      }
+    },
+    "tags": {
+      "capitalization": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "closed_loop": {
+        "sessions": 6,
+        "labelled": 6,
+        "groups": 2,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.5
+      },
+      "informal_or_identifier": {
+        "sessions": 18,
+        "labelled": 18,
+        "groups": 6,
+        "exact_success": 18,
+        "casefold_success": 18,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 18,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "language_switch": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 0,
+        "casefold_success": 0,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.0
+      },
+      "literal_override": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "missing_space": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 0,
+        "casefold_success": 0,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.0
+      },
+      "mixed_correction": {
+        "sessions": 9,
+        "labelled": 9,
+        "groups": 3,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.3333333333333333
+      },
+      "mixed_preservation": {
+        "sessions": 15,
+        "labelled": 15,
+        "groups": 5,
+        "exact_success": 15,
+        "casefold_success": 15,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 15,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "multiple_edits": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 0,
+        "casefold_success": 0,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.0
+      },
+      "names": {
+        "sessions": 9,
+        "labelled": 9,
+        "groups": 3,
+        "exact_success": 9,
+        "casefold_success": 9,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 9,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "real_word_intent": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 0,
+        "casefold_success": 0,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.0
+      },
+      "undo": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      }
+    },
+    "failures": [
+      {
+        "id": "mixed-fix-tommorow:english",
+        "group": "mixed-fix-tommorow",
+        "layout": "english",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "我哋約 tomorrow ",
+        "actual": "我哋約 tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-tommorow:quick3",
+        "group": "mixed-fix-tommorow",
+        "layout": "quick3",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "我哋約 tomorrow ",
+        "actual": "我哋約 tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-tommorow:quick5",
+        "group": "mixed-fix-tommorow",
+        "layout": "quick5",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "我哋約 tomorrow ",
+        "actual": "我哋約 tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-meting:english",
+        "group": "mixed-fix-meting",
+        "layout": "english",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "聽朝個 meeting ",
+        "actual": "聽朝個 meting ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-meting:quick3",
+        "group": "mixed-fix-meting",
+        "layout": "quick3",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "聽朝個 meeting ",
+        "actual": "聽朝個 meting ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-meting:quick5",
+        "group": "mixed-fix-meting",
+        "layout": "quick5",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "聽朝個 meeting ",
+        "actual": "聽朝個 meting ",
+        "composing": ""
+      },
+      {
+        "id": "two-edit-short:english",
+        "group": "two-edit-short",
+        "layout": "english",
+        "tags": [
+          "multiple_edits"
+        ],
+        "expected": "Are you ",
+        "actual": "Are too ",
+        "composing": ""
+      },
+      {
+        "id": "two-edit-short:quick3",
+        "group": "two-edit-short",
+        "layout": "quick3",
+        "tags": [
+          "multiple_edits"
+        ],
+        "expected": "Are you ",
+        "actual": "Are too ",
+        "composing": ""
+      },
+      {
+        "id": "two-edit-short:quick5",
+        "group": "two-edit-short",
+        "layout": "quick5",
+        "tags": [
+          "multiple_edits"
+        ],
+        "expected": "Are you ",
+        "actual": "Are too ",
+        "composing": ""
+      },
+      {
+        "id": "missing-space:english",
+        "group": "missing-space",
+        "layout": "english",
+        "tags": [
+          "missing_space"
+        ],
+        "expected": "thanks a lot ",
+        "actual": "thanks alot ",
+        "composing": ""
+      },
+      {
+        "id": "missing-space:quick3",
+        "group": "missing-space",
+        "layout": "quick3",
+        "tags": [
+          "missing_space"
+        ],
+        "expected": "thanks a lot ",
+        "actual": "thanks alot ",
+        "composing": ""
+      },
+      {
+        "id": "missing-space:quick5",
+        "group": "missing-space",
+        "layout": "quick5",
+        "tags": [
+          "missing_space"
+        ],
+        "expected": "thanks a lot ",
+        "actual": "thanks alot ",
+        "composing": ""
+      },
+      {
+        "id": "real-word:english",
+        "group": "real-word",
+        "layout": "english",
+        "tags": [
+          "real_word_intent"
+        ],
+        "expected": "the message is from ",
+        "actual": "the message is form ",
+        "composing": ""
+      },
+      {
+        "id": "real-word:quick3",
+        "group": "real-word",
+        "layout": "quick3",
+        "tags": [
+          "real_word_intent"
+        ],
+        "expected": "the message is from ",
+        "actual": "the message is form ",
+        "composing": ""
+      },
+      {
+        "id": "real-word:quick5",
+        "group": "real-word",
+        "layout": "quick5",
+        "tags": [
+          "real_word_intent"
+        ],
+        "expected": "the message is from ",
+        "actual": "the message is form ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-stream:english",
+        "group": "mixed-stream",
+        "layout": "english",
+        "tags": [
+          "closed_loop",
+          "language_switch"
+        ],
+        "expected": "我諗 the meeting is tomorrow ",
+        "actual": "我諗 teh meeting is tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-stream:quick3",
+        "group": "mixed-stream",
+        "layout": "quick3",
+        "tags": [
+          "closed_loop",
+          "language_switch"
+        ],
+        "expected": "我諗 the meeting is tomorrow ",
+        "actual": "我諗 teh meeting is tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-stream:quick5",
+        "group": "mixed-stream",
+        "layout": "quick5",
+        "tags": [
+          "closed_loop",
+          "language_switch"
+        ],
+        "expected": "我諗 the meeting is tomorrow ",
+        "actual": "我諗 teh meeting is tommorow ",
+        "composing": ""
+      }
+    ]
+  },
+  "baseline_native_library_sha256": "0747528e58e5ee86a3d9ea5504ec20ede0236c64883f4c0913fd6fa33b751907",
+  "candidate": {
+    "overall_diagnostic_counts": {
+      "sessions": 72,
+      "labelled": 72,
+      "groups": 24,
+      "exact_success": 57,
+      "casefold_success": 57,
+      "capitalization_only_failures": 0,
+      "clean_sessions": 42,
+      "clean_sessions_damaged": 0,
+      "success_fraction": 0.7916666666666666
+    },
+    "origin": {
+      "authored_diagnostic": {
+        "sessions": 72,
+        "labelled": 72,
+        "groups": 24,
+        "exact_success": 57,
+        "casefold_success": 57,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 42,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.7916666666666666
+      }
+    },
+    "layout": {
+      "english": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 24,
+        "exact_success": 19,
+        "casefold_success": 19,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 14,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.7916666666666666
+      },
+      "quick3": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 24,
+        "exact_success": 19,
+        "casefold_success": 19,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 14,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.7916666666666666
+      },
+      "quick5": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 24,
+        "exact_success": 19,
+        "casefold_success": 19,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 14,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.7916666666666666
+      }
+    },
+    "language": {
+      "english": {
+        "sessions": 45,
+        "labelled": 45,
+        "groups": 15,
+        "exact_success": 39,
+        "casefold_success": 39,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 27,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.8666666666666667
+      },
+      "mixed_cantonese_english": {
+        "sessions": 27,
+        "labelled": 27,
+        "groups": 9,
+        "exact_success": 18,
+        "casefold_success": 18,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 15,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.6666666666666666
+      }
+    },
+    "intent": {
+      "correction": {
+        "sessions": 24,
+        "labelled": 24,
+        "groups": 8,
+        "exact_success": 9,
+        "casefold_success": 9,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.375
+      },
+      "interaction": {
+        "sessions": 6,
+        "labelled": 6,
+        "groups": 2,
+        "exact_success": 6,
+        "casefold_success": 6,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "preservation": {
+        "sessions": 42,
+        "labelled": 42,
+        "groups": 14,
+        "exact_success": 42,
+        "casefold_success": 42,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 42,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      }
+    },
+    "tags": {
+      "capitalization": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "closed_loop": {
+        "sessions": 6,
+        "labelled": 6,
+        "groups": 2,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.5
+      },
+      "informal_or_identifier": {
+        "sessions": 18,
+        "labelled": 18,
+        "groups": 6,
+        "exact_success": 18,
+        "casefold_success": 18,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 18,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "language_switch": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 0,
+        "casefold_success": 0,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.0
+      },
+      "literal_override": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "missing_space": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 0,
+        "casefold_success": 0,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.0
+      },
+      "mixed_correction": {
+        "sessions": 9,
+        "labelled": 9,
+        "groups": 3,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.3333333333333333
+      },
+      "mixed_preservation": {
+        "sessions": 15,
+        "labelled": 15,
+        "groups": 5,
+        "exact_success": 15,
+        "casefold_success": 15,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 15,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "multiple_edits": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "names": {
+        "sessions": 9,
+        "labelled": 9,
+        "groups": 3,
+        "exact_success": 9,
+        "casefold_success": 9,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 9,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      },
+      "real_word_intent": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 0,
+        "casefold_success": 0,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 0.0
+      },
+      "undo": {
+        "sessions": 3,
+        "labelled": 3,
+        "groups": 1,
+        "exact_success": 3,
+        "casefold_success": 3,
+        "capitalization_only_failures": 0,
+        "clean_sessions": 0,
+        "clean_sessions_damaged": 0,
+        "success_fraction": 1.0
+      }
+    },
+    "failures": [
+      {
+        "id": "mixed-fix-tommorow:english",
+        "group": "mixed-fix-tommorow",
+        "layout": "english",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "我哋約 tomorrow ",
+        "actual": "我哋約 tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-tommorow:quick3",
+        "group": "mixed-fix-tommorow",
+        "layout": "quick3",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "我哋約 tomorrow ",
+        "actual": "我哋約 tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-tommorow:quick5",
+        "group": "mixed-fix-tommorow",
+        "layout": "quick5",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "我哋約 tomorrow ",
+        "actual": "我哋約 tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-meting:english",
+        "group": "mixed-fix-meting",
+        "layout": "english",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "聽朝個 meeting ",
+        "actual": "聽朝個 meting ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-meting:quick3",
+        "group": "mixed-fix-meting",
+        "layout": "quick3",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "聽朝個 meeting ",
+        "actual": "聽朝個 meting ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-fix-meting:quick5",
+        "group": "mixed-fix-meting",
+        "layout": "quick5",
+        "tags": [
+          "mixed_correction"
+        ],
+        "expected": "聽朝個 meeting ",
+        "actual": "聽朝個 meting ",
+        "composing": ""
+      },
+      {
+        "id": "missing-space:english",
+        "group": "missing-space",
+        "layout": "english",
+        "tags": [
+          "missing_space"
+        ],
+        "expected": "thanks a lot ",
+        "actual": "thanks alot ",
+        "composing": ""
+      },
+      {
+        "id": "missing-space:quick3",
+        "group": "missing-space",
+        "layout": "quick3",
+        "tags": [
+          "missing_space"
+        ],
+        "expected": "thanks a lot ",
+        "actual": "thanks alot ",
+        "composing": ""
+      },
+      {
+        "id": "missing-space:quick5",
+        "group": "missing-space",
+        "layout": "quick5",
+        "tags": [
+          "missing_space"
+        ],
+        "expected": "thanks a lot ",
+        "actual": "thanks alot ",
+        "composing": ""
+      },
+      {
+        "id": "real-word:english",
+        "group": "real-word",
+        "layout": "english",
+        "tags": [
+          "real_word_intent"
+        ],
+        "expected": "the message is from ",
+        "actual": "the message is form ",
+        "composing": ""
+      },
+      {
+        "id": "real-word:quick3",
+        "group": "real-word",
+        "layout": "quick3",
+        "tags": [
+          "real_word_intent"
+        ],
+        "expected": "the message is from ",
+        "actual": "the message is form ",
+        "composing": ""
+      },
+      {
+        "id": "real-word:quick5",
+        "group": "real-word",
+        "layout": "quick5",
+        "tags": [
+          "real_word_intent"
+        ],
+        "expected": "the message is from ",
+        "actual": "the message is form ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-stream:english",
+        "group": "mixed-stream",
+        "layout": "english",
+        "tags": [
+          "closed_loop",
+          "language_switch"
+        ],
+        "expected": "我諗 the meeting is tomorrow ",
+        "actual": "我諗 teh meeting is tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-stream:quick3",
+        "group": "mixed-stream",
+        "layout": "quick3",
+        "tags": [
+          "closed_loop",
+          "language_switch"
+        ],
+        "expected": "我諗 the meeting is tomorrow ",
+        "actual": "我諗 teh meeting is tommorow ",
+        "composing": ""
+      },
+      {
+        "id": "mixed-stream:quick5",
+        "group": "mixed-stream",
+        "layout": "quick5",
+        "tags": [
+          "closed_loop",
+          "language_switch"
+        ],
+        "expected": "我諗 the meeting is tomorrow ",
+        "actual": "我諗 teh meeting is tommorow ",
+        "composing": ""
+      }
+    ]
+  },
+  "candidate_native_library_sha256": "756f62f8247ab278b313fda09eb49b2972c2a20933b739e46926899f2c529696",
+  "diagnostic_exact_success_delta": 3,
+  "current_status": "Historical comparison of a withdrawn radius prototype; current engine is the accepted baseline",
+  "followup_report": "AUTOCORRECT_ITERATION_20261030.md"
+}

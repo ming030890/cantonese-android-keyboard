@@ -1,0 +1,14 @@
+{
+  "passed": false,
+  "cases": 10,
+  "failures": [
+    {
+      "id": "ambiguity-burger-butter",
+      "typed": "butger",
+      "expected": "butger",
+      "actual": "burger"
+    }
+  ],
+  "cases_sha256": "4ec168a59b7f83844929c2c11de6560c3211a296defd6c8fc0f837586d1dbbc4",
+  "probe_sha256": "fcb754cdf76d3f69016635878cafa5bd15751a6a4b74498cee3229f72799afe3"
+}

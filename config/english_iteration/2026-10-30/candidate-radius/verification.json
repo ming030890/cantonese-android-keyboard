@@ -1,0 +1,26 @@
+{
+  "status": "Unshipped candidate; old accepted baseline and objective weights unchanged",
+  "native_tests": {
+    "passed": 40,
+    "failed": 0,
+    "ignored": 0
+  },
+  "keyboard_gate": {
+    "passed": true,
+    "unit_scenario_tests": 285,
+    "failures": 0,
+    "skips": 0,
+    "screenshot_verification": true,
+    "debug_assembly": true
+  },
+  "native_source_sha256": "f9652ba779620d7ad8ca2ffaf1bb4c747b3e15a045fb289da5b09ecc22ace0b3",
+  "host_jni_sha256": "756f62f8247ab278b313fda09eb49b2972c2a20933b739e46926899f2c529696",
+  "android_jni_sha256": "4b5b683a0d3798b3e37b60ae33c0d5073405bb19e8bef016a24adec99a3c6ad2",
+  "logs": {
+    "native": "build/candidate-radius-stable-20261030/native-tests.log",
+    "keyboard": "build/candidate-radius-stable-20261030/verify-keyboard.log"
+  },
+  "product_quality": "Authored diagnostics: English 12/15 to13/15, mixed6/9 unchanged; no real bilingual chat qualification",
+  "subsequent_status": "Withdrawn after supplemental evaluation; accepted native source restored",
+  "final_decision": "../bilingual-eval-iteration/final-decision.json"
+}

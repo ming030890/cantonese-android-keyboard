@@ -1,200 +1,317 @@
 #!/usr/bin/env python3
-"""Attribute errors on the frozen cohort without tuning the production policy."""
+"""Diagnostic-only decomposition of the released English/bilingual decoder.
+
+No fitting, threshold selection, or production changes. Gold targets never enter
+native requests. Synthetic mixed-context errors are frozen before inference and
+must remain evaluation-only. Runtime timing is Mac native work, not Android IME.
+"""
 import argparse
 import collections
-import csv
 import hashlib
 import json
+import re
+import statistics
 import struct
+import subprocess
 from pathlib import Path
 
-from align_mobile_targets import osa, reference_target
-from audit_candidate_pipeline import digest, penalty
-from iterate_english_policy import metric, rerank, split
-from verify_english_acceptance import decision
+import autocorrect_eval_v2 as core
+from align_mobile_targets import osa
+
+SEED = 'error-analysis-mixed-20261030-v1'
+ROOT = Path(__file__).resolve().parents[1]
 
 
-def score_parts(typed, row):
-    word = row['word'].lower()
-    if row['completedChars']:
-        cost = 0.
-    elif ' ' in word:
-        cost = 1.5 if len(word) == len(typed)+1 else 1.
-    else:
-        cost = penalty(typed.lower(), word, row['edits'])
-    # Split LM evidence is logp(first) + 0.5 logp(second), not a causal phrase score.
-    return dict(lm=row['score']+cost, cost=cost, score=row['score'])
+def rank(target, words):
+    words = [core.norm(w) for w in words]
+    return words.index(core.norm(target)) + 1 if core.norm(target) in words else None
 
 
-def missing_reason(typed, target, vocabulary):
-    if any(part not in vocabulary for part in target.split()):
-        return 'target_word_absent_from_generation_vocabulary'
-    if ' ' in target:
-        return 'multiword_split_proposal_restriction'
-    if target.startswith(typed):
-        return 'unexpected_missing_prefix'
-    if abs(len(target)-len(typed)) > 1:
-        return 'length_difference_greater_than_one'
-    radius = 3 if len(typed) >= 6 else 2 if len(typed) >= 4 else 1
-    if osa(typed, target) > radius:
-        return 'outside_length_dependent_edit_radius'
-    return 'unexpected_missing_in_supported_neighborhood'
+def outcome(case, output):
+    if case['target'] is None:
+        return 'unlabelled'
+    target, typed = core.norm(case['target']), core.norm(case['typed'])
+    final = core.norm(output.get('correction') or case['typed'])
+    if typed == target:
+        return 'clean_preserved' if final == target else 'clean_damaged'
+    if final == target:
+        return 'corrected'
+    position = rank(target, [c['word'] for c in output['candidates']])
+    if position == 1:
+        return 'target_top1_not_committed'
+    if position is not None:
+        return 'target_rank2_to8'
+    return 'target_absent_top8'
 
 
-def veto(policy, case, out, best):
-    if out['known']:
-        return 'known_word_preservation'
-    if len(case['typed']) < policy['minimum_observed_length']:
-        return 'observed_word_too_short'
-    if best['completedChars']:
-        return 'automatic_completion_disabled'
-    if len(best['word']) < policy['minimum_candidate_length']:
-        return 'candidate_word_too_short'
-    return 'learned_acceptance_threshold'
+def latency(values):
+    return dict(n=len(values), median_ms=statistics.median(values),
+                p95_ms=core.percentile(values, .95), max_ms=max(values),
+                above_40ms=sum(v > 40 for v in values)) if values else {}
+
+
+def native(binary, args, requests, output):
+    """Sequential calls avoid host contention and preserve exact request order."""
+    results = []
+    with output.open('w') as saved, subprocess.Popen(
+        [str(binary.resolve()), *map(str, args)], stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE, text=True, bufsize=1,
+    ) as proc:
+        try:
+            for i, request in enumerate(requests):
+                proc.stdin.write(json.dumps(request, ensure_ascii=False) + '\n')
+                proc.stdin.flush()
+                line = proc.stdout.readline()
+                if not line:
+                    raise RuntimeError(f'Native process stopped at {i}: {proc.poll()}')
+                result = json.loads(line)
+                results.append(result)
+                saved.write(line)
+                if (i + 1) % 128 == 0:
+                    print(f'{output.stem}: {i+1}/{len(requests)}', flush=True)
+            proc.stdin.close()
+            if proc.wait(timeout=30):
+                raise RuntimeError('Native process failed')
+        except BaseException:
+            proc.kill()
+            proc.wait()
+            raise
+    return results
+
+
+def summary(cases, outputs):
+    return dict(metrics=core.metrics(cases, outputs),
+                outcomes=dict(collections.Counter(outcome(c, o) for c, o in zip(cases, outputs, strict=True))))
+
+
+def mutate(word, operation, identifier):
+    value = int(hashlib.sha256((SEED + identifier + operation).encode()).hexdigest(), 16)
+    positions = list(range(len(word)))
+    if operation == 'transpose':
+        positions = [i for i in range(len(word)-1) if word[i] != word[i+1]]
+    if not positions:
+        return None
+    i = positions[value % len(positions)]
+    if operation == 'delete':
+        return word[:i] + word[i+1:]
+    if operation == 'duplicate':
+        return word[:i] + word[i] + word[i:]
+    if operation == 'transpose':
+        return word[:i] + word[i+1] + word[i] + word[i+2:]
+    # Horizontal QWERTY neighbor: a controlled stressor, not an empirical noise fit.
+    row = next(r for r in ('qwertyuiop', 'asdfghjkl', 'zxcvbnm') if word[i] in r)
+    at = row.index(word[i])
+    choices = row[max(0, at-1):at] + row[at+1:at+2]
+    return word[:i] + choices[(value // len(positions)) % len(choices)] + word[i+1:]
+
+
+def mixed_rows():
+    rows = []
+    for name in ('generalization', 'phrase', 'prefix'):
+        rows += json.loads((ROOT / f'build/mixed-{name}-cohort.json').read_text())['rows']
+    result = []
+    for row in rows:
+        # Frozen natural context; remove right context to simulate live typing.
+        base = dict(row, right='', typed=row['observed'], operation='original')
+        if row['panel'] != 'english_in_chinese_context':
+            result.append(base)
+            continue
+        for version in (3, 5):
+            result.append(dict(base, version=version, id=f"{row['id']}:v{version}"))
+            for operation in ('delete', 'substitute', 'duplicate', 'transpose'):
+                typed = mutate(row['observed'], operation, row['id'])
+                if typed:
+                    result.append(dict(base, id=f"{row['id']}:v{version}:{operation}",
+                                       panel='synthetic_english_typo_in_chinese_context',
+                                       version=version, typed=typed, observed=typed, operation=operation))
+    return result
+
+
+def mixed_summary(rows, outputs):
+    result = {}
+    for panel in sorted({r['panel'] for r in rows}):
+        for version in (3, 5):
+            ids = [i for i, r in enumerate(rows) if r['panel'] == panel and r['version'] == version]
+            if not ids:
+                continue
+            cases, predictions = [rows[i] for i in ids], [outputs[i] for i in ids]
+            ranks = [rank(c['target'], o['display']) for c, o in zip(cases, predictions)]
+            english = [o['english'] for o in predictions]
+            values = dict(n=len(ids), display_top1=sum(r == 1 for r in ranks),
+                          display_top8=sum(r is not None and r <= 8 for r in ranks),
+                          display_available=sum(r is not None for r in ranks),
+                          native_latency=latency([o['elapsed_ms'] for o in predictions]))
+            if panel.startswith('chinese_'):
+                values['chinese_generated'] = sum(rank(c['target'], o['chinese']) is not None
+                                                 for c, o in zip(cases, predictions))
+                values['english_correction_proposed'] = sum(bool(o.get('correction')) and
+                    core.norm(o['correction']) != core.norm(c['typed']) for c, o in zip(cases, english))
+            elif panel != 'prefix':
+                values['english'] = summary(cases, english)
+            result[f'{panel}/quick{version}'] = values
+    return result
+
+
+def summarize_existing(output):
+    """Derive paired stage transitions without repeating native inference."""
+    report = json.loads((output/'report.json').read_text())
+    source = ROOT/'build/autocorrect-eval-v4/frozen/cases.jsonl'
+    assert core.digest(source) == report['binding']['cases_sha256']
+    cases, predictions = core.rows(source), core.rows(output/'frozen-outputs.jsonl')
+    panels = ({'mobile_observed','mobile_source_copy'}, {'real_touch_observed'}, {'authored_hard'})
+    scores = [core.metrics([c for c in cases if c['panel'] in panel],
+        [o for c,o in zip(cases,predictions,strict=True) if c['panel'] in panel])['f05'] for panel in panels]
+    baseline = json.loads((ROOT/'config/english_iteration/2026-10-29/short-nn-v2/accepted-score.json').read_text())['score']
+    report['unchanged_official_score'] = dict(score=sum(scores)/3, baseline=baseline, delta=sum(scores)/3-baseline)
+    audit = ROOT/'build/noisy-context-release74-check'
+    audit_report = json.loads((audit/'report.json').read_text())
+    assert audit_report['binding']['probe_sha256'] == report['binding']['probe_sha256']
+    assert core.digest(audit/'pairs.jsonl') == audit_report['binding']['pairs_sha256']
+    pairs, noise = core.rows(audit/'pairs.jsonl'), core.rows(audit/'outputs.jsonl')
+    report['prior_context_lost_corrections_by_stage'] = {}
+    for operation in ('delete','substitute','duplicate','transpose'):
+        counts = collections.Counter()
+        for c,a,b in zip(pairs,noise[::2],noise[1::2],strict=True):
+            if c['operation'] == operation and core.norm(c['typed']) != core.norm(c['target']) and \
+                core.norm(a['correction'] or c['typed']) == core.norm(c['target']) and \
+                core.norm(b['correction'] or c['typed']) != core.norm(c['target']):
+                counts[outcome(c,b)] += 1
+        report['prior_context_lost_corrections_by_stage'][operation] = dict(counts)
+    mixed = core.rows(output/'mixed-cases.jsonl')
+    assert core.digest(output/'mixed-cases.jsonl') == report['binding']['mixed_cases_sha256']
+    full, preview = core.rows(output/'mixed-full-outputs.jsonl'), core.rows(output/'mixed-preview-outputs.jsonl')
+    report['mixed_demotions'] = {}
+    for version in (3,5):
+        counts = collections.Counter()
+        for c,f,p in zip(mixed,full,preview,strict=True):
+            if c['panel'] != 'synthetic_english_typo_in_chinese_context' or c['version'] != version:
+                continue
+            rf, rp = rank(c['target'],f['display']), rank(c['target'],p['display'])
+            counts['n'] += 1
+            counts['preview_top8_to_full_below8'] += bool(rp and rp<=8 and (rf is None or rf>8))
+            counts['preview_below8_to_full_top8'] += bool((rp is None or rp>8) and rf and rf<=8)
+        report['mixed_demotions'][str(version)] = dict(counts)
+    report['derivation'] = dict(script_sha256=core.digest(__file__),
+        output_hashes={p.name:core.digest(p) for p in sorted(output.glob('*outputs.jsonl'))},
+        noise_outputs_sha256=core.digest(audit/'outputs.jsonl'))
+    report['limitations'] = [
+        'Diagnostic-only; no parameters fitted or selected.',
+        'The frozen English suite and older bilingual cohorts have development exposure.',
+        'Synthetic mixed-context variants are 255 perturbations from 64 documents; Quick3/5 are paired, not independent.',
+        'Prefix completion and explicit Chinese selection are distinct from automatic English correction.',
+        'Native Mac timings exclude Android scheduling/rendering and do not establish phone deadline failures.',
+    ]
+    core.write_json(output/'report.json',report)
+    return report
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--iteration', type=Path, required=True)
-    parser.add_argument('--output', type=Path, required=True)
-    args = parser.parse_args()
-    project = Path(__file__).resolve().parents[1]
-    model = project/'app/src/main/assets/language_model/model.cng'
-    policy_path = project/'config/english_iteration/2026-10-20/acceptance-policy-v1.json'
-    reference_path = Path('/Volumes/SSD/cantonese_ngram/raw/aalto-ite-v88/sentences.csv')
-    cases_path, cache_path = args.iteration/'cases.jsonl', args.iteration/'native-cache.json'
-    binding = json.loads((project/'config/english_iteration/2026-10-20/f05-linear-acceptance.json').read_text())['input_sha256']
-    assert digest(cases_path) == binding['build/english-iteration-2026-10-20/cases.jsonl']
-    assert digest(cache_path) == binding['build/english-iteration-2026-10-20/native-cache.json']
-    policy = json.loads(policy_path.read_text())
-    assert digest(model) == policy['model_sha256']
-    raw = model.read_bytes()
-    n = struct.unpack('<I', raw[8:12])[0]
-    metadata = json.loads(raw[12:12+n])
-    vocabulary = {metadata['tokens'][i].replace('’', "'").lower() for i in metadata['english_word_ids']}
-    references = {r['SENTENCE_ID']: r['SENTENCE'] for r in csv.DictReader(reference_path.open())}
-    cases = [json.loads(l) for l in cases_path.open()]
-    cached = json.loads(cache_path.read_text())['outputs']
-    assert len(cases) == len(cached)
-    selected = []
-    for c, out in zip(cases, cached):
-        if c['category'].startswith('prefix_') or split(c['group']) != 'evaluation':
-            continue
-        target = c['target'] if c['category'] == 'source_preservation' else reference_target(c, references[c['group']])
-        if target is not None:
-            selected.append((dict(c, target=target), out))
-    identities = '\n'.join(sorted(c['id'] for c, _ in selected))+'\n'
-    assert hashlib.sha256(identities.encode()).hexdigest() == '2a6361cda8ee35c00bfed060b409561d4abe6f863597df8eb029edea18271e5c'
-    counts = collections.Counter()
-    missing = collections.Counter()
-    rejection = collections.Counter()
-    ranking_causes = collections.Counter()
-    wrong_causes = collections.Counter()
-    breakdown = collections.defaultdict(collections.Counter)
-    errors, rankings, fixes = [], [], []
-    ablations = {name: collections.Counter() for name in ('current', 'lm_only', 'uniform_two_per_edit', 'cost_only')}
-    acceptance_ablations = {name: [] for name in ('without_known_word_veto', 'without_learned_threshold')}
-    for c, out in selected:
-        typed, target = c['typed'].lower(), c['target']
-        ranked = rerank(out['candidates'], 0.)
-        fix = decision(policy, c, out, ranked)
-        acceptance_ablations['without_known_word_veto'].append(decision(policy, c, dict(out, known=False), ranked))
-        eligible = ranked and veto(policy, c, out, ranked[0]) == 'learned_acceptance_threshold'
-        acceptance_ablations['without_learned_threshold'].append(ranked[0]['word'] if eligible else None)
-        rankings.append(ranked)
-        fixes.append(fix)
-        typo = typed != target
-        gold_rank = next((i+1 for i, r in enumerate(ranked) if r['word'].lower() == target), None)
-        counts['cases'] += 1
-        counts['typos' if typo else 'controls'] += 1
-        counts['known_typo' if typo and out['known'] else 'known_control' if out['known'] else 'unknown_input'] += 1
-        if not typo:
-            if fix:
-                counts['wrong_on_control'] += 1
-                wrong_causes['clean_control_changed'] += 1
-                errors.append(dict(c, kind='wrong_on_control', fix=fix, best=ranked[0],
-                                   target_rank=gold_rank, known=out['known']))
-            continue
-        counts['target_in_pool'] += gold_rank is not None
-        counts['target_in_top8'] += gold_rank is not None and gold_rank <= 8
-        counts['target_top1'] += gold_rank == 1
-        if gold_rank is not None:
-            gold = ranked[gold_rank-1]
-            for name, order in ablations.items():
-                if name == 'current':
-                    best = ranked[0]
-                else:
-                    def key(row):
-                        p = score_parts(typed, row)
-                        score = p['lm'] if name == 'lm_only' else -p['cost'] if name == 'cost_only' else p['lm']-(0 if row['completedChars'] else 2*row['edits'])
-                        return (-score, row['word'])
-                    best = min(ranked, key=key)
-                order['top1_on_covered_typos'] += best['word'].lower() == target
-                if ' ' not in target and all(' ' not in r['word'] for r in (ranked[0], gold)):
-                    order['top1_on_singleword_gold_and_current_winner'] += best['word'].lower() == target
-        if fix and fix.lower() == target:
-            counts['correct'] += 1
-            continue
-        counts['missed'] += 1
-        if fix:
-            counts['wrong_on_typo'] += 1
-            wrong_causes['target_absent' if gold_rank is None else 'target_present_ranked_below_wrong_winner'] += 1
-        if gold_rank is None:
-            stage = 'generation'
-            detail = missing_reason(typed, target, vocabulary)
-            missing[detail] += 1
-        elif gold_rank > 1:
-            stage = 'ranking'
-            a, b = score_parts(typed, ranked[0]), score_parts(typed, ranked[gold_rank-1])
-            if b['lm'] > a['lm']:
-                detail = 'cost_overrides_better_lm_evidence'
-            elif b['cost'] < a['cost']:
-                detail = 'lm_overrides_better_edit_cost'
-            else:
-                detail = 'lm_and_cost_both_favor_wrong_winner_or_tie'
-            ranking_causes[detail] += 1
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--probe', type=Path)
+    p.add_argument('--joined-probe', type=Path)
+    p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--summarize-existing', action='store_true')
+    a = p.parse_args()
+    if a.summarize_existing:
+        print(json.dumps(summarize_existing(a.output),ensure_ascii=False,indent=2))
+        return
+    if not a.probe or not a.joined_probe:
+        p.error('--probe and --joined-probe are required for inference')
+    a.output.mkdir(parents=True, exist_ok=False)
+    assets = ROOT / 'app/src/main/assets'
+    model = assets / 'language_model/model.cng'
+    suite = ROOT / 'build/autocorrect-eval-v4/frozen'
+    manifest = json.loads((suite / 'manifest.json').read_text())
+    assert core.digest(suite / 'cases.jsonl') == manifest['cases_sha256']
+    cases = core.rows(suite / 'cases.jsonl')
+    mixed = mixed_rows()
+    core.jsonl(a.output / 'mixed-cases.jsonl', mixed)
+    binding = dict(seed=SEED, model_sha256=core.digest(model), probe_sha256=core.digest(a.probe),
+        joined_probe_sha256=core.digest(a.joined_probe), script_sha256=core.digest(__file__),
+        cases_sha256=core.digest(suite / 'cases.jsonl'), mixed_cases_sha256=core.digest(a.output/'mixed-cases.jsonl'),
+        acceptance_sha256=core.digest(ROOT.parent/'QwenASR/crates/cantonese-ngram/src/english_acceptance.json'),
+        source_cohorts={name: core.digest(ROOT/f'build/mixed-{name}-cohort.json')
+                        for name in ('generalization', 'phrase', 'prefix')},
+        inference_fields=['left', 'typed/code', 'version', 'preview', 'spelling_limit', 'timing'],
+        parameters_selected=False, right_context_used=False)
+    core.write_json(a.output / 'binding.json', binding)
+    outputs = native(a.probe, [model], [dict(left=c['left'], typed=c['typed'], spelling_limit=8, timing=True)
+        for c in cases], a.output / 'frozen-outputs.jsonl')
+    report = dict(binding=binding, frozen=summary(cases, outputs))
+    report['frozen']['panels'] = {panel: summary([c for c in cases if c['panel'] == panel],
+        [o for c, o in zip(cases, outputs) if c['panel'] == panel]) for panel in sorted({c['panel'] for c in cases})}
+    report['frozen']['lengths'] = {name: summary([c for c in cases if group(c['typed']) == name],
+        [o for c, o in zip(cases, outputs) if group(c['typed']) == name]) for name in ('1','2','3','4-5','6+')}
+    report['frozen']['known_input'] = {str(known): summary([c for c,o in zip(cases,outputs) if o['known']==known],
+        [o for o in outputs if o['known']==known]) for known in (True,False)}
+    report['frozen']['native_latency'] = latency([o['elapsedMicros']/1000 for o in outputs])
+    missing = [i for i, (c, o) in enumerate(zip(cases, outputs)) if outcome(c, o) == 'target_absent_top8']
+    expanded = native(a.probe, [model], [dict(left=cases[i]['left'],typed=cases[i]['typed'],
+        spelling_limit=4096) for i in missing], a.output / 'expanded-outputs.jsonl')
+    data = model.read_bytes()
+    meta = json.loads(data[12:12+struct.unpack('<I', data[8:12])[0]])
+    vocabulary = {meta['tokens'][i].lower() for i in meta['english_word_ids']
+                  if re.fullmatch("[a-z']{1,32}", meta['tokens'][i].lower())}
+    coverage, details = collections.Counter(), []
+    for i, o in zip(missing, expanded):
+        c = cases[i]; target, typed = c['target'].lower(), c['typed'].lower()
+        position = rank(target, [x['word'] for x in o['candidates']])
+        if position is not None:
+            reason = 'generated_but_rank_below8'
+        elif len(o['candidates']) >= 4096:
+            reason = 'diagnostic_cap_unresolved'
+        elif not re.fullmatch("[a-z']{1,32}", typed):
+            reason = 'input_rejected_by_canonicalizer'
+        elif target not in vocabulary:
+            reason = 'outside_ordinary_word_vocabulary_or_multitoken'
+        elif osa(typed, target) > (3 if len(typed)>=6 else 2 if len(typed)>=4 else 1):
+            reason = 'outside_edit_radius'
         else:
-            stage = 'acceptance'
-            detail = veto(policy, c, out, ranked[0])
-            rejection[detail] += 1
-        counts[stage+'_misses'] += 1
-        breakdown[stage]['known_word_veto_also_applies'] += bool(out['known'])
-        breakdown[stage]['wrong_replacement_applied'] += bool(fix)
-        errors.append(dict(c, kind=stage, detail=detail, fix=fix, target_rank=gold_rank,
-                           known=out['known'], best=ranked[0] if ranked else None,
-                           best_parts=score_parts(typed, ranked[0]) if ranked else None,
-                           gold=ranked[gold_rank-1] if gold_rank else None,
-                           gold_parts=score_parts(typed, ranked[gold_rank-1]) if gold_rank else None))
-    assert counts['missed'] == counts['generation_misses']+counts['ranking_misses']+counts['acceptance_misses']
-    cases, outputs = map(list, zip(*selected))
-    current = metric(cases, outputs, rankings, fixes, 'evaluation')
-    expected = json.loads((project/'config/english_iteration/2026-10-20/f05-native-policy-verification.json').read_text())['evaluation']
-    for field in ('cases', 'correct', 'wrong', 'typos', 'f05'):
-        assert current[field] == expected[field], (field, current[field], expected[field])
-    paths = (Path(__file__), cases_path, cache_path, reference_path, policy_path, model,
-             Path(__file__).with_name('audit_candidate_pipeline.py'),
-             Path(__file__).with_name('align_mobile_targets.py'),
-             Path(__file__).with_name('iterate_english_policy.py'),
-             Path(__file__).with_name('verify_english_acceptance.py'))
-    report = dict(scope='Frozen development evaluation; diagnostic attribution only, no policy fitting or promotion',
-                  source_sha256={str(p): digest(p) for p in paths}, evaluation=current,
-                  counts=dict(counts), generation_reasons=dict(missing), ranking_reasons=dict(ranking_causes),
-                  acceptance_reasons=dict(rejection), wrong_replacement_reasons=dict(wrong_causes),
-                  overlapping_blockers={k: dict(v) for k, v in breakdown.items()},
-                  ranking_ablations={k: dict(v) for k, v in ablations.items()}, errors=errors,
-                  acceptance_ablations={name: metric(cases, outputs, rankings, decisions, 'evaluation')
-                                       for name, decisions in acceptance_ablations.items()},
-                  max_cached_candidates=max(len(o['candidates']) for _, o in selected),
-                  extra_diagnostics=dict(
-                      ranking_winner_is_completion=sum(e['kind']=='ranking' and e['best']['completedChars']>0 for e in errors),
-                      missing_contraction_targets=sum(e.get('detail')=='target_word_absent_from_generation_vocabulary' and "'" in e['target'] for e in errors),
-                      clean_controls_losing_apostrophe=sum(e['kind']=='wrong_on_control' and "'" in e['typed'] and "'" not in e['fix'] for e in errors)),
-                  limits=['Stage attribution is earliest failure, not proof of a single causal defect.',
-                          'Ranking ablations retain the same pool and do not refit acceptance; not deployable F0.5 comparisons.',
-                          'Split LM evidence uses the production heuristic, not a normalized phrase probability.',
-                          'No recorded tap positions or phone latency in this Aalto cohort.'])
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
-    print(json.dumps({k: v for k, v in report.items() if k not in ('errors', 'source_sha256')}, indent=2))
+            reason = 'other_generation_exclusion'
+        coverage[reason] += 1
+        details.append(dict(c, reason=reason, full_rank=position, top8=outputs[i]['candidates'],
+                            correction=outputs[i].get('correction')))
+    report['frozen']['absent_top8_decomposition'] = dict(coverage)
+    core.jsonl(a.output / 'missing-targets.jsonl', details)
+    errors = [dict(c, outcome=outcome(c,o), prediction=o) for c,o in zip(cases,outputs)
+              if outcome(c,o) not in ('clean_preserved','corrected','unlabelled')]
+    core.jsonl(a.output/'errors.jsonl',errors)
+    original = core.rows(ROOT/'build/autocorrect-eval-v4/release74-check/candidate-outputs.jsonl')
+    report['release74_parity_mismatches'] = sum(
+        {k:v for k,v in x.items() if k!='elapsedMicros'} != {k:v for k,v in y.items() if k!='elapsedMicros'}
+        for x,y in zip(original,outputs,strict=True))
+    audit = json.loads((ROOT/'build/noisy-context-release74-check/report.json').read_text())
+    assert audit['binding']['model_sha256'] == binding['model_sha256']
+    assert audit['binding']['probe_sha256'] == binding['probe_sha256']
+    report['prior_context_noise'] = {k:v['overall'] for k,v in audit['operations'].items()}
+    core.write_json(a.output/'report.json',report)
+    requests = [dict(code=c['typed'], left=c['left'], right='', version=c['version']) for c in mixed]
+    joined = native(a.joined_probe, [assets], requests, a.output/'mixed-full-outputs.jsonl')
+    report['mixed_full'] = mixed_summary(mixed, joined)
+    mixed_english = [(c,o) for c,o in zip(mixed,joined) if c['panel'] in
+                     ('english_in_chinese_context','synthetic_english_typo_in_chinese_context')]
+    no_context = native(a.probe,[model],[dict(typed=c['typed'],left='',spelling_limit=8)
+        for c,o in mixed_english],a.output/'mixed-without-context-outputs.jsonl')
+    report['mixed_context_ablation'] = {}
+    for panel in ('english_in_chinese_context','synthetic_english_typo_in_chinese_context'):
+        ids=[i for i,(c,o) in enumerate(mixed_english) if c['panel']==panel and c['version']==3]
+        cc=[mixed_english[i][0] for i in ids]
+        report['mixed_context_ablation'][panel]=dict(with_context=summary(cc,[mixed_english[i][1]['english'] for i in ids]),
+            without_context=summary(cc,[no_context[i] for i in ids]))
+    preview = native(a.joined_probe,[assets],[dict(r,preview=True) for r in requests],a.output/'mixed-preview-outputs.jsonl')
+    report['mixed_preview'] = mixed_summary(mixed,preview)
+    report['mixed_preview_full_english_mismatches'] = sum(x['english'] != y['english'] for x,y in zip(joined,preview))
+    core.jsonl(a.output/'mixed-errors.jsonl', [dict(c, full=o, preview=p) for c,o,p in zip(mixed,joined,preview)
+        if rank(c['target'],o['display']) != 1 or (c['panel'].startswith('synthetic_') and
+            core.norm(o['english'].get('correction') or c['typed']) != core.norm(c['target']))])
+    for key,path in [('model',model),('probe',a.probe),('joined_probe',a.joined_probe)]:
+        assert core.digest(path)==binding[key+'_sha256'], f'{key} changed during run'
+    core.write_json(a.output/'report.json',report)
+    print(json.dumps(summarize_existing(a.output),ensure_ascii=False,indent=2),flush=True)
+
+
+def group(word):
+    return str(len(word)) if len(word)<=3 else '4-5' if len(word)<=5 else '6+'
 
 
 if __name__ == '__main__':

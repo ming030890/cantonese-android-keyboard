@@ -1,0 +1,12 @@
+{
+  "schema": "keep-rescue-chat-confirmation-v1",
+  "confirmation_sha256": "ad9cd66b407e43b42852e28d101f81c92c4870a1dfc820ec8c476163b29da15a",
+  "policy_sha256": "51a22a1b3d692fca87dfef5efa767f73f112aea16d54accc0deedf65ec4e4cff",
+  "probe_sha256": "f5b20d58a37e0def4f1637511535375851c2aa9e7de57a1b61f0ff1389d9d6c2",
+  "baseline_probe_sha256": "82f64b42815feafe9872dedad2c19206948178436667a39e149b447292e304d8",
+  "script_sha256": "a2bf4962e22e46ae724ac28fac68ce42ad1472012a0f3c5e04f89899199036d8",
+  "selection": "Best of four models by TRAIN-only calibration F0.5 with source-family wrong/clean budgets and TP retention; stable numeric port passed development and unchanged JNI guards",
+  "decision": "Every chat panel must retain baseline TP, FP and clean-word budgets, with at least one improved count; natural and synthetic errors reported separately",
+  "previously_scored": false,
+  "product_checks_passed": true
+}

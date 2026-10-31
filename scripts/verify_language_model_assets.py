@@ -75,6 +75,28 @@ def verify_shared(project):
         if acceptance_file.read_bytes() not in binary or dictionary.read_bytes() not in binary:
             raise ValueError('Rebuild native library for the selected acceptance policy/dictionary')
         dictionary_bytes=dictionary.stat().st_size
+    channel_bytes=0
+    channel=selected['english_policy'].get('noisy_channel')
+    if channel:
+        directory=native/'english_channel_data'
+        if set(channel['files'])!={'lexicon.tsv','priors.tsv','channel.json','metadata.json','policy.json'}:
+            raise ValueError('Unexpected English channel resources')
+        binary=(project/'app/src/main/jniLibs/arm64-v8a/libcantonese_engine.so').read_bytes()
+        for name,expected in channel['files'].items():
+            path=directory/name
+            if sha(path)!=expected or path.read_bytes() not in binary:
+                raise ValueError('Rebuild native library for selected English channel: '+name)
+            channel_bytes+=path.stat().st_size
+        if json.loads((directory/'metadata.json').read_text())['model_sha256']!=sha(model):
+            raise ValueError('English channel priors/model mismatch')
+        if len((directory/'lexicon.tsv').read_text().splitlines())!=169575:
+            raise ValueError('English channel lexicon mismatch')
+        if set(channel['dictionary_sources'])!={'en_GB.dic','README_en_GB.txt','LGPL-2.1.txt','GPL-2.0.txt','DERIVATION.txt'}:
+            raise ValueError('Unexpected English dictionary sources/notices')
+        for name,expected in channel['dictionary_sources'].items():
+            path=assets/'licenses/english_dictionary'/name
+            if not path.is_file() or sha(path)!=expected:raise ValueError('English dictionary source/license mismatch: '+name)
+            channel_bytes+=path.stat().st_size
     apostrophe=json.loads((native/'english_apostrophe_acceptance.json').read_text())
     if apostrophe['model_sha256']!=sha(model):raise ValueError('Apostrophe model requires recalibration')
     if apostrophe['forms_sha256']!=sha(native/'english_apostrophe_forms.json'):raise ValueError('Apostrophe forms require recalibration')
@@ -92,11 +114,12 @@ def verify_shared(project):
     if fusion['inputs']['counts_sha256']!=hashlib.sha256(b'').hexdigest():raise ValueError('Count table must be absent')
     paths=['language_model/model.cng','language_model/handwriting_fusion.json','quick/quick3.bin','quick/quick5.bin','handwriting/labels.txt']
     total=sum((assets/p).stat().st_size for p in paths)
-    if total+dictionary_bytes>=30_000_000:raise ValueError('Shared prediction resources exceed30MB')
+    if total+dictionary_bytes+channel_bytes>=30_000_000:raise ValueError('Shared prediction resources exceed30MB')
     if not selected['experimental'] or selected['production_approved']:raise ValueError('V2 has not passed production qualification')
     return dict(passed=True,format=meta['format'],model_sha256=sha(model),bytes=len(raw),
                 prediction_resource_bytes=total,embedded_dictionary_bytes=dictionary_bytes,
-                prediction_data_with_dictionary_bytes=total+dictionary_bytes,one_shared_lm=True,english_spelling_assets=False,
+                prediction_data_with_dictionary_bytes=total+dictionary_bytes+channel_bytes,embedded_channel_bytes=channel_bytes,
+                one_shared_lm=True,english_spelling_assets=bool(channel),
                 right_context_tokens=0,experimental=True,production_approved=False)
 
 def verify_package(project, package):
@@ -126,6 +149,9 @@ def verify_package(project, package):
         if count_asset.exists():files.append('handwriting/lm_csr.bin')
         elif prefix+'assets/handwriting/lm_csr.bin' in archive.namelist():raise ValueError('Obsolete count table packaged')
         if (assets/'licenses/SCOWL.txt').is_file():files.append('licenses/SCOWL.txt')
+        dictionary_notices=assets/'licenses/english_dictionary'
+        if dictionary_notices.is_dir():
+            files.extend(str(p.relative_to(assets)) for p in sorted(dictionary_notices.iterdir()) if p.is_file())
         for file in files:check(archive,prefix+'assets/'+file,assets/file)
         for library in ['libcantonese_engine.so', 'libqwen_asr.so']:
             stripped=project/f'app/build/intermediates/stripped_native_libs/{variant}/strip{variant.capitalize()}DebugSymbols/out/lib/arm64-v8a'/library

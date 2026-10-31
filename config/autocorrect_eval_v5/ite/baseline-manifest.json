@@ -1,0 +1,21 @@
+{
+  "schema": "ite-whole-message-baseline-v5",
+  "frozen_manifest_sha256": "744dd643142a022fbd493c6bb081ed7ec1e366f96f0910d54f75bceb0c83e571",
+  "scores": {
+    "english": "a22b3652886486366ef8447422d321ea50c21003812a5f2cda4050c18dec17da",
+    "quick3": "9b4615e2ef2cb02f5eeb9ad79649b67d7d76c0a80788414d7ce6aeedfef48bad",
+    "quick5": "c809f14ddbcb304f07e9b6cb8f31f8e243e99d6419906510a6cf43bd35ee8d15"
+  },
+  "layout_outputs_identical": true,
+  "confirmation_run": false,
+  "production_quality_change": false,
+  "old_v4_accepted_score": 0.8939210767471755,
+  "old_v4_score_delta": 0,
+  "verification": "verification.json",
+  "distinct_attempts": 421,
+  "distinct_typo_attempts": 229,
+  "clustering": "Some attempts share participants/prompts; layout variants share the same attempt. Counts are descriptive, not independent-trial confidence estimates.",
+  "old_v4_score_recomputed": false,
+  "old_v4_score_delta_basis": "No production engine/model change in this evaluation iteration; accepted score retained, not remeasured.",
+  "verification_sha256": "38cc402f45a211bcd99a24e6e953af3431146bb061a49adab0b3dbb2a97198d3"
+}

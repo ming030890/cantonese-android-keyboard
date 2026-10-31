@@ -1,0 +1,292 @@
+{
+  "binding": {
+    "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "policy_sha256": "107494939b0e175f30618f0a19d522c56dc973d7c099a0cd34f68039b97f3d5c",
+    "script_sha256": "489124591e3bae2d960d063820c7329bff53d7a2cafaf62115b720443bedb9eb",
+    "feature_adapter_sha256": "da6919569ceb980a3a7f45760e2edad01fa03c0c6d1262dd96722f79427a1ced",
+    "source_report_sha256": "c946ed70b29c4a6a6c9aedbb66a859ddbb09f2df54f88ebcd4c1ecb16d02a16c",
+    "frozen_python_native_parity_mismatches": 0,
+    "noise_python_native_parity_mismatches": 0,
+    "frozen_parity_cases": 5261,
+    "noise_parity_outputs": 33160,
+    "parameters_fitted": false
+  },
+  "baseline": {
+    "cases": 5261,
+    "typos": 1315,
+    "tp": 903,
+    "fp": 58,
+    "clean_changes": 8,
+    "target_in_top8": 1171,
+    "target_top1": 1045,
+    "miss_ranking_or_acceptance": 268,
+    "clean": 3900,
+    "miss_absent_from_top8": 144,
+    "unlabelled": 46,
+    "fn": 412,
+    "f05": 0.8751696065128901,
+    "precision": 0.9396462018730489,
+    "recall": 0.6866920152091255,
+    "clean_changes_per_1000": 2.051282051282051
+  },
+  "unconditionally_commit_top1_diagnostic": {
+    "cases": 5261,
+    "typos": 1315,
+    "tp": 1045,
+    "fp": 2008,
+    "clean_changes": 1759,
+    "target_in_top8": 1171,
+    "target_top1": 1045,
+    "miss_ranking_or_acceptance": 126,
+    "clean": 3900,
+    "miss_absent_from_top8": 144,
+    "unlabelled": 46,
+    "fn": 270,
+    "f05": 0.38626450802099505,
+    "precision": 0.3422862757943007,
+    "recall": 0.7946768060836502,
+    "clean_changes_per_1000": 451.02564102564105
+  },
+  "ranking_diagnosis": {
+    "generated_but_not_top1": 141,
+    "gold_raw_lm_beats_winner_but_edit_cost_reverses": 41,
+    "gold_loses_to_winner_on_raw_lm_too": 99,
+    "separate_apostrophe_score_path": 1
+  },
+  "noise_feature_interventions": {
+    "delete": {
+      "same_top_two_typo_pairs": 538,
+      "lost_fix_same_top_two_correct_candidate_eligible": 53,
+      "recovered_restoring_candidate_raw": 28,
+      "recovered_restoring_literal_advantage": 5,
+      "recovered_restoring_runner_margins": 30,
+      "recovered_restoring_all_lm_features": 53,
+      "same_casefolded_top_two_but_changed_surface_features": 1,
+      "medians": {
+        "retained_candidate_raw_delta": -1.5787038803100586,
+        "lost_candidate_raw_delta": -5.9434104561805725,
+        "lost_penalized_margin_delta": -3.668553113937378
+      }
+    },
+    "substitute": {
+      "same_top_two_typo_pairs": 523,
+      "lost_fix_same_top_two_correct_candidate_eligible": 69,
+      "recovered_restoring_candidate_raw": 39,
+      "recovered_restoring_literal_advantage": 2,
+      "recovered_restoring_runner_margins": 40,
+      "recovered_restoring_all_lm_features": 69,
+      "same_casefolded_top_two_but_changed_surface_features": 1,
+      "medians": {
+        "retained_candidate_raw_delta": -1.557638168334961,
+        "lost_candidate_raw_delta": -5.40969181060791,
+        "lost_penalized_margin_delta": -2.964718818664551
+      }
+    },
+    "duplicate": {
+      "same_top_two_typo_pairs": 558,
+      "lost_fix_same_top_two_correct_candidate_eligible": 71,
+      "recovered_restoring_candidate_raw": 48,
+      "recovered_restoring_literal_advantage": 3,
+      "recovered_restoring_runner_margins": 45,
+      "recovered_restoring_all_lm_features": 71,
+      "same_casefolded_top_two_but_changed_surface_features": 2,
+      "medians": {
+        "retained_candidate_raw_delta": -1.51884126663208,
+        "lost_candidate_raw_delta": -5.45504903793335,
+        "lost_penalized_margin_delta": -3.0512027740478516
+      }
+    },
+    "transpose": {
+      "same_top_two_typo_pairs": 541,
+      "lost_fix_same_top_two_correct_candidate_eligible": 76,
+      "recovered_restoring_candidate_raw": 38,
+      "recovered_restoring_literal_advantage": 4,
+      "recovered_restoring_runner_margins": 47,
+      "recovered_restoring_all_lm_features": 76,
+      "same_casefolded_top_two_but_changed_surface_features": 2,
+      "medians": {
+        "retained_candidate_raw_delta": -1.6292827129364014,
+        "lost_candidate_raw_delta": -5.7036683559417725,
+        "lost_penalized_margin_delta": -3.2521886825561523
+      }
+    }
+  },
+  "tokenization": {
+    "delete": {
+      "typo_pairs": 1118,
+      "byte_fallback_increases": 547,
+      "context_token_count_increases": 547,
+      "crosses_32_token_limit": 0,
+      "lost_fixes": 180,
+      "lost_fixes_with_increased_byte_fallback": 114,
+      "lost_fixes_without_any_32_token_truncation": 180
+    },
+    "substitute": {
+      "typo_pairs": 1118,
+      "byte_fallback_increases": 910,
+      "context_token_count_increases": 910,
+      "crosses_32_token_limit": 0,
+      "lost_fixes": 217,
+      "lost_fixes_with_increased_byte_fallback": 198,
+      "lost_fixes_without_any_32_token_truncation": 217
+    },
+    "duplicate": {
+      "typo_pairs": 1118,
+      "byte_fallback_increases": 1089,
+      "context_token_count_increases": 1089,
+      "crosses_32_token_limit": 1,
+      "lost_fixes": 204,
+      "lost_fixes_with_increased_byte_fallback": 197,
+      "lost_fixes_without_any_32_token_truncation": 204
+    },
+    "transpose": {
+      "typo_pairs": 1118,
+      "byte_fallback_increases": 972,
+      "context_token_count_increases": 972,
+      "crosses_32_token_limit": 0,
+      "lost_fixes": 216,
+      "lost_fixes_with_increased_byte_fallback": 210,
+      "lost_fixes_without_any_32_token_truncation": 216
+    }
+  },
+  "noise_feature_examples": [
+    {
+      "id": "aalto:002dce10880ebfdd616440849bdaa11b02247bcc8466b628694e75d28542b49f:substitute",
+      "left": "england star Paul Gascoigne was onv ",
+      "operation": "substitute",
+      "original_left": "england star Paul Gascoigne was one ",
+      "panel": "mobile_observed",
+      "source_id": "aalto:002dce10880ebfdd616440849bdaa11b02247bcc8466b628694e75d28542b49f",
+      "target": "of",
+      "typed": "kf",
+      "candidate": "of",
+      "clean_raw": -0.10018539428710938,
+      "noisy_raw": -10.65141487121582,
+      "clean_pen_margin": 8.68640011548996,
+      "noisy_pen_margin": 3.304952621459961,
+      "clean_gate_logit": 3.9503219294842613,
+      "noisy_gate_logit": 0.9373123939411244,
+      "clean_context_tokens": 20,
+      "noisy_context_tokens": 22
+    },
+    {
+      "id": "aalto:0039fd7c19123240dbd487f9af13368d9f6249d329b78901ae7acd71ec31b774:substitute",
+      "left": "your begt ",
+      "operation": "substitute",
+      "original_left": "your best ",
+      "panel": "mobile_observed",
+      "source_id": "aalto:0039fd7c19123240dbd487f9af13368d9f6249d329b78901ae7acd71ec31b774",
+      "target": "bet",
+      "typed": "bey",
+      "candidate": "bet",
+      "clean_raw": -5.06540060043335,
+      "noisy_raw": -12.419585227966309,
+      "clean_pen_margin": 4.127499580383301,
+      "noisy_pen_margin": 1.16278076171875,
+      "clean_gate_logit": 2.487570639128382,
+      "noisy_gate_logit": -1.9450953261920771,
+      "clean_context_tokens": 2,
+      "noisy_context_tokens": 5
+    },
+    {
+      "id": "aalto:004617ebcc21fc29158f189c088f0edd98c1f678ac7473529f48a547fc708023:substitute",
+      "left": "Appointing Jeff as CFO is one importanb ",
+      "operation": "substitute",
+      "original_left": "Appointing Jeff as CFO is one important ",
+      "panel": "mobile_observed",
+      "source_id": "aalto:004617ebcc21fc29158f189c088f0edd98c1f678ac7473529f48a547fc708023",
+      "target": "step",
+      "typed": "steo",
+      "candidate": "step",
+      "clean_raw": -3.4273035526275635,
+      "noisy_raw": -14.965715408325195,
+      "clean_pen_margin": 8.404965877532959,
+      "noisy_pen_margin": 1.14227294921875,
+      "clean_gate_logit": 6.010495102039393,
+      "noisy_gate_logit": 0.8401645736555179,
+      "clean_context_tokens": 16,
+      "noisy_context_tokens": 24
+    },
+    {
+      "id": "aalto:004a77ef5ad87296ce9ac0b980171b2933e9b2e0e53cf81c6d5b62ae115c72dd:substitute",
+      "left": "until he can practice for a qouple ",
+      "operation": "substitute",
+      "original_left": "until he can practice for a couple ",
+      "panel": "mobile_observed",
+      "source_id": "aalto:004a77ef5ad87296ce9ac0b980171b2933e9b2e0e53cf81c6d5b62ae115c72dd",
+      "target": "of",
+      "typed": "if",
+      "candidate": "of",
+      "clean_raw": -0.36937999725341797,
+      "noisy_raw": -7.1828742027282715,
+      "clean_pen_margin": 6.286808669567108,
+      "noisy_pen_margin": 0.6501407623291016,
+      "clean_gate_logit": 3.1508972558367043,
+      "noisy_gate_logit": -2.9284460285588247,
+      "clean_context_tokens": 7,
+      "noisy_context_tokens": 12
+    },
+    {
+      "id": "aalto:009f1c65f17d2d99c3dc3859e6059fbbacb3bf9a47b8840b3516fb2a3778690c:substitute",
+      "left": "He is expected to play when the Browys ",
+      "operation": "substitute",
+      "original_left": "He is expected to play when the Browns ",
+      "panel": "mobile_observed",
+      "source_id": "aalto:009f1c65f17d2d99c3dc3859e6059fbbacb3bf9a47b8840b3516fb2a3778690c",
+      "target": "return",
+      "typed": "retien",
+      "candidate": "return",
+      "clean_raw": -8.835609436035156,
+      "noisy_raw": -11.21861457824707,
+      "clean_pen_margin": 3.8886871337890625,
+      "noisy_pen_margin": 1.813528060913086,
+      "clean_gate_logit": 2.457161174073077,
+      "noisy_gate_logit": 0.6791109068584653,
+      "clean_context_tokens": 8,
+      "noisy_context_tokens": 13
+    },
+    {
+      "id": "aalto:00d2c35bb6a7285bf96ce7a75c27fe611a4187a1f1ed10b4c356d51e0ef27487:substitute",
+      "left": "I hope you are seeling ",
+      "operation": "substitute",
+      "original_left": "I hope you are feeling ",
+      "panel": "mobile_observed",
+      "source_id": "aalto:00d2c35bb6a7285bf96ce7a75c27fe611a4187a1f1ed10b4c356d51e0ef27487",
+      "target": "better",
+      "typed": "bett",
+      "candidate": "better",
+      "clean_raw": -4.168868541717529,
+      "noisy_raw": -8.976201057434082,
+      "clean_pen_margin": 7.841115474700928,
+      "noisy_pen_margin": 2.5212526321411133,
+      "clean_gate_logit": 3.185479891142125,
+      "noisy_gate_logit": 0.7449597694195662,
+      "clean_context_tokens": 5,
+      "noisy_context_tokens": 11
+    }
+  ],
+  "tokenization_encoding_ablation": {
+    "cases": 933,
+    "native_context_encoding_parity_mismatches": 0,
+    "median_target_logp_change_clean_word_forced_to_bytes": -4.28765869140625,
+    "median_target_logp_change_actual_substitution": -3.99375057220459,
+    "clean_word_forced_to_bytes_target_drop_above2": 654,
+    "actual_substitution_target_drop_above2": 649,
+    "median_byte_token_probability_mass": {
+      "original": 0.06541867364107659,
+      "substitution": 0.8627763754584777,
+      "forced_clean_bytes": 0.8953359784986379
+    },
+    "median_target_logp_change_substitution_conditional_on_nonbyte": -2.090593073959785,
+    "requests_sha256": "240f0bf4799232a120b9c672d61ebf7d4de47c6f9601efb7c2025413860a4d61",
+    "outputs_sha256": "4e7b3316d8566782e4869f529575b6ea7ee0de685e3f3b1eaf7f6c1b733f6430"
+  },
+  "limitations": [
+    "Oracle clean-feature swaps are diagnostic and may be off the model input distribution; not deployable gains.",
+    "Restoration counts overlap and are not additive or unique causal attributions.",
+    "Tokenization effects are measured associations; a different tokenizer was not trained or evaluated.",
+    "Forced byte encoding is an artificial representation intervention with unchanged text; its scores do not establish correction gains.",
+    "Raw ranking comparison is pairwise against the current winner, not a complete reranking experiment.",
+    "Exposed frozen development data and synthetic stresses do not estimate production error prevalence."
+  ]
+}

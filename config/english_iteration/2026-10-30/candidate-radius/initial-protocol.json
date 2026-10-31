@@ -1,0 +1,35 @@
+{
+  "profiles": [
+    "parent",
+    "short",
+    "medium",
+    "long",
+    "combined"
+  ],
+  "expansion": {
+    "short": "length3 radius2",
+    "medium": "length4-5 radius3",
+    "long": "length6-12 radius4",
+    "combined": "length3-12 existing radius plus1"
+  },
+  "unchanged": [
+    "LM",
+    "acceptance",
+    "edit costs",
+    "vocabulary",
+    "mixed-language ranker"
+  ],
+  "selection": "Mean snapshot-selection F0.5 and recorded closed-loop selection F0.5; parent eligible; ties parent then narrower length scope",
+  "hashes": {
+    "script": "e2d3724246796b0e8c6aa457ab4290f4499e50e0b549f89905d8a7f4b7078512",
+    "native_source": "5ac9e3ca71637c465497a72c5f421b7a3384daeb9625cf5c8933cde785ff2821",
+    "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+    "policy": "107494939b0e175f30618f0a19d522c56dc973d7c099a0cd34f68039b97f3d5c",
+    "baseline_probe": "5539bfad28339b51d607101e555d6c067d7711764e3149a75341098009cca848",
+    "source_replay": "cb32cf4a6ce4aa9c7c5c07933114d45b57769fbaa936578c1cc162353244bbcd",
+    "snapshot_selection": "80b71f09d3b7f1eb286fff83e3a355b1dcb750a3c96eace94ee8dd2185733193",
+    "recorded_selection": "eb5278484ca3dee71eca599b3fd9e3ec750e55cb003f8ee86987ef122b272de2"
+  },
+  "frozen_labels_used_for_selection": false,
+  "production_changed": false
+}

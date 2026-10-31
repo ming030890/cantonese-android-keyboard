@@ -1,0 +1,45 @@
+{
+  "schema": "autocorrect-confirmation-v1",
+  "script_sha256": "4d8e4cd1ff8e3de8e1e2cd8399be895acf8a8d2cea5a95d329d27c1409b5408c",
+  "choice": "candidate-w0.25",
+  "radius": "candidate",
+  "weight": 0.25,
+  "selection": "Highest supplemental-dev Pareto-eligible profile that passes unchanged legacy objective; all fitted gate variants rejected",
+  "development_report_sha256": "f117d406b831ad83a722e774700a6e2599e000e72eff5d4e9196f24fc7aa3b81",
+  "rejected_study_hashes": {
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/bilingual-acceptance-20261030/column-study/development-report.json": "05f52a912760ed230607162ef2858354dd69172b1748f8b3fcddf6ca802e746a",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/bilingual-acceptance-20261030/calibrated-study/development-report.json": "c31e4d418559e1661d8e24a0c1c3c226ef901cf32ba996e60a423179a340d4f0",
+    "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/bilingual-acceptance-20261030/full-study/development-report.json": "fbbac6074435b3ca2abd2471d0255ec2ad8aca04607d8c8f2889d2e729d3fc38"
+  },
+  "legacy_gate": {
+    "score": 0.878942920387507,
+    "objective": {
+      "schema": "autocorrect-objective-v1",
+      "metric": "equal_weight_mean_f05",
+      "weights": {
+        "historical_full_mobile": 0.3333333333333333,
+        "real_touch_observed": 0.3333333333333333,
+        "authored_hard": 0.3333333333333333
+      },
+      "direction": "maximize",
+      "clean_controls": 46,
+      "hard_errors": 46,
+      "clean_selection": "Seeded domain round robin without model predictions",
+      "status": "Exposed development objective for hill climbing; not population accuracy or independent confirmation"
+    },
+    "components": {
+      "historical_full_mobile": 0.8743261455525606,
+      "real_touch_observed": 0.8983050847457628,
+      "authored_hard": 0.8641975308641975
+    },
+    "manifest_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+    "detailed_report_sha256": "96184b54d6542386a7e3e28623611f48e39dfad115e6636acd131fafb89a53e2",
+    "baseline_score": 0.8736146656392934,
+    "delta": 0.005328254748213634
+  },
+  "probe_sha256": "fcb754cdf76d3f69016635878cafa5bd15751a6a4b74498cee3229f72799afe3",
+  "baseline_probe_sha256": "5539bfad28339b51d607101e555d6c067d7711764e3149a75341098009cca848",
+  "suite_protocol_sha256": "73b7aa775d204f5377e0ba35e9c9fa23b83a259091c51ea811e205d6c200eba2",
+  "decision": "Every confirmation panel must retain baseline TP, FP and clean-damage budgets, with at least one additional correct fix; report uncertainty separately",
+  "confirmation_previously_scored": false
+}

@@ -1,0 +1,10 @@
+{
+  "../QwenASR/crates/cantonese-ngram/src/english_channel.rs": "bc5cc17a037bc92d32513ddb87d9e351d3eeb07c93c57ef28de23234facfa593",
+  "../QwenASR/crates/cantonese-ngram/src/cnn.rs": "89a3dcb1e6cf52106673f8f29ff81826475984a3f09f5d1f14aff97b69dd8ad9",
+  "../QwenASR/crates/cantonese-ngram/src/lib.rs": "155934a0a904d4f1bf8879ff00329581e443f0b711b422a1791767aa52baa073",
+  "../QwenASR/crates/cantonese-ngram/src/english_channel_data/policy.json": "ef10933720d06d75ebe6076742cf25004705896436fda1752aaf2bca454938dd",
+  "../QwenASR/crates/cantonese-ngram/src/english_channel_data/metadata.json": "550a3ecc70f0cf3ad3c3703375c10166bde91f9368bbef563029b69dde15ad4b",
+  "../QwenASR/crates/cantonese-ngram/src/english_channel_data/channel.json": "8cf8056a762d8617f97c6b7eba193b851bd5f0890e7683b454fe0f9097a55689",
+  "../QwenASR/crates/cantonese-ngram/src/english_channel_data/lexicon.tsv": "465762ffdb780b169ab021c3e2a2d5b453dae6dafc2befa49d1f4378a70bc6f0",
+  "../QwenASR/crates/cantonese-ngram/src/english_channel_data/priors.tsv": "bdf3942f4dc5ee380f7ef43f3a7ac1cca877142e104f392bd09297fc0e793a2c"
+}

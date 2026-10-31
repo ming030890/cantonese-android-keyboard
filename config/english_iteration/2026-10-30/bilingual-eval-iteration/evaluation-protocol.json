@@ -1,0 +1,568 @@
+{
+  "schema": "independent-autocorrect-supplement-v1",
+  "seed": "independent-autocorrect-eval-20261030-v1",
+  "builder_sha256": "29eea25728722b79eb3abc28d5e6207189cc1e39e23aa1f36703793932eb46a3",
+  "inference_started": false,
+  "parameters_selected": false,
+  "github": {
+    "commits": 203270,
+    "edits": 353055,
+    "eligible": 11291
+  },
+  "mixed": {
+    "selection_documents": 1957,
+    "non_original_written_source_excluded": 600,
+    "eligible_documents": 1217
+  },
+  "source_hashes": {
+    "github": "98219d275a49ad28fca832891876c255581b890d893b6d9c974ceb454ba2909d",
+    "recorded_channel": "a8d9096487700ae707929a788aabaa91ff48fa0e97131e5aed3d7bf9bb009398",
+    "vocabulary_model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322"
+  },
+  "split_hashes": {
+    "development": "37a68337c9015367137968f2ac1e46cdfc87e4c01d77b5d1ef9d0eec4d5980dd",
+    "confirmation": "9742bff7986976c9a677b1e70a8d5b2f40de04198956d713dad1e984c1f6b1c1"
+  },
+  "counts": {
+    "development": {
+      "github_real_typo": 512,
+      "github_corrected_control": 512,
+      "mixed_preservation": 128,
+      "mixed_synthetic_typo": 280
+    },
+    "confirmation": {
+      "github_real_typo": 512,
+      "github_corrected_control": 512,
+      "mixed_preservation": 128,
+      "mixed_synthetic_typo": 241
+    }
+  },
+  "channel_patterns": [
+    {
+      "operation": "delete",
+      "original": "a",
+      "typed": "",
+      "count": 1
+    },
+    {
+      "operation": "delete",
+      "original": "d",
+      "typed": "",
+      "count": 1
+    },
+    {
+      "operation": "delete",
+      "original": "e",
+      "typed": "",
+      "count": 1
+    },
+    {
+      "operation": "delete",
+      "original": "i",
+      "typed": "",
+      "count": 1
+    },
+    {
+      "operation": "delete",
+      "original": "n",
+      "typed": "",
+      "count": 2
+    },
+    {
+      "operation": "delete",
+      "original": "q",
+      "typed": "",
+      "count": 1
+    },
+    {
+      "operation": "delete",
+      "original": "r",
+      "typed": "",
+      "count": 4
+    },
+    {
+      "operation": "delete",
+      "original": "s",
+      "typed": "",
+      "count": 4
+    },
+    {
+      "operation": "delete",
+      "original": "t",
+      "typed": "",
+      "count": 2
+    },
+    {
+      "operation": "delete",
+      "original": "u",
+      "typed": "",
+      "count": 3
+    },
+    {
+      "operation": "delete",
+      "original": "x",
+      "typed": "",
+      "count": 1
+    },
+    {
+      "operation": "insert",
+      "original": "",
+      "typed": "a",
+      "count": 2
+    },
+    {
+      "operation": "insert",
+      "original": "",
+      "typed": "d",
+      "count": 1
+    },
+    {
+      "operation": "insert",
+      "original": "",
+      "typed": "f",
+      "count": 1
+    },
+    {
+      "operation": "insert",
+      "original": "",
+      "typed": "m",
+      "count": 1
+    },
+    {
+      "operation": "insert",
+      "original": "",
+      "typed": "s",
+      "count": 1
+    },
+    {
+      "operation": "insert",
+      "original": "",
+      "typed": "t",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "a",
+      "typed": "q",
+      "count": 18
+    },
+    {
+      "operation": "substitute",
+      "original": "a",
+      "typed": "s",
+      "count": 9
+    },
+    {
+      "operation": "substitute",
+      "original": "b",
+      "typed": "v",
+      "count": 4
+    },
+    {
+      "operation": "substitute",
+      "original": "c",
+      "typed": "f",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "c",
+      "typed": "v",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "c",
+      "typed": "x",
+      "count": 13
+    },
+    {
+      "operation": "substitute",
+      "original": "d",
+      "typed": "f",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "d",
+      "typed": "r",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "d",
+      "typed": "s",
+      "count": 15
+    },
+    {
+      "operation": "substitute",
+      "original": "d",
+      "typed": "x",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "e",
+      "typed": "d",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "e",
+      "typed": "r",
+      "count": 15
+    },
+    {
+      "operation": "substitute",
+      "original": "e",
+      "typed": "s",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "e",
+      "typed": "t",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "e",
+      "typed": "w",
+      "count": 40
+    },
+    {
+      "operation": "substitute",
+      "original": "f",
+      "typed": "d",
+      "count": 5
+    },
+    {
+      "operation": "substitute",
+      "original": "f",
+      "typed": "r",
+      "count": 3
+    },
+    {
+      "operation": "substitute",
+      "original": "g",
+      "typed": "d",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "g",
+      "typed": "f",
+      "count": 10
+    },
+    {
+      "operation": "substitute",
+      "original": "h",
+      "typed": "b",
+      "count": 3
+    },
+    {
+      "operation": "substitute",
+      "original": "h",
+      "typed": "g",
+      "count": 17
+    },
+    {
+      "operation": "substitute",
+      "original": "h",
+      "typed": "j",
+      "count": 4
+    },
+    {
+      "operation": "substitute",
+      "original": "h",
+      "typed": "y",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "i",
+      "typed": "e",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "i",
+      "typed": "j",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "i",
+      "typed": "o",
+      "count": 11
+    },
+    {
+      "operation": "substitute",
+      "original": "i",
+      "typed": "u",
+      "count": 11
+    },
+    {
+      "operation": "substitute",
+      "original": "k",
+      "typed": "j",
+      "count": 3
+    },
+    {
+      "operation": "substitute",
+      "original": "k",
+      "typed": "l",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "l",
+      "typed": "k",
+      "count": 6
+    },
+    {
+      "operation": "substitute",
+      "original": "l",
+      "typed": "p",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "l",
+      "typed": "s",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "m",
+      "typed": "k",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "m",
+      "typed": "n",
+      "count": 4
+    },
+    {
+      "operation": "substitute",
+      "original": "n",
+      "typed": "b",
+      "count": 8
+    },
+    {
+      "operation": "substitute",
+      "original": "n",
+      "typed": "h",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "n",
+      "typed": "j",
+      "count": 9
+    },
+    {
+      "operation": "substitute",
+      "original": "n",
+      "typed": "m",
+      "count": 8
+    },
+    {
+      "operation": "substitute",
+      "original": "o",
+      "typed": "i",
+      "count": 38
+    },
+    {
+      "operation": "substitute",
+      "original": "o",
+      "typed": "k",
+      "count": 10
+    },
+    {
+      "operation": "substitute",
+      "original": "o",
+      "typed": "p",
+      "count": 7
+    },
+    {
+      "operation": "substitute",
+      "original": "p",
+      "typed": "o",
+      "count": 12
+    },
+    {
+      "operation": "substitute",
+      "original": "r",
+      "typed": "e",
+      "count": 16
+    },
+    {
+      "operation": "substitute",
+      "original": "r",
+      "typed": "t",
+      "count": 6
+    },
+    {
+      "operation": "substitute",
+      "original": "s",
+      "typed": "a",
+      "count": 36
+    },
+    {
+      "operation": "substitute",
+      "original": "s",
+      "typed": "d",
+      "count": 17
+    },
+    {
+      "operation": "substitute",
+      "original": "s",
+      "typed": "w",
+      "count": 3
+    },
+    {
+      "operation": "substitute",
+      "original": "s",
+      "typed": "z",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "t",
+      "typed": "g",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "t",
+      "typed": "l",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "t",
+      "typed": "r",
+      "count": 20
+    },
+    {
+      "operation": "substitute",
+      "original": "t",
+      "typed": "y",
+      "count": 10
+    },
+    {
+      "operation": "substitute",
+      "original": "u",
+      "typed": "h",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "u",
+      "typed": "i",
+      "count": 4
+    },
+    {
+      "operation": "substitute",
+      "original": "u",
+      "typed": "j",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "u",
+      "typed": "t",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "u",
+      "typed": "y",
+      "count": 7
+    },
+    {
+      "operation": "substitute",
+      "original": "v",
+      "typed": "c",
+      "count": 5
+    },
+    {
+      "operation": "substitute",
+      "original": "w",
+      "typed": "a",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "w",
+      "typed": "e",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "w",
+      "typed": "q",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "x",
+      "typed": "z",
+      "count": 1
+    },
+    {
+      "operation": "substitute",
+      "original": "y",
+      "typed": "t",
+      "count": 3
+    },
+    {
+      "operation": "substitute",
+      "original": "y",
+      "typed": "u",
+      "count": 2
+    },
+    {
+      "operation": "substitute",
+      "original": "z",
+      "typed": "x",
+      "count": 2
+    },
+    {
+      "operation": "transpose",
+      "original": "ag",
+      "typed": "ga",
+      "count": 1
+    },
+    {
+      "operation": "transpose",
+      "original": "da",
+      "typed": "ad",
+      "count": 1
+    },
+    {
+      "operation": "transpose",
+      "original": "do",
+      "typed": "od",
+      "count": 1
+    },
+    {
+      "operation": "transpose",
+      "original": "hi",
+      "typed": "ih",
+      "count": 1
+    }
+  ],
+  "isolation": "Repository or original mixed-document group, paragraph hash and exact inference input disjoint between folds",
+  "confirmation_policy": "Do not score confirmation until a single development-selected candidate is frozen; report once and mark exposed",
+  "limitations": [
+    "Repository edits have inferred typo labels and documentation domain; not real phone/chat traffic.",
+    "GitHub controls are corrected-source counterparts, not sampled natural clean-word prevalence.",
+    "Mixed errors are synthetic, drawn from recorded fit-fold edit patterns; original contexts are LM selection text.",
+    "Mixed preservation asserts retention of recorded source spans, not independently reviewed spelling correctness.",
+    "Current mixed direct training-FP overlap excluded; inherited LM exposure remains unproven.",
+    "No claims of population weighting, conversational phone replay or true bilingual-chat qualification."
+  ]
+}

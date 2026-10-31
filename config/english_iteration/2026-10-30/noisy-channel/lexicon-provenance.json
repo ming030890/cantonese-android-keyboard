@@ -1,0 +1,11 @@
+{
+  "schema": "full-lexicon-noisy-channel-v1",
+  "lexicon_words": 169575,
+  "uk_base_words_added": 49254,
+  "source_counts_sha256": "346323cd605464785e631af886877ef9d1bd12bc8d583dfb55253a44f291fab6",
+  "source_dictionary_sha256": "dafe4d2f9536529576c50b024e16b3c928ede8f2565714a6b9dddd6c75c45502",
+  "imputed_priors": "UK roots absent from old table use empty-context shared-LM word probability as pseudocount, floor1; existing TRAIN counts remain unchanged",
+  "source_sha256": "b292de43cf877e7df1b8bccf6e97d2799fe6dcaeb10b537a245f51af94e877f0",
+  "channel_sha256": "4977171ed0b2bb147a0ece4b0b31ea6b503facecc4c38599c1d1387bb97127e7",
+  "confirmation_used": false
+}

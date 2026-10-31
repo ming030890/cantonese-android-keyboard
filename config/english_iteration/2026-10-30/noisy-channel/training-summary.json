@@ -1,0 +1,13 @@
+{
+  "fit_words": 8193,
+  "fit_operations": {
+    "substitution": 2123.0,
+    "deletion": 1297.0,
+    "insertion": 533.0,
+    "transposition": 493.0
+  },
+  "train_cases_sha256": "39170e8905b724b5ac4c29ddb5f564c120568fb2f9b925fe0f6b4c2308b2e83f",
+  "source_cases_sha256": "bc099432bf797610384b99f0a866687f67fb6ab9a2bf0eb42be2ce0369e93ccd",
+  "excluded_eval_inputs": 1,
+  "eval_examples_used": false
+}

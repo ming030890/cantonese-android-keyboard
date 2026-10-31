@@ -1,0 +1,29 @@
+{
+  "source_case": {
+    "left": "It was, a couple ",
+    "typed": "sccissor",
+    "acceptance_diagnostic": true
+  },
+  "alternatives": [
+    {
+      "word": "scissor",
+      "TRAIN_unigram_or_pseudocount": 1.0,
+      "neural_word_ids": [],
+      "letter_cost": 7.44292212,
+      "context_gain": 0.0,
+      "combined_score": -7.44292212
+    },
+    {
+      "word": "successor",
+      "TRAIN_unigram_or_pseudocount": 43.0,
+      "neural_word_ids": [
+        29437
+      ],
+      "letter_cost": 10.0660572,
+      "context_gain": 2.0864118337631226,
+      "combined_score": -4.218445250543315
+    }
+  ],
+  "classifier_score": 0.9078176420463658,
+  "note": "Post-confirmation failure analysis only; not used to refit or select a new model"
+}

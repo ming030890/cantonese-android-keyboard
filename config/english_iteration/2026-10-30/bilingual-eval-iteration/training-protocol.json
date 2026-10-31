@@ -1,0 +1,16 @@
+{
+  "script_sha256": "19d4ce379018f78cc9bd45654baa0f81fb65724b931d26196377b887d5a52eed",
+  "cases_sha256": "3bb12637da1d57fa5761ac6c382ba2681bed90bdb009a64a61f42767ae67d963",
+  "eval_protocol_sha256": "73b7aa775d204f5377e0ba35e9c9fa23b83a259091c51ea811e205d6c200eba2",
+  "documents": 768,
+  "rows": {
+    "mixed_clean": 768,
+    "mixed_typo": 1481,
+    "legacy_anchor": 3110
+  },
+  "exact_eval_input_overlap": 0,
+  "mixed_eval_group_overlap": 0,
+  "sampling": "Fixed hash sample of admitted current-LM TRAIN document fingerprints; one word per source group; legacy TRAIN-only source strata",
+  "holdouts": "All new development/confirmation inputs and groups excluded mechanically; no confirmation outputs read; tue/ir excluded from new mixed targets and inputs",
+  "limitations": "New mixed typos are synthetic; legacy anchor is historically exposed; no new participant/chat data"
+}

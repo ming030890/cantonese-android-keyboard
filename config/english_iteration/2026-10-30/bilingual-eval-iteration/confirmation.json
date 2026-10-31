@@ -1,0 +1,299 @@
+{
+  "protocol": {
+    "schema": "autocorrect-confirmation-v1",
+    "script_sha256": "4d8e4cd1ff8e3de8e1e2cd8399be895acf8a8d2cea5a95d329d27c1409b5408c",
+    "choice": "candidate-w0.25",
+    "radius": "candidate",
+    "weight": 0.25,
+    "selection": "Highest supplemental-dev Pareto-eligible profile that passes unchanged legacy objective; all fitted gate variants rejected",
+    "development_report_sha256": "f117d406b831ad83a722e774700a6e2599e000e72eff5d4e9196f24fc7aa3b81",
+    "rejected_study_hashes": {
+      "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/bilingual-acceptance-20261030/column-study/development-report.json": "05f52a912760ed230607162ef2858354dd69172b1748f8b3fcddf6ca802e746a",
+      "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/bilingual-acceptance-20261030/calibrated-study/development-report.json": "c31e4d418559e1661d8e24a0c1c3c226ef901cf32ba996e60a423179a340d4f0",
+      "/Users/tony/Documents/keyboard/cantonese-voice-keyboard/build/bilingual-acceptance-20261030/full-study/development-report.json": "fbbac6074435b3ca2abd2471d0255ec2ad8aca04607d8c8f2889d2e729d3fc38"
+    },
+    "legacy_gate": {
+      "score": 0.878942920387507,
+      "objective": {
+        "schema": "autocorrect-objective-v1",
+        "metric": "equal_weight_mean_f05",
+        "weights": {
+          "historical_full_mobile": 0.3333333333333333,
+          "real_touch_observed": 0.3333333333333333,
+          "authored_hard": 0.3333333333333333
+        },
+        "direction": "maximize",
+        "clean_controls": 46,
+        "hard_errors": 46,
+        "clean_selection": "Seeded domain round robin without model predictions",
+        "status": "Exposed development objective for hill climbing; not population accuracy or independent confirmation"
+      },
+      "components": {
+        "historical_full_mobile": 0.8743261455525606,
+        "real_touch_observed": 0.8983050847457628,
+        "authored_hard": 0.8641975308641975
+      },
+      "manifest_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+      "detailed_report_sha256": "96184b54d6542386a7e3e28623611f48e39dfad115e6636acd131fafb89a53e2",
+      "baseline_score": 0.8736146656392934,
+      "delta": 0.005328254748213634
+    },
+    "probe_sha256": "fcb754cdf76d3f69016635878cafa5bd15751a6a4b74498cee3229f72799afe3",
+    "baseline_probe_sha256": "5539bfad28339b51d607101e555d6c067d7711764e3149a75341098009cca848",
+    "suite_protocol_sha256": "73b7aa775d204f5377e0ba35e9c9fa23b83a259091c51ea811e205d6c200eba2",
+    "decision": "Every confirmation panel must retain baseline TP, FP and clean-damage budgets, with at least one additional correct fix; report uncertainty separately",
+    "confirmation_previously_scored": false
+  },
+  "baseline": {
+    "github_corrected_control": {
+      "cases": 512,
+      "clean": 512,
+      "tp": 0,
+      "fp": 0,
+      "clean_changes": 0,
+      "fn": 0,
+      "unlabelled": 0,
+      "typos": 0,
+      "target_in_top8": 0,
+      "target_top1": 0,
+      "miss_absent_from_top8": 0,
+      "miss_ranking_or_acceptance": 0,
+      "f05": 0.0,
+      "precision": null,
+      "recall": null,
+      "clean_changes_per_1000": 0.0
+    },
+    "github_real_typo": {
+      "cases": 512,
+      "typos": 512,
+      "tp": 444,
+      "fp": 18,
+      "clean_changes": 0,
+      "target_in_top8": 498,
+      "target_top1": 462,
+      "miss_ranking_or_acceptance": 54,
+      "miss_absent_from_top8": 14,
+      "fn": 68,
+      "unlabelled": 0,
+      "clean": 0,
+      "f05": 0.940677966101695,
+      "precision": 0.961038961038961,
+      "recall": 0.8671875,
+      "clean_changes_per_1000": null
+    },
+    "mixed_preservation": {
+      "cases": 128,
+      "clean": 128,
+      "tp": 0,
+      "fp": 5,
+      "clean_changes": 5,
+      "fn": 0,
+      "unlabelled": 0,
+      "typos": 0,
+      "target_in_top8": 0,
+      "target_top1": 0,
+      "miss_absent_from_top8": 0,
+      "miss_ranking_or_acceptance": 0,
+      "f05": 0.0,
+      "precision": 0.0,
+      "recall": null,
+      "clean_changes_per_1000": 39.0625
+    },
+    "mixed_synthetic_typo": {
+      "cases": 241,
+      "typos": 241,
+      "tp": 133,
+      "fp": 3,
+      "clean_changes": 0,
+      "target_in_top8": 225,
+      "target_top1": 174,
+      "miss_ranking_or_acceptance": 92,
+      "miss_absent_from_top8": 16,
+      "fn": 108,
+      "unlabelled": 0,
+      "clean": 0,
+      "f05": 0.8471337579617835,
+      "precision": 0.9779411764705882,
+      "recall": 0.5518672199170125,
+      "clean_changes_per_1000": null
+    }
+  },
+  "candidate": {
+    "github_corrected_control": {
+      "cases": 512,
+      "clean": 512,
+      "tp": 0,
+      "fp": 0,
+      "clean_changes": 0,
+      "fn": 0,
+      "unlabelled": 0,
+      "typos": 0,
+      "target_in_top8": 0,
+      "target_top1": 0,
+      "miss_absent_from_top8": 0,
+      "miss_ranking_or_acceptance": 0,
+      "f05": 0.0,
+      "precision": null,
+      "recall": null,
+      "clean_changes_per_1000": 0.0
+    },
+    "github_real_typo": {
+      "cases": 512,
+      "typos": 512,
+      "tp": 445,
+      "fp": 17,
+      "clean_changes": 0,
+      "target_in_top8": 498,
+      "target_top1": 462,
+      "miss_ranking_or_acceptance": 53,
+      "miss_absent_from_top8": 14,
+      "fn": 67,
+      "unlabelled": 0,
+      "clean": 0,
+      "f05": 0.9427966101694916,
+      "precision": 0.9632034632034632,
+      "recall": 0.869140625,
+      "clean_changes_per_1000": null
+    },
+    "mixed_preservation": {
+      "cases": 128,
+      "clean": 128,
+      "tp": 0,
+      "fp": 5,
+      "clean_changes": 5,
+      "fn": 0,
+      "unlabelled": 0,
+      "typos": 0,
+      "target_in_top8": 0,
+      "target_top1": 0,
+      "miss_absent_from_top8": 0,
+      "miss_ranking_or_acceptance": 0,
+      "f05": 0.0,
+      "precision": 0.0,
+      "recall": null,
+      "clean_changes_per_1000": 39.0625
+    },
+    "mixed_synthetic_typo": {
+      "cases": 241,
+      "typos": 241,
+      "tp": 135,
+      "fp": 3,
+      "clean_changes": 0,
+      "target_in_top8": 225,
+      "target_top1": 174,
+      "miss_ranking_or_acceptance": 90,
+      "miss_absent_from_top8": 16,
+      "fn": 106,
+      "unlabelled": 0,
+      "clean": 0,
+      "f05": 0.8511979823455234,
+      "precision": 0.9782608695652174,
+      "recall": 0.5601659751037344,
+      "clean_changes_per_1000": null
+    }
+  },
+  "uncertainty": {
+    "github_corrected_control": {
+      "groups": 430,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.0,
+        0.0
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "github_real_typo": {
+      "groups": 430,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.9250189031282302,
+        0.9592797096106981
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.006488267468173919
+      ]
+    },
+    "mixed_preservation": {
+      "groups": 128,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.0,
+        0.0
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "mixed_synthetic_typo": {
+      "groups": 82,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.7986052379341453,
+        0.8973123666428487
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.010599457443750664
+      ]
+    }
+  },
+  "guard_passed": true,
+  "additional_correct": 3,
+  "changed_cases": [
+    {
+      "id": "gtc:1b1354140070858c224da066e0b6c76ef5c9763826a854517ae08d1b4a9ababd",
+      "panel": "github_real_typo",
+      "typed": "Fixex",
+      "target": "Fixed",
+      "before": "Fixex",
+      "after": "fixed"
+    },
+    {
+      "id": "gtc:85af1e22752e16fb6b26a62e63ec8c5f9ecd5ef2e77b32632c81263e4db2c254",
+      "panel": "github_real_typo",
+      "typed": "rources",
+      "target": "resources",
+      "before": "sources",
+      "after": "rources"
+    },
+    {
+      "id": "mixed:2c13ca565f234ec5978b3aea7f53672933d052bf93d04466228214995a0c05d3:insert",
+      "panel": "mixed_synthetic_typo",
+      "typed": "Shtoes",
+      "target": "Shoes",
+      "before": "Shtoes",
+      "after": "shoes"
+    },
+    {
+      "id": "mixed:334a56204aa1d9a09a350c6522406eaa2520bb6ca9402bd66ad59dc2dfb90763:delete",
+      "panel": "mixed_synthetic_typo",
+      "typed": "ipd",
+      "target": "iPad",
+      "before": "ipd",
+      "after": "iPad"
+    }
+  ],
+  "now_exposed": true,
+  "limitation": "Source-disjoint supplemental confirmation, not spontaneous bilingual phone typing or an audit of all inherited LM exposure",
+  "passed_supplemental_counts_guard": true,
+  "final_adoption_qualified": false,
+  "scope_note": "Supplemental counts passed, but the later existing JNI ambiguity guard failed. Candidate rejected; see final-decision.json.",
+  "source_report_sha256": "37f7d2e327afd21fcdd467075f6d55a93b296df2ece99b4219c63e8e7d0bdc29"
+}

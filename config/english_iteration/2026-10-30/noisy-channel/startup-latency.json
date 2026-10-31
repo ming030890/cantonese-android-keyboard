@@ -1,0 +1,27 @@
+{
+  "scope": "Seven fresh processes, OS page cache warm, empty requests; includes process start and model parsing/trie initialization; excludes individual prediction. Mac mini M4, not Android.",
+  "samples_ms": {
+    "baseline": [
+      35.54820828139782,
+      33.87825004756451,
+      34.04837567359209,
+      34.06466729938984,
+      35.616083070635796,
+      34.14391726255417,
+      34.681166522204876
+    ],
+    "candidate": [
+      99.45416636765003,
+      106.31779208779335,
+      102.93012484908104,
+      107.00708348304033,
+      101.54912527650595,
+      108.408291824162,
+      103.12266740947962
+    ]
+  },
+  "median_ms": {
+    "baseline": 34.14391726255417,
+    "candidate": 103.12266740947962
+  }
+}

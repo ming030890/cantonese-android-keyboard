@@ -24,12 +24,12 @@
   "count_table_packaged": false,
   "experimental": true,
   "production_approved": false,
-  "selection": "One shared Cantonese/English/handwriting LM; English spelling candidates come from its existing vocabulary and are contextually ranked by the same LM",
+  "selection": "One shared Cantonese/English/handwriting LM; English spelling uses its vocabulary plus high-confidence learned typing-channel dictionary proposals",
   "qualification": "V2 improves contextual accuracy but fails English-prefix and mixed quantization retention guards",
   "native_verification": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/native-verification.json",
   "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/previous-assets",
   "english_policy": {
-    "candidate_source": "TRAIN-attested English model vocabulary",
+    "candidate_source": "TRAIN-attested LM vocabulary plus 169575 dictionary forms in the complementary English typing channel",
     "implementation": "../QwenASR/crates/cantonese-ngram/src/cnn.rs::english_suggestions",
     "parameter_source": "Native 22-24-1 FFN warm-started with authentic-context short-word supervision; literal-score input disabled; accepted parent threshold retained",
     "backspace_undo": true,
@@ -40,6 +40,27 @@
     "touch_evidence_used": false,
     "primary_metric": "f0.5",
     "known_word_policy": "Learned original-word versus replacement evidence",
-    "dictionary_provenance": "config/english_iteration/2026-10-24/gboard/dictionary-provenance.json"
+    "dictionary_provenance": "config/english_iteration/2026-10-24/gboard/dictionary-provenance.json",
+    "noisy_channel": {
+      "schema": "english-noisy-channel-v1",
+      "candidate_source": "169575 dictionary forms; TRAIN unigram counts and explicitly imputed UK-root priors",
+      "files": {
+        "channel.json": "8cf8056a762d8617f97c6b7eba193b851bd5f0890e7683b454fe0f9097a55689",
+        "lexicon.tsv": "465762ffdb780b169ab021c3e2a2d5b453dae6dafc2befa49d1f4378a70bc6f0",
+        "metadata.json": "550a3ecc70f0cf3ad3c3703375c10166bde91f9368bbef563029b69dde15ad4b",
+        "policy.json": "ef10933720d06d75ebe6076742cf25004705896436fda1752aaf2bca454938dd",
+        "priors.tsv": "bdf3942f4dc5ee380f7ef43f3a7ac1cca877142e104f392bd09297fc0e793a2c"
+      },
+      "qualification_report": "config/english_iteration/2026-10-30/noisy-channel/accepted-score.json",
+      "routing": "Nonempty English left context; preserve existing mixed-language, punctuation and case restoration decisions",
+      "training_hardware": "Local Mac mini M4; CPU-only fitting",
+      "dictionary_sources": {
+        "DERIVATION.txt": "f181f10e2d5af935065dd2464ffdca96f0eb382e86ed205805ac12a940cc663d",
+        "GPL-2.0.txt": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
+        "LGPL-2.1.txt": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+        "README_en_GB.txt": "7d1bad7d5a5e18bf1e34d3e88542a935fc69990926fce33dd9288aee222d1ef5",
+        "en_GB.dic": "dafe4d2f9536529576c50b024e16b3c928ede8f2565714a6b9dddd6c75c45502"
+      }
+    }
   }
 }

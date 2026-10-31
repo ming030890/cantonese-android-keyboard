@@ -1,0 +1,104 @@
+{
+  "frozen_touch": {
+    "static": {
+      "cases": 3127,
+      "clean": 2556,
+      "tp": 379,
+      "fp": 13,
+      "clean_changes": 2,
+      "unlabelled": 46,
+      "typos": 525,
+      "target_in_top8": 478,
+      "target_top1": 438,
+      "miss_ranking_or_acceptance": 99,
+      "miss_absent_from_top8": 47,
+      "fn": 146,
+      "f05": 0.9053989488772097,
+      "precision": 0.9668367346938775,
+      "recall": 0.7219047619047619,
+      "clean_changes_per_1000": 0.7824726134585289
+    },
+    "closed_loop": {
+      "cases": 3127,
+      "clean": 2556,
+      "tp": 402,
+      "fp": 12,
+      "clean_changes": 1,
+      "unlabelled": 46,
+      "typos": 525,
+      "target_in_top8": 480,
+      "target_top1": 451,
+      "miss_ranking_or_acceptance": 78,
+      "miss_absent_from_top8": 45,
+      "fn": 123,
+      "f05": 0.921595598349381,
+      "precision": 0.9710144927536232,
+      "recall": 0.7657142857142857,
+      "clean_changes_per_1000": 0.39123630672926446
+    },
+    "sentence_cer": {
+      "character_errors": 341,
+      "reference_characters": 14869,
+      "exact_trials": 347,
+      "trials": 480,
+      "cer": 0.02293362028381196
+    },
+    "remaining_typo_stages": {
+      "target_top1_rejected": 49,
+      "target_rank2_to8": 29,
+      "target_not_generated": 43,
+      "target_below8": 2
+    }
+  },
+  "recorded_development": {
+    "static": {
+      "cases": 3761,
+      "clean": 2760,
+      "tp": 635,
+      "fp": 35,
+      "clean_changes": 3,
+      "typos": 975,
+      "target_in_top8": 843,
+      "target_top1": 763,
+      "miss_ranking_or_acceptance": 208,
+      "miss_absent_from_top8": 132,
+      "unlabelled": 26,
+      "fn": 340,
+      "f05": 0.8686730506155951,
+      "precision": 0.9477611940298507,
+      "recall": 0.6512820512820513,
+      "clean_changes_per_1000": 1.0869565217391304
+    },
+    "closed_loop": {
+      "cases": 3761,
+      "clean": 2760,
+      "tp": 662,
+      "fp": 30,
+      "clean_changes": 3,
+      "typos": 975,
+      "target_in_top8": 844,
+      "target_top1": 776,
+      "miss_ranking_or_acceptance": 182,
+      "miss_absent_from_top8": 131,
+      "unlabelled": 26,
+      "fn": 313,
+      "f05": 0.8843173924659364,
+      "precision": 0.9566473988439307,
+      "recall": 0.678974358974359,
+      "clean_changes_per_1000": 1.0869565217391304
+    },
+    "sentence_cer": {
+      "character_errors": 803,
+      "reference_characters": 21087,
+      "exact_trials": 392,
+      "trials": 695,
+      "cer": 0.03808033385498174
+    },
+    "remaining_typo_stages": {
+      "target_rank2_to8": 68,
+      "target_not_generated": 121,
+      "target_top1_rejected": 114,
+      "target_below8": 10
+    }
+  }
+}

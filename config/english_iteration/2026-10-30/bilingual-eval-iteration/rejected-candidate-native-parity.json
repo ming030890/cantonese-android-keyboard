@@ -1,0 +1,15 @@
+{
+  "legacy": {
+    "cases": 5261,
+    "mismatches": 0
+  },
+  "development": {
+    "cases": 1432,
+    "mismatches": 0
+  },
+  "confirmation": {
+    "cases": 1393,
+    "mismatches": 0
+  },
+  "production_probe_sha256": "354b32d7d60a510806e980038e55221a355a463df63ef94dd8014ec2ddb55bbd"
+}

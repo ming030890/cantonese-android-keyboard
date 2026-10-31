@@ -1,0 +1,216 @@
+{
+  "schema": "manual-public-chat-spelling-review-v1",
+  "source_sha256": "c21b7785eec345681a12ba7cce33a103c60cdfd8c4888e567641d494365f87a9",
+  "reviewed_unique_utterances": 522,
+  "review_basis": "All eligible source utterances read in conversation order. Review followed initial baseline inspection, before any candidate inference or confirmation outputs. Obvious spelling/punctuation and real-word typos labelled; uncertain intended edits quarantined. Informal grammar and valid names are retained.",
+  "overrides": [
+    {
+      "source_id": "8deb7d48ebf974f93da40e3717db8b49686b00be257cf43523394b887f52a5e0",
+      "review_index": 18,
+      "text": "Hey! Whats up?",
+      "tokens": {
+        "Whats": "What's"
+      }
+    },
+    {
+      "source_id": "f3e243aa22b131e3bd54e0cd0b3825dda4ea432e939765aecd55b1d58cb48ef2",
+      "review_index": 25,
+      "text": "We met online during the quarentine and hit it off. She looks 10x better in person that online!",
+      "tokens": {
+        "that": "than"
+      }
+    },
+    {
+      "source_id": "47ae61d8b2d529ec304bb9a4ab9643b0a6f33fb0ae438796591d99ca48c598d9",
+      "review_index": 37,
+      "text": "whats wrong with him?",
+      "tokens": {
+        "whats": "what's"
+      }
+    },
+    {
+      "source_id": "e4cf51664d7fb624c6833e46b5ff908a90b286ccb5b2c673a005285ffbf054ad",
+      "review_index": 45,
+      "text": "His wife bought his an ugly tie for his birthday, but she loved it.",
+      "tokens": {
+        "his": "him"
+      }
+    },
+    {
+      "source_id": "256e84a0df69853c3d8dcf7a2f2363810b8065bc5f079f7095d8a3eab5b2a778",
+      "review_index": 70,
+      "text": "how is this pitcher",
+      "tokens": {
+        "pitcher": null
+      }
+    },
+    {
+      "source_id": "f66dfe0fdcf4e903c18e46950fd8f2264a7853c25e6e10fad3521c8790e8559a",
+      "review_index": 86,
+      "text": "pitcher",
+      "tokens": {
+        "pitcher": null
+      }
+    },
+    {
+      "source_id": "8ab39600aff8cc3d6ee764e36e6a87565410764391601dc1d2a1efe7a46a5e75",
+      "review_index": 94,
+      "text": "Yes sent me",
+      "tokens": {
+        "sent": null
+      }
+    },
+    {
+      "source_id": "251d9c820016b22099e16352d7cb41ae32f8bf986d78a7ae486e2b15caa163f9",
+      "review_index": 102,
+      "text": "My family made me a really nice pic that just got out of the oven so I'm a bit surprised actually. And thanks!",
+      "tokens": {
+        "pic": "pie"
+      }
+    },
+    {
+      "source_id": "5fd3db8af36e94d875cfbe3cd897bb4a7b78594d7d4bdc22fb75a84fe129b82a",
+      "review_index": 103,
+      "text": "Give me a second and I should you! I need to take the perfect pic.",
+      "tokens": {
+        "should": null
+      }
+    },
+    {
+      "source_id": "0aabffa234b0ceba18be51b23689ef38cc348aa3c37768b668cb1ee8d7bff9df",
+      "review_index": 163,
+      "text": "what find of music",
+      "tokens": {
+        "find": "kind"
+      }
+    },
+    {
+      "source_id": "97a02e999e82f2accdf963c9e2c0bed85c18ac4c33324f94959cf944ae12a9b0",
+      "review_index": 180,
+      "text": "like to search abut this",
+      "tokens": {
+        "abut": "about"
+      }
+    },
+    {
+      "source_id": "1a7af620efa33253238108d03039fb1df4aa6709ef80c5f9bb435140a9cd9308",
+      "review_index": 208,
+      "text": "Its so beautiful",
+      "tokens": {
+        "Its": "It's"
+      }
+    },
+    {
+      "source_id": "801cc078a11048ae5fbfc4a811049f6143f027f8b990db42bd4c189837861ca1",
+      "review_index": 216,
+      "text": "yeah its fun",
+      "tokens": {
+        "its": "it's"
+      }
+    },
+    {
+      "source_id": "19ee62091b2dd4971542dfbc4bd5bc53306b12cc7932670360de05834c46b5c4",
+      "review_index": 227,
+      "text": "that would be fun the",
+      "tokens": {
+        "the": null
+      }
+    },
+    {
+      "source_id": "f43ec359e1ed38e88be4166a266827f17f705201598a07b0a366f4532bba6593",
+      "review_index": 250,
+      "text": "id love to see it",
+      "tokens": {
+        "id": "i'd"
+      }
+    },
+    {
+      "source_id": "0e8dfedfd47fd91c6455d1efd9a6aeb05e1637af1936de9f599f6f0faa486a1f",
+      "review_index": 282,
+      "text": "am coo and you",
+      "tokens": {
+        "coo": null
+      }
+    },
+    {
+      "source_id": "262494f5f1699de2fe11a8088d606caca1193b9809dabf0a27e9015e4cb98708",
+      "review_index": 283,
+      "text": "do you ike to see the pics",
+      "tokens": {
+        "ike": "like"
+      }
+    },
+    {
+      "source_id": "b417c7074e3979027fd02bcb0bf5e4df1dce64546cb06eca4a347f89eedf382a",
+      "review_index": 296,
+      "text": "yes i remember your aunt Jadw",
+      "tokens": {
+        "Jadw": "Jade"
+      }
+    },
+    {
+      "source_id": "bba277e5ad1fb7738d79a43d44206ad693b6ace53c04d59a337c8d83fb23e91d",
+      "review_index": 347,
+      "text": "hows your day now?",
+      "tokens": {
+        "hows": "how's"
+      }
+    },
+    {
+      "source_id": "22a0dbe0759ae6e932f730ec5c10ec33ba465561ed7ab822c778f3044c5604eb",
+      "review_index": 351,
+      "text": "Sure, and that pic to my email. I've been to beaches, but never fishing.",
+      "tokens": {
+        "and": null
+      }
+    },
+    {
+      "source_id": "5eb133a48acccd867347e7d11339d84e8b4b5f51be2738defcb7b45081427e08",
+      "review_index": 354,
+      "text": "No I didn't Ive been too busy looking at old photos",
+      "tokens": {
+        "Ive": "I've"
+      }
+    },
+    {
+      "source_id": "60fd23b0e5a3ca9eecc472148895ec9921e1f60bdd8f12cb262775fc293f6c1f",
+      "review_index": 374,
+      "text": "that's for that idea",
+      "tokens": {
+        "that's": null
+      }
+    },
+    {
+      "source_id": "b2379075fd4ccce80d8607d785b9e7dc5c6dc5ffe9ba3b42ad82243c91f41304",
+      "review_index": 391,
+      "text": "its sad but not sleepy",
+      "tokens": {
+        "its": "it's"
+      }
+    },
+    {
+      "source_id": "0e6bd3a661ad9f6ddb4ffd3683b634f499c5b63f5c97463ccada051cd0e18799",
+      "review_index": 453,
+      "text": "It was to difficult to bake it in the heart shape. But I managed it after a few practices",
+      "tokens": {
+        "to": "too"
+      }
+    },
+    {
+      "source_id": "3fecb85fcafc45337953943f9a9ca4ca66a3e788823f2009493aef6f7b637361",
+      "review_index": 483,
+      "text": "Wow he still goo looking",
+      "tokens": {
+        "goo": "good"
+      }
+    },
+    {
+      "source_id": "8e815c9b1524a2a29c6ba384c5f45d8fa77691a0b0a6e99f8cd99c24b0e9e89c",
+      "review_index": 488,
+      "text": "his cool",
+      "tokens": {
+        "his": null
+      }
+    }
+  ]
+}

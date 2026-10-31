@@ -1,0 +1,32 @@
+{
+  "status": "No experimental engine change adopted; accepted engine restored",
+  "configurations": 38,
+  "fitted_policy_variants": 28,
+  "hardware": "Local Mac CPU/NumPy only; no remote training",
+  "rejection": "Existing ambiguity guard butger must abstain; selected candidate instead changed it to burger",
+  "test_expectations_changed": false,
+  "native_source_clean": true,
+  "native_revision": "3f47cbd528934154ff752ddda882aca58d92f9ed",
+  "accepted_score": 0.8736146656392934,
+  "baseline_delta": 0.0,
+  "unit_scenario_tests": {
+    "tests": 285,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native_tests": {
+    "passed": 38,
+    "failed": 0,
+    "ignored": 0
+  },
+  "screenshots_passed": true,
+  "android_debug_assembly_passed": true,
+  "confirmation_now_exposed": true,
+  "confirmation_not_for_future_selection": true,
+  "future_confirmation_order": "Preflight + legacy score + full actual JNI before revealing a new source-disjoint confirmation fold",
+  "artifacts": {
+    "withdrawn_patch": "build/conditional-english-scores-20261030/withdrawn-engine.patch",
+    "accepted_verification_log": "build/independent-autocorrect-eval-20261030/restored-verify-keyboard.log"
+  }
+}

@@ -221,18 +221,7 @@ internal class KeyboardSessionController(
             return
         }
         val isAllCharacters = (currentEditorInfo?.inputType ?: 0) and InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS != 0
-        if (!isAllCharacters && (english?.word?.isNotEmpty() == true || quick.hasActiveInput())) {
-            // Mid-word typing in sentence/words mode is always lowercase; skip IPC
-            if (!manualShift) _shiftState.value = ShiftState.Off
-            return
-        }
-        val shouldCap = AutoCapitalization.shouldCapitalize(
-            editor = editor,
-            editorInfo = currentEditorInfo,
-            autoCapEnabled = settings.autoCapitalizationEnabled(),
-            textBefore = textBefore,
-        )
-        if (shouldCap) {
+        if (isAllCharacters) {
             _shiftState.value = ShiftState.Shifted
             manualShift = false
         } else if (!manualShift) {

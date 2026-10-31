@@ -1,0 +1,60 @@
+{
+  "scope": "Mac mini M4 native calls; includes generation/ranking and per-process cold proposal cache, excludes model load and UI. Not Android device latency.",
+  "sample_cases": 1024,
+  "repeats": 3,
+  "sample_sha256": "8e8861c57f60af9486f722f1d46d953488948ce6fc10378738b22f3d92724d8d",
+  "probe_sha256": {
+    "baseline": "82f64b42815feafe9872dedad2c19206948178436667a39e149b447292e304d8",
+    "candidate": "f5b20d58a37e0def4f1637511535375851c2aa9e7de57a1b61f0ff1389d9d6c2"
+  },
+  "runs": [
+    {
+      "name": "baseline",
+      "repeat": 0,
+      "median_ms": 2.317,
+      "p95_ms": 6.62355
+    },
+    {
+      "name": "candidate",
+      "repeat": 0,
+      "median_ms": 2.4265,
+      "p95_ms": 6.757849999999999
+    },
+    {
+      "name": "candidate",
+      "repeat": 1,
+      "median_ms": 2.4295,
+      "p95_ms": 6.7966999999999995
+    },
+    {
+      "name": "baseline",
+      "repeat": 1,
+      "median_ms": 2.306,
+      "p95_ms": 6.574649999999997
+    },
+    {
+      "name": "baseline",
+      "repeat": 2,
+      "median_ms": 2.302,
+      "p95_ms": 6.589149999999998
+    },
+    {
+      "name": "candidate",
+      "repeat": 2,
+      "median_ms": 2.455,
+      "p95_ms": 6.84299999999999
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "median_ms": 2.31,
+      "p95_ms": 6.612349999999999,
+      "max_ms": 9.435
+    },
+    "candidate": {
+      "median_ms": 2.4405,
+      "p95_ms": 6.7959,
+      "max_ms": 9.761
+    }
+  }
+}

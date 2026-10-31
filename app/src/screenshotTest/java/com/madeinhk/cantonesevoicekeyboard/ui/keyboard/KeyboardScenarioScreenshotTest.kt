@@ -118,6 +118,11 @@ fun ScenarioGboardSupportedShortWordCorrection() = ScenarioScreen(remember { Key
 fun ScenarioNoisyContextCorrection() = ScenarioScreen(remember { KeyboardScenarios.noisyContextCorrection() })
 
 @PreviewTest
+@Preview(name = "Learned typing channel correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioLearnedTypingChannelCorrection() = ScenarioScreen(remember { KeyboardScenarios.learnedTypingChannelCorrection() })
+
+@PreviewTest
 @Preview(name = "Quick ir correction and undo", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioSharedLmQuickOverlapCorrection() = ScenarioScreen(remember { KeyboardScenarios.sharedLmQuickOverlapCorrection() })

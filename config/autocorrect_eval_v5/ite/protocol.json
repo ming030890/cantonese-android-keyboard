@@ -1,0 +1,96 @@
+{
+  "schema": "ite-whole-message-eval-v5",
+  "source": "https://zenodo.org/records/12528163",
+  "source_intake": {
+    "source": "https://zenodo.org/records/12528163/files/ite_typing_dataset.zip?download=1",
+    "index_sha256": "51f251f6e0e09e1362b0d5f4d877cc3a7ed37528d59a650b8188dd2b45eaea7e",
+    "members": {
+      "processed2020/english/participants_labeled.csv": {
+        "path": "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-full-v5/participants_labeled.csv",
+        "bytes": 20699602,
+        "crc32": 2645405131,
+        "sha256": "e5f1dc14698fcfb8e75368dd3f4fa9988fd52ccf7ea64efffc1d6ee706b162ca"
+      },
+      "processed2020/english/test_sections_labeled.csv": {
+        "path": "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-full-v5/test_sections_labeled.csv",
+        "bytes": 99249380,
+        "crc32": 3282053333,
+        "sha256": "d56f4ad9e083e5d49051de861f4a63270018d693e04c7dfbe2b045bf695b7e12"
+      },
+      "processed2020/english/log_data_labeled.csv": {
+        "path": "/Volumes/SSD/cantonese_ngram/raw/aalto-ite-full-v5/log_data_labeled.csv",
+        "bytes": 2943303403,
+        "crc32": 2259866519,
+        "sha256": "3dbaafb9100877ae11a8209c4da6cf1c0129d169b25a0afd96c42b234952cc81"
+      }
+    }
+  },
+  "seed": "ite-whole-message-v5-20261031",
+  "script_sha256": "1538c1380be1d4d153045a1374769e8bf43d044065d21d7bbb83510ce280230c",
+  "split_hashes": {
+    "development": "7518affbeb3af4d6856651b4ed3141e039163efac73c1861f71812cfeaad1be1",
+    "confirmation": "49dbab4b7fc065a8529fca7c54044d04355d4c12c7141f9be10a9e2e477b9ebb"
+  },
+  "counts": {
+    "development": {
+      "burst_3plus": 40,
+      "clean": 96,
+      "formatting_only": 96,
+      "one_error": 96,
+      "two_errors": 93
+    },
+    "confirmation": {
+      "burst_3plus": 33,
+      "clean": 96,
+      "formatting_only": 96,
+      "one_error": 96,
+      "two_errors": 96
+    }
+  },
+  "metadata_audit": {
+    "participants_total": 57997,
+    "unassisted_trials": 148834,
+    "edited_or_assisted_excluded": 99594,
+    "previous_prompt_excluded": 37372,
+    "cross_split_pair_excluded": 5888,
+    "repaired_windows_punctuation_trials": 586
+  },
+  "candidate_pool": {
+    "('confirmation', 'clean')": 1863,
+    "('confirmation', 'one_error')": 565,
+    "('development', 'clean')": 1735,
+    "('confirmation', 'formatting_only')": 512,
+    "('development', 'formatting_only')": 509,
+    "('development', 'one_error')": 465,
+    "('development', 'two_errors')": 116,
+    "('confirmation', 'two_errors')": 131,
+    "('confirmation', 'burst_3plus')": 37,
+    "('development', 'burst_3plus')": 47
+  },
+  "trace_rejections": {
+    "non_append_snapshot": 178,
+    "metadata_final_mismatch": 116,
+    "non_tap_or_ite_label:AC-COMMA": 26,
+    "non_tap_or_ite_label:MULT-CHAR-DEL": 6,
+    "non_tap_or_ite_label:REPLACE-DOT": 1,
+    "large_initial_snapshot": 2,
+    "non_tap_or_ite_label:AUTO-INPUT": 2
+  },
+  "target_per_stratum": 96,
+  "known_ac_actor_overlap": 0,
+  "known_prompt_overlap": 0,
+  "ac_rows_without_processed_actor": 0,
+  "frozen_before_inference": true,
+  "encoding": "Known printable Windows-1252 C1 punctuation mapped consistently in input snapshots, observed text and references before severity/sampling",
+  "sampling": "Fixed hash, balanced input/reference word edit distance; no model/vocabulary/target-availability filtering. Participant and prompt folds must agree; both remain disjoint.",
+  "limits": [
+    "Unassisted no-backspace mobile copy typing, not spontaneous chat or all assisted-keyboard usage",
+    "Initial short input snapshot may seed multiple characters; physical key timing is not inferred",
+    "Append-only trace validation excludes ambiguous/system-driven edits; all attrition reported",
+    "Known source-AC participants and previously used prompt groups excluded; undocumented inherited training exposure remains unproven",
+    "Word edit distance is an error-burden measure, not a count of independent physical typos",
+    "Error-severity balancing is a stress-design convention; original candidate-pool counts retained, not deployment prevalence",
+    "English only; cannot establish Cantonese/English mixing",
+    "Controller replay settles at word boundaries and submits final composition; not physical-phone timing"
+  ]
+}

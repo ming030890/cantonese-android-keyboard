@@ -1,0 +1,229 @@
+{
+  "protocol": {
+    "schema": "english-noisy-channel-confirmation-v1",
+    "policy_sha256": "e583400021e37f3489f80181eedaa97ea40a0658b8ae1ee8f7b86d0780215812",
+    "probe_sha256": "7c84fe2aad446f7b222d75e1b1b674b93399ee3cbabbff24512a483c024b7067",
+    "baseline_probe_sha256": "5539bfad28339b51d607101e555d6c067d7711764e3149a75341098009cca848",
+    "confirmation_sha256": "7e77088fe72e08e22cd3f20ea120d061123af0830cb46528c5da8978591dc08e",
+    "script_sha256": "0ca9fbf57f414285e73cc488608ad03b0524a37bbcc327f89de8ae07949b924d",
+    "selection": "Highest TRAIN-calibration F0.5 with per-source wrong/clean budgets; top calibration policy passed frozen objective and development guards",
+    "decision": "All panels retain baseline TP, FP and clean budgets; English real-author typos must gain at least one additional correct fix. Report grouped uncertainty; this is not spontaneous phone typing.",
+    "previously_scored": false,
+    "all_product_checks_passed": true
+  },
+  "metrics": {
+    "baseline": {
+      "github_corrected_control": {
+        "cases": 512,
+        "clean": 512,
+        "tp": 0,
+        "fp": 0,
+        "clean_changes": 0,
+        "fn": 0,
+        "unlabelled": 0,
+        "typos": 0,
+        "target_in_top8": 0,
+        "target_top1": 0,
+        "miss_absent_from_top8": 0,
+        "miss_ranking_or_acceptance": 0,
+        "f05": 0.0,
+        "precision": null,
+        "recall": null,
+        "clean_changes_per_1000": 0.0
+      },
+      "github_real_typo": {
+        "cases": 512,
+        "typos": 512,
+        "tp": 449,
+        "fp": 13,
+        "clean_changes": 0,
+        "target_in_top8": 500,
+        "target_top1": 469,
+        "miss_ranking_or_acceptance": 51,
+        "miss_absent_from_top8": 12,
+        "fn": 63,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.951271186440678,
+        "precision": 0.9718614718614719,
+        "recall": 0.876953125,
+        "clean_changes_per_1000": null
+      },
+      "mixed_preservation": {
+        "cases": 128,
+        "clean": 128,
+        "tp": 0,
+        "fp": 4,
+        "clean_changes": 4,
+        "fn": 0,
+        "unlabelled": 0,
+        "typos": 0,
+        "target_in_top8": 0,
+        "target_top1": 0,
+        "miss_absent_from_top8": 0,
+        "miss_ranking_or_acceptance": 0,
+        "f05": 0.0,
+        "precision": 0.0,
+        "recall": null,
+        "clean_changes_per_1000": 31.25
+      },
+      "mixed_synthetic_typo": {
+        "cases": 261,
+        "typos": 261,
+        "tp": 132,
+        "fp": 3,
+        "clean_changes": 0,
+        "target_in_top8": 231,
+        "target_top1": 190,
+        "miss_ranking_or_acceptance": 99,
+        "miss_absent_from_top8": 30,
+        "fn": 129,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.8239700374531835,
+        "precision": 0.9777777777777777,
+        "recall": 0.5057471264367817,
+        "clean_changes_per_1000": null
+      }
+    },
+    "candidate": {
+      "github_corrected_control": {
+        "cases": 512,
+        "clean": 512,
+        "tp": 0,
+        "fp": 0,
+        "clean_changes": 0,
+        "fn": 0,
+        "unlabelled": 0,
+        "typos": 0,
+        "target_in_top8": 0,
+        "target_top1": 0,
+        "miss_absent_from_top8": 0,
+        "miss_ranking_or_acceptance": 0,
+        "f05": 0.0,
+        "precision": null,
+        "recall": null,
+        "clean_changes_per_1000": 0.0
+      },
+      "github_real_typo": {
+        "cases": 512,
+        "typos": 512,
+        "tp": 454,
+        "fp": 13,
+        "clean_changes": 0,
+        "target_in_top8": 501,
+        "target_top1": 472,
+        "miss_ranking_or_acceptance": 47,
+        "miss_absent_from_top8": 11,
+        "fn": 58,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.9537815126050421,
+        "precision": 0.9721627408993576,
+        "recall": 0.88671875,
+        "clean_changes_per_1000": null
+      },
+      "mixed_preservation": {
+        "cases": 128,
+        "clean": 128,
+        "tp": 0,
+        "fp": 4,
+        "clean_changes": 4,
+        "fn": 0,
+        "unlabelled": 0,
+        "typos": 0,
+        "target_in_top8": 0,
+        "target_top1": 0,
+        "miss_absent_from_top8": 0,
+        "miss_ranking_or_acceptance": 0,
+        "f05": 0.0,
+        "precision": 0.0,
+        "recall": null,
+        "clean_changes_per_1000": 31.25
+      },
+      "mixed_synthetic_typo": {
+        "cases": 261,
+        "typos": 261,
+        "tp": 132,
+        "fp": 3,
+        "clean_changes": 0,
+        "target_in_top8": 231,
+        "target_top1": 190,
+        "miss_ranking_or_acceptance": 99,
+        "miss_absent_from_top8": 30,
+        "fn": 129,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.8239700374531835,
+        "precision": 0.9777777777777777,
+        "recall": 0.5057471264367817,
+        "clean_changes_per_1000": null
+      }
+    }
+  },
+  "uncertainty": {
+    "github_corrected_control": {
+      "groups": 469,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.0,
+        0.0
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "github_real_typo": {
+      "groups": 469,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.9365684311251559,
+        0.9676080296840252
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0005016260568898063,
+        0.004984543707870686
+      ]
+    },
+    "mixed_preservation": {
+      "groups": 128,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.0,
+        0.0
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "mixed_synthetic_typo": {
+      "groups": 89,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.7627118644067796,
+        0.8723439954305298
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "additional_correct_english": 5,
+  "qualified": true,
+  "confirmation_now_exposed": true
+}

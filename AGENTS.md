@@ -1,10 +1,13 @@
 # Cantonese Voice Keyboard
 
 For candidate/autocorrect changes, follow `AUTOCORRECT_OBJECTIVE.md`: it defines
-the datasets, scoring command and acceptance gate. Report one aggregate score
-and its baseline delta. Use a freshly built native probe and the frozen suite;
-keep evaluation examples out of training. Quality changes must improve the
-accepted aggregate score and pass required checks. Report latency tradeoffs.
+the datasets, scoring commands and acceptance gate. The primary evaluation is
+whole-message ITE plus mixed Cantonese/English controller replay; report both
+panels, clean-text harm and paired baseline deltas. Keep the frozen v4 aggregate
+as a regression check, not the model-selection objective. Use freshly built
+candidate native libraries/probes and frozen inputs; keep evaluation examples
+out of training. Follow the primary improvement and regression gates in that
+document, pass required checks, and report latency tradeoffs.
 
 ## Repository scope
 

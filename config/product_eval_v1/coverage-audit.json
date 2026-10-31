@@ -1,0 +1,313 @@
+{
+  "schema": "autocorrect-eval-coverage-audit-v1",
+  "binding": {
+    "cases_sha256": "3a7dcff3415a6df849e6d73ebe2e3d84b8f401f09948944b3d4471cf5bf9abef",
+    "script_sha256": "a48c3f60aceaf72e9993d031b651ac67be61ef87ecd35f1b401993be0e44cb20",
+    "accepted_outputs_sha256": "21e04d3063ba50a655e85b990da4f5b958978b9d34c26a25c249ad7cdf00dd07"
+  },
+  "pooled_descriptive_metrics": {
+    "cases": 5261,
+    "typos": 1315,
+    "tp": 903,
+    "fp": 58,
+    "clean_changes": 8,
+    "target_in_top8": 1171,
+    "target_top1": 1045,
+    "miss_ranking_or_acceptance": 268,
+    "clean": 3900,
+    "miss_absent_from_top8": 144,
+    "unlabelled": 46,
+    "fn": 412,
+    "f05": 0.8751696065128901,
+    "precision": 0.9396462018730489,
+    "recall": 0.6866920152091255,
+    "clean_changes_per_1000": 2.051282051282051
+  },
+  "official_development_score": 0.8736146656392934,
+  "panels": {
+    "authored_hard": {
+      "cases": 92,
+      "labelled": 92,
+      "typos": 46,
+      "clean": 46,
+      "han_in_context": 3,
+      "han_in_typed_or_target": 0,
+      "non_ascii_typed": 3,
+      "nonletter_typed": 16,
+      "uppercase_in_typed": 4,
+      "domains": {
+        "short_words": 3,
+        "large_distance": 25,
+        "chat": 3,
+        "work": 2,
+        "travel": 3,
+        "food": 3,
+        "emoji_punctuation": 3,
+        "apostrophes": 15,
+        "word_boundaries": 6,
+        "real_word_intent": 10,
+        "slang": 3,
+        "names": 3,
+        "identifiers": 2,
+        "urls_email": 3,
+        "dialect": 2,
+        "mixed_cantonese": 3,
+        "real_word_preservation": 3
+      }
+    },
+    "mobile_observed": {
+      "cases": 788,
+      "labelled": 788,
+      "typos": 744,
+      "clean": 44,
+      "han_in_context": 0,
+      "han_in_typed_or_target": 0,
+      "non_ascii_typed": 0,
+      "nonletter_typed": 3,
+      "uppercase_in_typed": 0,
+      "domains": {
+        "mobile_copy_typing": 788
+      }
+    },
+    "mobile_source_copy": {
+      "cases": 1254,
+      "labelled": 1254,
+      "typos": 0,
+      "clean": 1254,
+      "han_in_context": 0,
+      "han_in_typed_or_target": 0,
+      "non_ascii_typed": 0,
+      "nonletter_typed": 25,
+      "uppercase_in_typed": 227,
+      "domains": {
+        "mobile_copy_typing": 1254
+      }
+    },
+    "real_touch_observed": {
+      "cases": 3127,
+      "labelled": 3081,
+      "typos": 525,
+      "clean": 2556,
+      "han_in_context": 0,
+      "han_in_typed_or_target": 0,
+      "non_ascii_typed": 0,
+      "nonletter_typed": 0,
+      "uppercase_in_typed": 0,
+      "domains": {
+        "mobile_email_copy_typing": 3127
+      }
+    }
+  },
+  "word_scoring": {
+    "case_sensitive": false,
+    "capitalization_quality_measured": false,
+    "observed_key_geometry_used": false,
+    "actual_layout_used": false,
+    "wall_clock_deadlines_measured": false
+  },
+  "production_session_coverage": {
+    "natural_spontaneous_chat_sessions": 0,
+    "natural_bilingual_typing_streams": 0,
+    "android_inputconnection_replays_in_objective": 0,
+    "recorded_copy_typing_trials": 480
+  },
+  "touch_closed_loop": {
+    "words": 3127,
+    "trials": 480,
+    "static": {
+      "cases": 3127,
+      "clean": 2556,
+      "tp": 364,
+      "fp": 14,
+      "clean_changes": 1,
+      "unlabelled": 46,
+      "typos": 525,
+      "target_in_top8": 472,
+      "target_top1": 428,
+      "miss_ranking_or_acceptance": 108,
+      "miss_absent_from_top8": 53,
+      "fn": 161,
+      "f05": 0.8934707903780069,
+      "precision": 0.9629629629629629,
+      "recall": 0.6933333333333334,
+      "clean_changes_per_1000": 0.39123630672926446
+    },
+    "closed_loop": {
+      "cases": 3127,
+      "clean": 2556,
+      "tp": 390,
+      "fp": 11,
+      "clean_changes": 0,
+      "unlabelled": 46,
+      "typos": 525,
+      "target_in_top8": 474,
+      "target_top1": 441,
+      "miss_ranking_or_acceptance": 84,
+      "miss_absent_from_top8": 51,
+      "fn": 135,
+      "f05": 0.9159229685298262,
+      "precision": 0.972568578553616,
+      "recall": 0.7428571428571429,
+      "clean_changes_per_1000": 0.0
+    },
+    "oracle_upstream_repair": {
+      "missed": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 394,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "target_in_top8": 474,
+        "target_top1": 440,
+        "miss_ranking_or_acceptance": 80,
+        "miss_absent_from_top8": 51,
+        "fn": 131,
+        "f05": 0.9167054443927408,
+        "precision": 0.9704433497536946,
+        "recall": 0.7504761904761905,
+        "clean_changes_per_1000": 0.0
+      },
+      "wrong_edit": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 390,
+        "fp": 11,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "target_in_top8": 474,
+        "target_top1": 441,
+        "miss_ranking_or_acceptance": 84,
+        "miss_absent_from_top8": 51,
+        "fn": 135,
+        "f05": 0.9159229685298262,
+        "precision": 0.972568578553616,
+        "recall": 0.7428571428571429,
+        "clean_changes_per_1000": 0.0
+      },
+      "all": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 394,
+        "fp": 12,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "target_in_top8": 474,
+        "target_top1": 440,
+        "miss_ranking_or_acceptance": 80,
+        "miss_absent_from_top8": 51,
+        "fn": 131,
+        "f05": 0.9167054443927408,
+        "precision": 0.9704433497536946,
+        "recall": 0.7504761904761905,
+        "clean_changes_per_1000": 0.0
+      }
+    },
+    "attribution": {
+      "feedback_recovers_static_error": 29,
+      "feedback_loses_static_correct": 2,
+      "remaining_incorrect_words": 135,
+      "remaining_typos": 135,
+      "remaining_with_all_previous_words_correct": 107,
+      "remaining_with_upstream_labelled_errors": 25,
+      "remaining_recovered_repairing_missed": 4,
+      "remaining_recovered_repairing_all": 4,
+      "remaining_no_labelled_upstream_error_but_ambiguous_history": 3
+    },
+    "remaining_typo_stages": {
+      "target_top1_rejected": 51,
+      "target_rank2_to8": 33,
+      "target_not_generated": 49,
+      "target_below8": 2
+    },
+    "sentence_cer": {
+      "character_errors": 365,
+      "reference_characters": 14869,
+      "exact_trials": 337,
+      "trials": 480,
+      "cer": 0.024547716726074382
+    },
+    "upstream_repair_examples": [
+      {
+        "id": "vt_exp2:p13:mobile624:2",
+        "typed": "rlse",
+        "target": "else",
+        "left": "jas snyome ",
+        "actual": null,
+        "recovered_by": [
+          "missed",
+          "all"
+        ],
+        "prior_errors": {
+          "missed": 2
+        },
+        "stage": "target_rank2_to8"
+      },
+      {
+        "id": "vt_exp2:p13:mobile341:8",
+        "typed": "ettands",
+        "target": "errands",
+        "left": "i may take the opportunity to tun some ",
+        "actual": null,
+        "recovered_by": [
+          "missed",
+          "all"
+        ],
+        "prior_errors": {
+          "correct": 7,
+          "missed": 1
+        },
+        "stage": "target_top1_rejected"
+      },
+      {
+        "id": "vt_exp2:p14:mobile1339:1",
+        "typed": "trird",
+        "target": "tried",
+        "left": "o ",
+        "actual": null,
+        "recovered_by": [
+          "missed",
+          "all"
+        ],
+        "prior_errors": {
+          "missed": 1
+        },
+        "stage": "target_top1_rejected"
+      },
+      {
+        "id": "vt_exp2:p24:mobile1054:4",
+        "typed": "afdreds",
+        "target": "address",
+        "left": "she has a seb ",
+        "actual": null,
+        "recovered_by": [
+          "missed",
+          "all"
+        ],
+        "prior_errors": {
+          "correct": 3,
+          "missed": 1
+        },
+        "stage": "target_top1_rejected"
+      }
+    ]
+  },
+  "exposure": {
+    "status": "Exposed development, not independent confirmation",
+    "latest_update_excludes_frozen_exact_inputs": true,
+    "latest_update_quarantined_rows": 1117,
+    "latest_update_effective_exact_input_overlap": 0,
+    "inherited_checkpoint_prior_exposure": true,
+    "limitation": "Latest-fit exclusion does not erase inherited weights or repeated model-selection exposure; complete LM-history disjointness is unproven"
+  },
+  "blockers": [
+    "No natural Cantonese/English chat typing streams with confirmed intent.",
+    "No fresh participant/conversation/source-separated confirmation cohort.",
+    "Word F0.5 ignores case and does not measure actual event-boundary/editor behavior.",
+    "Equal benchmark weights and authored challenge prevalence are not measured usage weights.",
+    "Word outcomes cannot establish recovery effort, cursor/undo success or phone deadline losses."
+  ]
+}

@@ -12,6 +12,16 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EnglishAutocorrectScenarioTest {
+    @Test fun scenarioTextEntryPreservesSupplementaryUnicodeAcrossLayouts() {
+        for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+            KeyboardScenario(initialMode = mode, englishEngine = ScenarioEnglishEngine()).use { s ->
+                s.start(); s.type("好🙂")
+                assertEquals("好🙂", s.editor.text)
+                assertEquals("", s.editor.composing)
+            }
+        }
+    }
+
     @Test fun contextualProfileCanCorrectShortEnglishDespiteAnOverlappingChineseQuickCode() {
         for(confident in listOf(false,true)) for(selectChinese in listOf(false,true)) {
             val engine=object:EnglishCandidateEngine {
@@ -177,6 +187,7 @@ class EnglishAutocorrectScenarioTest {
         KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum, englishEngine = ScenarioEnglishEngine()).use { s ->
             s.editor.actionEnter = true; s.start(); s.type("teh"); s.press(KeyboardKeyKind.Enter)
             assertEquals("the", s.editor.text); assertEquals(1, s.editor.actions)
+            assertEquals(listOf("the"), s.editor.submittedTexts)
             s.press(KeyboardKeyKind.Delete); assertEquals("th", s.editor.text)
         }
     }

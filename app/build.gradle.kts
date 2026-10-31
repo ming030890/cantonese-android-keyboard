@@ -32,7 +32,7 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 74
+        versionCode = 75
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -197,6 +197,13 @@ tasks.register("verifyKeyboard") {
 
 // Opt-in host JNI integration tests use the same Rust exports as Android.
 tasks.withType<Test>().configureEach {
+    providers.gradleProperty("productEvalSessions").orNull?.let {
+        inputs.file(File(it)).withPropertyName("productEvalSessionsFile")
+        systemProperty("product.eval.sessions", it)
+    }
+    providers.gradleProperty("productEvalReport").orNull?.let {
+        systemProperty("product.eval.report", it)
+    }
     providers.gradleProperty("bilingualAssets").orNull?.let {
         inputs.dir(File(it)).withPropertyName("bilingualAssetsDir")
         systemProperty("bilingual.assets", it)

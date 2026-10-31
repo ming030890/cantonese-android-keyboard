@@ -1,0 +1,9 @@
+British English dictionary source:
+https://github.com/LibreOffice/dictionaries/tree/4fa94195b8136364dd40bf2b0366a0fe32058899/en
+
+The embedded English channel lexicon adds lowercase ASCII roots from en_GB.dic
+to the existing SCOWL US suggestion forms. Hunspell flags and non-ASCII forms
+are not copied into the channel table. See README_en_GB.txt for attribution,
+LGPL-2.1.txt and GPL-2.0.txt for license texts, and en_GB.dic for upstream source.
+The generated lexicon and fitting/export scripts are maintained with the
+keyboard source; English data is separate from the Rust implementation.

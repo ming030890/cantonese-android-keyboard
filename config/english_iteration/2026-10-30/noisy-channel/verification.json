@@ -1,0 +1,14 @@
+{
+  "native_tests": 39,
+  "native_failures": 0,
+  "unit_tests": 286,
+  "unit_failures": 0,
+  "unit_skipped": 0,
+  "keyboard_gate": "passed",
+  "screenshots": "Updated new scenario only, inspected, verified separately",
+  "jni_scenarios": "New channel corrections, Space, undo and literal recommit in English/Quick3/Quick5",
+  "android_library_sha256": "7191f3213673f2101a2f064016b8143504a8609a159e6a545457836ef94faa68",
+  "host_probe_sha256": "82f64b42815feafe9872dedad2c19206948178436667a39e149b447292e304d8",
+  "apk_sha256": "422f74badb0e5fd00b619fb077451759245fa37ec7120ade2521a408cd6f78af",
+  "deployment": "Local APK assembled and verified; no deployment in this research iteration"
+}

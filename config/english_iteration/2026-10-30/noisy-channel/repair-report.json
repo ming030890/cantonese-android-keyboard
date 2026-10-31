@@ -1,0 +1,24 @@
+{
+  "exact_canonical_inference_input_overlap": {
+    "frozen": 0,
+    "development": 0,
+    "confirmation": 0
+  },
+  "fit_cases": 8193,
+  "fit_cases_sha256": "39170e8905b724b5ac4c29ddb5f564c120568fb2f9b925fe0f6b4c2308b2e83f",
+  "policy_sha256": "ef10933720d06d75ebe6076742cf25004705896436fda1752aaf2bca454938dd",
+  "probe_sha256": "82f64b42815feafe9872dedad2c19206948178436667a39e149b447292e304d8",
+  "initial_confirmation_report_sha256": "df02b546ab1f8dd7ee33492f8e2fb82c5b5c0d7d85107ba158238b0b34683f0a",
+  "confirmation_already_exposed": true,
+  "reason": "Remove one leaked frozen clean control; rerun identical TRAIN-only calibration. No decisions or labels from confirmation selected the repair.",
+  "cohorts": {
+    "development_calibration_regressions": {
+      "cases": 13482,
+      "decision_changes": []
+    },
+    "confirmation": {
+      "cases": 1413,
+      "decision_changes": []
+    }
+  }
+}

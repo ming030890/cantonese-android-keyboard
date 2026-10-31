@@ -1,0 +1,1299 @@
+{
+  "binding": {
+    "schema": "closed-loop-component-audit-v1",
+    "script_sha256": "9d4e526517fc19faa3cec4b866d5a39504087bdb2ee1375891447ec83bd857d2",
+    "hashes": {
+      "probe": "e09b75ef9d09a5a86af89a4d2ad5e50581cf7337a6e44ab5c1491814df637613",
+      "model": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+      "policy": "107494939b0e175f30618f0a19d522c56dc973d7c099a0cd34f68039b97f3d5c"
+    },
+    "parameters_fitted": false,
+    "experimental_radius_profile": "combined_stable",
+    "ordinary_inference_fields": [
+      "left_from_own_committed_output",
+      "typed_observation",
+      "spelling_limit",
+      "timing"
+    ],
+    "oracle_fields": "Separate diagnostic previous-word label repairs; never focal/future targets or editor state",
+    "frozen_touch_attempt_identity": {
+      "source_trial_ids_with_multiple_attempts": 0,
+      "attempts_reidentified": 0,
+      "events_preserved": 3127
+    },
+    "frozen_touch_manifest_sha256": "d3ce12f7b8e9eb29ea74fdfb5af105391d3c60b42765761b87025e0e62974682",
+    "recorded_development_attempt_identity": {
+      "source_trial_ids_with_multiple_attempts": 34,
+      "attempts_reidentified": 69,
+      "events_preserved": 3761
+    },
+    "recorded_development_manifest_sha256": "16cb7bf2dc5469cdf531bd3b67faf71b24ac4d870d0be729cbe19b7c84bfd82f"
+  },
+  "cohorts": {
+    "frozen_touch": {
+      "words": 3127,
+      "trials": 480,
+      "static": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 369,
+        "fp": 13,
+        "clean_changes": 1,
+        "unlabelled": 46,
+        "typos": 525,
+        "target_in_top8": 480,
+        "target_top1": 434,
+        "miss_ranking_or_acceptance": 111,
+        "miss_absent_from_top8": 45,
+        "fn": 156,
+        "f05": 0.8986848514369216,
+        "precision": 0.9659685863874345,
+        "recall": 0.7028571428571428,
+        "clean_changes_per_1000": 0.39123630672926446
+      },
+      "closed_loop": {
+        "cases": 3127,
+        "clean": 2556,
+        "tp": 395,
+        "fp": 10,
+        "clean_changes": 0,
+        "unlabelled": 46,
+        "typos": 525,
+        "target_in_top8": 482,
+        "target_top1": 447,
+        "miss_ranking_or_acceptance": 87,
+        "miss_absent_from_top8": 43,
+        "fn": 130,
+        "f05": 0.9207459207459208,
+        "precision": 0.9753086419753086,
+        "recall": 0.7523809523809524,
+        "clean_changes_per_1000": 0.0
+      },
+      "oracle_upstream_repair": {
+        "missed": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 399,
+          "fp": 11,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "target_in_top8": 482,
+          "target_top1": 446,
+          "miss_ranking_or_acceptance": 83,
+          "miss_absent_from_top8": 43,
+          "fn": 126,
+          "f05": 0.9214780600461894,
+          "precision": 0.973170731707317,
+          "recall": 0.76,
+          "clean_changes_per_1000": 0.0
+        },
+        "wrong_edit": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 395,
+          "fp": 10,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "target_in_top8": 482,
+          "target_top1": 447,
+          "miss_ranking_or_acceptance": 87,
+          "miss_absent_from_top8": 43,
+          "fn": 130,
+          "f05": 0.9207459207459208,
+          "precision": 0.9753086419753086,
+          "recall": 0.7523809523809524,
+          "clean_changes_per_1000": 0.0
+        },
+        "all": {
+          "cases": 3127,
+          "clean": 2556,
+          "tp": 399,
+          "fp": 11,
+          "clean_changes": 0,
+          "unlabelled": 46,
+          "typos": 525,
+          "target_in_top8": 482,
+          "target_top1": 446,
+          "miss_ranking_or_acceptance": 83,
+          "miss_absent_from_top8": 43,
+          "fn": 126,
+          "f05": 0.9214780600461894,
+          "precision": 0.973170731707317,
+          "recall": 0.76,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "attribution": {
+        "feedback_recovers_static_error": 29,
+        "feedback_loses_static_correct": 2,
+        "remaining_incorrect_words": 130,
+        "remaining_typos": 130,
+        "remaining_with_all_previous_words_correct": 103,
+        "remaining_with_upstream_labelled_errors": 24,
+        "remaining_recovered_repairing_missed": 4,
+        "remaining_recovered_repairing_all": 4,
+        "remaining_no_labelled_upstream_error_but_ambiguous_history": 3
+      },
+      "remaining_typo_stages": {
+        "target_top1_rejected": 52,
+        "target_rank2_to8": 35,
+        "target_not_generated": 37,
+        "target_below8": 6
+      },
+      "sentence_cer": {
+        "character_errors": 351,
+        "reference_characters": 14869,
+        "exact_trials": 341,
+        "trials": 480,
+        "cer": 0.02360616046808797
+      },
+      "upstream_repair_examples": [
+        {
+          "id": "vt_exp2:p13:mobile624:2",
+          "typed": "rlse",
+          "target": "else",
+          "left": "jas snyome ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 2
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "vt_exp2:p13:mobile341:8",
+          "typed": "ettands",
+          "target": "errands",
+          "left": "i may take the opportunity to tun some ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 7,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_exp2:p14:mobile1339:1",
+          "typed": "trird",
+          "target": "tried",
+          "left": "o ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_exp2:p24:mobile1054:4",
+          "typed": "afdreds",
+          "target": "address",
+          "left": "she has a seb ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 3,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        }
+      ]
+    },
+    "recorded_development": {
+      "words": 3761,
+      "trials": 695,
+      "static": {
+        "cases": 3761,
+        "clean": 2760,
+        "tp": 630,
+        "fp": 34,
+        "clean_changes": 2,
+        "typos": 975,
+        "target_in_top8": 851,
+        "target_top1": 766,
+        "miss_ranking_or_acceptance": 221,
+        "unlabelled": 26,
+        "miss_absent_from_top8": 124,
+        "fn": 345,
+        "f05": 0.8675296061690995,
+        "precision": 0.9487951807228916,
+        "recall": 0.6461538461538462,
+        "clean_changes_per_1000": 0.7246376811594203
+      },
+      "closed_loop": {
+        "cases": 3761,
+        "clean": 2760,
+        "tp": 664,
+        "fp": 33,
+        "clean_changes": 2,
+        "typos": 975,
+        "target_in_top8": 851,
+        "target_top1": 778,
+        "miss_ranking_or_acceptance": 187,
+        "unlabelled": 26,
+        "miss_absent_from_top8": 124,
+        "fn": 311,
+        "f05": 0.8822747807600319,
+        "precision": 0.9526542324246772,
+        "recall": 0.681025641025641,
+        "clean_changes_per_1000": 0.7246376811594203
+      },
+      "oracle_upstream_repair": {
+        "missed": {
+          "cases": 3761,
+          "clean": 2760,
+          "tp": 684,
+          "fp": 31,
+          "clean_changes": 2,
+          "typos": 975,
+          "target_in_top8": 851,
+          "target_top1": 782,
+          "miss_ranking_or_acceptance": 167,
+          "unlabelled": 26,
+          "miss_absent_from_top8": 124,
+          "fn": 291,
+          "f05": 0.8917861799217731,
+          "precision": 0.9566433566433566,
+          "recall": 0.7015384615384616,
+          "clean_changes_per_1000": 0.7246376811594203
+        },
+        "wrong_edit": {
+          "cases": 3761,
+          "clean": 2760,
+          "tp": 665,
+          "fp": 33,
+          "clean_changes": 2,
+          "typos": 975,
+          "target_in_top8": 851,
+          "target_top1": 780,
+          "miss_ranking_or_acceptance": 186,
+          "unlabelled": 26,
+          "miss_absent_from_top8": 124,
+          "fn": 310,
+          "f05": 0.8826652508627555,
+          "precision": 0.9527220630372493,
+          "recall": 0.6820512820512821,
+          "clean_changes_per_1000": 0.7246376811594203
+        },
+        "all": {
+          "cases": 3761,
+          "clean": 2760,
+          "tp": 685,
+          "fp": 31,
+          "clean_changes": 2,
+          "typos": 975,
+          "target_in_top8": 851,
+          "target_top1": 784,
+          "miss_ranking_or_acceptance": 166,
+          "unlabelled": 26,
+          "miss_absent_from_top8": 124,
+          "fn": 290,
+          "f05": 0.8921594165147174,
+          "precision": 0.9567039106145251,
+          "recall": 0.7025641025641025,
+          "clean_changes_per_1000": 0.7246376811594203
+        }
+      },
+      "attribution": {
+        "feedback_recovers_static_error": 38,
+        "feedback_loses_static_correct": 4,
+        "remaining_incorrect_words": 313,
+        "remaining_typos": 311,
+        "remaining_with_all_previous_words_correct": 244,
+        "remaining_with_upstream_labelled_errors": 67,
+        "remaining_recovered_repairing_missed": 21,
+        "remaining_recovered_repairing_all": 23,
+        "clean_damage": 2,
+        "remaining_recovered_repairing_wrong_edit": 2,
+        "remaining_no_labelled_upstream_error_but_ambiguous_history": 2
+      },
+      "remaining_typo_stages": {
+        "target_rank2_to8": 73,
+        "target_top1_rejected": 114,
+        "target_not_generated": 112,
+        "target_below8": 12
+      },
+      "sentence_cer": {
+        "character_errors": 808,
+        "reference_characters": 21087,
+        "exact_trials": 393,
+        "trials": 695,
+        "cer": 0.03831744676815099
+      },
+      "upstream_repair_examples": [
+        {
+          "id": "vt_dev:d1:mobile759:4",
+          "typed": "dara",
+          "target": "data",
+          "left": "i have dome more ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 3,
+            "missed": 1
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "vt_dev:d1:mobile1682:1",
+          "typed": "yoy",
+          "target": "you",
+          "left": "an ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_dev:d2:mobile1017#attempt0:3",
+          "typed": "davr",
+          "target": "dave",
+          "left": "i wt with ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 2,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_dev:d2:mobile1624#attempt1:2",
+          "typed": "yiy",
+          "target": "you",
+          "left": "i woukdsuggest ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 1,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_dev:d3:mobile498:1",
+          "typed": "wr",
+          "target": "we",
+          "left": "fo ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_dev:d3:mobile498:2",
+          "typed": "neeed",
+          "target": "need",
+          "left": "fo wr ",
+          "actual": "needed",
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 2
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "vt_dev:d3:mobile753:4",
+          "typed": "bobus",
+          "target": "bonus",
+          "left": "did he get adigning ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 3,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user01:task1:21:5",
+          "typed": "xontest",
+          "target": "contest",
+          "left": "win first prixe in the ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 4,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user03:task3:13:5",
+          "typed": "fontest",
+          "target": "contest",
+          "left": "win first prir in the ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 4,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user03:task3:18:3",
+          "typed": "trier",
+          "target": "tried",
+          "left": "thenfirdt time he ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1,
+            "correct": 2
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user04:task2:17:2",
+          "typed": "printwrvis",
+          "target": "printer is",
+          "left": "the lawer ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 1,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user04:task2:25:6",
+          "typed": "ia",
+          "target": "is",
+          "left": "a tumor is ok provides it ",
+          "actual": null,
+          "recovered_by": [
+            "wrong_edit",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 5,
+            "wrong_edit": 1
+          },
+          "stage": "target_rank2_to8"
+        }
+      ]
+    }
+  },
+  "recorded_by_split": {
+    "fit": {
+      "words": 2963,
+      "trials": 569,
+      "static": {
+        "cases": 2963,
+        "clean": 2212,
+        "tp": 472,
+        "fp": 28,
+        "clean_changes": 1,
+        "typos": 742,
+        "target_in_top8": 630,
+        "target_top1": 568,
+        "miss_absent_from_top8": 112,
+        "miss_ranking_or_acceptance": 158,
+        "unlabelled": 9,
+        "fn": 270,
+        "f05": 0.8606856309263311,
+        "precision": 0.944,
+        "recall": 0.6361185983827493,
+        "clean_changes_per_1000": 0.45207956600361665
+      },
+      "closed_loop": {
+        "cases": 2963,
+        "clean": 2212,
+        "tp": 496,
+        "fp": 25,
+        "clean_changes": 1,
+        "typos": 742,
+        "target_in_top8": 630,
+        "target_top1": 577,
+        "miss_absent_from_top8": 112,
+        "miss_ranking_or_acceptance": 134,
+        "unlabelled": 9,
+        "fn": 246,
+        "f05": 0.8775654635527247,
+        "precision": 0.9520153550863724,
+        "recall": 0.6684636118598383,
+        "clean_changes_per_1000": 0.45207956600361665
+      },
+      "oracle_upstream_repair": {
+        "missed": {
+          "cases": 2963,
+          "clean": 2212,
+          "tp": 512,
+          "fp": 24,
+          "clean_changes": 1,
+          "typos": 742,
+          "target_in_top8": 630,
+          "target_top1": 579,
+          "miss_absent_from_top8": 112,
+          "miss_ranking_or_acceptance": 118,
+          "unlabelled": 9,
+          "fn": 230,
+          "f05": 0.887040887040887,
+          "precision": 0.9552238805970149,
+          "recall": 0.6900269541778976,
+          "clean_changes_per_1000": 0.45207956600361665
+        },
+        "wrong_edit": {
+          "cases": 2963,
+          "clean": 2212,
+          "tp": 497,
+          "fp": 25,
+          "clean_changes": 1,
+          "typos": 742,
+          "target_in_top8": 630,
+          "target_top1": 579,
+          "miss_absent_from_top8": 112,
+          "miss_ranking_or_acceptance": 133,
+          "unlabelled": 9,
+          "fn": 245,
+          "f05": 0.8780918727915195,
+          "precision": 0.9521072796934866,
+          "recall": 0.6698113207547169,
+          "clean_changes_per_1000": 0.45207956600361665
+        },
+        "all": {
+          "cases": 2963,
+          "clean": 2212,
+          "tp": 513,
+          "fp": 24,
+          "clean_changes": 1,
+          "typos": 742,
+          "target_in_top8": 630,
+          "target_top1": 581,
+          "miss_absent_from_top8": 112,
+          "miss_ranking_or_acceptance": 117,
+          "unlabelled": 9,
+          "fn": 229,
+          "f05": 0.8875432525951558,
+          "precision": 0.9553072625698324,
+          "recall": 0.6913746630727763,
+          "clean_changes_per_1000": 0.45207956600361665
+        }
+      },
+      "attribution": {
+        "feedback_recovers_static_error": 27,
+        "feedback_loses_static_correct": 3,
+        "remaining_incorrect_words": 247,
+        "remaining_typos": 246,
+        "remaining_with_all_previous_words_correct": 193,
+        "remaining_with_upstream_labelled_errors": 52,
+        "remaining_recovered_repairing_missed": 16,
+        "remaining_recovered_repairing_all": 18,
+        "clean_damage": 1,
+        "remaining_recovered_repairing_wrong_edit": 2,
+        "remaining_no_labelled_upstream_error_but_ambiguous_history": 2
+      },
+      "remaining_typo_stages": {
+        "target_not_generated": 101,
+        "target_rank2_to8": 53,
+        "target_top1_rejected": 81,
+        "target_below8": 11
+      },
+      "sentence_cer": {
+        "character_errors": 681,
+        "reference_characters": 16914,
+        "exact_trials": 328,
+        "trials": 569,
+        "cer": 0.040262504434196524
+      },
+      "upstream_repair_examples": [
+        {
+          "id": "vt_dev:d2:mobile1017#attempt0:3",
+          "typed": "davr",
+          "target": "dave",
+          "left": "i wt with ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 2,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_dev:d2:mobile1624#attempt1:2",
+          "typed": "yiy",
+          "target": "you",
+          "left": "i woukdsuggest ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 1,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user01:task1:21:5",
+          "typed": "xontest",
+          "target": "contest",
+          "left": "win first prixe in the ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 4,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user03:task3:13:5",
+          "typed": "fontest",
+          "target": "contest",
+          "left": "win first prir in the ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 4,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user03:task3:18:3",
+          "typed": "trier",
+          "target": "tried",
+          "left": "thenfirdt time he ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1,
+            "correct": 2
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user04:task2:17:2",
+          "typed": "printwrvis",
+          "target": "printer is",
+          "left": "the lawer ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 1,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user04:task2:25:6",
+          "typed": "ia",
+          "target": "is",
+          "left": "a tumor is ok provides it ",
+          "actual": null,
+          "recovered_by": [
+            "wrong_edit",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 5,
+            "wrong_edit": 1
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "google:user04:task3:5:2",
+          "typed": "od",
+          "target": "of",
+          "left": "the backyard ",
+          "actual": null,
+          "recovered_by": [
+            "wrong_edit",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 1,
+            "wrong_edit": 1
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "google:user06:task4:7:3",
+          "typed": "cqre",
+          "target": "care",
+          "left": "i di not ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 2,
+            "missed": 1
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "google:user06:task4:14:2",
+          "typed": "fiels",
+          "target": "field",
+          "left": "longer tyanbqbfootbqll ",
+          "actual": "files",
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 1,
+            "missed": 1
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "google:user08:task3:24:2",
+          "typed": "bigbpile",
+          "target": "big pile",
+          "left": "all togetherninbone ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 1,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "google:user09:task1:4:1",
+          "typed": "carebif",
+          "target": "care if",
+          "left": "indont ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        }
+      ]
+    },
+    "calibration": {
+      "words": 343,
+      "trials": 53,
+      "static": {
+        "cases": 343,
+        "clean": 241,
+        "tp": 59,
+        "fp": 3,
+        "clean_changes": 1,
+        "typos": 89,
+        "target_in_top8": 87,
+        "target_top1": 75,
+        "miss_ranking_or_acceptance": 28,
+        "unlabelled": 13,
+        "miss_absent_from_top8": 2,
+        "fn": 30,
+        "f05": 0.8753709198813057,
+        "precision": 0.9516129032258065,
+        "recall": 0.6629213483146067,
+        "clean_changes_per_1000": 4.149377593360996
+      },
+      "closed_loop": {
+        "cases": 343,
+        "clean": 241,
+        "tp": 62,
+        "fp": 4,
+        "clean_changes": 1,
+        "typos": 89,
+        "target_in_top8": 87,
+        "target_top1": 75,
+        "miss_ranking_or_acceptance": 25,
+        "unlabelled": 13,
+        "miss_absent_from_top8": 2,
+        "fn": 27,
+        "f05": 0.8781869688385269,
+        "precision": 0.9393939393939394,
+        "recall": 0.6966292134831461,
+        "clean_changes_per_1000": 4.149377593360996
+      },
+      "oracle_upstream_repair": {
+        "missed": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 64,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "target_in_top8": 87,
+          "target_top1": 76,
+          "miss_ranking_or_acceptance": 23,
+          "unlabelled": 13,
+          "miss_absent_from_top8": 2,
+          "fn": 25,
+          "f05": 0.8864265927977839,
+          "precision": 0.9411764705882353,
+          "recall": 0.7191011235955056,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "wrong_edit": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 62,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "target_in_top8": 87,
+          "target_top1": 75,
+          "miss_ranking_or_acceptance": 25,
+          "unlabelled": 13,
+          "miss_absent_from_top8": 2,
+          "fn": 27,
+          "f05": 0.8781869688385269,
+          "precision": 0.9393939393939394,
+          "recall": 0.6966292134831461,
+          "clean_changes_per_1000": 4.149377593360996
+        },
+        "all": {
+          "cases": 343,
+          "clean": 241,
+          "tp": 64,
+          "fp": 4,
+          "clean_changes": 1,
+          "typos": 89,
+          "target_in_top8": 87,
+          "target_top1": 76,
+          "miss_ranking_or_acceptance": 23,
+          "unlabelled": 13,
+          "miss_absent_from_top8": 2,
+          "fn": 25,
+          "f05": 0.8864265927977839,
+          "precision": 0.9411764705882353,
+          "recall": 0.7191011235955056,
+          "clean_changes_per_1000": 4.149377593360996
+        }
+      },
+      "attribution": {
+        "feedback_recovers_static_error": 3,
+        "feedback_loses_static_correct": 0,
+        "remaining_incorrect_words": 28,
+        "remaining_typos": 27,
+        "remaining_with_all_previous_words_correct": 24,
+        "remaining_with_upstream_labelled_errors": 4,
+        "remaining_recovered_repairing_missed": 2,
+        "remaining_recovered_repairing_all": 2,
+        "clean_damage": 1
+      },
+      "remaining_typo_stages": {
+        "target_rank2_to8": 12,
+        "target_top1_rejected": 13,
+        "target_not_generated": 2
+      },
+      "sentence_cer": {
+        "character_errors": 59,
+        "reference_characters": 1768,
+        "exact_trials": 20,
+        "trials": 53,
+        "cer": 0.0333710407239819
+      },
+      "upstream_repair_examples": [
+        {
+          "id": "vt_dev:d1:mobile759:4",
+          "typed": "dara",
+          "target": "data",
+          "left": "i have dome more ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 3,
+            "missed": 1
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "vt_dev:d1:mobile1682:1",
+          "typed": "yoy",
+          "target": "you",
+          "left": "an ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        }
+      ]
+    },
+    "selection": {
+      "words": 348,
+      "trials": 53,
+      "static": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 84,
+        "fp": 2,
+        "clean_changes": 0,
+        "typos": 122,
+        "target_in_top8": 113,
+        "target_top1": 103,
+        "miss_ranking_or_acceptance": 29,
+        "miss_absent_from_top8": 9,
+        "unlabelled": 4,
+        "fn": 38,
+        "f05": 0.9012875536480687,
+        "precision": 0.9767441860465116,
+        "recall": 0.6885245901639344,
+        "clean_changes_per_1000": 0.0
+      },
+      "closed_loop": {
+        "cases": 348,
+        "clean": 222,
+        "tp": 91,
+        "fp": 3,
+        "clean_changes": 0,
+        "typos": 122,
+        "target_in_top8": 113,
+        "target_top1": 106,
+        "miss_ranking_or_acceptance": 22,
+        "miss_absent_from_top8": 9,
+        "unlabelled": 4,
+        "fn": 31,
+        "f05": 0.9136546184738956,
+        "precision": 0.9680851063829787,
+        "recall": 0.7459016393442623,
+        "clean_changes_per_1000": 0.0
+      },
+      "oracle_upstream_repair": {
+        "missed": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 93,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "target_in_top8": 113,
+          "target_top1": 108,
+          "miss_ranking_or_acceptance": 20,
+          "miss_absent_from_top8": 9,
+          "unlabelled": 4,
+          "fn": 29,
+          "f05": 0.9262948207171314,
+          "precision": 0.9789473684210527,
+          "recall": 0.7622950819672131,
+          "clean_changes_per_1000": 0.0
+        },
+        "wrong_edit": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 91,
+          "fp": 3,
+          "clean_changes": 0,
+          "typos": 122,
+          "target_in_top8": 113,
+          "target_top1": 106,
+          "miss_ranking_or_acceptance": 22,
+          "miss_absent_from_top8": 9,
+          "unlabelled": 4,
+          "fn": 31,
+          "f05": 0.9136546184738956,
+          "precision": 0.9680851063829787,
+          "recall": 0.7459016393442623,
+          "clean_changes_per_1000": 0.0
+        },
+        "all": {
+          "cases": 348,
+          "clean": 222,
+          "tp": 93,
+          "fp": 2,
+          "clean_changes": 0,
+          "typos": 122,
+          "target_in_top8": 113,
+          "target_top1": 108,
+          "miss_ranking_or_acceptance": 20,
+          "miss_absent_from_top8": 9,
+          "unlabelled": 4,
+          "fn": 29,
+          "f05": 0.9262948207171314,
+          "precision": 0.9789473684210527,
+          "recall": 0.7622950819672131,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "attribution": {
+        "feedback_recovers_static_error": 8,
+        "feedback_loses_static_correct": 1,
+        "remaining_incorrect_words": 31,
+        "remaining_typos": 31,
+        "remaining_with_all_previous_words_correct": 21,
+        "remaining_with_upstream_labelled_errors": 10,
+        "remaining_recovered_repairing_missed": 3,
+        "remaining_recovered_repairing_all": 3
+      },
+      "remaining_typo_stages": {
+        "target_rank2_to8": 7,
+        "target_top1_rejected": 15,
+        "target_not_generated": 8,
+        "target_below8": 1
+      },
+      "sentence_cer": {
+        "character_errors": 58,
+        "reference_characters": 1821,
+        "exact_trials": 31,
+        "trials": 53,
+        "cer": 0.03185063152114223
+      },
+      "upstream_repair_examples": [
+        {
+          "id": "vt_dev:d3:mobile498:1",
+          "typed": "wr",
+          "target": "we",
+          "left": "fo ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        },
+        {
+          "id": "vt_dev:d3:mobile498:2",
+          "typed": "neeed",
+          "target": "need",
+          "left": "fo wr ",
+          "actual": "needed",
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "missed": 2
+          },
+          "stage": "target_rank2_to8"
+        },
+        {
+          "id": "vt_dev:d3:mobile753:4",
+          "typed": "bobus",
+          "target": "bonus",
+          "left": "did he get adigning ",
+          "actual": null,
+          "recovered_by": [
+            "missed",
+            "all"
+          ],
+          "prior_errors": {
+            "correct": 3,
+            "missed": 1
+          },
+          "stage": "target_top1_rejected"
+        }
+      ]
+    },
+    "evaluation": {
+      "words": 107,
+      "trials": 20,
+      "static": {
+        "cases": 107,
+        "clean": 85,
+        "tp": 15,
+        "fp": 1,
+        "clean_changes": 0,
+        "typos": 22,
+        "target_in_top8": 21,
+        "target_top1": 20,
+        "miss_ranking_or_acceptance": 6,
+        "miss_absent_from_top8": 1,
+        "fn": 7,
+        "unlabelled": 0,
+        "f05": 0.872093023255814,
+        "precision": 0.9375,
+        "recall": 0.6818181818181818,
+        "clean_changes_per_1000": 0.0
+      },
+      "closed_loop": {
+        "cases": 107,
+        "clean": 85,
+        "tp": 15,
+        "fp": 1,
+        "clean_changes": 0,
+        "typos": 22,
+        "target_in_top8": 21,
+        "target_top1": 20,
+        "miss_ranking_or_acceptance": 6,
+        "miss_absent_from_top8": 1,
+        "fn": 7,
+        "unlabelled": 0,
+        "f05": 0.872093023255814,
+        "precision": 0.9375,
+        "recall": 0.6818181818181818,
+        "clean_changes_per_1000": 0.0
+      },
+      "oracle_upstream_repair": {
+        "missed": {
+          "cases": 107,
+          "clean": 85,
+          "tp": 15,
+          "fp": 1,
+          "clean_changes": 0,
+          "typos": 22,
+          "target_in_top8": 21,
+          "target_top1": 19,
+          "miss_ranking_or_acceptance": 6,
+          "miss_absent_from_top8": 1,
+          "fn": 7,
+          "unlabelled": 0,
+          "f05": 0.872093023255814,
+          "precision": 0.9375,
+          "recall": 0.6818181818181818,
+          "clean_changes_per_1000": 0.0
+        },
+        "wrong_edit": {
+          "cases": 107,
+          "clean": 85,
+          "tp": 15,
+          "fp": 1,
+          "clean_changes": 0,
+          "typos": 22,
+          "target_in_top8": 21,
+          "target_top1": 20,
+          "miss_ranking_or_acceptance": 6,
+          "miss_absent_from_top8": 1,
+          "fn": 7,
+          "unlabelled": 0,
+          "f05": 0.872093023255814,
+          "precision": 0.9375,
+          "recall": 0.6818181818181818,
+          "clean_changes_per_1000": 0.0
+        },
+        "all": {
+          "cases": 107,
+          "clean": 85,
+          "tp": 15,
+          "fp": 1,
+          "clean_changes": 0,
+          "typos": 22,
+          "target_in_top8": 21,
+          "target_top1": 19,
+          "miss_ranking_or_acceptance": 6,
+          "miss_absent_from_top8": 1,
+          "fn": 7,
+          "unlabelled": 0,
+          "f05": 0.872093023255814,
+          "precision": 0.9375,
+          "recall": 0.6818181818181818,
+          "clean_changes_per_1000": 0.0
+        }
+      },
+      "attribution": {
+        "feedback_recovers_static_error": 0,
+        "feedback_loses_static_correct": 0,
+        "remaining_incorrect_words": 7,
+        "remaining_typos": 7,
+        "remaining_with_all_previous_words_correct": 6,
+        "remaining_with_upstream_labelled_errors": 1
+      },
+      "remaining_typo_stages": {
+        "target_top1_rejected": 5,
+        "target_not_generated": 1,
+        "target_rank2_to8": 1
+      },
+      "sentence_cer": {
+        "character_errors": 10,
+        "reference_characters": 584,
+        "exact_trials": 14,
+        "trials": 20,
+        "cer": 0.017123287671232876
+      },
+      "upstream_repair_examples": []
+    }
+  },
+  "native_work": {
+    "unique_calls": 6417,
+    "median_ms": 1.529,
+    "p95_ms": 2.7233999999999994,
+    "max_ms": 7.723,
+    "scope": "Sequential cached native Mac calls, includes diagnostic queries; not phone latency"
+  },
+  "limitations": [
+    "Recorded reconstructed copy typing; no user response to hypothetical replacements or phone deadlines.",
+    "Oracle probes use earlier labels and supply diagnostic upper bounds, not deployable correction.",
+    "Oracle attribution overlaps; a replacement can improve or harm later decisions.",
+    "Ambiguous prior words remain as actually committed even in the all-repaired probe.",
+    "Development-exposed English streams; no complete natural bilingual typing streams are available here.",
+    "Mobile correction snapshots and hard cases are not invented into complete streams."
+  ]
+}

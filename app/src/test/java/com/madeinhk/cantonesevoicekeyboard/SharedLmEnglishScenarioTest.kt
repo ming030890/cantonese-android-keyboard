@@ -11,6 +11,39 @@ import org.junit.Test
 import java.io.File
 
 class SharedLmEnglishScenarioTest {
+    @Test fun learnedTypingChannelCorrectsAndUndoesAcrossLayoutsThroughJni() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        // Exposed evaluation diagnostics; neither case was used to fit the channel.
+        val examples = listOf(Triple("i plan to be in the office ", "tommorow", "tomorrow"),
+            Triple("I think she ", "deosnt", "doesn't"))
+        for ((left, typed, fixed) in examples) {
+            for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+                KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+                val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+                val english = SharedLmEnglishEngine(quick::englishContextHandle)
+                assertEquals(fixed, english.predict(typed, floatArrayOf(), floatArrayOf(), left, "").correction)
+                KeyboardScenario(initialText = left, initialMode = mode, clipboardText = null,
+                    quickEngine = quick, englishEngine = english).use { s ->
+                    s.quickVersion = version
+                    s.start(); s.type(typed)
+                    val candidates = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                    assertTrue(candidates.any { it.text == fixed })
+                    assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                    s.press(KeyboardKeyKind.Space)
+                    assertEquals("$mode/$version", left + fixed + " ", s.editor.text)
+                    assertEquals("", s.editor.composing)
+                    s.press(KeyboardKeyKind.Delete)
+                    assertEquals(left, s.editor.text)
+                    assertEquals(typed, s.editor.composing)
+                    s.press(KeyboardKeyKind.Space)
+                    assertEquals(left + typed + " ", s.editor.text)
+                }
+            }
+        }
+    }
+
     @Test fun expandedShortTrainingCorrectsAndUndoesAcrossLayoutsThroughJni() {
         val library = System.getProperty("english.native.library")
         assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
@@ -575,8 +608,8 @@ class SharedLmEnglishScenarioTest {
                 Triple("exmaole", "example", true), Triple("tyoes", "types", false),
                 Triple("sjre", "sure", true), Triple("varely", "barely", true),
                 Triple("engloaj", "english", true), Triple("troggee", "trigger", true),
-                // The accepted fit now fixes mwrge as well as offering merge.
-                Triple("mwrge", "merge", true), Triple("wrror", "error", false),
+                // The accepted fit now fixes mwrge and wrror as well as offering merge.
+                Triple("mwrge", "merge", true), Triple("wrror", "error", true),
                 Triple("inthe", "in the", false))) {
                 val prediction = english.predict(typed, floatArrayOf(), floatArrayOf(), "", "")
                 assertTrue("$typed still offers $target", prediction.candidates.any { it.word.equals(target, true) })

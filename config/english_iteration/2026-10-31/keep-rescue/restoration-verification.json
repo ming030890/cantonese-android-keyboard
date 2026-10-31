@@ -1,0 +1,17 @@
+{
+  "restored_native_source_exact": true,
+  "restored_library_exact": true,
+  "final_keyboard_gate": "BUILD SUCCESSFUL",
+  "final_jvm_tests": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "skipped_scope": "Optional product replay requires session/report properties; it was run for the candidate and the accepted checkpoint was already measured",
+  "asset_package_passed": true,
+  "accepted_score": 0.8939210767471755,
+  "accepted_probe_sha256": "82f64b42815feafe9872dedad2c19206948178436667a39e149b447292e304d8",
+  "accepted_library_sha256": "7191f3213673f2101a2f064016b8143504a8609a159e6a545457836ef94faa68",
+  "experimental_candidate_deployed": false
+}

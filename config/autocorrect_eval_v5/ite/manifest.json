@@ -1,0 +1,36 @@
+{
+  "schema": "keyboard-autocorrect-eval-v5-ite-manifest",
+  "date": "2026-10-31",
+  "source": "https://zenodo.org/records/12528163",
+  "files": {
+    "confirmation-sessions.jsonl": "47a4ea3b84f9cbcadfdd55ae5acf69879b30cc25e2cdacd671e1c4775b18f5b6",
+    "confirmation.jsonl": "49dbab4b7fc065a8529fca7c54044d04355d4c12c7141f9be10a9e2e477b9ebb",
+    "development-english.jsonl": "d7f014b861655fa40c6a9f0aa521465b08700d9a1e89b5e2efabce4a75cdc13b",
+    "development-quick3.jsonl": "35dc1fdd46bd034ddac8a51bd179476eee9f8a7c4d90930b28411898687872e1",
+    "development-quick5.jsonl": "a86ddee8824f4455344a9bfed4eb0c899f9043b1189fa456c48cdc089fe83d65",
+    "development-sessions.jsonl": "f9949d457a8fade8612e35c5404404af5762ec3b8a007f109bd5395ff6afd692",
+    "development.jsonl": "7518affbeb3af4d6856651b4ed3141e039163efac73c1861f71812cfeaad1be1",
+    "ite-archive-index.json": "51f251f6e0e09e1362b0d5f4d877cc3a7ed37528d59a650b8188dd2b45eaea7e",
+    "known-ite-prompts.json": "d52e4541eba93c9fac62bd9086058d5a28849a783d56f19b5777fc14f1c02def",
+    "protocol.json": "614f19af15201e94c4bbcf2687803f7a72f20ce58eef20f4ff91651baeade999",
+    "selected-traces.jsonl": "502be4f10d3b16e731b00eb8e33356a11060648e679ccc194fe14466f019b71f"
+  },
+  "development": {
+    "attempts": 421,
+    "participants": 398,
+    "prompts": 157,
+    "status": "exposed by accepted-baseline replay; not fresh confirmation"
+  },
+  "confirmation": {
+    "attempts": 417,
+    "participants": 386,
+    "prompts": 162,
+    "status": "not run through any model in this study"
+  },
+  "training_exclusion": "Exclude both folds, participants, prompt groups and derived variants from training and tuning corpora. Development may guide experiments; confirmation must stay closed until a candidate and acceptance rule are fixed.",
+  "split_overlap": {
+    "participants": 0,
+    "prompts": 0
+  },
+  "score_policy": "Report error-bearing complete lexical message recovery by input word-edit burden; clean harm and exact-text recovery separately. Do not pool layout variants or equate this with deployment quality. Frozen v4 objective unchanged."
+}

@@ -1,0 +1,226 @@
+[
+  {
+    "filename": "ITE_words/",
+    "size": 0,
+    "compressed": 0,
+    "header_offset": 0,
+    "method": 0,
+    "crc": 0
+  },
+  {
+    "filename": "ITE_words/ac_words_en.csv",
+    "size": 27072686,
+    "compressed": 8229688,
+    "header_offset": 72,
+    "method": 8,
+    "crc": 1407251172
+  },
+  {
+    "filename": "ITE_words/ac_words_fi.csv",
+    "size": 1533022,
+    "compressed": 422086,
+    "header_offset": 8229863,
+    "method": 8,
+    "crc": 746850316
+  },
+  {
+    "filename": "ITE_words/pred_words_en.csv",
+    "size": 22805944,
+    "compressed": 6656113,
+    "header_offset": 8652052,
+    "method": 8,
+    "crc": 3840305651
+  },
+  {
+    "filename": "ITE_words/pred_words_fi.csv",
+    "size": 2424286,
+    "compressed": 669216,
+    "header_offset": 15308270,
+    "method": 8,
+    "crc": 2555547788
+  },
+  {
+    "filename": "processed2020/",
+    "size": 0,
+    "compressed": 0,
+    "header_offset": 15977591,
+    "method": 0,
+    "crc": 0
+  },
+  {
+    "filename": "processed2020/finnish/",
+    "size": 0,
+    "compressed": 0,
+    "header_offset": 15977667,
+    "method": 0,
+    "crc": 0
+  },
+  {
+    "filename": "processed2020/finnish/sentences.csv",
+    "size": 32098,
+    "compressed": 12896,
+    "header_offset": 15977751,
+    "method": 8,
+    "crc": 1831092131
+  },
+  {
+    "filename": "processed2020/finnish/log_data_labeled_fi.csv",
+    "size": 527051994,
+    "compressed": 84219127,
+    "header_offset": 15990760,
+    "method": 8,
+    "crc": 925672708
+  },
+  {
+    "filename": "processed2020/finnish/participants_labeled_fi.csv",
+    "size": 3242325,
+    "compressed": 633677,
+    "header_offset": 100210010,
+    "method": 8,
+    "crc": 830193994
+  },
+  {
+    "filename": "processed2020/finnish/test_sections_labeled_fi.csv",
+    "size": 17980201,
+    "compressed": 6285902,
+    "header_offset": 100843814,
+    "method": 8,
+    "crc": 1937467437
+  },
+  {
+    "filename": "processed2020/english/",
+    "size": 0,
+    "compressed": 0,
+    "header_offset": 107129844,
+    "method": 0,
+    "crc": 0
+  },
+  {
+    "filename": "processed2020/english/participants_labeled.csv",
+    "size": 20699602,
+    "compressed": 4311462,
+    "header_offset": 107129928,
+    "method": 8,
+    "crc": 2645405131
+  },
+  {
+    "filename": "processed2020/english/test_sections_labeled.csv",
+    "size": 99249380,
+    "compressed": 39165043,
+    "header_offset": 111441514,
+    "method": 8,
+    "crc": 3282053333
+  },
+  {
+    "filename": "processed2020/english/log_data_labeled.csv",
+    "size": 2943303403,
+    "compressed": 501247951,
+    "header_offset": 150606682,
+    "method": 8,
+    "crc": 2259866519
+  },
+  {
+    "filename": "processed2020/english/sentences.csv",
+    "size": 82494,
+    "compressed": 31667,
+    "header_offset": 651854753,
+    "method": 8,
+    "crc": 1050464840
+  },
+  {
+    "filename": "raw_data/",
+    "size": 0,
+    "compressed": 0,
+    "header_offset": 651886533,
+    "method": 0,
+    "crc": 0
+  },
+  {
+    "filename": "raw_data/typingtest_english_2020-06-03/",
+    "size": 0,
+    "compressed": 0,
+    "header_offset": 651886604,
+    "method": 0,
+    "crc": 0
+  },
+  {
+    "filename": "raw_data/typingtest_english_2020-06-03/README.txt",
+    "size": 648,
+    "compressed": 386,
+    "header_offset": 651886705,
+    "method": 8,
+    "crc": 4111074289
+  },
+  {
+    "filename": "raw_data/typingtest_english_2020-06-03/raw_log_data_en_2020-06-03.csv",
+    "size": 65357383836,
+    "compressed": 5905696018,
+    "header_offset": 651887218,
+    "method": 8,
+    "crc": 2872059209
+  },
+  {
+    "filename": "raw_data/typingtest_english_2020-06-03/raw_participants_en_2020-06-03.csv",
+    "size": 87144128,
+    "compressed": 10624194,
+    "header_offset": 6557583411,
+    "method": 8,
+    "crc": 4180490726
+  },
+  {
+    "filename": "raw_data/typingtest_english_2020-06-03/raw_sentences_en_2020-06-03.csv",
+    "size": 88262,
+    "compressed": 31790,
+    "header_offset": 6568207756,
+    "method": 8,
+    "crc": 150969566
+  },
+  {
+    "filename": "raw_data/typingtest_english_2020-06-03/raw_test_sections_en_2020-06-03.csv",
+    "size": 384948403,
+    "compressed": 158014393,
+    "header_offset": 6568239694,
+    "method": 8,
+    "crc": 2400312593
+  },
+  {
+    "filename": "raw_data/typingtest_finnish_2020-06-03/",
+    "size": 0,
+    "compressed": 0,
+    "header_offset": 6726254239,
+    "method": 0,
+    "crc": 0
+  },
+  {
+    "filename": "raw_data/typingtest_finnish_2020-06-03/raw_participants_fi_2020-06-03.csv",
+    "size": 5825209,
+    "compressed": 763947,
+    "header_offset": 6726254340,
+    "method": 8,
+    "crc": 1491772317
+  },
+  {
+    "filename": "raw_data/typingtest_finnish_2020-06-03/raw_log_data_fi_2020-06-03.csv",
+    "size": 7022328317,
+    "compressed": 571725553,
+    "header_offset": 6727018438,
+    "method": 8,
+    "crc": 3171440795
+  },
+  {
+    "filename": "raw_data/typingtest_finnish_2020-06-03/raw_sentences_fi_2020-06-03.csv",
+    "size": 32098,
+    "compressed": 12896,
+    "header_offset": 7298744166,
+    "method": 8,
+    "crc": 1831092131
+  },
+  {
+    "filename": "raw_data/typingtest_finnish_2020-06-03/raw_test_sections_fi_2020-06-03.csv",
+    "size": 30756202,
+    "compressed": 10912581,
+    "header_offset": 7298757210,
+    "method": 8,
+    "crc": 809063603
+  }
+]

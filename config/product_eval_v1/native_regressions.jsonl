@@ -1,0 +1,10 @@
+{"id":"ambiguity-burger-butter","left":"","typed":"butger","expected":"butger","basis":"Existing SharedLmEnglishScenarioTest.refittedAcceptanceCorrectsAtSpaceAndUndoAcrossLayoutsThroughJni assertion; no unique intended repair"}
+{"id":"uncertain-wastg","left":"","typed":"wastg","expected":"wastg","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"preserve-bokeh","left":"","typed":"bokeh","expected":"bokeh","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"preserve-alstom","left":"","typed":"Alstom","expected":"Alstom","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"preserve-xentara","left":"","typed":"Xentara","expected":"Xentara","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"uncertain-thses","left":"","typed":"thses","expected":"thses","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"uncertain-inthe","left":"","typed":"inthe","expected":"inthe","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"preserve-apostrophe","left":"I ","typed":"don't","expected":"don't","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"uncertain-completion","left":"I said ","typed":"hel","expected":"hel","basis":"Existing experiment_noisy_acceptance.PRESERVATION guard"}
+{"id":"known-correction-game","left":"","typed":"gwme","expected":"game","basis":"Existing SharedLmEnglishScenarioTest.refittedAcceptanceCorrectsAtSpaceAndUndoAcrossLayoutsThroughJni assertion"}

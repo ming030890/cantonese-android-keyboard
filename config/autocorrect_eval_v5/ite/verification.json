@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-31",
+  "keyboard_gate": "passed",
+  "unit_scenario_tests": {
+    "tests": 287,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gate_tasks": [
+    "testDebugUnitTest",
+    "testDebugScreenshotTestDefaultTestSuite",
+    "assembleDebug"
+  ],
+  "python_tests": {
+    "ite_builder_and_message_scorer": 11,
+    "product_session_schema": 5,
+    "failures": 0
+  },
+  "frozen_hashes_verified": true,
+  "development_replay": {
+    "layouts": [
+      "english",
+      "quick3",
+      "quick5"
+    ],
+    "attempts_per_layout": 421,
+    "submitted_text_identical_across_layouts": true
+  },
+  "confirmation_replayed": false,
+  "model_asset_validation_passed": true,
+  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "scorer_sha256": "28b47e0db02d4bb9ae926de5d41bfe2673562932fbdcb3a175bed3fdb3c5f6f1",
+  "verified_harness_sha256": "c2787143f3f4215e57fa75ffe994736c3a9158896edb5042e4916806672a6f9e",
+  "source_diff_whitespace_check": "passed",
+  "production_engine_changed": false,
+  "phone_latency_measured": false
+}

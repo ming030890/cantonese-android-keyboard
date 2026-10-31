@@ -1,0 +1,184 @@
+{
+  "protocol": {
+    "schema": "keep-rescue-chat-confirmation-v1",
+    "confirmation_sha256": "ad9cd66b407e43b42852e28d101f81c92c4870a1dfc820ec8c476163b29da15a",
+    "policy_sha256": "51a22a1b3d692fca87dfef5efa767f73f112aea16d54accc0deedf65ec4e4cff",
+    "probe_sha256": "f5b20d58a37e0def4f1637511535375851c2aa9e7de57a1b61f0ff1389d9d6c2",
+    "baseline_probe_sha256": "82f64b42815feafe9872dedad2c19206948178436667a39e149b447292e304d8",
+    "script_sha256": "a2bf4962e22e46ae724ac28fac68ce42ad1472012a0f3c5e04f89899199036d8",
+    "selection": "Best of four models by TRAIN-only calibration F0.5 with source-family wrong/clean budgets and TP retention; stable numeric port passed development and unchanged JNI guards",
+    "decision": "Every chat panel must retain baseline TP, FP and clean-word budgets, with at least one improved count; natural and synthetic errors reported separately",
+    "previously_scored": false,
+    "product_checks_passed": true
+  },
+  "metrics": {
+    "baseline": {
+      "chat_natural_spelling": {
+        "cases": 15,
+        "typos": 15,
+        "tp": 9,
+        "fp": 1,
+        "clean_changes": 0,
+        "target_in_top8": 11,
+        "target_top1": 9,
+        "miss_absent_from_top8": 4,
+        "miss_ranking_or_acceptance": 2,
+        "fn": 6,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.8181818181818182,
+        "precision": 0.9,
+        "recall": 0.6,
+        "clean_changes_per_1000": null
+      },
+      "chat_preservation": {
+        "cases": 1196,
+        "clean": 1196,
+        "tp": 0,
+        "fp": 2,
+        "clean_changes": 2,
+        "fn": 0,
+        "unlabelled": 0,
+        "typos": 0,
+        "target_in_top8": 0,
+        "target_top1": 0,
+        "miss_absent_from_top8": 0,
+        "miss_ranking_or_acceptance": 0,
+        "f05": 0.0,
+        "precision": 0.0,
+        "recall": null,
+        "clean_changes_per_1000": 1.6722408026755853
+      },
+      "chat_synthetic_typo": {
+        "cases": 710,
+        "typos": 710,
+        "tp": 540,
+        "fp": 17,
+        "clean_changes": 0,
+        "target_in_top8": 697,
+        "target_top1": 638,
+        "miss_ranking_or_acceptance": 157,
+        "miss_absent_from_top8": 13,
+        "fn": 170,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.9189925119128659,
+        "precision": 0.9694793536804309,
+        "recall": 0.7605633802816901,
+        "clean_changes_per_1000": null
+      }
+    },
+    "candidate": {
+      "chat_natural_spelling": {
+        "cases": 15,
+        "typos": 15,
+        "tp": 9,
+        "fp": 2,
+        "clean_changes": 0,
+        "target_in_top8": 11,
+        "target_top1": 9,
+        "miss_absent_from_top8": 4,
+        "miss_ranking_or_acceptance": 2,
+        "fn": 6,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.7627118644067796,
+        "precision": 0.8181818181818182,
+        "recall": 0.6,
+        "clean_changes_per_1000": null
+      },
+      "chat_preservation": {
+        "cases": 1196,
+        "clean": 1196,
+        "tp": 0,
+        "fp": 2,
+        "clean_changes": 2,
+        "fn": 0,
+        "unlabelled": 0,
+        "typos": 0,
+        "target_in_top8": 0,
+        "target_top1": 0,
+        "miss_absent_from_top8": 0,
+        "miss_ranking_or_acceptance": 0,
+        "f05": 0.0,
+        "precision": 0.0,
+        "recall": null,
+        "clean_changes_per_1000": 1.6722408026755853
+      },
+      "chat_synthetic_typo": {
+        "cases": 710,
+        "typos": 710,
+        "tp": 544,
+        "fp": 12,
+        "clean_changes": 0,
+        "target_in_top8": 698,
+        "target_top1": 644,
+        "miss_ranking_or_acceptance": 154,
+        "miss_absent_from_top8": 12,
+        "fn": 166,
+        "unlabelled": 0,
+        "clean": 0,
+        "f05": 0.9270620313565099,
+        "precision": 0.9784172661870504,
+        "recall": 0.7661971830985915,
+        "clean_changes_per_1000": null
+      }
+    }
+  },
+  "uncertainty": {
+    "chat_natural_spelling": {
+      "groups": 10,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.5170222092343659,
+        0.9649122807017544
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        -0.1638157894736842,
+        0.0
+      ]
+    },
+    "chat_preservation": {
+      "groups": 23,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.0,
+        0.0
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "chat_synthetic_typo": {
+      "groups": 23,
+      "replicates": 1000,
+      "seed": 2026102405,
+      "method": "Percentile cluster bootstrap: participant for touch, prompt for Aalto, scenario for authored",
+      "f05_95_interval": [
+        0.9077807997951362,
+        0.9444077460148936
+      ],
+      "limitation": "Sampling uncertainty only; does not address selection bias, exposure, or population mismatch",
+      "paired_delta_f05_95_interval": [
+        -0.0014125304561935805,
+        0.01566867589091432
+      ]
+    }
+  },
+  "qualified": false,
+  "confirmation_now_exposed": true,
+  "limitations": [
+    "Small public PhotoChat source, not private user typing or tap traces",
+    "Natural typo labels manually reviewed from source, not supplied by authors",
+    "Preservation asserts retaining source text, not confirmed user intent; real-word source mistakes may remain",
+    "Synthetic typo panel is not natural error prevalence",
+    "Direct current CNN TRAIN fingerprints and conversation groups excluded; inherited exposure remains incompletely audited"
+  ]
+}

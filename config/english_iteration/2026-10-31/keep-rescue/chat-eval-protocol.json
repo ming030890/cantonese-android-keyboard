@@ -1,0 +1,79 @@
+{
+  "schema": "public-chat-keep-eval-v2",
+  "source_sha256": "c21b7785eec345681a12ba7cce33a103c60cdfd8c4888e567641d494365f87a9",
+  "script_sha256": "7874cd96a7b984c60a062dbc53372adde06f50212fb5206ecfefe28310efce78",
+  "review_sha256": "c40b9fe8d4f54698ffc9d708f602986b9b7c3a6a18464ecbe3d28cb4c74aa55e",
+  "split_hashes": {
+    "development": "1fe8f1d6916e0c396afa62fca9a1a7ec4c7f08a3ad365186483a6238511485a6",
+    "confirmation": "ad9cd66b407e43b42852e28d101f81c92c4870a1dfc820ec8c476163b29da15a"
+  },
+  "counts": {
+    "development": {
+      "chat_preservation": 1293,
+      "chat_synthetic_typo": 765,
+      "chat_natural_spelling": 14
+    },
+    "confirmation": {
+      "chat_preservation": 1196,
+      "chat_synthetic_typo": 710,
+      "chat_natural_spelling": 15
+    }
+  },
+  "audit": {
+    "selection_origins": 3388,
+    "train_conversation_excluded": 2849,
+    "previous_or_duplicate_input_excluded": 551,
+    "duplicate_utterance_excluded": 17,
+    "eligible_source_conversations": 45,
+    "eligible_unique_utterances": 522
+  },
+  "natural_spelling_annotations": {
+    "ahd": "had",
+    "beutiful": "beautiful",
+    "bthe": "the",
+    "cagar": "cigar",
+    "dont": "don't",
+    "ejoying": "enjoying",
+    "gess": "guess",
+    "i'l": "I'll",
+    "quarentine": "quarantine",
+    "sccissor": "scissor",
+    "thats": "that's",
+    "theres": "there's",
+    "wasd": "was",
+    "woth": "with"
+  },
+  "conversational_preservation": [
+    "awwww",
+    "brayden",
+    "cya",
+    "goliaths",
+    "hah",
+    "haha",
+    "hahaha",
+    "maci",
+    "mmmm",
+    "nite",
+    "ohhh",
+    "okk",
+    "omg"
+  ],
+  "quarantined_forms": [
+    "eet",
+    "jadw",
+    "mato",
+    "tiime"
+  ],
+  "train_group_overlap": 0,
+  "train_model_fingerprint_overlap": 0,
+  "previous_exact_input_overlap": 0,
+  "model_outputs_used_for_sampling": false,
+  "confirmation_scored": false,
+  "limitations": [
+    "Small public PhotoChat source, not private user typing or tap traces",
+    "Natural typo labels manually reviewed from source, not supplied by authors",
+    "Preservation asserts retaining source text, not confirmed user intent; real-word source mistakes may remain",
+    "Synthetic typo panel is not natural error prevalence",
+    "Direct current CNN TRAIN fingerprints and conversation groups excluded; inherited exposure remains incompletely audited"
+  ]
+}
