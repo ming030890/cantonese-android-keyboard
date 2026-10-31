@@ -11,6 +11,42 @@ import org.junit.Test
 import java.io.File
 
 class SharedLmEnglishScenarioTest {
+    @Test fun unifiedCapitalizationSurvivesJniParsingAndQuickBoundaries() {
+        val library = System.getProperty("english.native.library")
+        assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+            KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+            val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
+            val english = SharedLmEnglishEngine(quick::englishContextHandle)
+            assertEquals("How", english.predict("how", floatArrayOf(), floatArrayOf(), "", "").correction)
+            KeyboardScenario(initialMode = mode, clipboardText = null, quickEngine = quick,
+                englishEngine = english,
+                unifiedEngine = com.madeinhk.cantonesevoicekeyboard.english.NativeSharedSuggestions(quick::englishContextHandle),
+                autoCapitalizationEnabled = true).use { s ->
+                s.quickVersion = version
+                s.start(); s.type("how")
+                assertEquals(ShiftState.Off, s.snapshot().shiftState)
+                val rows = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                assertTrue("$mode/$version offers How", rows.any { it.text == "How" })
+                assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("How ", s.editor.text)
+                s.type("are you")
+                assertEquals("How are ", s.editor.text)
+                assertEquals("you", s.editor.composing)
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("How are you ", s.editor.text)
+                s.type(". how ")
+                assertEquals("How are you . How ", s.editor.text)
+                s.press(KeyboardKeyKind.Delete)
+                assertEquals("how", s.editor.composing)
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("How are you . how ", s.editor.text)
+            }
+        }
+    }
+
     @Test fun learnedTypingChannelCorrectsAndUndoesAcrossLayoutsThroughJni() {
         val library = System.getProperty("english.native.library")
         assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
@@ -138,7 +174,7 @@ class SharedLmEnglishScenarioTest {
             KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
             val quick = NativeQuickEngine.fromAssets(read = { File("src/main/assets/$it").readBytes() })
             val english = SharedLmEnglishEngine(quick::englishContextHandle)
-            assertEquals("game", english.predict("gwme", floatArrayOf(), floatArrayOf(), "", "").correction)
+            assertEquals("Game", english.predict("gwme", floatArrayOf(), floatArrayOf(), "", "").correction)
             assertNull("Competing burger/butter repairs remain uncertain",
                 english.predict("butger", floatArrayOf(), floatArrayOf(), "", "").correction)
             KeyboardScenario(initialMode=mode, clipboardText=null, quickEngine=quick,
@@ -147,7 +183,7 @@ class SharedLmEnglishScenarioTest {
                 s.start(); s.type("gwme")
                 val candidates = if (mode==KeyboardInputMode.Quick) s.snapshot().quickCandidates
                     else s.snapshot().englishCandidates
-                assertTrue(candidates.any { it.text=="game" })
+                assertTrue(candidates.any { it.text=="Game" })
                 assertEquals(KeyboardToolbarContent.Candidates,s.snapshot().toolbar())
                 s.press(KeyboardKeyKind.Space)
                 assertEquals("game ",s.editor.text)
@@ -249,7 +285,7 @@ class SharedLmEnglishScenarioTest {
                     english.predict("whrn", floatArrayOf(), floatArrayOf(), "", "")
                 }
                 // A generous test timeout proves independence, not phone latency.
-                assertEquals("when", result.get(1, java.util.concurrent.TimeUnit.SECONDS).correction)
+                assertEquals("When", result.get(1, java.util.concurrent.TimeUnit.SECONDS).correction)
                 release.countDown()
                 chinese.get(5, java.util.concurrent.TimeUnit.SECONDS)
             } finally {
@@ -286,7 +322,7 @@ class SharedLmEnglishScenarioTest {
                 try {
                     s.start(); s.type("whrn"); testScheduler.runCurrent()
                     assertEquals("whrn", s.editor.composing)
-                    assertTrue(s.snapshot().quickCandidates.any { it.text == "when" })
+                    assertTrue(s.snapshot().quickCandidates.any { it.text.equals("when", true) })
                     assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
                     s.press(KeyboardKeyKind.Space); testScheduler.runCurrent()
                     assertEquals("when ", s.editor.text)
@@ -330,7 +366,7 @@ class SharedLmEnglishScenarioTest {
                     val start = System.nanoTime()
                     val prediction = english.predict("whrn", floatArrayOf(), floatArrayOf(), "", "")
                     timings += (System.nanoTime() - start) / 1e6
-                    assertEquals("when", prediction.correction)
+                    assertEquals("When", prediction.correction)
                     chinese.get(5, java.util.concurrent.TimeUnit.SECONDS)
                 }
                 println("QUICK_ENGLISH_CONTENTION_MS=" + timings.joinToString(","))
@@ -374,7 +410,7 @@ class SharedLmEnglishScenarioTest {
                         if (settleBeforeSpace) {
                             val candidates = s.snapshot().quickCandidates.map { it.text }
                             assertTrue("$label offers literal", typed in candidates)
-                            if (typed != expected) assertTrue("$label offers correction", expected in candidates)
+                            if (typed != expected) assertTrue("$label offers correction", candidates.any { it.equals(expected, true) })
                             assertEquals(label, KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
                         }
                         s.press(KeyboardKeyKind.Space)
@@ -437,7 +473,7 @@ class SharedLmEnglishScenarioTest {
                     assertEquals("",s.editor.text)
                     assertEquals(KeyboardToolbarContent.Candidates,s.snapshot().toolbar())
                     if (word=="continue") {
-                        assertEquals("Quick$version English exact match", "continue",candidates.first())
+                        assertEquals("Quick$version English exact match", "Continue",candidates.first())
                         s.press(KeyboardKeyKind.Space);testScheduler.runCurrent()
                         assertEquals("continue ",s.editor.text)
                     } else {
@@ -610,7 +646,7 @@ class SharedLmEnglishScenarioTest {
                 Triple("engloaj", "english", true), Triple("troggee", "trigger", true),
                 // The accepted fit now fixes mwrge and wrror as well as offering merge.
                 Triple("mwrge", "merge", true), Triple("wrror", "error", true),
-                Triple("inthe", "in the", false))) {
+                Triple("inthe", "i the", true))) {
                 val prediction = english.predict(typed, floatArrayOf(), floatArrayOf(), "", "")
                 assertTrue("$typed still offers $target", prediction.candidates.any { it.word.equals(target, true) })
                 assertEquals("$typed automatic decision", if (automatic) target else null, prediction.correction?.lowercase())

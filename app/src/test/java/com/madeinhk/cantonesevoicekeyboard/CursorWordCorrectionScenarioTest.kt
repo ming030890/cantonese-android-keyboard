@@ -13,6 +13,72 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CursorWordCorrectionScenarioTest {
+    @Test fun typingDismissesManualAlternativesWithAutomaticCorrectionOff() {
+        for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+            KeyboardScenario(initialText = "Fix teh word.", initialMode = mode,
+                englishEngine = ScenarioEnglishEngine()).use { s ->
+                s.autocorrectLayouts = emptySet()
+                s.start(); s.moveCursor(5)
+                assertTrue(s.english!!.inspectingWord)
+                s.type("x")
+                assertFalse(s.english.inspectingWord)
+                assertEquals("Fix txeh word.", s.editor.text + s.editor.composing + s.editor.right)
+                val rows = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                assertFalse(rows.any { it.text == "the" })
+            }
+        }
+    }
+
+    @Test fun manualCorrectionWorksWithAutomaticCorrectionOffAndWhenOpeningInsideWord() = runTest {
+        for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+            for (openInsideWord in listOf(false, true)) {
+                KeyboardScenario(initialText = if (openInsideWord) "Fix t" else "Fix teh word.", initialMode = mode,
+                    clipboardText = "clipboard", englishEngine = ScenarioEnglishEngine(),
+                    scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler)),
+                    englishDispatcher = StandardTestDispatcher(testScheduler)).use { s ->
+                    s.autocorrectLayouts = emptySet()
+                    if (openInsideWord) s.editor.right = "eh word."
+                    s.start()
+                    if (!openInsideWord) s.moveCursor(5)
+                    runCurrent()
+                    assertEquals("", s.editor.composing)
+                    val rows = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                    assertEquals(listOf("teh", "the"), rows.map { it.text })
+                    assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+                    assertNotNull(s.snapshot().clipboard)
+                    assertEquals("Fix teh word.", s.editor.text + s.editor.right)
+                    s.choose("the"); runCurrent()
+                    assertEquals("Fix the word.", s.editor.text + s.editor.right)
+                    assertEquals("", s.editor.composing)
+                }
+            }
+        }
+    }
+
+    @Test fun nativeManualCapitalizationReplacesWordUnderCursorAcrossLayouts() {
+        val library = System.getProperty("english.native.library")
+        org.junit.Assume.assumeNotNull("Actual JNI requires -PenglishNativeLibrary", library)
+        System.load(requireNotNull(library))
+        for ((mode, version) in listOf(KeyboardInputMode.AlphaNum to 3,
+            KeyboardInputMode.Quick to 3, KeyboardInputMode.Quick to 5)) {
+            val quick = com.madeinhk.cantonesevoicekeyboard.quick.NativeQuickEngine.fromAssets(
+                read = { java.io.File("src/main/assets/$it").readBytes() })
+            KeyboardScenario(initialText = "how are you", initialMode = mode, quickEngine = quick,
+                englishEngine = SharedLmEnglishEngine(quick::englishContextHandle),
+                unifiedEngine = NativeSharedSuggestions(quick::englishContextHandle)).use { s ->
+                s.quickVersion = version
+                s.autocorrectLayouts = emptySet()
+                s.start(); s.moveCursor(1)
+                val rows = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
+                assertTrue("$mode/$version offers explicit capitalization", rows.any { it.text == "How" })
+                assertEquals("how are you", s.editor.text + s.editor.right)
+                s.choose("How")
+                assertEquals("How are you", s.editor.text + s.editor.right)
+                assertEquals("", s.editor.composing)
+            }
+        }
+    }
+
     @Test fun inspectingAndReplacingWholeWordPreservesBothSidesAcrossLayouts() = runTest {
         for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
             val engine = ScenarioEnglishEngine()
@@ -81,15 +147,12 @@ class CursorWordCorrectionScenarioTest {
         }
     }
 
-    @Test fun selectionsProtectedFieldsAndDisabledCorrectionDoNotInspect() {
+    @Test fun selectionsAndProtectedFieldsDoNotInspect() {
         for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
             KeyboardScenario(initialText = "Fix teh word.", initialMode = mode,
                 clipboardText = null, englishEngine = ScenarioEnglishEngine()).use { s ->
                 s.start(); s.moveCursor(5, 7)
                 assertFalse(s.english!!.inspectingWord)
-                s.autocorrectLayouts = emptySet(); s.moveCursor(5)
-                assertFalse(s.english.inspectingWord)
-                s.autocorrectLayouts = setOf(KeyboardSettings.LAYOUT_ENGLISH, KeyboardSettings.LAYOUT_QUICK)
                 s.start(EditorInfo().apply { inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD })
                 s.moveCursor(5)
                 assertFalse(s.english.inspectingWord)

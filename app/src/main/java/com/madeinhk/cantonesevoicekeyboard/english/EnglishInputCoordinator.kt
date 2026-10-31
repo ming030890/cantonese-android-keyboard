@@ -33,6 +33,7 @@ internal class EnglishInputCoordinator(
     private var joinedQuick: QuickInputCoordinator? = null
     private var quickSnapshot: QuickSuggestionInput? = null
     var quickEnglishEnabled: () -> Boolean = { true }
+    var autoCapitalizationEnabled: () -> Boolean = { true }
     val hasUnifiedSuggestions get() = unifiedEngine != null
 
     private data class CursorWord(val before: String, val after: String, val cursor: Int,
@@ -328,6 +329,13 @@ internal class EnglishInputCoordinator(
         }
     }
 
+    private fun automaticWord(fixed: String, typed: String): String {
+        val cased = caseWord(fixed, typed)
+        return if (!autoCapitalizationEnabled() && typed.firstOrNull()?.isLowerCase() == true &&
+            cased.drop(1).none { it.isUpperCase() })
+            cased.replaceFirstChar { it.lowercaseChar() } else cased
+    }
+
     private fun eligible() = safeStart && word.length in 1..64 && word.any { it.isAsciiLetter() } &&
         word.all { it.isAsciiLetter() || it == '\'' || it == '’' } &&
         (word == word.lowercase(Locale.ROOT) || word == word.uppercase(Locale.ROOT) ||
@@ -385,9 +393,13 @@ internal class EnglishInputCoordinator(
         val quote = if (original.last() in "'’" && apostropheBase?.first == original.dropLast(1)) original.takeLast(1) else ""
         val source = if (quote.isNotEmpty()) apostropheBase!!.second else prediction
         val currentResult = if (quote.isNotEmpty()) true else resultWord == word
-        val allowEnglishDecision=!chineseMatch || engine?.allowsQuickCodeCorrections==true
+        // Case-only changes preserve the literal Quick letters. A matching
+        // Chinese code must not veto their casing while the unified backend
+        // operates without loading a separate English engine instance.
+        val caseOnly = source.correction?.let { it != original && it.equals(original, ignoreCase = true) } == true
+        val allowEnglishDecision=!chineseMatch || engine?.allowsQuickCodeCorrections==true || caseOnly
         val replacement = selected ?: if (allowCorrection && !suppress && allowEnglishDecision && eligible() && currentResult)
-            source.correction?.let { caseWord(it, original) + quote } ?: original else original
+            source.correction?.let { automaticWord(it, original) + quote } ?: original else original
         val delayed = pending?.takeIf {
             allowCorrection && !suppress && allowEnglishDecision && eligible() && !currentResult &&
                 selected == null && delimiter.isNotEmpty()
@@ -423,7 +435,8 @@ internal class EnglishInputCoordinator(
             val finishedRequest = request
             scope.launch {
                 val result = delayed.await() ?: return@launch
-                val fixed = result.correction?.let { caseWord(it, original) } ?: return@launch
+                val fixed = result.correction?.let { automaticWord(it, original) } ?: return@launch
+                if (fixed == original) return@launch
                 val selection = editor.cursorSelection()
                 if (closed || request != finishedRequest || word.isNotEmpty() ||
                     (selection != null && (selection.first != selection.second ||

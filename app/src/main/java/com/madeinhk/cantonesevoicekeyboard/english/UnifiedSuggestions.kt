@@ -99,7 +99,7 @@ internal fun parseSharedPrediction(result: JSONObject, typed: String): EnglishPr
         val row = rows.getJSONObject(i)
         val edits = row.getInt("edits")
         EnglishCandidate(row.getString("word"), row.getDouble("score"), 2.0 * edits, edits, row.getInt("completedChars"))
-    }.filter { !it.word.equals(typed, ignoreCase = true) }.distinctBy { it.word.lowercase(java.util.Locale.ROOT) }
+    }.filter { it.word != typed }.distinctBy { it.word.lowercase(java.util.Locale.ROOT) }
     return EnglishPrediction(candidates = candidates,
         correction = if (result.isNull("correction")) null else result.getString("correction").takeIf { fix -> candidates.any { it.word == fix } },
         known = result.getBoolean("known"), replaceBefore = typed.length, reason = "shared_lm_spelling",

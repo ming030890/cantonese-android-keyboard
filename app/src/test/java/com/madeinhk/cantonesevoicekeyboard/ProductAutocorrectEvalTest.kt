@@ -20,7 +20,9 @@ import kotlin.time.Duration.Companion.minutes
 /** Opt-in measurement, not an assertion that every labelled intent is satisfied. */
 class ProductAutocorrectEvalTest {
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    @Test fun replaySessionsThroughProductionController() = runTest(timeout = 5.minutes) {
+    // All three frozen ITE layout variants plus mixed-script sessions exceed
+    // five minutes on the host; allow the full replay to finish and report.
+    @Test fun replaySessionsThroughProductionController() = runTest(timeout = 15.minutes) {
         val library = System.getProperty("english.native.library")
         val input = System.getProperty("product.eval.sessions")
         val destination = System.getProperty("product.eval.report")

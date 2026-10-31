@@ -39,7 +39,7 @@ internal class SharedLmEnglishEngine(
     override fun predictObserved(word: String, centers: FloatArray, points: FloatArray, left: String, right: String): EnglishPrediction {
         if (word.isEmpty()) return EnglishPrediction(reason = "shared_lm_completion")
         val result=suggest(contextHandle(),left,word)
-        val candidates=result.candidates.filter { !it.word.equals(word,ignoreCase=true) }
+        val candidates=result.candidates.filter { it.word != word }
             .distinctBy { it.word.lowercase(java.util.Locale.ROOT) }
         return result.copy(candidates=candidates,
             correction=result.correction?.takeIf { fix -> candidates.any { it.word==fix } },

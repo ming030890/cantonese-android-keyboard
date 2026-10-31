@@ -12,6 +12,54 @@ import com.madeinhk.cantonesevoicekeyboard.KeyboardScenarios
 import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @PreviewTest
+@Preview(name = "Model restores internal capitals", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioModelCasing() = ScenarioScreen(remember {
+    val engine = com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
+        contextHandle = { 0L }, suggest = { _, _, _ ->
+            com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                candidates = listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate("iPhone", 0.0, 0.0, 0, 0)),
+                correction = "iPhone", known = true)
+        })
+    KeyboardScenario(initialText = "I just got an ", initialMode = KeyboardInputMode.Quick,
+        englishEngine = engine, autoCapitalizationEnabled = true).use { scenario ->
+        scenario.start(); scenario.type("iphone")
+        scenario.snapshot()
+    }
+})
+
+@PreviewTest
+@Preview(name = "Quick manual word correction with autocorrect off", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioQuickManualCursorCorrection() = ScenarioScreen(remember {
+    KeyboardScenario(initialText = "Fix t", initialMode = KeyboardInputMode.Quick,
+        englishEngine = com.madeinhk.cantonesevoicekeyboard.ScenarioEnglishEngine()).use { scenario ->
+        scenario.autocorrectLayouts = emptySet()
+        scenario.editor.right = "eh word."
+        scenario.start()
+        scenario.snapshot()
+    }
+})
+
+@PreviewTest
+@Preview(name = "Quick capitalization correction", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioQuickCapitalizationCorrection() = ScenarioScreen(remember {
+    val engine = object : com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidateEngine {
+        override fun predict(word: String, centers: FloatArray, points: FloatArray, left: String, right: String) =
+            com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                candidates = listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate("How", 0.0, 0.0, 0, 0)),
+                correction = "How", known = true)
+    }
+    KeyboardScenario(initialMode = KeyboardInputMode.Quick, englishEngine = engine,
+        autoCapitalizationEnabled = true).use { scenario ->
+        scenario.start()
+        scenario.type("how")
+        scenario.snapshot()
+    }
+})
+
+@PreviewTest
 @Preview(name = "Quick first letter auto caps", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioAutoCapsQuick() = ScenarioScreen(remember {

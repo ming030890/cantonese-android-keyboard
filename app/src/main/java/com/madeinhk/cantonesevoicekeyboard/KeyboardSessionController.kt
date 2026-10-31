@@ -72,6 +72,7 @@ internal class KeyboardSessionController(
     private val english = dependencies.english
     init {
         english?.onContextRevised = { refreshPredictions() }
+        english?.autoCapitalizationEnabled = settings.autoCapitalizationEnabled
         english?.quickEnglishEnabled = { autocorrectActive(KeyboardInputMode.Quick) }
         english?.attachQuick(quick)
         if (english?.hasUnifiedSuggestions == true) english.onCursorCandidates = { words ->
@@ -293,6 +294,10 @@ internal class KeyboardSessionController(
             info?.getInitialTextBeforeCursor(64, 0)?.toString()
         } else null
         refreshPredictions(initialText)
+        // Opening the keyboard in the middle of committed text may not produce
+        // a subsequent selection callback. Inspect that word immediately.
+        if (editor.getTextAfterCursor(1)?.firstOrNull()?.let { it.isAsciiLetter() || it in "'’" } == true)
+            inspectCursorWord()
     }
 
     private fun ensureValidInputMode() {
@@ -360,10 +365,14 @@ internal class KeyboardSessionController(
         val wasQuick = english?.quick == true && english.word.isNotEmpty()
         english?.onSelectionChanged(newStart, newEnd, composingEnd)
         if (wasQuick && english?.word.isNullOrEmpty()) quick.completeExternalCommit()
-        if (inputViewVisible && autocorrectActive() &&
-            _keyboardInputMode.value in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick) &&
-            !quick.hasActiveInput() && editor.cursorSelection() == (newStart to newEnd)) english?.inspectWordAtCursor()
+        if (editor.cursorSelection() == (newStart to newEnd)) inspectCursorWord()
         onSelectionChanged()
+    }
+
+    private fun inspectCursorWord() {
+        if (inputViewVisible && editorAllowsEnglish &&
+            _keyboardInputMode.value in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick) &&
+            !quick.hasActiveInput()) english?.inspectWordAtCursor()
     }
 
     fun onTouchEvidence(evidence: EnglishTouchEvidence?) { pendingTouch = evidence }
@@ -500,6 +509,7 @@ internal class KeyboardSessionController(
         voice.interrupt()
         suggestions.onUserTyped()
         val typed = if (_shiftState.value.isUppercase) char.uppercase() else char
+        if (english?.inspectingWord == true) english.reset()
         quick.onKey(typed)
         if (_shiftState.value == ShiftState.Shifted) {
             _shiftState.value = ShiftState.Off

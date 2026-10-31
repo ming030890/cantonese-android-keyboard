@@ -323,16 +323,19 @@ class UnifiedSuggestionScenarioTest {
         }
     }
 
-    @Test fun quickNextWordSelectionPreservesBothWordSeparators() = runTest {
+    @Test fun openingInsideCommittedWordOffersWholeWordAlternativesInsteadOfNextWords() = runTest {
         val engine = Engine(); val worker = Worker()
         KeyboardScenario(initialText = "hello", clipboardText = null,
             scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler)),
             englishDispatcher = worker, unifiedEngine = engine).use { s ->
             s.editor.right = "world"
             s.start(); runCurrent(); worker.drain(testScheduler)
-            s.choose("next"); runCurrent()
-            assertEquals("hello next ", s.editor.text)
-            assertEquals("world", s.editor.right)
+            assertTrue(s.english!!.inspectingWord)
+            assertEquals(listOf("helloworld", "helloworld候選"), s.snapshot().quickCandidates.map { it.text })
+            assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
+            s.choose("helloworld候選"); runCurrent()
+            assertEquals("helloworld候選", s.editor.text)
+            assertEquals("", s.editor.right)
             assertEquals("", s.editor.composing)
         }
     }
@@ -387,7 +390,7 @@ class UnifiedSuggestionScenarioTest {
                 s.start(); s.type("gwme")
                 assertEquals("gwme", s.editor.composing)
                 val candidates = if (mode == KeyboardInputMode.Quick) s.snapshot().quickCandidates else s.snapshot().englishCandidates
-                assertTrue(candidates.any { it.text == "game" })
+                assertTrue(candidates.any { it.text == "Game" })
                 assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
                 s.press(KeyboardKeyKind.Space)
                 assertEquals("game ", s.editor.text); assertEquals("", s.editor.composing)

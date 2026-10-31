@@ -1,5 +1,37 @@
 # Keyboard QA specification
 
+2026-10-31: model-selected casing is restored after the lexical spelling decision.
+Exact known words and corrections use the existing model vocabulary and context
+scores, including internal capitals. `iphone → iPhone` works at sentence start,
+after punctuation and mid-sentence; contextual `apple → Apple` works in the
+reported phone sentence while `I ate an apple` stays lowercase. Sentence caps
+preserve internal capitals. One-letter byte-token IDs render as letters.
+Capitalization-only changes in Quick preserve the code's letters and remain
+available when Chinese matches exist; Chinese candidates stay explicitly
+selectable. `ModelCasingScenarioTest` exercises the actual unified JNI path in
+English/Quick3/Quick5, the complete reported sentence, candidates/toolbar, undo,
+literal recommit and manual cursor correction with autocorrect off.
+`ScenarioModelCasing` renders `iphone`/`iPhone`. This supersedes the older note
+that Quick's casing is only a sentence-start trigger; vocabulary/model weights
+and lexical acceptance thresholds are retained.
+For uncased input, automatic model-driven casing requires the exact word's
+score to beat or tie the best edit-penalized alternative; weak acronym matches
+stay literal. Existing user capitalization remains a case cue. Normal sentence
+initials retain their first-letter fallback independently of that model gate.
+
+
+2026-10-31: fixed unified capitalization after the release-75 merge. Native
+start-of-text casing now runs after the spelling decision; Android retains
+capitalization-only candidates and corrections. Sentence-start Shift remains off:
+`how` stays literal while composing and becomes `How` at Space. The real-JNI
+`unifiedCapitalizationSurvivesJniParsingAndQuickBoundaries` regression types
+`how are you` in English/Quick3/Quick5 and covers capitalization-only undo and
+literal recommit. `unifiedAutomaticCasingRespectsSettingAndExplicitChineseSelection`
+covers disabling automatic caps while preserving spelling correction and explicit
+Chinese selection. `ScenarioQuickCapitalizationCorrection` renders `how`/`How`;
+this supersedes the initial-Shift behavior described in the 2026-10-26 note below.
+
+
 2026-10-31: a conservative learned typing channel complements the shared CNN in
 nonempty English contexts. The frozen aggregate improves 0.873615 → 0.893921;
 mixed-language decisions retain the existing policy. The actual JNI test
@@ -678,14 +710,16 @@ sentences”). English, Traditional Chinese and Simplified Chinese copy stay ali
 
 ### 2026-10-25: Corrections for committed words under the cursor
 
-On English and Quick with autocorrect enabled, moving a collapsed cursor into a
+On English and Quick, moving a collapsed cursor into a
 committed English word shows its literal spelling and correction alternatives.
 Lookup uses the complete word, including letters after the cursor, and surrounding
 context with that word removed. Cursor movement never changes editor text or
 starts composition. Corrections temporarily take precedence over the clipboard
 chip while retaining clipboard availability for subsequent cursor moves. Tapping an alternative replaces the complete word, keeps
 adjacent text and punctuation, and leaves the cursor after the replacement.
-Selections, protected fields and disabled autocorrect do not start lookup.
+Manual lookup also works with automatic correction disabled. Opening the
+keyboard with the cursor inside a word starts lookup without requiring another
+cursor move. Selections and protected fields do not start lookup.
 Moving or editing invalidates pending results; selection rechecks the cursor and
 both sides before replacement. Space, Enter and Backspace remain literal edits.
 
@@ -693,6 +727,12 @@ both sides before replacement. Space, Enter and Backspace remain literal edits.
 receiver with injected dispatchers across English/Quick and unified inference.
 `ImeEditorTest` covers guarded, batched InputConnection replacement;
 `ScenarioCursorWordCorrections` renders the inspected word's candidate row.
+The 2026-10-31 manual-correction update adds opening-inside-word and
+setting-disabled scenarios, a real-JNI `how → How` selection in
+English/Quick3/Quick5, and dismissal of stale alternatives when typing resumes.
+`ScenarioQuickManualCursorCorrection` renders Quick's `teh`/`the` alternatives
+with automatic correction off. Automatic correction remains disabled during
+these manual selections; tapping an alternative authorizes that replacement.
 This changes lookup routing, without changing native candidate ranking or
 correction thresholds. Device editor behavior and phone inference latency require
 Android integration verification.

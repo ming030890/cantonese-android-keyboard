@@ -10,6 +10,39 @@ import android.view.inputmethod.EditorInfo
 class AutoCapitalizationScenarioTest {
 
     @Test
+    fun unifiedAutomaticCasingRespectsSettingAndExplicitChineseSelection() {
+        for (enabled in listOf(false, true)) {
+            for (mode in listOf(KeyboardInputMode.AlphaNum, KeyboardInputMode.Quick)) {
+                val english = com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine(
+                    contextHandle = { 0L }, suggest = { _, _, typed ->
+                        val fixed = when (typed) { "hwllo" -> "Hello"; "wrror" -> "ERROR"; else -> "How" }
+                        com.madeinhk.cantonesevoicekeyboard.english.EnglishPrediction(
+                            listOf(com.madeinhk.cantonesevoicekeyboard.english.EnglishCandidate(fixed, 0.0, 0.0, 0, 0)), fixed)
+                    })
+                KeyboardScenario(initialMode = mode, englishEngine = english,
+                    autoCapitalizationEnabled = enabled).use { s ->
+                    s.engine.lookup = { _, _, _, _ -> listOf(com.madeinhk.cantonesevoicekeyboard.quick.QuickCandidate("你", 0)) }
+                    s.start(); s.type("how")
+                    s.press(KeyboardKeyKind.Space)
+                    assertEquals(if (enabled) "How " else "how ", s.editor.text)
+                    s.type("hwllo")
+                    s.press(KeyboardKeyKind.Space)
+                    assertEquals(if (enabled) "How Hello " else "how hello ", s.editor.text)
+                    s.type("wrror")
+                    s.press(KeyboardKeyKind.Space)
+                    assertEquals(if (enabled) "How Hello ERROR " else "how hello ERROR ", s.editor.text)
+                    if (mode == KeyboardInputMode.Quick) {
+                        s.type("how")
+                        assertTrue(s.snapshot().quickCandidates.any { it.text == "你" })
+                        s.choose("你")
+                        assertTrue(s.editor.text.endsWith("你"))
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun startOfTextAndSentenceTerminatorsLeaveShiftStateOffForUnifiedAutocorrect() {
         for (variation in listOf(InputType.TYPE_TEXT_VARIATION_NORMAL, InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT)) {
             KeyboardScenario(initialMode = KeyboardInputMode.AlphaNum).use { s ->
