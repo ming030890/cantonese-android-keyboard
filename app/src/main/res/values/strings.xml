@@ -242,4 +242,8 @@
     <string name="subtype_handwriting">Cantonese — Handwriting</string>
     <string name="settings_system_layouts">Android keyboard settings</string>
     <string name="settings_system_layouts_description">Enable your layouts in Android to use the keyboard switcher.</string>
+    <string name="settings_quick_learning_title">Learn from Quick selections</string>
+    <string name="settings_quick_learning_desc">Remember your Chinese candidate choices and next-word patterns on this device. History is excluded from backup.</string>
+    <string name="settings_quick_clear_history">Clear learned history</string>
+    <string name="settings_quick_history_cleared">Quick history cleared</string>
 </resources>

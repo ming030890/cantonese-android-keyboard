@@ -332,3 +332,14 @@ fun ScenarioSystemEnglishLayout() = ScenarioScreen(remember {
 @Preview(name = "Corrections for word under cursor", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioCursorWordCorrections() = ScenarioScreen(remember { KeyboardScenarios.cursorWordCorrections() })
+
+@PreviewTest
+@Preview(name = "Quick learned candidate first", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioQuickLearnedCandidates() = ScenarioScreen(remember {
+    val history = com.madeinhk.cantonesevoicekeyboard.quick.QuickPersonalization()
+    repeat(2) {
+        KeyboardScenario(personalization = history).use { s -> s.type("of"); s.choose("係") }
+    }
+    KeyboardScenario(clipboardText = null, personalization = history).use { s -> s.type("of"); s.snapshot() }
+})

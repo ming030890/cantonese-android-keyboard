@@ -189,3 +189,27 @@ fun SettingsQuickLightLargeTextScreenshot() {
         darkTheme = false,
     )
 }
+
+@PreviewTest
+@Preview(name = "Quick learning enabled", widthDp = 360, heightDp = 250)
+@Composable
+fun QuickLearningEnabledScreenshot() {
+    CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
+        Box(Modifier.fillMaxSize().background(Color(0xFF121714)).padding(16.dp)) {
+            QuickLearningCard(true, {}, {})
+        }
+    }
+}
+
+@PreviewTest
+@Preview(name = "Quick learning disabled", widthDp = 320, heightDp = 290, fontScale = 1.3f)
+@Composable
+fun QuickLearningDisabledScreenshot() {
+    CantoneseVoiceKeyboardTheme(darkTheme = false, dynamicColor = false) {
+        androidx.compose.runtime.CompositionLocalProvider(LocalSettingsLightTheme provides true) {
+            Box(Modifier.fillMaxSize().background(Color(0xFFF7F9F5)).padding(16.dp)) {
+                QuickLearningCard(false, {}, {})
+            }
+        }
+    }
+}

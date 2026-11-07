@@ -71,6 +71,9 @@ internal class KeyboardSessionController(
     private val suggestions = dependencies.suggestions
     private val english = dependencies.english
     init {
+        quick.canRefreshPersonalization = {
+            _keyboardInputMode.value == KeyboardInputMode.Quick && english?.inspectingWord != true
+        }
         english?.onContextRevised = { refreshPredictions() }
         english?.autoCapitalizationEnabled = settings.autoCapitalizationEnabled
         english?.quickEnglishEnabled = { autocorrectActive(KeyboardInputMode.Quick) }

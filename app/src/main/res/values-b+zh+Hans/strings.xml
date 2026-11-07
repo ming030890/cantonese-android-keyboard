@@ -159,4 +159,8 @@
     <string name="subtype_handwriting">粤语 — 手写</string>
     <string name="settings_system_layouts">Android 键盘设置</string>
     <string name="settings_system_layouts_description">在 Android 启用所选键盘，即可使用键盘切换按钮。</string>
+    <string name="settings_quick_learning_title">学习速成选字习惯</string>
+    <string name="settings_quick_learning_desc">在此设备记住你选择的中文字词及接续用词习惯。学习记录不会备份。</string>
+    <string name="settings_quick_clear_history">清除学习记录</string>
+    <string name="settings_quick_history_cleared">已清除速成学习记录</string>
 </resources>

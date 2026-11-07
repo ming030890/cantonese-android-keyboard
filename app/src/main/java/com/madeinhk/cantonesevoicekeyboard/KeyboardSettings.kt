@@ -51,6 +51,14 @@ object KeyboardSettings {
         _autoCapitalizationFlow.value = isAutoCapitalizationEnabled(context)
     }
 
+    fun isQuickLearningEnabled(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean("quick_learning", true)
+
+    fun setQuickLearningEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putBoolean("quick_learning", enabled).apply()
+        com.madeinhk.cantonesevoicekeyboard.quick.QuickPersonalizationStore.get(context).enabled = enabled
+    }
+
     fun getQuickVersion(context: Context): Int {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getInt(KEY_QUICK_VERSION, DEFAULT_QUICK_VERSION)

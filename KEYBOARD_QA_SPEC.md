@@ -743,3 +743,30 @@ Frozen autocorrect aggregate from a clean, freshly built native probe:
 Cursor moves now perform one asynchronous English lookup per changed word/context;
 unchanged snapshots reuse the current result. No phone latency measurement was
 possible because no Android device was connected.
+
+
+## Quick personal learning (2026-11-06)
+
+Quick3/Quick5 learn only valid explicit Chinese candidate selections. Two choices
+are required before promotion; matching eight-character left context outranks
+general code preference, with a 30-day frequency half-life and at most three
+promotions. Code preferences are separate by Quick version; learned continuations
+are shared. Code lookup never invents candidates, and English/literal slots and
+automatic correction decisions remain unchanged. Preview and full publications
+use the same ranking after request-validity checks.
+
+History contains up to 5,000 aggregate records, selected text and keyed context
+hashes; it lives in app-private no-backup storage with asynchronous loading and
+atomic replacement. The enabled-by-default Quick learning toggle stops both
+recording and use while retaining history. Clear removes active history and
+invalidates queued writes. Password fields and no-personalized-learning editors
+use ordinary ranking and never record choices. Voice, handwriting, paste, literal
+commits and cursor-word replacements do not train this store.
+
+Coverage: `QuickPersonalizationTest`, `QuickPersonalizationScenarioTest` and
+`QuickLearningEditorPolicyTest`; settings controls and a production-controller
+learned candidate snapshot have screenshot baselines. Persistence, startup/clear
+races, protected editors, bilingual slots, later pages, preview/full consistency,
+stale publication, corruption fallback and version separation are covered. History
+refreshes affect only the active Quick row and preserve English composition and
+cursor-word inspection.

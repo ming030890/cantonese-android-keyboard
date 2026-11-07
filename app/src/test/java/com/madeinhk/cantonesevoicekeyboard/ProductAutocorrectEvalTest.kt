@@ -53,6 +53,7 @@ class ProductAutocorrectEvalTest {
                 KeyboardScenario(initialText = session.getString("initial_text"), clipboardText = null,
                     initialMode = if (layout == "english") KeyboardInputMode.AlphaNum else KeyboardInputMode.Quick,
                     quickEngine = quick, englishEngine = english, scope = scope,
+                    personalization = com.madeinhk.cantonesevoicekeyboard.quick.QuickPersonalization(),
                     lookupDispatcher = dispatcher, englishDispatcher = dispatcher,
                     autoCapitalizationEnabled = session.optBoolean("auto_capitalization", false)).use { keyboard ->
                     keyboard.quickVersion = if (layout == "quick5") 5 else 3

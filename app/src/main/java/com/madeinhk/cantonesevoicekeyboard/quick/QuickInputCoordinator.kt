@@ -6,6 +6,7 @@ import android.util.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 
 internal data class QuickSuggestionInput(val id: Long, val code: String, val version: Int, val left: String, val right: String)
 
@@ -15,6 +16,7 @@ internal class QuickInputCoordinator(
     initialVersion: Int = 3,
     private val scope: CoroutineScope? = null,
     private val lookupDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
+    private val personalization: QuickPersonalization? = null,
 ) : AutoCloseable {
     companion object {
         // Match the native engine's maximum so next-word candidates can be paged.
@@ -30,6 +32,7 @@ internal class QuickInputCoordinator(
         editor = editor,
         initialVersion = initialVersion,
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+        personalization = QuickPersonalizationStore.get(context),
     )
 
     private var engine: QuickCandidateEngine? = null
@@ -50,6 +53,14 @@ internal class QuickInputCoordinator(
     var isCandidateRequestActive: ((Long) -> Boolean)? = null
     private var displayedRequest: Long? = null
     private var joinedInput: QuickSuggestionInput? = null
+    var canRefreshPersonalization: () -> Boolean = { true }
+    init {
+        if (personalization != null && scope != null) scope.launch {
+            personalization.changes.drop(1).collect {
+                if (canRefreshPersonalization()) { joinedInput = null; refreshCandidates() }
+            }
+        }
+    }
     fun canSelectJoined(text: String) = displayedRequest == requestId && _joinedCandidates.value.any { it.text == text }
     /** Committed-word inspection owns the row until composition/predictions resume. */
     fun publishCursorCandidates(words: List<QuickCandidate>) {
@@ -67,11 +78,11 @@ internal class QuickInputCoordinator(
     }
     fun publishJoined(input: QuickSuggestionInput, result: com.madeinhk.cantonesevoicekeyboard.english.JoinedSuggestions) {
         if (closed || requestId != input.id || composingText != input.code || currentVersion != input.version) return
-        _candidates.value = result.chinese.mapIndexed { i, text -> QuickCandidate(text, i) }
+        _candidates.value = personalized(input.version, input.code, input.left, result.chinese).mapIndexed { i, text -> QuickCandidate(text, i) }
         candidatesForCode = input.code
         candidateCodeLength = result.codeLength
         displayedRequest = input.id
-        _joinedCandidates.value = result.display.mapIndexed { i, text -> QuickCandidate(text, i) }
+        _joinedCandidates.value = personalized(input.version, input.code, input.left, result.display).mapIndexed { i, text -> QuickCandidate(text, i) }
     }
 
     fun setVersion(version: Int) {
@@ -112,7 +123,17 @@ internal class QuickInputCoordinator(
         refreshCandidates()
     }
 
+    private fun personalized(version: Int, code: String, left: String, texts: List<String>): List<String> =
+        if (editor.isPersonalizedLearningAllowed()) personalization?.rank(version, code, left, texts) ?: texts else texts
+
+    private fun personalized(result: LookupResult, code: String, version: Int): List<QuickCandidate> =
+        personalized(version, code, result.left, result.candidates.map { it.text }).mapIndexed { i, text -> QuickCandidate(text, i) }
+
     fun selectCandidate(text: String) {
+        val valid = if (onCandidateRequest != null) canSelectJoined(text)
+            else candidatesForCode == composingText && _candidates.value.any { it.text == text }
+        val learningCode = composingText.take(candidateCodeLength).takeIf { it.isNotEmpty() }
+        val learningLeft = joinedInput?.left ?: editor.getTextBeforeCursor(composingText.length + 512).orEmpty().removeSuffix(composingText)
         // Keep adjacent English words separate when inserting a whole-word prediction.
         fun wordChar(c: Char?) = c != null && (c in 'a'..'z' || c in 'A'..'Z' || c in '0'..'9')
         val prediction = !hasActiveInput()
@@ -123,6 +144,7 @@ internal class QuickInputCoordinator(
         val remainder = if (!prediction && candidatesForCode == composingText &&
             _candidates.value.any { it.text == text }) composingText.drop(candidateCodeLength) else ""
         editor.commitText(prefix + text + suffix)
+        if (valid && editor.isPersonalizedLearningAllowed()) personalization?.record(currentVersion, learningCode, text, learningLeft)
         clearComposingState()
         if (remainder.isNotEmpty()) {
             composingText = remainder
@@ -217,7 +239,7 @@ internal class QuickInputCoordinator(
         val lookup = candidateLookup(code, version)
         if (scope == null) {
             val result = lookup()
-            _candidates.value = result.candidates
+            _candidates.value = personalized(result, code, version)
             candidateCodeLength = result.codeLength
             candidatesForCode = code
             return
@@ -227,21 +249,21 @@ internal class QuickInputCoordinator(
             if (previewLookup != null) {
                 val preview = withContext(lookupDispatcher) { previewLookup() }
                 if (!closed && requestId == id && composingText == code && currentVersion == version && preview.candidates.isNotEmpty()) {
-                    _candidates.value = preview.candidates
+                    _candidates.value = personalized(preview, code, version)
                     candidateCodeLength = preview.codeLength
                     candidatesForCode = code
                 }
             }
             val result = withContext(lookupDispatcher) { lookup() }
             if (!closed && requestId == id && composingText == code && currentVersion == version) {
-                _candidates.value = result.candidates
+                _candidates.value = personalized(result, code, version)
                 candidateCodeLength = result.codeLength
                 candidatesForCode = code
             }
         }
     }
 
-    private data class LookupResult(val candidates: List<QuickCandidate>, val codeLength: Int)
+    private data class LookupResult(val candidates: List<QuickCandidate>, val codeLength: Int, val left: String)
 
     private fun candidateLookup(code: String, version: Int, preview: Boolean = false): () -> LookupResult {
         // InputConnection includes the composing code before the cursor.
@@ -255,11 +277,11 @@ internal class QuickInputCoordinator(
                     val words = if (preview) it.previewCandidates(version, lookupCode, left, right)
                         else if (code.isEmpty()) it.predictions(left, right, PREDICTION_LIMIT)
                         else it.candidates(version, lookupCode, left, right)
-                    LookupResult(words, lookupCode.length)
-                } ?: LookupResult(emptyList(), lookupCode.length)
+                    LookupResult(words, lookupCode.length, left)
+                } ?: LookupResult(emptyList(), lookupCode.length, left)
             }.onFailure {
                 Log.e("QuickInputCoordinator", "Quick inference failed", it)
-            }.getOrDefault(LookupResult(emptyList(), lookupCode.length))
+            }.getOrDefault(LookupResult(emptyList(), lookupCode.length, left))
         }
     }
 

@@ -62,7 +62,17 @@ fun SettingsScreen(
         mutableStateOf(KeyboardSettings.isAutoCapitalizationEnabled(context))
     }
 
+    var quickLearning by remember { mutableStateOf(KeyboardSettings.isQuickLearningEnabled(context)) }
     SettingsScreenContent(
+        quickLearning = quickLearning,
+        onQuickLearningChange = { enabled ->
+            KeyboardSettings.setQuickLearningEnabled(context, enabled)
+            quickLearning = enabled
+        },
+        onClearQuickHistory = {
+            com.madeinhk.cantonesevoicekeyboard.quick.QuickPersonalizationStore.get(context).clear()
+            Toast.makeText(context, R.string.settings_quick_history_cleared, Toast.LENGTH_SHORT).show()
+        },
         enabledLayouts = enabledLayouts,
         onConfigureSystemLayouts = if (Build.VERSION.SDK_INT < 34) ({
             context.getSystemService(InputMethodManager::class.java)?.showInputMethodAndSubtypeEnabler(
@@ -103,6 +113,9 @@ fun SettingsScreenContent(
     onHapticFeedbackChange: (Boolean) -> Unit = {},
     autoCapitalization: Boolean = true,
     onAutoCapitalizationChange: (Boolean) -> Unit = {},
+    quickLearning: Boolean = true,
+    onQuickLearningChange: (Boolean) -> Unit = {},
+    onClearQuickHistory: () -> Unit = {},
     onConfigureSystemLayouts: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -184,6 +197,8 @@ fun SettingsScreenContent(
                         selectedVersion = quickVersion,
                         onVersionChange = onQuickVersionChange
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    QuickLearningCard(quickLearning, onQuickLearningChange, onClearQuickHistory)
                 }
 
                 // Preferences Header
@@ -260,6 +275,40 @@ private fun SettingsBackButton(onBack: () -> Unit) {
 }
 
 
+
+@Composable
+internal fun QuickLearningCard(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    onClear: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        border = BorderStroke(1.dp, CardBorderColor),
+    ) {
+        Column(Modifier.padding(horizontal = 20.dp, vertical = 18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.settings_quick_learning_title),
+                    modifier = Modifier.weight(1f), fontSize = 16.sp, color = PrimaryTextColor)
+                Switch(checked = checked, onCheckedChange = onCheckedChange,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MintOnAccentColor,
+                        checkedTrackColor = MintAccentColor,
+                        uncheckedThumbColor = SecondaryTextColor,
+                        uncheckedTrackColor = MiniKeySurface,
+                        uncheckedBorderColor = PillUnselectedBorder,
+                    ))
+            }
+            Text(stringResource(R.string.settings_quick_learning_desc),
+                fontSize = 13.sp, lineHeight = 18.sp, color = SecondaryTextColor)
+            TextButton(onClick = onClear) {
+                Text(stringResource(R.string.settings_quick_clear_history), color = MintAccentColor)
+            }
+        }
+    }
+}
 
 @Composable
 fun QuickVersionCard(

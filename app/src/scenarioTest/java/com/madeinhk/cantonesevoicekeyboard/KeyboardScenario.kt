@@ -29,6 +29,7 @@ internal class KeyboardScenario(
     boundaryDispatcher: CoroutineDispatcher? = null,
     previewDispatcher: CoroutineDispatcher? = null,
     var autoCapitalizationEnabled: Boolean = false,
+    personalization: com.madeinhk.cantonesevoicekeyboard.quick.QuickPersonalization? = null,
 ) : AutoCloseable {
     val editor = MemoryKeyboardEditor(initialText)
     val engine = ScenarioQuickEngine()
@@ -39,7 +40,7 @@ internal class KeyboardScenario(
     var quickVersion = 3
     var enabledLayouts = setOf(KeyboardSettings.LAYOUT_QUICK, KeyboardSettings.LAYOUT_ENGLISH,
                                KeyboardSettings.LAYOUT_HANDWRITING)
-    val quick = QuickInputCoordinator({ quickEngine ?: engine }, editor, scope = scope, lookupDispatcher = lookupDispatcher)
+    val quick = QuickInputCoordinator({ quickEngine ?: engine }, editor, scope = scope, lookupDispatcher = lookupDispatcher, personalization = personalization)
     var autocorrectLayouts = setOf(KeyboardSettings.LAYOUT_ENGLISH, KeyboardSettings.LAYOUT_QUICK)
     val english = (englishEngine ?: unifiedEngine?.let { ScenarioEnglishEngine() })?.let { engine ->
         com.madeinhk.cantonesevoicekeyboard.english.EnglishInputCoordinator(editor, { engine },
@@ -120,6 +121,8 @@ internal class KeyboardScenario(
 }
 
 internal class MemoryKeyboardEditor(var text: String = "", var right: String = "") : KeyboardEditor {
+    var personalizedLearningAllowed = true
+    override fun isPersonalizedLearningAllowed() = personalizedLearningAllowed
     var composing = ""
     val commits = mutableListOf<String>()
     override fun setComposingText(text: String) { composing = text }
