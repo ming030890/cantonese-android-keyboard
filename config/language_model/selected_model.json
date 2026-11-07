@@ -1,7 +1,7 @@
 {
   "format": "KBCNN_INT8_V1",
   "model_source": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/shared_keyboard.cnn",
-  "model_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "model_sha256": "dc1fa55ec341067cd752e1ee799cbb255e42d4e96eb17dd7a149da7d17f2d8e1",
   "model_bytes": 12675264,
   "config": {
     "vocab_size": 65536,
@@ -19,7 +19,7 @@
     "right_context_tokens": 0
   },
   "fusion_source": "config/language_model/handwriting_fusion_cnn_v2.json",
-  "fusion_sha256": "9b7cf13af65933432461298a4e6ba35f632c6eb114ca5509ae67089edcc82aba",
+  "fusion_sha256": "502c1f614ad822ec112653a1095bf7f898b972a0d02bc5c80ef46b17c8f11303",
   "neural_short_contexts": true,
   "count_table_packaged": false,
   "experimental": true,
@@ -36,7 +36,7 @@
     "qualification_report": "config/english_iteration/2026-10-29/short-nn-v2/accepted-score.json",
     "production_qualified": false,
     "acceptance_source": "../QwenASR/crates/cantonese-ngram/src/english_acceptance.json",
-    "acceptance_sha256": "107494939b0e175f30618f0a19d522c56dc973d7c099a0cd34f68039b97f3d5c",
+    "acceptance_sha256": "2a76593959d2e0c00d7829529c636745f1e4dcbd29d570b3b5adf6fd47607f0f",
     "touch_evidence_used": false,
     "primary_metric": "f0.5",
     "known_word_policy": "Learned original-word versus replacement evidence",
@@ -47,7 +47,7 @@
       "files": {
         "channel.json": "8cf8056a762d8617f97c6b7eba193b851bd5f0890e7683b454fe0f9097a55689",
         "lexicon.tsv": "465762ffdb780b169ab021c3e2a2d5b453dae6dafc2befa49d1f4378a70bc6f0",
-        "metadata.json": "550a3ecc70f0cf3ad3c3703375c10166bde91f9368bbef563029b69dde15ad4b",
+        "metadata.json": "21313aef2ab502d983a33a82f7054036127b8a3dd7a09aeb534815794eb94670",
         "policy.json": "ef10933720d06d75ebe6076742cf25004705896436fda1752aaf2bca454938dd",
         "priors.tsv": "bdf3942f4dc5ee380f7ef43f3a7ac1cca877142e104f392bd09297fc0e793a2c"
       },

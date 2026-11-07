@@ -422,7 +422,8 @@ and keywords. Existing AndroidX recent history is retained. The picker always st
 one continuous vertical sheet; tabs jump to sections and scrolling updates the selected tab.
 Every new visible keyboard session restores the selected text layout and closes emoji/search. Picks from categories,
 search and variants move the complete sequence to the front without duplicates,
-retaining the latest 64 selections across sessions. `EmojiCatalogTest` covers order,
+retaining the latest 24 unique selections across sessions (updated 2026-11-01).
+Existing longer histories are capped when loaded. `EmojiCatalogTest` covers order,
 serialization and the limit; `EmojiPickerInteractionTest` covers selecting and reopening.
 Recent screenshots cover full and narrow widths. Emoji keys use a 30 dp smiley
 (previously 22 dp), reducing internal space on both English and Quick layouts.

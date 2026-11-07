@@ -61,13 +61,14 @@ class EmojiCatalogTest {
         assertTrue(EmojiHistory(listOf("obsolete")).entries(catalog()).isEmpty())
     }
 
-    @Test fun recentEmojiRetainOnlyTheLatest64UniqueSelections() {
+    @Test fun recentEmojiRetainOnlyTheLatest24UniqueSelections() {
         var history = EmojiHistory()
         val emoji = catalog().entries.take(65).map { it.emoji }
         emoji.forEach { history = history.pick(it) }
-        assertEquals(emoji.reversed().take(64), history.emoji)
+        assertEquals(emoji.reversed().take(24), history.emoji)
+        assertEquals(emoji.reversed().take(24), EmojiHistory(emoji.reversed()).emoji)
         history = history.pick(emoji.last())
-        assertEquals(64, history.emoji.size)
+        assertEquals(24, history.emoji.size)
         assertEquals(emoji.last(), history.emoji.first())
     }
 

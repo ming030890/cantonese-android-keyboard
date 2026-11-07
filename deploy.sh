@@ -105,28 +105,35 @@ if [ ! -d "$QWEN_ASR_DIR" ]; then
     exit 1
 fi
 
-pushd "$QWEN_ASR_DIR" > /dev/null
+if [ -f "/private/tmp/OpenBLAS/libopenblas.a" ] && [ -f "/private/tmp/qwen-v18-kleidiai/build-android/libkleidiai.a" ]; then
+    pushd "$QWEN_ASR_DIR" > /dev/null
 
-echo -e "${COLOR_INFO}Building Rust crate 'qwen-asr' with native DOTPROD features and OpenBLAS...${COLOR_RESET}"
+    echo -e "${COLOR_INFO}Building Rust crate 'qwen-asr' with native DOTPROD features and OpenBLAS...${COLOR_RESET}"
 
-CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$QWEN_ASR_DIR/android-aarch64-clang" \
-CC_aarch64_linux_android="$QWEN_ASR_DIR/android-aarch64-clang" \
-AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar \
-RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
-RUSTFLAGS="-C target-feature=+dotprod" \
-PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
-OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
-OPENBLAS_ANDROID_STATIC=1 \
-KLEIDIAI_LIB_DIR=/private/tmp/qwen-v18-kleidiai/build-android \
-CARGO_TARGET_DIR="$QWEN_ASR_TARGET_DIR" \
-cargo build --release --target aarch64-linux-android --features "blas android kleidiai" -p qwen-asr
+    CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$QWEN_ASR_DIR/android-aarch64-clang" \
+    CC_aarch64_linux_android="$QWEN_ASR_DIR/android-aarch64-clang" \
+    AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar \
+    RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
+    RUSTFLAGS="-C target-feature=+dotprod" \
+    PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
+    OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
+    OPENBLAS_ANDROID_STATIC=1 \
+    KLEIDIAI_LIB_DIR=/private/tmp/qwen-v18-kleidiai/build-android \
+    CARGO_TARGET_DIR="$QWEN_ASR_TARGET_DIR" \
+    cargo build --release --target aarch64-linux-android --features "blas android kleidiai" -p qwen-asr
 
-popd > /dev/null
+    popd > /dev/null
 
-echo -e "${COLOR_INFO}Copying compiled .so to keyboard project...${COLOR_RESET}"
-mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
-cp "$QWEN_ASR_TARGET_DIR/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
-echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
+    echo -e "${COLOR_INFO}Copying compiled .so to keyboard project...${COLOR_RESET}"
+    mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
+    cp "$QWEN_ASR_TARGET_DIR/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
+    echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
+elif [ -f "$SO_DEST" ]; then
+    echo -e "${COLOR_WARNING}Static ASR libraries in /private/tmp not present; reusing existing $SO_DEST.${COLOR_RESET}"
+else
+    echo -e "${COLOR_ERROR}Error: Missing static ASR libraries in /private/tmp and no prebuilt $SO_DEST found.${COLOR_RESET}"
+    exit 1
+fi
 
 echo -e "${COLOR_INFO}Compiling unified Cantonese engine (handwriting + Quick + LM)...${COLOR_RESET}"
 NATIVE_LM_LINKER="${NATIVE_LM_LINKER:-/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android32-clang}"
