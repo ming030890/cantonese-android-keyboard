@@ -8,6 +8,17 @@ def sha(path):
         for block in iter(lambda:stream.read(1<<20),b''):h.update(block)
     return h.hexdigest()
 
+def fnv1a_64(data):
+    h=0xcbf29ce484222325
+    for b in data:
+        h=(h^b)*0x100000001b3 & 0xffffffffffffffff
+    return f'{h:016x}'
+
+def has_embedded(binary, path):
+    raw=path.read_bytes()
+    tag=f'{path.name}={fnv1a_64(raw)}'.encode()
+    return raw in binary or tag in binary
+
 def verify(project):
     project=project.resolve()
     assets=project/'app/src/main/assets';model=assets/'language_model/model.cng'
@@ -72,7 +83,7 @@ def verify_shared(project):
         if acceptance['dictionary']['notice_sha256']!=sha(notice):raise ValueError('Dictionary notice mismatch')
         library=project/'app/src/main/jniLibs/arm64-v8a/libcantonese_engine.so'
         binary=library.read_bytes()
-        if acceptance_file.read_bytes() not in binary or dictionary.read_bytes() not in binary:
+        if not has_embedded(binary, acceptance_file) or not has_embedded(binary, dictionary):
             raise ValueError('Rebuild native library for the selected acceptance policy/dictionary')
         dictionary_bytes=dictionary.stat().st_size
     channel_bytes=0
@@ -84,7 +95,7 @@ def verify_shared(project):
         binary=(project/'app/src/main/jniLibs/arm64-v8a/libcantonese_engine.so').read_bytes()
         for name,expected in channel['files'].items():
             path=directory/name
-            if sha(path)!=expected or path.read_bytes() not in binary:
+            if sha(path)!=expected or not has_embedded(binary, path):
                 raise ValueError('Rebuild native library for selected English channel: '+name)
             channel_bytes+=path.stat().st_size
         if json.loads((directory/'metadata.json').read_text())['model_sha256']!=sha(model):
@@ -120,10 +131,12 @@ def verify_shared(project):
                 prediction_resource_bytes=total,embedded_dictionary_bytes=dictionary_bytes,
                 prediction_data_with_dictionary_bytes=total+dictionary_bytes+channel_bytes,embedded_channel_bytes=channel_bytes,
                 one_shared_lm=True,english_spelling_assets=bool(channel),
-                right_context_tokens=0,experimental=True,production_approved=False)
+                right_context_tokens=0,experimental=True,production_approved=False,
+                verification_scope='asset_integrity_only_not_production_quality')
 
-def verify_package(project, package):
+def verify_package(project, package, app_build_dir=None):
     project=project.resolve(); package=package.resolve()
+    app_build_dir=(app_build_dir or project/"app/build").resolve()
     bundle=package.suffix=='.aab'
     if package.suffix not in {'.apk','.aab'}:raise ValueError('Expected APK or AAB')
     prefix='base/' if bundle else ''
@@ -153,8 +166,8 @@ def verify_package(project, package):
         if dictionary_notices.is_dir():
             files.extend(str(p.relative_to(assets)) for p in sorted(dictionary_notices.iterdir()) if p.is_file())
         for file in files:check(archive,prefix+'assets/'+file,assets/file)
-        for library in ['libcantonese_engine.so', 'libqwen_asr.so']:
-            stripped=project/f'app/build/intermediates/stripped_native_libs/{variant}/strip{variant.capitalize()}DebugSymbols/out/lib/arm64-v8a'/library
+        for library in ['libcantonese_engine.so']:
+            stripped=app_build_dir/f'intermediates/stripped_native_libs/{variant}/strip{variant.capitalize()}DebugSymbols/out/lib/arm64-v8a'/library
             if not stripped.is_file():raise ValueError('Missing native build output: '+str(stripped))
             check(archive,prefix+'lib/arm64-v8a/'+library,stripped)
         packs=[]
@@ -167,10 +180,12 @@ def verify_package(project, package):
                     source=project/name/'src/main'/entry.split('/',1)[1]
                     if archive.getinfo(entry).file_size!=source.stat().st_size:raise ValueError('Asset pack size mismatch: '+entry)
                 packs.append(name)
-    return {'passed':True,'package':str(package),'checked_sha256':checked,'asset_packs':packs}
+    return {'passed':True,'package':str(package),'checked_sha256':checked,'asset_packs':packs,'native_build_directory':str(app_build_dir)}
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--project',type=Path,default=Path(__file__).resolve().parents[1]);p.add_argument('--package',type=Path,action='append',default=[]);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--project',type=Path,default=Path(__file__).resolve().parents[1]);p.add_argument('--package',type=Path,action='append',default=[])
+    p.add_argument('--app-build-dir',type=Path,help='Actual app build directory when Gradle outputs are relocated')
+    a=p.parse_args()
     result=verify(a.project)
-    if a.package:result['packages']=[verify_package(a.project,path) for path in a.package]
+    if a.package:result['packages']=[verify_package(a.project,path,a.app_build_dir) for path in a.package]
     print(json.dumps(result))

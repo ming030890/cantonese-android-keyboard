@@ -30,7 +30,7 @@ QWEN_ASR_TARGET_DIR="${QWEN_ASR_TARGET_DIR:-/private/tmp/qwen-asr-android-releas
 
 # Where the converted model lives on the build machine. scripts/reshard_model.py
 # combines and splits its model*.safetensors tensors into five ≤480 MiB shards.
-SOURCE_MODEL_DIR="/Volumes/SSD/Confucius4-R2T2-kleidiai-packed"
+SOURCE_MODEL_DIR="${SOURCE_MODEL_DIR:-/Volumes/SSD/Confucius4-R2T2-kleidiai-packed}"
 # Five asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shards 2..5 in packs B..E. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
@@ -51,9 +51,15 @@ BUNDLETOOL_JAR="$TOOLS_DIR/bundletool-all-${BUNDLETOOL_VERSION}.jar"
 # --release builds a Play-uploadable AAB (signed if keystore.properties is set)
 # and skips the on-device install. Default is the on-device debug flow.
 RELEASE=false
+NATIVE_ONLY=false
 for arg in "$@"; do
     if [ "$arg" == "--release" ] || [ "$arg" == "-r" ]; then
         RELEASE=true
+    elif [ "$arg" == "--native-only" ]; then
+        NATIVE_ONLY=true
+    else
+        echo "Unknown argument: $arg" >&2
+        exit 1
     fi
 done
 
@@ -68,8 +74,8 @@ fi
 # ---------------------------------------------------------------------------
 # 1. Locate ADB and verify device connection
 # ---------------------------------------------------------------------------
-if [ "$RELEASE" = "true" ]; then
-    echo -e "${COLOR_INFO}[Step 1/7] Release mode: skipping device check (AAB is for Play upload).${COLOR_RESET}"
+if [ "$RELEASE" = "true" ] || [ "$NATIVE_ONLY" = "true" ]; then
+    echo -e "${COLOR_INFO}[Step 1/7] Build-only mode: skipping device installation.${COLOR_RESET}"
     DEVICE_ID=""
     ADB=""
 else
@@ -105,52 +111,60 @@ if [ ! -d "$QWEN_ASR_DIR" ]; then
     exit 1
 fi
 
-if [ -f "/private/tmp/OpenBLAS/libopenblas.a" ] && [ -f "/private/tmp/qwen-v18-kleidiai/build-android/libkleidiai.a" ]; then
-    pushd "$QWEN_ASR_DIR" > /dev/null
+# The builder restores pinned sources as needed and verifies cached archive hashes.
+NATIVE_DEPS_INFO=$(python3 "$PROJECT_DIR/scripts/build_android_native_dependencies.py" --jobs "${NATIVE_JOBS:-4}")
+native_setting() {
+    python3 -c 'import json,sys; value=json.load(sys.stdin)
+for part in sys.argv[1].split("."): value=value[part]
+print(value)' "$1" <<< "$NATIVE_DEPS_INFO"
+}
+OPENBLAS_ARCHIVE=$(native_setting libraries.openblas.path)
+KLEIDIAI_ARCHIVE=$(native_setting libraries.kleidiai.path)
+NATIVE_CC=$(native_setting compiler)
+NATIVE_TOOLS=$(native_setting ndk_tools)
+NATIVE_RUSTFLAGS="-C target-feature=+dotprod -C link-arg=-Wl,-z,max-page-size=16384"
 
-    echo -e "${COLOR_INFO}Building Rust crate 'qwen-asr' with native DOTPROD features and OpenBLAS...${COLOR_RESET}"
-
-    CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$QWEN_ASR_DIR/android-aarch64-clang" \
-    CC_aarch64_linux_android="$QWEN_ASR_DIR/android-aarch64-clang" \
-    AR_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar \
-    RANLIB_aarch64_linux_android=/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ranlib \
-    RUSTFLAGS="-C target-feature=+dotprod" \
-    PATH="/Users/tony/.rustup/toolchains/stable-aarch64-apple-darwin/bin:/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH" \
-    OPENBLAS_ANDROID_LIB_DIR=/private/tmp/OpenBLAS \
-    OPENBLAS_ANDROID_STATIC=1 \
-    KLEIDIAI_LIB_DIR=/private/tmp/qwen-v18-kleidiai/build-android \
-    CARGO_TARGET_DIR="$QWEN_ASR_TARGET_DIR" \
-    cargo build --release --target aarch64-linux-android --features "blas android kleidiai" -p qwen-asr
-
-    popd > /dev/null
-
-    echo -e "${COLOR_INFO}Copying compiled .so to keyboard project...${COLOR_RESET}"
-    mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
-    cp "$QWEN_ASR_TARGET_DIR/aarch64-linux-android/release/libqwen_asr.so" "$SO_DEST"
-    echo -e "${COLOR_SUCCESS}Native library successfully compiled and placed in jniLibs!${COLOR_RESET}"
-elif [ -f "$SO_DEST" ]; then
-    echo -e "${COLOR_WARNING}Static ASR libraries in /private/tmp not present; reusing existing $SO_DEST.${COLOR_RESET}"
-else
-    echo -e "${COLOR_ERROR}Error: Missing static ASR libraries in /private/tmp and no prebuilt $SO_DEST found.${COLOR_RESET}"
-    exit 1
-fi
-
-echo -e "${COLOR_INFO}Compiling unified Cantonese engine (handwriting + Quick + LM)...${COLOR_RESET}"
-NATIVE_LM_LINKER="${NATIVE_LM_LINKER:-/Users/tony/Library/Android/sdk/ndk/30.0.14904198/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android32-clang}"
-ENGINE_TARGET_DIR="${ENGINE_TARGET_DIR:-/private/tmp/cantonese-engine-android-target}"
-ENGINE_MANIFEST="$QWEN_ASR_DIR/crates/cantonese-ngram/Cargo.toml"
-pushd "${TMPDIR:-/private/tmp}" > /dev/null
-CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_LM_LINKER" CARGO_TARGET_DIR="$ENGINE_TARGET_DIR" cargo build --manifest-path "$ENGINE_MANIFEST" --target aarch64-linux-android --release --features android --lib
+pushd "$QWEN_ASR_DIR" > /dev/null
+CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NATIVE_CC" \
+CC_aarch64_linux_android="$NATIVE_CC" \
+AR_aarch64_linux_android="$NATIVE_TOOLS/llvm-ar" \
+RANLIB_aarch64_linux_android="$NATIVE_TOOLS/llvm-ranlib" \
+RUSTFLAGS="$NATIVE_RUSTFLAGS" \
+PATH="$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin:$NATIVE_TOOLS:$PATH" \
+OPENBLAS_ANDROID_LIB_DIR="$(dirname "$OPENBLAS_ARCHIVE")" \
+OPENBLAS_ANDROID_STATIC=1 \
+KLEIDIAI_LIB_DIR="$(dirname "$KLEIDIAI_ARCHIVE")" \
+CARGO_TARGET_DIR="$QWEN_ASR_TARGET_DIR" \
+cargo build --locked --offline --release --target aarch64-linux-android --features "blas android kleidiai cantonese-engine" -p qwen-asr
 popd > /dev/null
 mkdir -p "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a"
 rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libstust_handwriting_inference.so"
 rm -f "$PROJECT_DIR/app/src/main/jniLibs/arm64-v8a/libcantonese_ngram.so"
-cp "$ENGINE_TARGET_DIR/aarch64-linux-android/release/libcantonese_engine.so" "$ENGINE_SO_DEST"
-echo -e "${COLOR_SUCCESS}Unified Cantonese engine compiled and placed in jniLibs!${COLOR_RESET}"
+rm -f "$SO_DEST"
+cp "$QWEN_ASR_TARGET_DIR/aarch64-linux-android/release/libqwen_asr.so" "$ENGINE_SO_DEST"
+echo -e "${COLOR_SUCCESS}Unified Cantonese engine (ASR + handwriting + Quick + LM) compiled and placed in jniLibs!${COLOR_RESET}"
 # The selected shared model and fusion are staged together after native parity checks.
 # Deployment only verifies them; it must never restore legacy English/spelling assets.
 LM_ASSET="$PROJECT_DIR/app/src/main/assets/language_model/model.cng"
 python3 "$PROJECT_DIR/scripts/verify_language_model_assets.py" --project "$PROJECT_DIR"
+
+python3 - "$PROJECT_DIR" "$(native_setting manifest)" "$NATIVE_RUSTFLAGS" <<'PYCODE'
+import hashlib,json,subprocess,sys
+from pathlib import Path
+project=Path(sys.argv[1]);native=project.parent/'QwenASR'
+sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
+metadata=dict(source_revision=subprocess.check_output(['git','-C',str(native),'rev-parse','HEAD'],text=True).strip(),
+    source_diff_sha256=hashlib.sha256(subprocess.check_output(['git','-C',str(native),'diff','HEAD'])).hexdigest(),
+    dependency_manifest=sys.argv[2],dependency_manifest_sha256=sha(Path(sys.argv[2])),rustflags=sys.argv[3],
+    libraries={name:sha(project/'app/src/main/jniLibs/arm64-v8a'/name) for name in ('libcantonese_engine.so',)})
+output=project/'build/native-build-provenance.json';output.parent.mkdir(exist_ok=True)
+output.write_text(json.dumps(metadata,indent=2)+'\n')
+print('Native build provenance: '+str(output))
+PYCODE
+if [ "$NATIVE_ONLY" = "true" ]; then
+    echo "Native build and staged model checks passed."
+    exit 0
+fi
 
 # ---------------------------------------------------------------------------
 # 3. Stage the ASR model into the Play Asset Delivery packs
@@ -237,7 +251,7 @@ fi
 cd "$PROJECT_DIR"
 if [ "$RELEASE" = "true" ]; then
     echo -e "${COLOR_INFO}[Step 6/7] Building RELEASE App Bundle (.aab) for Play upload...${COLOR_RESET}"
-    ./gradlew :app:verifyKeyboard
+    ./gradlew :app:verifyRelease
     ./gradlew :app:bundleRelease
 else
     echo -e "${COLOR_INFO}[Step 6/7] Building debug App Bundle (.aab)...${COLOR_RESET}"
@@ -249,6 +263,7 @@ if [ ! -f "$AAB_PATH" ]; then
     exit 1
 fi
 python3 "$PROJECT_DIR/scripts/verify_language_model_assets.py" --project "$PROJECT_DIR" --package "$AAB_PATH"
+python3 "$PROJECT_DIR/scripts/verify_release_assets.py" --project "$PROJECT_DIR" --package "$AAB_PATH"
 
 if [ "$RELEASE" = "true" ]; then
     echo -e "${COLOR_SUCCESS}================================================================${COLOR_RESET}"

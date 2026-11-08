@@ -86,10 +86,10 @@ def main():
         'cold_cache_override': '1' if args.cold_cache else previous_cold_cache,
         'audio_ms': len(pcm) / 32,
         'device': command('shell', 'getprop', 'ro.product.model', capture_output=True, text=True).stdout.strip(),
-        'local_native_sha256': hashlib.sha256((Path(__file__).resolve().parents[1] / 'app/src/main/jniLibs/arm64-v8a/libqwen_asr.so').read_bytes()).hexdigest(),
+        'local_native_sha256': hashlib.sha256((Path(__file__).resolve().parents[1] / 'app/src/main/jniLibs/arm64-v8a/libcantonese_engine.so').read_bytes()).hexdigest(),
         'device_context': query_device_context(command),
     }
-    stripped = Path(__file__).resolve().parents[1] / 'app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/arm64-v8a/libqwen_asr.so'
+    stripped = Path(__file__).resolve().parents[1] / 'app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/arm64-v8a/libcantonese_engine.so'
     if stripped.exists():
         metadata['expected_packaged_native_sha256'] = hashlib.sha256(stripped.read_bytes()).hexdigest()
     (args.output / 'metadata.json').write_text(json.dumps(metadata, indent=2) + '\n')

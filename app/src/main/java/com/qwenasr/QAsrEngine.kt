@@ -1,6 +1,5 @@
 package com.qwenasr
 
-import android.os.SystemClock
 import android.util.Log
 import com.madeinhk.cantonesevoicekeyboard.BuildConfig
 import com.madeinhk.cantonesevoicekeyboard.VoiceLatencyTrace
@@ -24,9 +23,13 @@ open class QAsrEngine {
 
         init {
             try {
-                System.loadLibrary("qwen_asr")
-            } catch (e: Throwable) {
-                // Host unit tests or missing native library on host
+                System.loadLibrary("cantonese_engine")
+            } catch (_: Throwable) {
+                try {
+                    System.loadLibrary("qwen_asr")
+                } catch (_: Throwable) {
+                    // Host unit tests or missing native library on host
+                }
             }
         }
     }
@@ -140,26 +143,6 @@ open class QAsrEngine {
     }
 
     /**
-     * Set Chinese output variant conversion.
-     * @param variant BCP-47 style variant such as "zh-HK", "zh-Hant", or "" to disable.
-     * @return True if the variant was accepted, false otherwise.
-     */
-    open fun setChineseVariant(variant: String): Boolean {
-        synchronized(this) {
-            if (nativeHandle != 0L) {
-                val success = nativeSetChineseVariant(nativeHandle, variant)
-                if (!success) {
-                    Log.e(TAG, "Invalid Chinese variant: $variant")
-                }
-                return success
-            } else {
-                Log.e(TAG, "Cannot set Chinese variant: model is not loaded")
-                return false
-            }
-        }
-    }
-
-    /**
      * Set transcription prompt to guide context/style.
      * @param prompt Guided context prompt string.
      */
@@ -233,7 +216,6 @@ open class QAsrEngine {
     private external fun nativePushPcm16(sessionHandle: Long, buffer: ByteBuffer, byteCount: Int): Int
     private external fun nativeStopVadSession(sessionHandle: Long, finalize: Boolean)
     private external fun nativeSetLanguage(handle: Long, language: String): Boolean
-    private external fun nativeSetChineseVariant(handle: Long, variant: String): Boolean
     private external fun nativeSetPrompt(handle: Long, prompt: String)
     private external fun nativeSetSegmentSec(handle: Long, sec: Float)
     private external fun nativePreloadEncoder(handle: Long)
