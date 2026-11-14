@@ -1,0 +1,4 @@
+• Improved multi-word Cantonese Quick (速成) phrase ranking and optional on-device selection learning.
+• Added contextual English autocorrect, model casing restoration, and emoji search with skin-tone variants.
+• Made offline voice typing optional with Wi-Fi download controls and lighter app size.
+• Updated light and dark theme styling across setup and Settings.

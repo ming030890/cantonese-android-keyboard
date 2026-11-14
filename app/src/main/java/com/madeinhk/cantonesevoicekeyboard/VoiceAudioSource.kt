@@ -1,7 +1,6 @@
 package com.madeinhk.cantonesevoicekeyboard
 
 import android.media.AudioRecord
-import android.os.SystemClock
 import java.nio.ByteBuffer
 
 /** The replay substitutes only capture; chunk processing, JNI, VAD and editor stay shared. */

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "ndk_version": "30.0.14904198",
+  "android_api": 32,
+  "abi": "arm64-v8a",
+  "openblas": {
+    "repository": "https://github.com/OpenMathLib/OpenBLAS.git",
+    "revision": "e0166008be8e466242aa76b2ff75ce3f0fbf574a",
+    "version": "0.3.34",
+    "target": "ARMV8",
+    "threads": 1
+  },
+  "kleidiai": {
+    "repository": "https://github.com/ARM-software/kleidiai.git",
+    "revision": "6787251d9cc2f38a3a6024b11fd7ace10cde4cd9"
+  }
+}

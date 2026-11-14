@@ -25,7 +25,7 @@
   "experimental": true,
   "production_approved": false,
   "selection": "One shared Cantonese/English/handwriting LM; English spelling uses its vocabulary plus high-confidence learned typing-channel dictionary proposals",
-  "qualification": "V2 improves contextual accuracy but fails English-prefix and mixed quantization retention guards",
+  "qualification": "Historical V2 guard failures refer to model 915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322. Release77 changed the weights; exact-current-artifact production qualification is not established by the retained historical report. See qualification_audit.",
   "native_verification": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/native-verification.json",
   "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/previous-assets",
   "english_policy": {
@@ -33,12 +33,12 @@
     "implementation": "../QwenASR/crates/cantonese-ngram/src/cnn.rs::english_suggestions",
     "parameter_source": "Native 22-24-1 FFN warm-started with authentic-context short-word supervision; literal-score input disabled; accepted parent threshold retained",
     "backspace_undo": true,
-    "qualification_report": "config/english_iteration/2026-10-29/short-nn-v2/accepted-score.json",
+    "qualification_report": "config/language_model/qualification_audit_20261108.json",
     "production_qualified": false,
     "acceptance_source": "../QwenASR/crates/cantonese-ngram/src/english_acceptance.json",
     "acceptance_sha256": "2a76593959d2e0c00d7829529c636745f1e4dcbd29d570b3b5adf6fd47607f0f",
     "touch_evidence_used": false,
-    "primary_metric": "f0.5",
+    "primary_metric": "whole-message ITE plus mixed Cantonese/English controller replay",
     "known_word_policy": "Learned original-word versus replacement evidence",
     "dictionary_provenance": "config/english_iteration/2026-10-24/gboard/dictionary-provenance.json",
     "noisy_channel": {
@@ -61,6 +61,11 @@
         "README_en_GB.txt": "7d1bad7d5a5e18bf1e34d3e88542a935fc69990926fce33dd9288aee222d1ef5",
         "en_GB.dic": "dafe4d2f9536529576c50b024e16b3c928ede8f2565714a6b9dddd6c75c45502"
       }
-    }
-  }
+    },
+    "historical_qualification_report": "config/english_iteration/2026-10-29/short-nn-v2/accepted-score.json",
+    "legacy_regression_metric": "f0.5"
+  },
+  "qualification_audit": "config/language_model/qualification_audit_20261108.json",
+  "native_verification_scope": "historical_parent_only; hash differs from current model",
+  "current_native_smoke": "config/language_model/current_native_smoke_20261108.json"
 }

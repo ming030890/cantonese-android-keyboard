@@ -36,12 +36,15 @@ from pathlib import Path
 # for the safetensors header and any future tensor reordering.
 SHARD_LIMIT_BYTES = 480 * 1024 * 1024
 
-TOKENIZER_FILES = [
+REQUIRED_SUPPORT_FILES = [
     "vocab.json",
     "merges.txt",
+]
+OPTIONAL_SUPPORT_FILES = [
     "cantonese_zhconv_adapter.json",
     "cantonese_zhconv_adapter.safetensors",
 ]
+TOKENIZER_FILES = REQUIRED_SUPPORT_FILES + OPTIONAL_SUPPORT_FILES
 RESHARD_MANIFEST = ".reshard_manifest.json"
 
 
@@ -269,15 +272,16 @@ def main():
             _copy_tokenizer(source, pack_dirs[0])
             return
 
-        src_size = sum(path.stat().st_size for path in src_models)
-        out_size = sum(p.stat().st_size for p in expected_paths)
-        if abs(out_size - src_size) < 2 * 1024 * 1024:
-            print(f"shards already present and size-consistent ({out_size / 1024 / 1024:.1f} MiB total).")
-            print(f"recording source fingerprint in {manifest_path}. Use --force to rebuild.")
-            pack_dirs[0].mkdir(parents=True, exist_ok=True)
-            write_manifest(manifest_path, source_manifest)
-            _copy_tokenizer(source, pack_dirs[0])
-            return
+        if existing_manifest is None:
+            src_size = sum(path.stat().st_size for path in src_models)
+            out_size = sum(p.stat().st_size for p in expected_paths)
+            if abs(out_size - src_size) < 2 * 1024 * 1024:
+                print(f"shards already present and size-consistent ({out_size / 1024 / 1024:.1f} MiB total).")
+                print(f"recording source fingerprint in {manifest_path}. Use --force to rebuild.")
+                pack_dirs[0].mkdir(parents=True, exist_ok=True)
+                write_manifest(manifest_path, source_manifest)
+                _copy_tokenizer(source, pack_dirs[0])
+                return
 
     reshard_raw(src_models, pack_dirs, limit)
     _copy_tokenizer(source, pack_dirs[0])
@@ -287,14 +291,25 @@ def main():
 
 
 def _copy_tokenizer(source: Path, pack_a: Path):
-    """Tokenizer files live alongside shard 1 in pack_a."""
+    """Tokenizer and optional adapter files live alongside shard 1 in pack_a."""
     pack_a.mkdir(parents=True, exist_ok=True)
-    for name in TOKENIZER_FILES:
+    for name in REQUIRED_SUPPORT_FILES:
         src = source / name
         if not src.exists():
-            print(f"warning: {src} not found, skipping")
-            continue
+            sys.exit(f"error: required tokenizer file not found: {src}")
         dst = pack_a / name
+        if dst.exists() and dst.stat().st_size == src.stat().st_size and sha256_file(dst) == sha256_file(src):
+            continue
+        print(f"copying {name} -> {dst}")
+        shutil.copy2(src, dst)
+    for name in OPTIONAL_SUPPORT_FILES:
+        src = source / name
+        dst = pack_a / name
+        if not src.exists():
+            if dst.exists():
+                print(f"removing stale {name} -> {dst}")
+                dst.unlink()
+            continue
         if dst.exists() and dst.stat().st_size == src.stat().st_size and sha256_file(dst) == sha256_file(src):
             continue
         print(f"copying {name} -> {dst}")

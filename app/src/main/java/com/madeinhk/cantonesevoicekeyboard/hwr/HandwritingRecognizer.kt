@@ -65,6 +65,8 @@ class HandwritingRecognizer private constructor(
             if (!nativeLibraryLoaded) return null
             return runCatching {
                 val appContext = context.applicationContext
+                // Remove the legacy unconditional debug artifact on the next recognizer load.
+                runCatching { appContext.getExternalFilesDir(null)?.resolve("last_input_strokes.json")?.delete() }
                 val model = appContext.assets.open(MODEL_ASSET).use { it.readBytes() }
                 val labels = appContext.assets.open(LABELS_ASSET).use { it.readBytes() }
                 val lm = runCatching {
@@ -202,17 +204,16 @@ class HandwritingRecognizer private constructor(
         val totalPoints = strokes.sumOf { it.size }
         if (totalPoints == 0) return emptyList()
 
-        Log.i(TAG, "predictStrokes: ${strokes.size} strokes, total points=$totalPoints, canvas=${canvasWidth}x${canvasHeight}, prevChar=$prevChar")
-
         val flatPoints = FloatArray(totalPoints * 3)
         val strokeCounts = IntArray(strokes.size)
+        val startTimeMs = strokes.firstNotNullOf { it.firstOrNull()?.timeMs }
         var offset = 0
         strokes.forEachIndexed { strokeIdx, stroke ->
             strokeCounts[strokeIdx] = stroke.size
             for (pt in stroke) {
                 flatPoints[offset++] = pt.x
                 flatPoints[offset++] = pt.y
-                flatPoints[offset++] = pt.timeMs.toFloat()
+                flatPoints[offset++] = (pt.timeMs - startTimeMs).toFloat()
             }
         }
 
@@ -225,34 +226,6 @@ class HandwritingRecognizer private constructor(
             topK,
             prevChar,
         ) ?: throw HandwritingRecognitionException("Native handwriting stroke inference failed")
-
-        Log.i(TAG, "predictStrokes result: ${predictions.joinToString(", ")}")
-
-        runCatching {
-            val file = java.io.File("/sdcard/Android/data/com.madeinhk.cantonesevoicekeyboard/files/last_input_strokes.json")
-            file.parentFile?.mkdirs()
-            val json = org.json.JSONObject()
-            json.put("canvas_width", canvasWidth)
-            json.put("canvas_height", canvasHeight)
-            val strokesArray = org.json.JSONArray()
-            for (stroke in strokes) {
-                val ptsArray = org.json.JSONArray()
-                for (pt in stroke) {
-                    val p = org.json.JSONObject()
-                    p.put("x", pt.x)
-                    p.put("y", pt.y)
-                    p.put("t", pt.timeMs)
-                    ptsArray.put(p)
-                }
-                strokesArray.put(ptsArray)
-            }
-            json.put("strokes", strokesArray)
-            val predsArray = org.json.JSONArray()
-            for (p in predictions) predsArray.put(p)
-            json.put("predictions", predsArray)
-            file.writeText(json.toString(2))
-            Log.i(TAG, "Saved debug strokes to ${file.absolutePath}")
-        }
 
         return predictions.mapIndexed { rank, text ->
             HandwritingCandidate(text = text, rank = rank)

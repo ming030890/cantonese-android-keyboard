@@ -21,6 +21,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -33,6 +35,11 @@ internal class VoiceInputCoordinator(
     private val editor: KeyboardEditor,
     private val currentSession: () -> Long,
     private val isInputViewVisible: () -> Boolean,
+    private val voiceEnabled: () -> Boolean = { context?.let(KeyboardSettings::isVoiceInputEnabled) ?: true },
+    private val modelAvailable: () -> Boolean = { context?.let(ModelAssetPack::isModelAvailable) ?: true },
+    private val modelDownloadStatus: () -> kotlinx.coroutines.flow.Flow<ModelDownloadStatus> = {
+        checkNotNull(context).let { ModelAssetPack.downloadStatusFlow(it, requestDownload = true) }
+    },
 ) : VoiceSession {
     companion object {
         private const val TAG = "CantoneseIME"
@@ -68,7 +75,7 @@ internal class VoiceInputCoordinator(
 
     internal suspend fun awaitModelForBenchmark() {
         check(BuildConfig.DEBUG)
-        ensureModelLoadingStarted(currentSession(), userInitiated = true)
+        ensureModelLoadingStarted(currentSession())
         modelLoadingJob?.join()
         check(modelLoaded) { "ASR model is not ready: ${_state.value}" }
     }
@@ -78,7 +85,7 @@ internal class VoiceInputCoordinator(
         val requestedAt = VoiceClock.nanoTime()
         check(!recording && activeSession?.engineJob?.isActive != true)
         require(pcm.isNotEmpty() && pcm.size % 2 == 0)
-        ensureModelLoadingStarted(currentSession(), userInitiated = true)
+        ensureModelLoadingStarted(currentSession())
         modelLoadingJob?.join()
         check(modelLoaded) { "ASR model is not ready: ${_state.value}" }
         val readyAt = VoiceClock.nanoTime()
@@ -111,7 +118,7 @@ internal class VoiceInputCoordinator(
         check(!recording && activeSession?.engineJob?.isActive != true)
         require(pcm1.isNotEmpty() && pcm1.size % 2 == 0)
         require(pcm2.isNotEmpty() && pcm2.size % 2 == 0)
-        ensureModelLoadingStarted(currentSession(), userInitiated = true)
+        ensureModelLoadingStarted(currentSession())
         modelLoadingJob?.join()
         check(modelLoaded) { "ASR model is not ready: ${_state.value}" }
         val readyAt = VoiceClock.nanoTime()
@@ -185,7 +192,7 @@ internal class VoiceInputCoordinator(
     private val scope = CoroutineScope(job + Dispatchers.Main.immediate)
     private val engineMutex = Mutex()
     @Volatile private var engine: QAsrEngine? = null
-    private var modelLoaded = false
+    @Volatile private var modelLoaded = false
     private var modelLoadingJob: Job? = null
     private var generation = 0L
     private var sessionCounter = 0L
@@ -197,12 +204,61 @@ internal class VoiceInputCoordinator(
     private val _volume = MutableStateFlow(0f)
     override val volume = _volume.asStateFlow()
 
-    override fun onInputViewStarted(session: Long) = ensureModelLoadingStarted(session, userInitiated = false)
+    override val enabled: Boolean get() = voiceEnabled()
+    private var downloadFeedbackJob: Job? = null
+
+    init {
+        if (context != null) scope.launch {
+            KeyboardSettings.voiceInputEnabledFlow.collectLatest { value ->
+                if (!value) {
+                    downloadFeedbackJob?.cancel()
+                    modelLoadingJob?.cancel()
+                    interrupt()
+                    _state.value = KeyboardUiState.Idle
+                    val active = activeSession
+                    listOfNotNull(active?.audioJob, active?.engineJob, modelLoadingJob).joinAll()
+                    engineMutex.withLock { engine?.free(); modelLoaded = false }
+                }
+            }
+        }
+    }
+
+    // Opening a keyboard is a typing action. Model setup/status is shown only after a mic tap.
+    override fun onInputViewStarted(session: Long) {
+        downloadFeedbackJob?.cancel()
+        modelLoadingJob?.cancel()
+        if (!recording) _state.value = KeyboardUiState.Idle
+    }
+
+    private fun showDownloadFeedback(ctx: Context?) {
+        if (downloadFeedbackJob?.isActive == true) return
+        downloadFeedbackJob = scope.launch {
+            modelDownloadStatus().first { status ->
+                if (!enabled || !isInputViewVisible()) return@first true
+                val message = when (status) {
+                    ModelDownloadStatus.WaitingForWifi -> ctx?.getString(R.string.model_status_waiting_wifi) ?: "Use Wi-Fi with no data limit."
+                    ModelDownloadStatus.RequiresConfirmation -> ctx?.getString(R.string.voice_model_open_setup) ?: "Confirm download in keyboard setup."
+                    ModelDownloadStatus.Ready -> ctx?.getString(R.string.voice_model_ready_tap) ?: "Ready. Tap the mic to speak."
+                    is ModelDownloadStatus.Failed -> ctx?.getString(R.string.error_model_not_found) ?: "Voice download failed. Tap Retry."
+                    is ModelDownloadStatus.Downloading -> ctx?.getString(R.string.voice_model_download_progress, status.percent) ?: "Voice download: ${status.percent}%"
+                    else -> ctx?.getString(R.string.keyboard_status_downloading_model) ?: "Downloading voice typing…"
+                }
+                _state.value = if (status is ModelDownloadStatus.Failed)
+                    KeyboardUiState.Error(message, canRetryModelDownload = true)
+                else KeyboardUiState.ModelNotReady(message)
+                status is ModelDownloadStatus.Ready || status is ModelDownloadStatus.Failed
+            }
+        }
+    }
 
     override fun toggle() {
+        if (!enabled) return
         val error = _state.value as? KeyboardUiState.Error
         if (error != null) {
-            if (error.canRetryModelDownload) ensureModelLoadingStarted(currentSession(), userInitiated = true)
+            if (error.canRetryModelDownload) {
+                context?.let { ModelAssetPack.requestDownload(it, retry = true) }
+                ensureModelLoadingStarted(currentSession())
+            }
             return
         }
         if (
@@ -220,12 +276,18 @@ internal class VoiceInputCoordinator(
         } else if (modelLoaded) {
             start()
         } else {
-            ensureModelLoadingStarted(currentSession(), userInitiated = true)
+            ensureModelLoadingStarted(currentSession())
         }
     }
 
     override fun interrupt() {
         val voiceState = _state.value
+        if (voiceState is KeyboardUiState.ModelNotReady || voiceState is KeyboardUiState.LoadingModel ||
+            voiceState is KeyboardUiState.Error) {
+            downloadFeedbackJob?.cancel()
+            modelLoadingJob?.cancel()
+            _state.value = KeyboardUiState.Idle
+        }
         val session = activeSession
         if (session?.discarded == true) return
         if (
@@ -253,6 +315,8 @@ internal class VoiceInputCoordinator(
     override fun isRecording(): Boolean = recording
 
     override fun finish(releaseModel: Boolean, session: Long) {
+        modelLoadingJob?.cancel()
+        downloadFeedbackJob?.cancel()
         val stopJob = stop(discard = true)
         val active = activeSession
         val jobs = listOfNotNull(
@@ -275,6 +339,7 @@ internal class VoiceInputCoordinator(
 
     override fun destroy() {
         if (debugInstance === this) debugInstance = null
+        downloadFeedbackJob?.cancel()
         val stopJob = stop(discard = true)
         val active = activeSession
         val jobs = listOfNotNull(active?.audioJob, active?.engineJob, modelLoadingJob, stopJob)
@@ -287,113 +352,69 @@ internal class VoiceInputCoordinator(
         }
     }
 
-    private fun ensureModelLoadingStarted(session: Long, userInitiated: Boolean = false) {
-        if (!isInputViewVisible()) {
-            _state.value = KeyboardUiState.Idle
+    private fun ensureModelLoadingStarted(session: Long) {
+        if (!enabled || !isInputViewVisible()) return
+        if (!modelAvailable()) {
+            showDownloadFeedback(context)
             return
         }
-        if (modelLoaded) {
-            _state.value = KeyboardUiState.Idle
-            return
-        }
-        if (modelLoadingJob?.isCompleted == false) {
-            if (userInitiated) {
-                if (_state.value is KeyboardUiState.Idle) {
-                    _state.value = KeyboardUiState.LoadingModel
-                }
-            }
-            return
-        }
-        if (userInitiated) {
-            _state.value = KeyboardUiState.LoadingModel
-        }
+        if (modelLoaded || modelLoadingJob?.isActive == true) return
+        _state.value = KeyboardUiState.LoadingModel
         val load = scope.launch(Dispatchers.Default) {
             val startedAt = SystemClock.elapsedRealtime()
             try {
                 VoiceLatencyTrace.event("model_resolve_begin")
-                val modelDir = context?.let { ctx ->
-                    ModelAssetPack.resolveModelDir(ctx) {
-                        if (userInitiated || _state.value is KeyboardUiState.LoadingModel) {
-                            _state.value = KeyboardUiState.DownloadingModel
-                        }
-                    }
-                }
+                val modelDir = context?.let { ModelAssetPack.resolveModelDir(it) }
                 if (modelDir == null) {
-                    if (userInitiated) {
-                        _state.value = KeyboardUiState.Error(
-                            context?.getString(R.string.error_model_not_found) ?: "Model not found",
-                            canRetryModelDownload = true,
-                        )
-                    } else {
-                        _state.value = KeyboardUiState.Idle
-                    }
+                    _state.value = KeyboardUiState.Error(
+                        context?.getString(R.string.error_model_not_found) ?: "Voice download failed. Tap Retry.",
+                        canRetryModelDownload = true,
+                    )
                     return@launch
                 }
                 VoiceLatencyTrace.event("model_resolve_end")
-                if (userInitiated) {
-                    _state.value = KeyboardUiState.LoadingModel
-                }
                 VoiceLatencyTrace.event("model_load_begin")
                 val success = engineMutex.withLock {
                     val activeEngine = getOrCreateEngine()
                     val loaded = activeEngine.loadModel(modelDir.absolutePath, ASR_WORKER_THREADS)
                     if (loaded) {
                         activeEngine.setLanguage("Cantonese")
-                        activeEngine.setChineseVariant("")
                         activeEngine.setPrompt("")
                         activeEngine.setSegmentSec(0.0f)
                     }
                     loaded
                 }
                 VoiceLatencyTrace.event("model_load_end", "success" to success)
-                if (success) {
-                    if (isInputViewVisible()) {
-                        modelLoaded = true
-                        if (userInitiated) {
-                            withContext(Dispatchers.Main) {
-                                start()
-                            }
-                        } else {
-                            _state.value = KeyboardUiState.Idle
-                        }
-                    } else {
-                        engineMutex.withLock { engine?.free() }
-                        modelLoaded = false
-                        _state.value = KeyboardUiState.Idle
+                if (!enabled || session != currentSession() || !isInputViewVisible()) {
+                    engineMutex.withLock { engine?.free() }
+                    modelLoaded = false
+                    _state.value = KeyboardUiState.Idle
+                } else if (success) {
+                    modelLoaded = true
+                    withContext(Dispatchers.Main) {
+                        if (enabled && session == currentSession() && isInputViewVisible()) start()
                     }
                 } else {
-                    if (userInitiated) {
-                        _state.value = KeyboardUiState.Error(
-                            context?.getString(R.string.error_failed_initialize_asr) ?: "Failed to initialize ASR",
-                        )
-                    } else {
-                        _state.value = KeyboardUiState.Idle
-                    }
+                    _state.value = KeyboardUiState.Error(context.getString(R.string.error_failed_initialize_asr))
                 }
             } catch (error: CancellationException) {
-                if (session == currentSession() && isInputViewVisible() && !modelLoaded) {
-                    _state.value = KeyboardUiState.Idle
+                withContext(kotlinx.coroutines.NonCancellable) {
+                    engineMutex.withLock { if (!modelLoaded) engine?.free() }
                 }
+                if (session == currentSession() && !modelLoaded) _state.value = KeyboardUiState.Idle
                 throw error
             } catch (error: Throwable) {
                 Log.e(TAG, "Unexpected error while loading ASR model", error)
-                if (userInitiated && isInputViewVisible()) {
-                    _state.value = KeyboardUiState.Error(
-                        context?.getString(R.string.error_failed_initialize_asr) ?: "Failed to initialize ASR",
-                    )
-                } else {
-                    _state.value = KeyboardUiState.Idle
-                }
+                _state.value = if (enabled && isInputViewVisible()) KeyboardUiState.Error(
+                    context?.getString(R.string.error_failed_initialize_asr) ?: "Voice unavailable. Reopen keyboard.",
+                ) else KeyboardUiState.Idle
             } finally {
                 Log.i(TAG, "ASR load job completed in ${SystemClock.elapsedRealtime() - startedAt}ms")
             }
         }
         modelLoadingJob = load
-        load.invokeOnCompletion { cause ->
+        load.invokeOnCompletion {
             if (modelLoadingJob === load) modelLoadingJob = null
-            if (cause is CancellationException && isInputViewVisible() && !modelLoaded) {
-                scope.launch { ensureModelLoadingStarted(currentSession()) }
-            }
         }
     }
 
@@ -409,7 +430,7 @@ internal class VoiceInputCoordinator(
     internal fun stopForTest(discard: Boolean = false): Job? = stop(discard)
 
     private fun start(replayPcm: ByteArray? = null) {
-        if (recording || !modelLoaded) return
+        if (!enabled || recording || !modelLoaded) return
         val activeEngine = getOrCreateEngine()
 
         // Refresh once per recording so restoring the adb flag also disables logs
@@ -430,7 +451,7 @@ internal class VoiceInputCoordinator(
             )
             if (minBufferSize == AudioRecord.ERROR || minBufferSize == AudioRecord.ERROR_BAD_VALUE) {
                 _state.value = KeyboardUiState.Error(
-                    context?.getString(R.string.error_audio_format_failed) ?: "Audio format failed",
+                    context?.getString(R.string.error_audio_format_failed) ?: "Mic unavailable. Reopen keyboard.",
                 )
                 return
             }
@@ -444,14 +465,14 @@ internal class VoiceInputCoordinator(
                 )
             } catch (error: SecurityException) {
                 _state.value = KeyboardUiState.Error(
-                    context?.getString(R.string.error_audio_permission_missing) ?: "Audio permission missing",
+                    context?.getString(R.string.error_audio_permission_missing) ?: "Allow mic access in app settings.",
                 )
                 return
             }
             if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
                 audioRecord.release()
                 _state.value = KeyboardUiState.Error(
-                    context?.getString(R.string.error_microphone_init_failed) ?: "Microphone init failed",
+                    context?.getString(R.string.error_microphone_init_failed) ?: "Mic unavailable. Reopen keyboard.",
                 )
                 return
             }
@@ -460,7 +481,7 @@ internal class VoiceInputCoordinator(
             } catch (error: IllegalStateException) {
                 audioRecord.release()
                 _state.value = KeyboardUiState.Error(
-                    context?.getString(R.string.error_failed_access_microphone) ?: "Failed to access microphone",
+                    context?.getString(R.string.error_failed_access_microphone) ?: "Mic unavailable. Close other recording apps.",
                 )
                 return
             }

@@ -53,8 +53,15 @@ internal class EnglishInputCoordinator(
     private var safeStart = true
     private var closed = false
     var onContextRevised: () -> Unit = {}
-    private val contextWindow = ContextRevisionWindow(editor, { engine }, scope, worker,
-        { !closed && word.isEmpty() }, { undo=null;onContextRevised() })
+    var onAutocorrectEpisode: (AutocorrectEpisode) -> Unit = {}
+    internal val editTracker = AutocorrectEditTracker { onAutocorrectEpisode(it) }
+    private val contextWindow = ContextRevisionWindow(
+        editor, { engine }, scope, worker,
+        { !closed && word.isEmpty() },
+        { undo = null; onContextRevised() },
+        onWordRevised = { orig, fixed -> editTracker.onDelayedBoundaryCorrection(orig, fixed) },
+        onUndoRevision = { orig, fixed -> editTracker.onUndo(orig, fixed) },
+    )
     var word = ""
         private set
     var quick = false
@@ -370,7 +377,9 @@ internal class EnglishInputCoordinator(
         cursorWord?.let { target ->
             if (selected == null) { reset(); return false }
             if (!canSelect(selected) || !cursorWordMatches(target)) { reset(); return false }
+            val wasQuick = quick
             val replaced = editor.replaceWordAtCursor(target.before, target.after, selected)
+            if (replaced) editTracker.onCursorWordReplaced(target.left, target.before + target.after, selected, wasQuick)
             reset()
             return replaced
         }
@@ -398,8 +407,9 @@ internal class EnglishInputCoordinator(
         // operates without loading a separate English engine instance.
         val caseOnly = source.correction?.let { it != original && it.equals(original, ignoreCase = true) } == true
         val allowEnglishDecision=!chineseMatch || engine?.allowsQuickCodeCorrections==true || caseOnly
+        val proposedCorrection = source.correction?.let { automaticWord(it, original) + quote }
         val replacement = selected ?: if (allowCorrection && !suppress && allowEnglishDecision && eligible() && currentResult)
-            source.correction?.let { automaticWord(it, original) + quote } ?: original else original
+            proposedCorrection ?: original else original
         val delayed = pending?.takeIf {
             allowCorrection && !suppress && allowEnglishDecision && eligible() && !currentResult &&
                 selected == null && delimiter.isNotEmpty()
@@ -428,6 +438,19 @@ internal class EnglishInputCoordinator(
         val mayReconsider=allowCorrection && !suppress && allowEnglishDecision && eligible() && selected==null && delimiter==" "
         val remember=mayReconsider && currentResult && (!source.known || source.reconsiderKnown) && source.correction==null && replacement==original
         val originalCenters=centers.copyOf()
+        val episodeLeft = if (replaceCount > original.length) originalLeft.dropLast(replaceCount - original.length) else originalLeft
+        editTracker.onWordCommitted(
+            left = episodeLeft,
+            typed = undoOriginal,
+            committed = replacement,
+            selected = selected,
+            proposedCorrection = proposedCorrection,
+            known = source.known,
+            candidates = source.candidates,
+            quick = wasQuick,
+            centers = originalCenters,
+            points = evidence,
+        )
         reset(cancelLookup = delayed == null, preserveContext = mayReconsider, preserveDisplay = hasUnifiedSuggestions); undo = record
         if(mayReconsider) contextWindow.boundary(original,replacement,delimiter,originalLeft,originalCenters,evidence,remember)
         if (delayed != null) {
@@ -443,6 +466,7 @@ internal class EnglishInputCoordinator(
                         (cursor != null && selection.first != cursor)))) return@launch
                 pendingBoundaryCursor = null
                 if (editor.replaceTextBeforeCursor(original + delimiter, fixed + delimiter)) {
+                    editTracker.onDelayedBoundaryCorrection(original, fixed)
                     undo = Undo(original, fixed + delimiter, wasQuick, editor.cursorSelection()?.first)
                 }
             }
@@ -460,7 +484,9 @@ internal class EnglishInputCoordinator(
             if ((selection == null || (selection.first == selection.second &&
                     (record.cursor == null || record.cursor == selection.first))) &&
                 editor.replaceTextBeforeCursor(record.committed, "")) {
-                engine?.rejected(record.original.lowercase(Locale.ROOT),record.committed.trimEnd().lowercase(Locale.ROOT))
+                val committedWord = record.committed.trimEnd { !it.isAsciiLetter() && it !in "'’" }
+                engine?.rejected(record.original.lowercase(Locale.ROOT),committedWord.lowercase(Locale.ROOT))
+                editTracker.onUndo(record.original, committedWord)
                 quick = record.quick; safeStart = true; word = record.original; suppress = true
                 taps.clear(); repeat(word.length) { taps += null }
                 if (!quick) editor.setComposingText(word)
@@ -571,8 +597,12 @@ internal class EnglishInputCoordinator(
             editor.getTextBeforeCursor(512).orEmpty() == target.left + target.before &&
             editor.getTextAfterCursor(256).orEmpty() == target.after + target.right
 
+    fun flushAutocorrectEpisodes() {
+        editTracker.onSessionFinished()
+    }
+
     override fun close() {
-        closed=true;reset()
+        closed=true;editTracker.onSessionFinished();reset()
         // Closing an ONNX session must serialize with in-flight inference.
         scope.launch(worker) { (engine as? AutoCloseable)?.close() }.invokeOnCompletion { scope.cancel() }
     }

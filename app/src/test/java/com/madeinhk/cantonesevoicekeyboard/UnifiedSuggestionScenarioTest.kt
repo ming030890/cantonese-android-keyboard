@@ -371,8 +371,11 @@ class UnifiedSuggestionScenarioTest {
                 }
                 engine.newRequest().use { token ->
                     val result = engine.compose(token, version, "df", "I use ", "", true)
-                    assertEquals(quick.previewCandidates(version, "df", "I use ", "").map { it.text }, result.chinese)
-                    assertEquals(result.chinese, result.display.take(result.chinese.size))
+                    val fullChinese = quick.previewCandidates(version, "df", "I use ", "").map { it.text }
+                    if (version == 3) assertTrue("Exercise the compact-payload boundary", fullChinese.size > 100)
+                    // JNI keeps compact Chinese metadata; complete two-letter codes display every candidate.
+                    assertEquals(fullChinese.take(100), result.chinese)
+                    assertEquals(fullChinese, result.display.take(fullChinese.size))
                 }
             }
         }

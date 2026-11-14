@@ -174,7 +174,7 @@ fun SettingsLegacySystemLayoutsScreenshot() {
 @Composable
 fun SettingsAllLayoutsLightScreenshot() {
     SettingsScreenScreenshotContent(
-        enabledLayouts = KeyboardSettings.DEFAULT_LAYOUTS + KeyboardSettings.LAYOUT_HANDWRITING,
+        enabledLayouts = setOf(KeyboardSettings.LAYOUT_QUICK, KeyboardSettings.LAYOUT_ENGLISH, KeyboardSettings.LAYOUT_HANDWRITING),
         darkTheme = false,
     )
 }

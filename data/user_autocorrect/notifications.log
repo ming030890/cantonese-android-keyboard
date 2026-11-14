@@ -1,0 +1,3239 @@
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 1 total) ===
+Synced at: 2026-11-08 18:10:03
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 1 (0 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (2 edits, 4 total) ===
+Synced at: 2026-11-08 18:10:09
+New episodes in this batch: 3 (2 actionable edits)
+Total stored episodes: 4 (2 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='Cantonese ' typed='asr' auto='as' -> target='asr'
+  - [candidate_selected] left='Cantonese asr is ' typed='food' auto='food' -> target='good'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 5 total) ===
+Synced at: 2026-11-08 18:25:52
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 5 (3 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='' typed='usr' auto='Usr' -> target='Use'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +11 autocorrect episodes synced (2 edits, 16 total) ===
+Synced at: 2026-11-08 18:26:11
+New episodes in this batch: 11 (2 actionable edits)
+Total stored episodes: 16 (5 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Use this for app ' typed='jcon' auto='jcon' -> target='ocon'
+  - [backspace_retype_repair] left='Use this for app icon. ' typed='foow' auto='foow' -> target='follow'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 18 total) ===
+Synced at: 2026-11-08 18:26:37
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 18 (5 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 19 total) ===
+Synced at: 2026-11-08 18:28:08
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 19 (5 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 20 total) ===
+Synced at: 2026-11-08 18:30:22
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 20 (5 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (1 edits, 27 total) ===
+Synced at: 2026-11-08 18:30:33
+New episodes in this batch: 7 (1 actionable edits)
+Total stored episodes: 27 (6 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='Use the ' typed='gplay' auto='play' -> target='gplay'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 28 total) ===
+Synced at: 2026-11-08 18:31:08
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 28 (6 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (0 edits, 37 total) ===
+Synced at: 2026-11-08 18:31:16
+New episodes in this batch: 9 (0 actionable edits)
+Total stored episodes: 37 (6 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (1 edits, 46 total) ===
+Synced at: 2026-11-08 18:31:30
+New episodes in this batch: 9 (1 actionable edits)
+Total stored episodes: 46 (7 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='For eon can you rrseach and make ' typed='sugveatio' auto='suggestion' -> target='suggestion'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 47 total) ===
+Synced at: 2026-11-08 18:37:04
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 47 (7 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (1 edits, 55 total) ===
+Synced at: 2026-11-08 18:37:15
+New episodes in this batch: 8 (1 actionable edits)
+Total stored episodes: 55 (8 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='' typed='donr' auto='donr' -> target='done'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 56 total) ===
+Synced at: 2026-11-08 18:40:05
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 56 (8 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 57 total) ===
+Synced at: 2026-11-08 18:44:08
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 57 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='' typed='byt' auto='But' -> target='byt'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 61 total) ===
+Synced at: 2026-11-08 18:44:16
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 61 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 62 total) ===
+Synced at: 2026-11-08 18:44:24
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 62 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 63 total) ===
+Synced at: 2026-11-08 18:45:22
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 63 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 64 total) ===
+Synced at: 2026-11-08 18:49:51
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 64 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 65 total) ===
+Synced at: 2026-11-08 18:50:34
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 65 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 67 total) ===
+Synced at: 2026-11-08 18:50:39
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 67 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 69 total) ===
+Synced at: 2026-11-08 18:50:44
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 69 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 72 total) ===
+Synced at: 2026-11-08 18:51:05
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 72 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 73 total) ===
+Synced at: 2026-11-08 18:51:34
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 73 (9 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (1 edits, 78 total) ===
+Synced at: 2026-11-08 18:51:49
+New episodes in this batch: 5 (1 actionable edits)
+Total stored episodes: 78 (10 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Remove the Keyboard setup ' typed='deeplonk' auto='deeplonk' -> target='deeplink'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 83 total) ===
+Synced at: 2026-11-08 18:51:53
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 83 (10 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 84 total) ===
+Synced at: 2026-11-08 18:52:22
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 84 (10 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (2 edits, 90 total) ===
+Synced at: 2026-11-08 18:52:37
+New episodes in this batch: 6 (2 actionable edits)
+Total stored episodes: 90 (12 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='Do not ' typed='menriom' auto='mention' -> target='menriom'
+  - [backspace_retype_repair] left='Do not menrion Voice typing is optional \n\nBy default, check ' typed='ir' auto='ir' -> target='if'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (1 edits, 100 total) ===
+Synced at: 2026-11-08 18:52:53
+New episodes in this batch: 10 (1 actionable edits)
+Total stored episodes: 100 (13 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Do not menrion Voice typing is optional \n\nBy default, check if user has quick ' typed='keyboa' auto='keyboard' -> target='keyboard'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (3 edits, 106 total) ===
+Synced at: 2026-11-08 18:53:08
+New episodes in this batch: 6 (3 actionable edits)
+Total stored episodes: 106 (16 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='ot menrion Voice typing is optional \n\nBy default, check if user has quick keyboard, if so enable quick . \n\nOtherwise default ro ' typed='q' auto='q' -> target='a'
+  - [candidate_selected] left='ot menrion Voice typing is optional \n\nBy default, check if user has quick keyboard, if so enable quick . \n\nOtherwise default ro ' typed='q' auto='q' -> target='a'
+  - [candidate_selected] left='ot menrion Voice typing is optional \n\nBy default, check if user has quick keyboard, if so enable quick . \n\nOtherwise default to ' typed='q' auto='q' -> target='a'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 110 total) ===
+Synced at: 2026-11-08 18:53:18
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 110 (16 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 111 total) ===
+Synced at: 2026-11-08 18:54:56
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 111 (16 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (1 edits, 120 total) ===
+Synced at: 2026-11-08 18:55:10
+New episodes in this batch: 9 (1 actionable edits)
+Total stored episodes: 120 (17 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Can you check ' typed='ctash' auto='ctash' -> target='crash'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 121 total) ===
+Synced at: 2026-11-08 18:55:42
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 121 (17 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 122 total) ===
+Synced at: 2026-11-08 18:55:59
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 122 (17 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (0 edits, 132 total) ===
+Synced at: 2026-11-08 18:56:16
+New episodes in this batch: 10 (0 actionable edits)
+Total stored episodes: 132 (17 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 133 total) ===
+Synced at: 2026-11-08 18:56:23
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 133 (18 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='When I type q, i' typed='r' auto='r' -> target='t'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 134 total) ===
+Synced at: 2026-11-08 19:58:27
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 134 (18 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 137 total) ===
+Synced at: 2026-11-08 19:58:30
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 137 (18 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 138 total) ===
+Synced at: 2026-11-08 20:19:43
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 138 (18 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (1 edits, 143 total) ===
+Synced at: 2026-11-08 20:19:52
+New episodes in this batch: 5 (1 actionable edits)
+Total stored episodes: 143 (19 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Can y' typed='oi' auto='oi' -> target='ou'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 144 total) ===
+Synced at: 2026-11-08 20:21:02
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 144 (19 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (0 edits, 151 total) ===
+Synced at: 2026-11-08 20:21:20
+New episodes in this batch: 7 (0 actionable edits)
+Total stored episodes: 151 (19 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 152 total) ===
+Synced at: 2026-11-08 20:22:13
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 152 (19 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (1 edits, 158 total) ===
+Synced at: 2026-11-08 20:22:31
+New episodes in this batch: 6 (1 actionable edits)
+Total stored episodes: 158 (20 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Can you extract the  ' typed='origi' auto='original' -> target='original'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (0 edits, 165 total) ===
+Synced at: 2026-11-08 20:22:46
+New episodes in this batch: 7 (0 actionable edits)
+Total stored episodes: 165 (20 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +13 autocorrect episodes synced (0 edits, 178 total) ===
+Synced at: 2026-11-08 20:23:02
+New episodes in this batch: 13 (0 actionable edits)
+Total stored episodes: 178 (20 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (1 edits, 188 total) ===
+Synced at: 2026-11-08 20:23:16
+New episodes in this batch: 10 (1 actionable edits)
+Total stored episodes: 188 (21 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_then_edit] left='ginal link to pull latest new  restaurants for my location\n\nI wany you to run a weekly job to see what fits me\n\nMy taste bud is ' typed='asian' auto='Asian' -> target='east'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 189 total) ===
+Synced at: 2026-11-08 20:23:52
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 189 (21 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (3 edits, 193 total) ===
+Synced at: 2026-11-08 20:24:09
+New episodes in this batch: 4 (3 actionable edits)
+Total stored episodes: 193 (24 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='Thai ' typed='viet' auto='diet' -> target='viet'
+  - [backspace_retype_repair] left='Thai viet a' typed='ee' auto='ee' -> target='re'
+  - [backspace_retype_repair] left='Thai viet are ' typed='food' auto='food' -> target='good'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 197 total) ===
+Synced at: 2026-11-08 20:24:24
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 197 (24 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 199 total) ===
+Synced at: 2026-11-08 20:24:39
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 199 (24 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 200 total) ===
+Synced at: 2026-11-08 20:24:40
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 200 (24 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (1 edits, 205 total) ===
+Synced at: 2026-11-08 20:24:55
+New episodes in this batch: 5 (1 actionable edits)
+Total stored episodes: 205 (25 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_then_select] left="Don't just check  what new " typed='nut' auto='nut' -> target='but'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 206 total) ===
+Synced at: 2026-11-08 20:26:16
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 206 (25 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +13 autocorrect episodes synced (2 edits, 219 total) ===
+Synced at: 2026-11-08 20:26:32
+New episodes in this batch: 13 (2 actionable edits)
+Total stored episodes: 219 (27 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left=' Did you actually pull the ' typed='kisr' auto='kisr' -> target='list'
+  - [backspace_retype_repair] left=' Did you actually pull the list ' typed='deol' auto='deol' -> target='from'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 222 total) ===
+Synced at: 2026-11-08 20:26:35
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 222 (27 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 223 total) ===
+Synced at: 2026-11-08 20:26:59
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 223 (27 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 227 total) ===
+Synced at: 2026-11-08 20:27:03
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 227 (27 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 228 total) ===
+Synced at: 2026-11-08 20:32:49
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 228 (27 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 230 total) ===
+Synced at: 2026-11-08 20:32:50
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 230 (27 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (2 edits, 240 total) ===
+Synced at: 2026-11-08 21:45:43
+New episodes in this batch: 10 (2 actionable edits)
+Total stored episodes: 240 (29 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Anything to ' typed='noti' auto='notice' -> target='notice'
+  - [backspace_retype_repair] left='Anything to notice for a 16mo ' typed='nsby' auto='nsby' -> target='baby'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (1 edits, 242 total) ===
+Synced at: 2026-11-08 21:45:51
+New episodes in this batch: 2 (1 actionable edits)
+Total stored episodes: 242 (30 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Already walking ' typed='ibdependenyl' auto='independently' -> target='independently'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 243 total) ===
+Synced at: 2026-11-08 21:46:14
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 243 (30 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (0 edits, 249 total) ===
+Synced at: 2026-11-08 21:46:22
+New episodes in this batch: 6 (0 actionable edits)
+Total stored episodes: 249 (30 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 250 total) ===
+Synced at: 2026-11-08 21:46:50
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 250 (30 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (2 edits, 257 total) ===
+Synced at: 2026-11-08 21:47:05
+New episodes in this batch: 7 (2 actionable edits)
+Total stored episodes: 257 (32 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='I think his ' typed='weakwar' auto='weakwar' -> target='weakesr'
+  - [backspace_retype_repair] left='I think his weakes' typed='r' auto='r' -> target='t'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 259 total) ===
+Synced at: 2026-11-08 21:47:07
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 259 (32 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 260 total) ===
+Synced at: 2026-11-08 21:49:04
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 260 (32 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (2 edits, 267 total) ===
+Synced at: 2026-11-08 21:49:19
+New episodes in this batch: 7 (2 actionable edits)
+Total stored episodes: 267 (34 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='He did all ' typed='thasw' auto='thasw' -> target='thwse'
+  - [backspace_retype_repair] left='He did all these . But ' typed='rbf' auto='rbf' -> target='tbf'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 269 total) ===
+Synced at: 2026-11-08 21:49:22
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 269 (34 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 270 total) ===
+Synced at: 2026-11-08 21:50:26
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 270 (34 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (1 edits, 280 total) ===
+Synced at: 2026-11-08 21:50:42
+New episodes in this batch: 10 (1 actionable edits)
+Total stored episodes: 280 (35 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_then_edit] left='My wife and me can take a day off next ' typed='dridau' auto='Friday' -> target='Friday'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (2 edits, 289 total) ===
+Synced at: 2026-11-08 21:50:58
+New episodes in this batch: 9 (2 actionable edits)
+Total stored episodes: 289 (37 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='My wife and me can take a day off next Friday. \n\nSuggest us a day \n\nWe need ' typed='o' auto='o' -> target='to'
+  - [backspace_retype_repair] left='My wife and me can take a day off next Friday. \n\nSuggest us a day \n\nWe need to pick ' typed='uo' auto='uo' -> target='up'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 292 total) ===
+Synced at: 2026-11-08 21:51:06
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 292 (37 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 293 total) ===
+Synced at: 2026-11-08 21:52:20
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 293 (37 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 294 total) ===
+Synced at: 2026-11-08 21:52:24
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 294 (37 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 295 total) ===
+Synced at: 2026-11-08 21:53:18
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 295 (37 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 296 total) ===
+Synced at: 2026-11-08 21:53:20
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 296 (38 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Any ' typed='recommendatio' auto='recommendatio' -> target='recommendation'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 297 total) ===
+Synced at: 2026-11-08 21:53:51
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 297 (38 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 301 total) ===
+Synced at: 2026-11-08 21:54:07
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 301 (38 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (1 edits, 303 total) ===
+Synced at: 2026-11-08 21:54:10
+New episodes in this batch: 2 (1 actionable edits)
+Total stored episodes: 303 (39 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Just hotel\n？ \n\nNothing more ' typed='untetestin' auto='interesting' -> target='interesting'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 304 total) ===
+Synced at: 2026-11-08 21:55:16
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 304 (39 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 308 total) ===
+Synced at: 2026-11-08 21:55:29
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 308 (39 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 309 total) ===
+Synced at: 2026-11-08 21:55:55
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 309 (39 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 310 total) ===
+Synced at: 2026-11-08 21:56:32
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 310 (39 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 314 total) ===
+Synced at: 2026-11-08 21:56:47
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 314 (39 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 315 total) ===
+Synced at: 2026-11-08 21:57:15
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 315 (39 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (1 edits, 319 total) ===
+Synced at: 2026-11-08 21:57:31
+New episodes in this batch: 4 (1 actionable edits)
+Total stored episodes: 319 (40 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Can ' typed='wr' auto='wr' -> target='we'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 320 total) ===
+Synced at: 2026-11-08 21:57:32
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 320 (41 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Can we disucuss the  sex ' typed='ffirdt' auto='first' -> target='first'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 321 total) ===
+Synced at: 2026-11-08 21:58:20
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 321 (41 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 322 total) ===
+Synced at: 2026-11-08 21:58:21
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 322 (41 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 323 total) ===
+Synced at: 2026-11-08 21:59:05
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 323 (41 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (1 edits, 325 total) ===
+Synced at: 2026-11-08 21:59:20
+New episodes in this batch: 2 (1 actionable edits)
+Total stored episodes: 325 (42 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_then_edit] left='1  and 2\n\n' typed='ken' auto='Ken' -> target='mem'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (1 edits, 327 total) ===
+Synced at: 2026-11-08 21:59:27
+New episodes in this batch: 2 (1 actionable edits)
+Total stored episodes: 327 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='1  and 2\n\nmen are ' typed='alway' auto='always' -> target='always'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 328 total) ===
+Synced at: 2026-11-08 22:00:38
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 328 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (0 edits, 334 total) ===
+Synced at: 2026-11-08 22:00:51
+New episodes in this batch: 6 (0 actionable edits)
+Total stored episodes: 334 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 335 total) ===
+Synced at: 2026-11-08 22:01:56
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 335 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 336 total) ===
+Synced at: 2026-11-08 22:03:35
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 336 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 337 total) ===
+Synced at: 2026-11-08 23:15:20
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 337 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 338 total) ===
+Synced at: 2026-11-08 23:16:25
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 338 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 339 total) ===
+Synced at: 2026-11-08 23:18:11
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 339 (43 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (1 edits, 341 total) ===
+Synced at: 2026-11-08 23:18:44
+New episodes in this batch: 2 (1 actionable edits)
+Total stored episodes: 341 (44 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='i ' typed='ak' auto='ak' -> target='am'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 342 total) ===
+Synced at: 2026-11-08 23:50:43
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 342 (44 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (0 edits, 350 total) ===
+Synced at: 2026-11-09 06:51:11
+New episodes in this batch: 8 (0 actionable edits)
+Total stored episodes: 350 (44 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 354 total) ===
+Synced at: 2026-11-09 06:51:41
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 354 (44 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (0 edits, 360 total) ===
+Synced at: 2026-11-09 06:53:07
+New episodes in this batch: 6 (0 actionable edits)
+Total stored episodes: 360 (44 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (2 edits, 366 total) ===
+Synced at: 2026-11-09 06:53:57
+New episodes in this batch: 6 (2 actionable edits)
+Total stored episodes: 366 (46 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='How likely she is indeed ' typed='dpy' auto='dpy' -> target='spy'
+  - [candidate_selected] left='' typed='democrac' auto='Democracy' -> target='Democrat'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (1 edits, 369 total) ===
+Synced at: 2026-11-09 06:54:15
+New episodes in this batch: 3 (1 actionable edits)
+Total stored episodes: 369 (47 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Demo Party ' typed='eont' auto='eont' -> target="won't"
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 372 total) ===
+Synced at: 2026-11-09 07:17:04
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 372 (47 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (1 edits, 376 total) ===
+Synced at: 2026-11-09 07:17:20
+New episodes in this batch: 4 (1 actionable edits)
+Total stored episodes: 376 (48 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='https://huggingface.co/collections/nvidia/nemotron-35-transcribe\n\nLook Like Finally ' typed='nad' auto='and' -> target='Has'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (1 edits, 381 total) ===
+Synced at: 2026-11-09 07:17:44
+New episodes in this batch: 5 (1 actionable edits)
+Total stored episodes: 381 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='https://huggingface.co/collections/nvidia/nemotron-35-transcribe\n\nLook Like Finally Has Cantonese support \n' typed='buy' auto='Buy' -> target='But'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 382 total) ===
+Synced at: 2026-11-09 07:18:54
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 382 (50 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_then_edit] left='' typed='no' auto='No' -> target='o'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 383 total) ===
+Synced at: 2026-11-09 07:21:38
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 383 (50 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 388 total) ===
+Synced at: 2026-11-09 07:27:49
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 388 (50 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 389 total) ===
+Synced at: 2026-11-09 07:36:06
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 389 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='' typed='github' auto='GitHub' -> target='github'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (1 edits, 392 total) ===
+Synced at: 2026-11-09 08:29:55
+New episodes in this batch: 3 (1 actionable edits)
+Total stored episodes: 392 (52 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='' typed='fevelop' auto='Develop' -> target='Develop'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 393 total) ===
+Synced at: 2026-11-09 08:30:00
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 393 (52 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 394 total) ===
+Synced at: 2026-11-09 08:40:49
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 394 (52 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (1 edits, 397 total) ===
+Synced at: 2026-11-09 08:41:23
+New episodes in this batch: 3 (1 actionable edits)
+Total stored episodes: 397 (53 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Wait Analytics default ' typed='odd' auto='odd' -> target='off'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (1 edits, 403 total) ===
+Synced at: 2026-11-09 08:50:56
+New episodes in this batch: 6 (1 actionable edits)
+Total stored episodes: 403 (54 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='' typed='YHing' auto='YHing' -> target='Anything'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +12 autocorrect episodes synced (1 edits, 415 total) ===
+Synced at: 2026-11-09 08:55:24
+New episodes in this batch: 12 (1 actionable edits)
+Total stored episodes: 415 (55 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Anything else w' typed='r' auto='r' -> target='e'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (0 edits, 423 total) ===
+Synced at: 2026-11-09 08:56:26
+New episodes in this batch: 8 (0 actionable edits)
+Total stored episodes: 423 (55 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (1 edits, 426 total) ===
+Synced at: 2026-11-09 09:00:23
+New episodes in this batch: 3 (1 actionable edits)
+Total stored episodes: 426 (56 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Yeah this ' typed='obe' auto='one' -> target='one'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (0 edits, 436 total) ===
+Synced at: 2026-11-09 09:00:38
+New episodes in this batch: 10 (0 actionable edits)
+Total stored episodes: 436 (56 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 438 total) ===
+Synced at: 2026-11-09 09:04:33
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 438 (56 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 439 total) ===
+Synced at: 2026-11-09 09:07:10
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 439 (56 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (1 edits, 449 total) ===
+Synced at: 2026-11-09 09:07:28
+New episodes in this batch: 10 (1 actionable edits)
+Total stored episodes: 449 (57 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left="16 mo Milestones  don't look " typed='ar' auto='ar' -> target='at'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 450 total) ===
+Synced at: 2026-11-09 09:13:24
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 450 (57 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 451 total) ===
+Synced at: 2026-11-09 09:13:30
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 451 (57 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 452 total) ===
+Synced at: 2026-11-09 09:26:52
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 452 (57 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 455 total) ===
+Synced at: 2026-11-09 09:26:57
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 455 (57 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +16 autocorrect episodes synced (1 edits, 416 total) ===
+Synced at: 2026-11-09 11:21:08
+New episodes in this batch: 16 (1 actionable edits)
+Total stored episodes: 416 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='not ' typed='owr' auto='owr' -> target='per'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 416 total) ===
+Synced at: 2026-11-09 11:27:15
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 416 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 417 total) ===
+Synced at: 2026-11-09 12:27:12
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 417 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 417 total) ===
+Synced at: 2026-11-09 22:10:56
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 417 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 418 total) ===
+Synced at: 2026-11-09 22:34:24
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 418 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 418 total) ===
+Synced at: 2026-11-09 22:34:33
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 418 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='' typed='waso' auto='Was' -> target='waso'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 419 total) ===
+Synced at: 2026-11-09 23:54:51
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 419 (49 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 420 total) ===
+Synced at: 2026-11-10 07:48:41
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 420 (50 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='' typed='onxe' auto='onxe' -> target='once'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (2 edits, 422 total) ===
+Synced at: 2026-11-10 07:49:01
+New episodes in this batch: 4 (2 actionable edits)
+Total stored episodes: 422 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='once thing i ' typed='obsercws' auto='obsercws' -> target='observwd'
+  - [backspace_retype_repair] left='once thing i observ' typed='es' auto='es' -> target='ed'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 426 total) ===
+Synced at: 2026-11-10 07:49:14
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 426 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (0 edits, 435 total) ===
+Synced at: 2026-11-10 07:49:28
+New episodes in this batch: 9 (0 actionable edits)
+Total stored episodes: 435 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 436 total) ===
+Synced at: 2026-11-10 07:51:20
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 436 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 437 total) ===
+Synced at: 2026-11-10 08:11:19
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 437 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (1 edits, 437 total) ===
+Synced at: 2026-11-10 08:11:36
+New episodes in this batch: 2 (1 actionable edits)
+Total stored episodes: 437 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='No ' typed='overfittung' auto='overfishing' -> target='overfitting'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 441 total) ===
+Synced at: 2026-11-10 08:11:53
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 441 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 446 total) ===
+Synced at: 2026-11-10 08:12:11
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 446 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 451 total) ===
+Synced at: 2026-11-10 08:12:28
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 451 (51 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (1 edits, 456 total) ===
+Synced at: 2026-11-10 08:12:44
+New episodes in this batch: 6 (1 actionable edits)
+Total stored episodes: 456 (52 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='No overfitting . No custom rules. Think of features, ' typed='boumdaru' auto='boundary' -> target='boundary'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 461 total) ===
+Synced at: 2026-11-10 08:12:59
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 461 (52 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (0 edits, 466 total) ===
+Synced at: 2026-11-10 08:25:22
+New episodes in this batch: 7 (0 actionable edits)
+Total stored episodes: 466 (52 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (2 edits, 468 total) ===
+Synced at: 2026-11-10 22:03:29
+New episodes in this batch: 2 (2 actionable edits)
+Total stored episodes: 468 (54 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='屋企係廣東話，' typed='nurser' auto='nurser' -> target='nursery'
+  - [candidate_selected] left='Crab, ' typed='cloth' auto='cloth' -> target='clothes'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +56 autocorrect episodes synced (5 edits, 521 total) ===
+Synced at: 2026-11-10 22:07:40
+New episodes in this batch: 56 (5 actionable edits)
+Total stored episodes: 521 (58 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Can I ' typed='fees' auto='fees' -> target='feed'
+  - [backspace_retype_repair] left='Gemini API skill based ' typed='toll' auto='toll' -> target='tool'
+  - [backspace_retype_repair] left='Android adk now support ' typed='aoo' auto='aoo' -> target='aop'
+  - [backspace_retype_repair] left='Android adk now support app function ' typed='natibely' auto='natibely' -> target='natively'
+  - [backspace_retype_repair] left='Android adk now support app function natively. I wonder if wr can enable progressive disclosure ' typed='rher' auto='rher' -> target='there'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (1 edits, 523 total) ===
+Synced at: 2026-11-10 22:07:56
+New episodes in this batch: 4 (1 actionable edits)
+Total stored episodes: 523 (59 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Is model ' typed='distillatio' auto='distillation' -> target='distillation'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +11 autocorrect episodes synced (3 edits, 534 total) ===
+Synced at: 2026-11-10 22:08:13
+New episodes in this batch: 11 (3 actionable edits)
+Total stored episodes: 534 (62 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Is model distillation really from Jeff ' typed='sean' auto='sean' -> target='Dean'
+  - [candidate_selected] left='Is model distillation really from Jeff Dean? \nI ' typed='knpw' auto='know' -> target='know'
+  - [backspace_retype_repair] left='Is model distillation really from Jeff Dean? \nI know he had a paper ' typed='doe' auto='doe' -> target='for'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (1 edits, 543 total) ===
+Synced at: 2026-11-10 22:09:08
+New episodes in this batch: 10 (1 actionable edits)
+Total stored episodes: 543 (63 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Is model distillation really from Jeff Dean? \nI know he had a paper for that  \nBut I thought it was a ' typed='mivh' auto='mivh' -> target='much'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (0 edits, 553 total) ===
+Synced at: 2026-11-10 22:09:24
+New episodes in this batch: 10 (0 actionable edits)
+Total stored episodes: 553 (63 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (2 edits, 561 total) ===
+Synced at: 2026-11-10 22:09:40
+New episodes in this batch: 9 (2 actionable edits)
+Total stored episodes: 561 (64 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Then I think over claimed it\n\nMajority of distillation do not depend on the ' typed='logita' auto='logita' -> target='logits'
+  - [backspace_retype_repair] left='Then I think over claimed it\n\nMajority of distillation do not depend on the logits \n\nSimply ' typed='the' auto='the' -> target='Use'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 562 total) ===
+Synced at: 2026-11-10 22:10:16
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 562 (63 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 567 total) ===
+Synced at: 2026-11-10 22:10:50
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 567 (63 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (1 edits, 575 total) ===
+Synced at: 2026-11-10 22:11:06
+New episodes in this batch: 8 (1 actionable edits)
+Total stored episodes: 575 (64 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='nah i meant ' typed='satinf' auto='satinf' -> target='satiny'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (1 edits, 579 total) ===
+Synced at: 2026-11-10 22:11:56
+New episodes in this batch: 4 (1 actionable edits)
+Total stored episodes: 579 (65 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='nah i meant saying Jeff Dean is over claiming ' typed='crdita' auto='crdita' -> target='credits'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (2 edits, 587 total) ===
+Synced at: 2026-11-10 23:03:48
+New episodes in this batch: 10 (2 actionable edits)
+Total stored episodes: 587 (66 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Search ' typed='bardwe' auto='bardwe' -> target='harder'
+  - [undo_keep_literal] left='Compare ' typed='thisnmodel' auto='this model' -> target='thisnmodel'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (1 edits, 593 total) ===
+Synced at: 2026-11-11 00:07:06
+New episodes in this batch: 7 (1 actionable edits)
+Total stored episodes: 593 (67 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Compare this model with our ' typed='oroducti' auto='oroducti' -> target='production'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 594 total) ===
+Synced at: 2026-11-11 00:08:37
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 594 (67 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (1 edits, 603 total) ===
+Synced at: 2026-11-11 00:08:46
+New episodes in this batch: 9 (1 actionable edits)
+Total stored episodes: 603 (68 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='' typed='prodyctio' auto='Production' -> target='Production'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (0 edits, 611 total) ===
+Synced at: 2026-11-11 07:56:16
+New episodes in this batch: 9 (0 actionable edits)
+Total stored episodes: 611 (68 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 612 total) ===
+Synced at: 2026-11-11 07:56:26
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 612 (69 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='' typed='ca' auto='Ca' -> target='ca'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +64 autocorrect episodes synced (5 edits, 672 total) ===
+Synced at: 2026-11-11 20:19:36
+New episodes in this batch: 64 (5 actionable edits)
+Total stored episodes: 672 (74 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='' typed='cind' auto='cind' -> target='Find'
+  - [backspace_retype_repair] left='Sorry for some reasons the ' typed='fall' auto='fall' -> target='call'
+  - [backspace_retype_repair] left='Sandy just reminded me. ' typed='keo' auto='keo' -> target='Leo'
+  - [candidate_selected] left='Sandy just reminded me. Leo has ' typed='constipatio' auto='constipation' -> target='constipation'
+  - [candidate_selected] left='Sandy just reminded me. Leo has constipation since ' typed='yesyerda' auto='yesterday' -> target='yesterday'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 673 total) ===
+Synced at: 2026-11-11 22:56:34
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 673 (74 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 674 total) ===
+Synced at: 2026-11-11 22:56:42
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 674 (74 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (1 edits, 679 total) ===
+Synced at: 2026-11-11 22:57:18
+New episodes in this batch: 7 (1 actionable edits)
+Total stored episodes: 679 (75 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='' typed='sens' auto='sens' -> target='send'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (1 edits, 681 total) ===
+Synced at: 2026-11-11 22:57:36
+New episodes in this batch: 2 (1 actionable edits)
+Total stored episodes: 681 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='send gmsil ' typed='yo' auto='yo' -> target='to'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 684 total) ===
+Synced at: 2026-11-12 07:27:50
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 684 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 687 total) ===
+Synced at: 2026-11-12 08:05:43
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 687 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +11 autocorrect episodes synced (1 edits, 696 total) ===
+Synced at: 2026-11-12 08:23:45
+New episodes in this batch: 11 (1 actionable edits)
+Total stored episodes: 696 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Can you fix th ' typed='icloid' auto='icloid' -> target='icloud'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 698 total) ===
+Synced at: 2026-11-12 08:24:02
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 698 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (0 edits, 702 total) ===
+Synced at: 2026-11-12 08:24:07
+New episodes in this batch: 4 (0 actionable edits)
+Total stored episodes: 702 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 704 total) ===
+Synced at: 2026-11-12 10:24:41
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 704 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (0 edits, 709 total) ===
+Synced at: 2026-11-12 11:32:35
+New episodes in this batch: 7 (0 actionable edits)
+Total stored episodes: 709 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 710 total) ===
+Synced at: 2026-11-12 13:01:14
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 710 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 710 total) ===
+Synced at: 2026-11-12 13:08:40
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 710 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (0 edits, 715 total) ===
+Synced at: 2026-11-12 18:01:18
+New episodes in this batch: 6 (0 actionable edits)
+Total stored episodes: 715 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 715 total) ===
+Synced at: 2026-11-12 18:01:37
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 715 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 717 total) ===
+Synced at: 2026-11-12 19:00:58
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 717 (76 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +41 autocorrect episodes synced (10 edits, 753 total) ===
+Synced at: 2026-11-12 19:44:21
+New episodes in this batch: 41 (10 actionable edits)
+Total stored episodes: 753 (84 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Hey Hey I got stuck in Golders Green. It the train ' typed='doesn' auto='doesn' -> target='doesnt'
+  - [cursor_inspect_repair] left='Hey Hey I got stuck in Golders Green. It the train ' typed='doesnt' auto='doesnt' -> target="doesn't"
+  - [candidate_selected] left="Hey Hey I got stuck in Golders Green. It the train doesn't move in ten " typed='min' auto='min' -> target='minutes'
+  - [backspace_retype_repair] left="Hey Hey I got stuck in Golders Green. If the train doesn't move in ten minutes, I will ask you to pick up " typed='catjo' auto='catjo' -> target='catji'
+  - [candidate_selected] left="Hey Hey I got stuck in Golders Green. If the train doesn't move in ten minutes, I will ask you to pick up catji. " typed='Thamks' auto='Thanks' -> target='Thanks'
+  - [candidate_selected] left='Okay train ' typed='depar' auto='depar' -> target='departing'
+  - [backspace_retype_repair] left='' typed='o' auto='o' -> target='I'
+  - [candidate_selected] left='I should be able to dog ' typed='rusg' auto='rusg' -> target='rush'
+  - [candidate_selected] left='Dog ' typed='rishinh' auto='Fishing' -> target='rushing'
+  - [candidate_selected] left='On ' typed='th' auto='the' -> target='the'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 755 total) ===
+Synced at: 2026-11-13 05:00:01
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 755 (84 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +87 autocorrect episodes synced (4 edits, 833 total) ===
+Synced at: 2026-11-13 13:09:40
+New episodes in this batch: 87 (4 actionable edits)
+Total stored episodes: 833 (86 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Hi ' typed='ther' auto='there' -> target='the'
+  - [undo_keep_literal] left='Hi folks,\n\nWe are taking leo to gp, just in case ' typed='rhwre' auto='there' -> target='rhwre'
+  - [undo_then_edit] left='Hi folks,\n\nWe are taking leo to gp, just in case he is not feeling well \n\n' typed='if' auto='If' -> target='Will'
+  - [backspace_retype_repair] left='Are we s' typed='rill' auto='rill' -> target='till'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 834 total) ===
+Synced at: 2026-11-13 13:13:14
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 834 (86 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 835 total) ===
+Synced at: 2026-11-13 13:13:35
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 835 (86 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 838 total) ===
+Synced at: 2026-11-13 14:23:38
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 838 (86 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 839 total) ===
+Synced at: 2026-11-13 15:49:23
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 839 (86 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 840 total) ===
+Synced at: 2026-11-13 18:32:57
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 840 (86 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 841 total) ===
+Synced at: 2026-11-13 18:35:01
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 841 (87 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='' typed='ar' auto='Ar' -> target='ar'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (1 edits, 845 total) ===
+Synced at: 2026-11-13 18:35:18
+New episodes in this batch: 4 (1 actionable edits)
+Total stored episodes: 845 (88 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='I am ' typed='askint' auto='askint' -> target='asking'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 847 total) ===
+Synced at: 2026-11-13 19:00:07
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 847 (88 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 848 total) ===
+Synced at: 2026-11-13 19:17:10
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 848 (88 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 850 total) ===
+Synced at: 2026-11-13 20:53:30
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 850 (88 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 851 total) ===
+Synced at: 2026-11-13 21:04:33
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 851 (88 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (2 edits, 857 total) ===
+Synced at: 2026-11-13 21:04:50
+New episodes in this batch: 8 (2 actionable edits)
+Total stored episodes: 857 (88 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_then_edit] left="Why can't other GPU or " typed='rpu' auto='GPU' -> target='GPU'
+  - [backspace_retype_repair] left="Why can't other GPU or GPU ve " typed='cusa' auto='cusa' -> target='cuda'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (1 edits, 861 total) ===
+Synced at: 2026-11-13 21:05:00
+New episodes in this batch: 4 (1 actionable edits)
+Total stored episodes: 861 (89 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left="Why can't other GPU or GPU ve cuda compatible? Then nividia lose its " typed='advant' auto='advant' -> target='advantage'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 862 total) ===
+Synced at: 2026-11-13 21:07:05
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 862 (89 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (0 edits, 867 total) ===
+Synced at: 2026-11-13 22:39:28
+New episodes in this batch: 8 (0 actionable edits)
+Total stored episodes: 867 (89 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 868 total) ===
+Synced at: 2026-11-13 22:43:09
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 868 (89 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (2 edits, 875 total) ===
+Synced at: 2026-11-13 22:43:25
+New episodes in this batch: 9 (2 actionable edits)
+Total stored episodes: 875 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left="So before cuda, ppl can't program " typed='gou' auto='you' -> target='GPU'
+  - [backspace_retype_repair] left="So before cuda, ppl can't program GPU? Then " typed='whys' auto='whys' -> target='whats'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (0 edits, 880 total) ===
+Synced at: 2026-11-13 22:43:32
+New episodes in this batch: 6 (0 actionable edits)
+Total stored episodes: 880 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 882 total) ===
+Synced at: 2026-11-13 23:25:01
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 882 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +10 autocorrect episodes synced (0 edits, 890 total) ===
+Synced at: 2026-11-13 23:27:08
+New episodes in this batch: 10 (0 actionable edits)
+Total stored episodes: 890 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 891 total) ===
+Synced at: 2026-11-13 23:28:33
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 891 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +11 autocorrect episodes synced (0 edits, 902 total) ===
+Synced at: 2026-11-13 23:28:56
+New episodes in this batch: 11 (0 actionable edits)
+Total stored episodes: 902 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +4 autocorrect episodes synced (1 edits, 905 total) ===
+Synced at: 2026-11-13 23:29:29
+New episodes in this batch: 4 (1 actionable edits)
+Total stored episodes: 905 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [undo_keep_literal] left='No I meant not when he is a player. \n\nBut he usually 轉播 the ' typed='dager' auto='danger' -> target='dager'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (0 edits, 913 total) ===
+Synced at: 2026-11-14 04:19:58
+New episodes in this batch: 8 (0 actionable edits)
+Total stored episodes: 913 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +7 autocorrect episodes synced (0 edits, 920 total) ===
+Synced at: 2026-11-14 06:57:13
+New episodes in this batch: 7 (0 actionable edits)
+Total stored episodes: 920 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 921 total) ===
+Synced at: 2026-11-14 07:01:21
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 921 (91 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +12 autocorrect episodes synced (1 edits, 933 total) ===
+Synced at: 2026-11-14 07:01:52
+New episodes in this batch: 12 (1 actionable edits)
+Total stored episodes: 933 (92 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='This model ' typed='someho' auto='somehow' -> target='somehow'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +5 autocorrect episodes synced (0 edits, 938 total) ===
+Synced at: 2026-11-14 07:16:40
+New episodes in this batch: 5 (0 actionable edits)
+Total stored episodes: 938 (92 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +9 autocorrect episodes synced (0 edits, 947 total) ===
+Synced at: 2026-11-14 07:31:31
+New episodes in this batch: 9 (0 actionable edits)
+Total stored episodes: 947 (92 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +37 autocorrect episodes synced (4 edits, 978 total) ===
+Synced at: 2026-11-14 09:55:30
+New episodes in this batch: 37 (4 actionable edits)
+Total stored episodes: 978 (96 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_then_select] left='Should we enable the vad path ' typed='rhen' auto='rhen' -> target='then'
+  - [backspace_retype_repair] left='Since we have ' typed='changes' auto='changes' -> target='changed'
+  - [backspace_retype_repair] left='Since we have changed model, ' typed='anh' auto='anh' -> target='any'
+  - [backspace_retype_repair] left='Since we have changed model, any constants to ' typed='yune' auto='yune' -> target='tune'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 978 total) ===
+Synced at: 2026-11-14 09:59:19
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 978 (96 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (0 edits, 981 total) ===
+Synced at: 2026-11-14 11:36:13
+New episodes in this batch: 3 (0 actionable edits)
+Total stored episodes: 981 (96 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 981 total) ===
+Synced at: 2026-11-14 11:45:00
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 981 (96 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 981 total) ===
+Synced at: 2026-11-14 11:48:13
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 981 (96 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 982 total) ===
+Synced at: 2026-11-14 11:50:19
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 982 (96 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (1 edits, 986 total) ===
+Synced at: 2026-11-14 11:50:40
+New episodes in this batch: 6 (1 actionable edits)
+Total stored episodes: 986 (97 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Improve the handwriting \n\nThere two events are not synchronised no' typed='e' auto='e' -> target='w'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (1 edits, 994 total) ===
+Synced at: 2026-11-14 11:50:56
+New episodes in this batch: 8 (1 actionable edits)
+Total stored episodes: 994 (98 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='ents are not synchronised now.  the word is recognised and inserted into edittext. \nThe canvas is cleared and accept the second ' typed='handwrii' auto='handwriting' -> target='handwriting'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 995 total) ===
+Synced at: 2026-11-14 11:51:59
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 995 (98 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +11 autocorrect episodes synced (0 edits, 1006 total) ===
+Synced at: 2026-11-14 11:53:23
+New episodes in this batch: 11 (0 actionable edits)
+Total stored episodes: 1006 (98 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (0 edits, 1012 total) ===
+Synced at: 2026-11-14 11:54:02
+New episodes in this batch: 6 (0 actionable edits)
+Total stored episodes: 1012 (98 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (1 edits, 1015 total) ===
+Synced at: 2026-11-14 11:55:35
+New episodes in this batch: 3 (1 actionable edits)
+Total stored episodes: 1015 (99 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [candidate_selected] left='Cantonese ' typed='bandwriing' auto='handwriting' -> target='handwriting'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +14 autocorrect episodes synced (1 edits, 1029 total) ===
+Synced at: 2026-11-14 11:56:38
+New episodes in this batch: 14 (1 actionable edits)
+Total stored episodes: 1029 (100 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='Make a ' typed='fall' auto='fall' -> target='call'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 1030 total) ===
+Synced at: 2026-11-14 11:59:28
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 1030 (101 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='' typed='bke' auto='bke' -> target='blue'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (1 edits, 1037 total) ===
+Synced at: 2026-11-14 12:00:03
+New episodes in this batch: 8 (1 actionable edits)
+Total stored episodes: 1037 (102 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='blue does not seem to have ' typed='cae' auto='cae' -> target='car'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +3 autocorrect episodes synced (1 edits, 1040 total) ===
+Synced at: 2026-11-14 12:00:18
+New episodes in this batch: 3 (1 actionable edits)
+Total stored episodes: 1040 (103 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='In ' typed='venera' auto='venera' -> target='general'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (1 edits, 1040 total) ===
+Synced at: 2026-11-14 12:00:33
+New episodes in this batch: 1 (1 actionable edits)
+Total stored episodes: 1040 (103 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='In general any handwriting ' typed='hardocded' auto='Hardcover' -> target='hardcoded'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +8 autocorrect episodes synced (1 edits, 1048 total) ===
+Synced at: 2026-11-14 12:00:49
+New episodes in this batch: 8 (1 actionable edits)
+Total stored episodes: 1048 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+New edit patterns in this sync:
+  - [backspace_retype_repair] left='In general any handwriting hardcoded constants or logic to fix ? Or low ' typed='ganfing' auto='ganfing' -> target='hanging'
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 1050 total) ===
+Synced at: 2026-11-14 12:01:35
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 1050 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 1050 total) ===
+Synced at: 2026-11-14 12:02:34
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 1050 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 1051 total) ===
+Synced at: 2026-11-14 12:03:09
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 1051 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 1052 total) ===
+Synced at: 2026-11-14 12:03:51
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 1052 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 1053 total) ===
+Synced at: 2026-11-14 12:04:28
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 1053 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +2 autocorrect episodes synced (0 edits, 1053 total) ===
+Synced at: 2026-11-14 12:06:34
+New episodes in this batch: 2 (0 actionable edits)
+Total stored episodes: 1053 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +1 autocorrect episodes synced (0 edits, 1054 total) ===
+Synced at: 2026-11-14 12:07:10
+New episodes in this batch: 1 (0 actionable edits)
+Total stored episodes: 1054 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +14 autocorrect episodes synced (0 edits, 1066 total) ===
+Synced at: 2026-11-14 12:07:37
+New episodes in this batch: 14 (0 actionable edits)
+Total stored episodes: 1066 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+
+=== [Cantonese Keyboard] +6 autocorrect episodes synced (0 edits, 1072 total) ===
+Synced at: 2026-11-14 12:09:21
+New episodes in this batch: 6 (0 actionable edits)
+Total stored episodes: 1072 (104 actionable edits)
+Stored at: /Users/tony/Documents/keyboard/cantonese-voice-keyboard/data/user_autocorrect/episodes.jsonl
+
+Training was NOT started automatically (data-collection mode).
+When you are ready to run training on the Mac mini:
+  python3 /Users/tony/Documents/keyboard/cantonese-voice-keyboard/scripts/autocorrect_iterative_daemon.py --train-once
+or via HTTP:
+  curl -X POST http://127.0.0.1:8765/api/v1/train
+

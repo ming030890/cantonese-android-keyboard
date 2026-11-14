@@ -8,10 +8,26 @@ import kotlinx.coroutines.flow.asStateFlow
 object KeyboardSettings {
     private const val PREFS_NAME = "keyboard_settings"
     private const val KEY_ENABLED_LAYOUTS = "enabled_layouts"
-    private const val KEY_MULTILINGUAL = "multilingual_typing"
     private const val KEY_HAPTIC = "haptic_feedback"
     private const val KEY_QUICK_VERSION = "quick_version"
     private const val KEY_AUTOCAPITALIZATION = "auto_capitalization"
+    private const val KEY_VOICE_INPUT = "voice_input_enabled"
+    const val DEFAULT_VOICE_INPUT = true
+
+    private val _voiceInputEnabledFlow = MutableStateFlow(DEFAULT_VOICE_INPUT)
+    val voiceInputEnabledFlow: StateFlow<Boolean> = _voiceInputEnabledFlow.asStateFlow()
+
+    fun isVoiceInputEnabled(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_VOICE_INPUT, DEFAULT_VOICE_INPUT)
+
+    fun setVoiceInputEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_VOICE_INPUT, enabled).apply()
+        _voiceInputEnabledFlow.value = enabled
+        if (enabled) ModelAssetPack.requestDownload(context) else ModelAssetPack.cancelDownload(context)
+    }
+
     const val DEFAULT_AUTOCAPITALIZATION = true
 
     const val LAYOUT_ENGLISH = "english"
@@ -22,18 +38,7 @@ object KeyboardSettings {
     const val QUICK_VERSION_5 = 5
     const val DEFAULT_QUICK_VERSION = QUICK_VERSION_3
 
-    fun isAutocorrectEnabled(context: Context, layout: String): Boolean {
-        // Autocorrect is always on
-        return true
-    }
-
-    fun setAutocorrectEnabled(context: Context, layout: String, enabled: Boolean) {
-        // Autocorrect is always on; setting is preserved for API compatibility
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
-            .putBoolean("autocorrect_$layout", true).apply()
-    }
-
-    val DEFAULT_LAYOUTS = setOf(LAYOUT_QUICK, LAYOUT_ENGLISH, LAYOUT_HANDWRITING)
+    val DEFAULT_LAYOUTS = setOf(LAYOUT_HANDWRITING)
 
     private val _enabledLayoutsFlow = MutableStateFlow<Set<String>>(DEFAULT_LAYOUTS)
     val enabledLayoutsFlow: StateFlow<Set<String>> = _enabledLayoutsFlow.asStateFlow()
@@ -45,6 +50,9 @@ object KeyboardSettings {
     val autoCapitalizationFlow: StateFlow<Boolean> = _autoCapitalizationFlow.asStateFlow()
 
     fun init(context: Context) {
+        _voiceInputEnabledFlow.value = isVoiceInputEnabled(context)
+        if (_voiceInputEnabledFlow.value) ModelAssetPack.requestDownload(context)
+        else ModelAssetPack.cancelDownload(context)
         _enabledLayoutsFlow.value = getEnabledLayouts(context)
         KeyboardSubtypes.syncEnabled(context, _enabledLayoutsFlow.value)
         _quickVersionFlow.value = getQuickVersion(context)
@@ -98,9 +106,6 @@ object KeyboardSettings {
         KeyboardSubtypes.syncEnabled(context, safeLayouts)
     }
 
-    fun isLayoutEnabled(context: Context, layoutId: String): Boolean =
-        getEnabledLayouts(context).contains(layoutId)
-
     fun computeToggle(current: Set<String>, layoutId: String): Set<String> {
         val updated = current.toMutableSet()
         if (updated.contains(layoutId)) {
@@ -131,17 +136,6 @@ object KeyboardSettings {
             return currentLayouts
         }
         return toggleLayout(context, layoutId)
-    }
-
-    fun isMultilingualTypingEnabled(context: Context): Boolean =
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getBoolean(KEY_MULTILINGUAL, false)
-
-    fun setMultilingualTypingEnabled(context: Context, enabled: Boolean) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_MULTILINGUAL, enabled)
-            .apply()
     }
 
     fun isHapticFeedbackEnabled(context: Context): Boolean =

@@ -5,7 +5,6 @@ import android.util.Log
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingInferenceIdleDelayMillis
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognitionEngine
-import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognitionException
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognitionQueue
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognizer
 import kotlinx.coroutines.CancellationException
@@ -28,6 +27,8 @@ internal class HandwritingInputCoordinator(
     private val predictionProvider: ((left: String, right: String, limit: Int) -> List<HandwritingCandidate>)? = null,
     coroutineScope: CoroutineScope? = null,
     private val synchronousPredictionsForTest: Boolean = false,
+    recognitionEngine: HandwritingRecognitionEngine? = null,
+    private val recognitionDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.Default,
 ) : HandwritingSession {
     companion object {
         private const val TAG = "CantoneseIME"
@@ -48,7 +49,8 @@ internal class HandwritingInputCoordinator(
 
     private val internalJob = if (coroutineScope == null) SupervisorJob() else null
     private val scope = coroutineScope ?: CoroutineScope(internalJob!! + Dispatchers.Main.immediate)
-    @Volatile private var recognizer: HandwritingRecognitionEngine? = null
+    override var onRecognitionApplied: () -> Unit = {}
+    @Volatile private var recognizer: HandwritingRecognitionEngine? = recognitionEngine
     private var loadingJob: Job? = null
     @Volatile private var debugRecordingId: String? = null
     private val queue = HandwritingRecognitionQueue<Request>(
@@ -246,7 +248,7 @@ internal class HandwritingInputCoordinator(
             if (!isInputViewVisible() || session != currentSession()) {
                 loaded?.close()
             } else if (loaded == null) {
-                _error.value = context?.getString(R.string.error_handwriting_model_unavailable) ?: "Handwriting model unavailable"
+                _error.value = context?.getString(R.string.error_handwriting_model_unavailable) ?: "Handwriting unavailable. Reopen keyboard."
             } else {
                 synchronized(this@HandwritingInputCoordinator) {
                     recognizer = loaded
@@ -273,35 +275,35 @@ internal class HandwritingInputCoordinator(
             val activeRecognizer = recognizer
             if (activeRecognizer == null) {
                 if (request.characterId == characterId) {
-                    _error.value = context?.getString(R.string.error_handwriting_model_unavailable) ?: "Handwriting model unavailable"
+                    _error.value = context?.getString(R.string.error_handwriting_model_unavailable) ?: "Handwriting unavailable. Reopen keyboard."
                     _candidates.value = emptyList()
                 }
                 return
             }
             val leftContext = editor.getTextBeforeCursor(512).orEmpty()
             val rightContext = editor.getTextAfterCursor(256).orEmpty()
-            val result = withContext(Dispatchers.Default) {
+            val result = withContext(recognitionDispatcher) {
                 activeRecognizer.setLanguageContext(leftContext, rightContext)
-                val modelPixels = runCatching {
-                    activeRecognizer.modelInputPixels(
-                        request.pixels,
-                        request.width,
-                        request.height,
-                    )
-                }.getOrNull() ?: ByteArray(48 * 48)
-                val recordingId = if (editor.isPersonalizedLearningAllowed()) {
-                    context?.let {
-                        DebugHandwritingStore.capture(
-                            it,
-                            request.pixels,
-                            request.width,
-                            request.height,
-                            modelPixels,
-                            48,
-                            48,
-                        )
-                    }
-                } else null
+                // Stroke recognition needs no raster. Build capture images only when opted in,
+                // on this worker rather than in the pen-up event on the UI thread.
+                val recordingId = context?.takeIf {
+                    editor.isPersonalizedLearningAllowed() &&
+                        DebugHandwritingSettings.isStoreDebugHandwritingEnabled(it)
+                }?.let { ctx ->
+                    runCatching {
+                        val bitmap = if (request.pixels.isNotEmpty()) {
+                            com.madeinhk.cantonesevoicekeyboard.ui.keyboard.HandwritingBitmap(
+                                request.pixels, request.width, request.height)
+                        } else {
+                            com.madeinhk.cantonesevoicekeyboard.ui.keyboard.handwritingBitmap(
+                                request.strokes, androidx.compose.ui.unit.IntSize(request.width, request.height))
+                        }
+                        val modelPixels = activeRecognizer.modelInputPixels(
+                            bitmap.pixels, bitmap.width, bitmap.height)
+                        if (modelPixels == null) null else DebugHandwritingStore.capture(
+                            ctx, bitmap.pixels, bitmap.width, bitmap.height, modelPixels, 48, 48)
+                    }.onFailure { Log.e(TAG, "Handwriting debug capture failed", it) }.getOrNull()
+                }
                 val predictions = if (request.strokes.isNotEmpty() && request.canvasWidth > 0f && request.canvasHeight > 0f) {
                     val prevChar = leftContext.takeLast(1).takeIf { it.isNotBlank() }
                     activeRecognizer.predictStrokes(
@@ -351,15 +353,17 @@ internal class HandwritingInputCoordinator(
             if (topCandidate != null) {
                 composition = topCandidate
                 editor.setComposingText(topCandidate)
+                onRecognitionApplied()
             } else {
-                discard()
+                _error.value = context?.getString(R.string.error_handwriting_recognition_failed)
+                    ?: "Not recognized. Write it again."
             }
         } catch (error: CancellationException) {
             throw error
         } catch (error: Throwable) {
             Log.e(TAG, "Handwriting recognition failed", error)
             if (isLatest(request) && request.characterId == characterId) {
-                _error.value = context?.getString(R.string.error_handwriting_recognition_failed) ?: "Handwriting recognition failed"
+                _error.value = context?.getString(R.string.error_handwriting_recognition_failed) ?: "Not recognized. Write it again."
                 _candidates.value = emptyList()
             }
         } finally {

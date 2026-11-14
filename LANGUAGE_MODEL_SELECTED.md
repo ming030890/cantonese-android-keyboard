@@ -1,5 +1,11 @@
 # Selected keyboard model: shared V2 CNN (experimental)
 
+## Current manifest audit (2026-11-08)
+
+Release77 changed the selected model to SHA-256 `dc1fa55ec341067cd752e1ee799cbb255e42d4e96eb17dd7a149da7d17f2d8e1`. The October source path, native-verification report and failure description retained below belong to the older `915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322` artifact. They do not qualify or characterize the exact current weights. The current model has release77 Quick development benchmark evidence, but its manifest does not identify a matching whole-message/mixed-script production qualification report. Approval flags remain unchanged. They are internal bookkeeping, not a Play publishing requirement or runtime feature switch. Asset verification checks consistency, not production accuracy. See [audit](config/language_model/qualification_audit_20261108.json).
+
+## Historical October integration
+
 The app stages `cnn_repair_002` at its selected 35M-exposure checkpoint as one
 INT8 causal CNN for Cantonese, English, mixed Quick ranking and handwriting
 language priors. The model includes its exact canonical vocabulary and a list

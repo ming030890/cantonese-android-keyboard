@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -93,7 +94,7 @@ fun PromptedHandwritingScreen(
     val saveFailedMessage = stringResource(R.string.challenge_save_failed)
     val folderAccessError = stringResource(R.string.debug_sync_failed)
     val ink = rememberPromptedInkState()
-    val measuredKeyboardCanvas = remember(context.resources.configuration.orientation) {
+    val measuredKeyboardCanvas = remember(LocalConfiguration.current.orientation) {
         HandwritingCanvasGeometry.read(context)
     }
     val navigationBarHeight = with(density) {

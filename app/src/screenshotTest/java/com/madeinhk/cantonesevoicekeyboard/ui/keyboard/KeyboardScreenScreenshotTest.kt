@@ -67,7 +67,7 @@ fun KeyboardScreenRecordingScreenshot() {
 @Composable
 fun KeyboardScreenErrorScreenshot() {
     KeyboardScreenScreenshotContent(
-        state = KeyboardUiState.Error("Model download failed", canRetryModelDownload = true)
+        state = KeyboardUiState.Error(androidx.compose.ui.res.stringResource(R.string.error_model_not_found), canRetryModelDownload = true)
     )
 }
 

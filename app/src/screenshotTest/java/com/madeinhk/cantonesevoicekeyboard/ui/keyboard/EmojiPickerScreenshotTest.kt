@@ -60,3 +60,9 @@ fun EmojiRecentScreenshot() {
         )
     }
 }
+
+@PreviewTest
+@Preview(name = "Emoji copy Traditional Chinese", locale = "b+zh+Hant+HK", widthDp = 320, heightDp = KeyboardUiDefaults.EmojiSurfaceHeightDp)
+@Preview(name = "Emoji copy Simplified Chinese", locale = "b+zh+Hans", widthDp = 320, heightDp = KeyboardUiDefaults.EmojiSurfaceHeightDp)
+@Composable
+fun EmojiChineseCopyScreenshot() = EmojiSearchPreview(null, dark = true)

@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-08",
+  "scope": "Provenance and qualification-metadata audit; no model weights or acceptance thresholds changed",
+  "current_model_sha256": "dc1fa55ec341067cd752e1ee799cbb255e42d4e96eb17dd7a149da7d17f2d8e1",
+  "selected_hash_matches_packaged_model": true,
+  "model_changed_in_commit": "7fabedad86403817884e94940a536fca9d09a12c",
+  "historical_native_verification_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "historical_model_source_sha256": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "historical_native_verification_matches_current_model": false,
+  "historical_failure_description_applies_to_hash": "915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322",
+  "release77_evidence": "RELEASE_77.md: Quick single-word/multi-word development benchmarks and asset/test checks",
+  "current_primary_quality_evidence": "No exact-release77-model primary-panel qualification report was found in the selected manifest; release76/November6 primary results predate the hash change",
+  "assessment": "Historical source/report references and guard-failure description are stale for release77. Production qualification of the exact current artifact is not established by those reports. The approval flag is internal metadata, not a Google Play requirement or runtime feature gate.",
+  "approval_flags_unchanged": {
+    "experimental": true,
+    "production_approved": false
+  },
+  "confirmation_fold_opened": false,
+  "current_native_smoke_report": "config/language_model/current_native_smoke_20261108.json"
+}

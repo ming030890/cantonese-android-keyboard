@@ -279,7 +279,7 @@ class KeyboardQaContractTest {
 
     @Test
     fun tb01_toolbarPrecedenceCoversEveryCombination() {
-        val voices = listOf(KeyboardUiState.Idle, KeyboardUiState.LoadingModel, KeyboardUiState.DownloadingModel,
+        val voices = listOf(KeyboardUiState.Idle, KeyboardUiState.LoadingModel, KeyboardUiState.ModelNotReady("Downloading model…"),
                             KeyboardUiState.Recording, KeyboardUiState.Transcribing, KeyboardUiState.Error("failed"),
                             KeyboardUiState.Error("retry download", true))
         for (mode in KeyboardInputMode.entries) for (voice in voices) for (bits in 0 until 32) {

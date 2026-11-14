@@ -86,7 +86,7 @@ fi
 
 # 4. Upload to Google Play Store internal track
 echo -e "${COLOR_INFO}[Step 3/4] Uploading AAB to Google Play Store internal track...${COLOR_RESET}"
-gplay publish track \
+gplay release \
     --package "$PACKAGE" \
     --track internal \
     --bundle "$AAB_PATH"

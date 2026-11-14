@@ -187,15 +187,6 @@ internal class QuickInputCoordinator(
         return false
     }
 
-    fun onEnter() {
-        if (composingText.isNotEmpty()) {
-            editor.commitText(composingText)
-            clearComposingState()
-        } else {
-            editor.sendEnter()
-        }
-    }
-
     fun discard() {
         _joinedCandidates.value = emptyList()
         if (composingText.isNotEmpty()) {

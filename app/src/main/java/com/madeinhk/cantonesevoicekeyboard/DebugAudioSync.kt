@@ -13,6 +13,7 @@ data class DebugSyncResult(val uploaded: Int, val failed: Int)
 object DebugAudioSync {
     suspend fun syncPending(context: Context, folderTreeUri: Uri): DebugSyncResult =
         withContext(Dispatchers.IO) {
+            check(BuildConfig.INTERNAL_TOOLS) { "Training-data sync is available only in internal builds" }
             val resolver = context.contentResolver
             val rootDocumentUri = DocumentsContract.buildDocumentUriUsingTree(
                 folderTreeUri,

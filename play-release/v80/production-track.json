@@ -1,0 +1,19 @@
+[
+  {
+    "name": "1.0 (80)",
+    "versionCodes": [
+      "80"
+    ],
+    "status": "draft",
+    "releaseNotes": [
+      {
+        "language": "en-US",
+        "text": "• Introducing the new name: 烏龜鍵盤 － 廣東話.\n• New turtle keyboard app icon, including support for Android themed icons."
+      },
+      {
+        "language": "zh-HK",
+        "text": "• 全新名稱：烏龜鍵盤 － 廣東話。\n• 換上全新烏龜鍵盤圖示，支援 Android 主題圖示。"
+      }
+    ]
+  }
+]

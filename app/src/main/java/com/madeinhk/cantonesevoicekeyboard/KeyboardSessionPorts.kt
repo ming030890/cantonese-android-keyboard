@@ -33,6 +33,7 @@ internal interface KeyboardEditor {
 }
 
 internal interface VoiceSession {
+    val enabled: Boolean get() = true
     val state: StateFlow<KeyboardUiState>
     val volume: StateFlow<Float>
     fun onInputViewStarted(session: Long)
@@ -45,6 +46,7 @@ internal interface VoiceSession {
 }
 
 internal interface HandwritingSession {
+    var onRecognitionApplied: () -> Unit
     val candidates: StateFlow<List<HandwritingCandidate>>
     val recognizing: StateFlow<Boolean>
     val error: StateFlow<String?>

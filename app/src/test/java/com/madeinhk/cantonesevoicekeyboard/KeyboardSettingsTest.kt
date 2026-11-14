@@ -7,12 +7,8 @@ import org.junit.Test
 class KeyboardSettingsTest {
 
     @Test
-    fun defaultLayoutsContainsExpectedLayouts() {
-        val defaults = KeyboardSettings.DEFAULT_LAYOUTS
-        assertTrue(defaults.contains(KeyboardSettings.LAYOUT_ENGLISH))
-        assertTrue(defaults.contains(KeyboardSettings.LAYOUT_QUICK))
-        assertTrue(defaults.contains(KeyboardSettings.LAYOUT_HANDWRITING))
-        assertEquals(3, defaults.size)
+    fun defaultLayoutIsHandwritingOnly() {
+        assertEquals(setOf(KeyboardSettings.LAYOUT_HANDWRITING), KeyboardSettings.DEFAULT_LAYOUTS)
     }
 
     @Test
@@ -47,10 +43,4 @@ class KeyboardSettingsTest {
         assertEquals(setOf(KeyboardSettings.LAYOUT_HANDWRITING), resultHandwriting)
     }
 
-    @Test
-    fun autocorrectIsAlwaysOn() {
-        val dummyContext = android.content.ContextWrapper(null)
-        assertTrue(KeyboardSettings.isAutocorrectEnabled(dummyContext, KeyboardSettings.LAYOUT_ENGLISH))
-        assertTrue(KeyboardSettings.isAutocorrectEnabled(dummyContext, KeyboardSettings.LAYOUT_QUICK))
-    }
 }

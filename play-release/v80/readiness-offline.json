@@ -1,0 +1,171 @@
+{
+  "packageName": "com.madeinhk.cantonesevoicekeyboard",
+  "track": "production",
+  "artifact": "app-release.aab",
+  "offline": true,
+  "checks": [
+    {
+      "id": "artifact-preflight-complete",
+      "section": "artifact",
+      "state": "info",
+      "message": "Ran 9 offline artifact scanners.",
+      "details": {
+        "format": "aab",
+        "minSdk": 32,
+        "package": "com.madeinhk.cantonesevoicekeyboard",
+        "size": 1859141006,
+        "targetSdk": 36,
+        "versionCode": 80,
+        "versionName": "1.0"
+      }
+    },
+    {
+      "id": "preflight-manifest-exported_component",
+      "section": "artifact",
+      "state": "warning",
+      "field": "com.google.android.play.core.assetpacks.AssetPackExtractionService",
+      "message": "service com.google.android.play.core.assetpacks.AssetPackExtractionService is exported without a permission guard",
+      "remediation": "any installed app can reach this component; add android:permission or set exported=false",
+      "details": {
+        "entry": "com.google.android.play.core.assetpacks.AssetPackExtractionService",
+        "scanner": "manifest"
+      }
+    },
+    {
+      "id": "preflight-permissions-dangerous_permissions",
+      "section": "artifact",
+      "state": "info",
+      "field": "android.permission.RECORD_AUDIO",
+      "message": "android.permission.RECORD_AUDIO (Microphone access)",
+      "remediation": "disclose audio collection in the Data safety form",
+      "details": {
+        "entry": "android.permission.RECORD_AUDIO",
+        "reference": "https://support.google.com/googleplay/android-developer/answer/10787469",
+        "scanner": "permissions"
+      }
+    },
+    {
+      "id": "preflight-permissions-dangerous_permissions",
+      "section": "artifact",
+      "state": "info",
+      "field": "android.permission.FOREGROUND_SERVICE",
+      "message": "android.permission.FOREGROUND_SERVICE (Foreground service)",
+      "remediation": "from Android 14 each service also needs a typed FOREGROUND_SERVICE_* permission",
+      "details": {
+        "entry": "android.permission.FOREGROUND_SERVICE",
+        "scanner": "permissions"
+      }
+    },
+    {
+      "id": "preflight-permissions-dangerous_permissions",
+      "section": "artifact",
+      "state": "info",
+      "field": "android.permission.RECEIVE_BOOT_COMPLETED",
+      "message": "android.permission.RECEIVE_BOOT_COMPLETED (Start at boot)",
+      "remediation": "background startup is scrutinized for battery impact",
+      "details": {
+        "entry": "android.permission.RECEIVE_BOOT_COMPLETED",
+        "scanner": "permissions"
+      }
+    },
+    {
+      "id": "preflight-secrets-misplaced_files",
+      "section": "artifact",
+      "state": "warning",
+      "field": "BUNDLE-METADATA/com.android.tools.build.gradle/app-metadata.properties",
+      "message": "build contains a developer-environment artifact",
+      "remediation": "exclude it from your assets/resources source sets",
+      "details": {
+        "entry": "BUNDLE-METADATA/com.android.tools.build.gradle/app-metadata.properties",
+        "scanner": "secrets"
+      }
+    },
+    {
+      "id": "preflight-size-bundle_size",
+      "section": "artifact",
+      "state": "blocking",
+      "message": "compressed size 1.7 GB exceeds the 200.0 MB limit",
+      "remediation": "move large assets to Play Asset Delivery or split them into dynamic feature modules; this is the archive's compressed size, an approximation of the generated download",
+      "details": {
+        "reference": "https://developer.android.com/guide/playcore/asset-delivery",
+        "scanner": "size"
+      }
+    },
+    {
+      "id": "preflight-size-size_breakdown",
+      "section": "artifact",
+      "state": "info",
+      "message": "compressed size by category: assets 1.7 GB, other 5.9 MB, native 3.0 MB, dex 1.4 MB, resources 179.3 KB, resource-table 35.3 KB, meta-inf 15.5 KB",
+      "details": {
+        "scanner": "size"
+      }
+    },
+    {
+      "id": "preflight-size-largest_entries",
+      "section": "artifact",
+      "state": "info",
+      "message": "largest entries: model_pack_c/assets/qwen-asr-m4-lmhead-int8/model-00003-of-00005.safetensors (416.6 MB), model_pack_b/assets/qwen-asr-m4-lmhead-int8/model-00002-of-00005.safetensors (407.8 MB), model_pack_d/assets/qwen-asr-m4-lmhead-int8/model-00004-of-00005.safetensors (375.2 MB), model_pack_a/assets/qwen-asr-m4-lmhead-int8/model-00001-of-00005.safetensors (280.5 MB), model_pack_e/assets/qwen-asr-m4-lmhead-int8/model-00005-of-00005.safetensors (266.2 MB)",
+      "remediation": "compress or lazily download these assets to cut install size",
+      "details": {
+        "scanner": "size"
+      }
+    },
+    {
+      "id": "local-listings-found",
+      "section": "metadata",
+      "state": "info",
+      "message": "Found local listing data for 2 locale(s).",
+      "details": {
+        "localeCount": 2,
+        "path": "play-release/v80/metadata"
+      }
+    },
+    {
+      "id": "local-screenshots-skipped",
+      "section": "media",
+      "state": "info",
+      "message": "No local screenshots directory was provided.",
+      "remediation": "Provide --screenshots-dir or a metadata directory to validate local store media."
+    },
+    {
+      "id": "release-notes-found",
+      "section": "release",
+      "state": "info",
+      "message": "Found release notes for 2 locale(s)."
+    },
+    {
+      "id": "app-content-inventory-not-provided",
+      "section": "app-content",
+      "state": "warning",
+      "message": "No offline app-content inventory was provided.",
+      "remediation": "Provide --app-content @app-content.json to inventory Console-only declarations."
+    },
+    {
+      "id": "remote-checks-skipped",
+      "section": "remote",
+      "state": "info",
+      "message": "Remote Play checks were explicitly skipped; no authentication or network call was made."
+    },
+    {
+      "id": "manual-data-safety",
+      "section": "manual",
+      "state": "manual",
+      "message": "Data safety completeness cannot be fully verified from the current API surface.",
+      "remediation": "Confirm the Play Console data safety form is complete for this release."
+    },
+    {
+      "id": "manual-policy-review",
+      "section": "manual",
+      "state": "manual",
+      "message": "Policy review and Console-only release gates may still require manual confirmation.",
+      "remediation": "Review Play Console warnings, policy messages, and publishing state before rollout."
+    }
+  ],
+  "summary": {
+    "blocking": 1,
+    "warnings": 3,
+    "info": 10,
+    "manual": 2,
+    "ready": false
+  }
+}

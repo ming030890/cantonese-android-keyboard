@@ -1,0 +1,24 @@
+{
+  "package": "com.madeinhk.cantonesevoicekeyboard",
+  "editId": "05855903671216722838",
+  "dir": "play-release/v80/metadata",
+  "files": [
+    "play-release/v80/metadata/en-US/images/phoneScreenshots/01.png",
+    "play-release/v80/metadata/en-US/images/phoneScreenshots/02.png",
+    "play-release/v80/metadata/en-US/images/phoneScreenshots/03.png",
+    "play-release/v80/metadata/en-US/images/phoneScreenshots/04.png",
+    "play-release/v80/metadata/en-US/images/phoneScreenshots/05.png",
+    "play-release/v80/metadata/en-US/images/phoneScreenshots/06.png",
+    "play-release/v80/metadata/en-US/images/featureGraphic.png",
+    "play-release/v80/metadata/en-US/images/icon.png",
+    "play-release/v80/metadata/zh-HK/images/phoneScreenshots/01.png",
+    "play-release/v80/metadata/zh-HK/images/phoneScreenshots/02.png",
+    "play-release/v80/metadata/zh-HK/images/phoneScreenshots/03.png",
+    "play-release/v80/metadata/zh-HK/images/phoneScreenshots/04.png",
+    "play-release/v80/metadata/zh-HK/images/phoneScreenshots/05.png",
+    "play-release/v80/metadata/zh-HK/images/phoneScreenshots/06.png",
+    "play-release/v80/metadata/zh-HK/images/featureGraphic.png",
+    "play-release/v80/metadata/zh-HK/images/icon.png"
+  ],
+  "dryRun": false
+}

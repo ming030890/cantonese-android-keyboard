@@ -199,13 +199,6 @@ class DebugAudioStore private constructor(
             }.sortedByDescending { it.createdAtMillis }
         }
 
-        fun markBad(context: Context, recordingId: String, isBad: Boolean = true): Boolean =
-            updateMetadata(context, recordingId) {
-                it.put("is_bad", isBad)
-                    .put("is_annotated", false)
-                    .put("synced", false)
-            }
-
         fun saveAnnotation(
             context: Context,
             recordingId: String,
@@ -231,14 +224,6 @@ class DebugAudioStore private constructor(
             val metadata = File(File(root, recordingId), METADATA_FILE_NAME)
             if (!metadata.isFile) "" else JSONObject(metadata.readText()).optString("model_transcript", "")
         }.getOrDefault("")
-
-        fun updateCorrectedTranscript(context: Context, recordingId: String, transcript: String): Boolean {
-            val updated = updateMetadata(context, recordingId) { metadata ->
-                metadata.put("corrected_transcript", transcript).put("synced", false)
-            }
-            if (!updated) return false
-            return writeCorrectedTranscript(context, recordingId, transcript)
-        }
 
         fun saveInferenceResult(context: Context, recordingId: String, modelTranscript: String): Boolean {
             var correctedTranscript = modelTranscript

@@ -74,6 +74,7 @@ fun KeyboardScreen(
     debugTouchBounds: Boolean = false,
     keyboardHapticConfig: KeyboardHapticConfig = KeyboardHapticConfig(),
 ) {
+    val voiceEnabled by com.madeinhk.cantonesevoicekeyboard.KeyboardSettings.voiceInputEnabledFlow.collectAsState()
     val voice by uiState.collectAsState()
     val volume by volumeLevel.collectAsState()
     val action by keyboardAction.collectAsState()
@@ -92,7 +93,8 @@ fun KeyboardScreen(
     val chinesePunctuation by chinesePunctuation.collectAsState()
     KeyboardScreen(
         renderState = KeyboardRenderState(
-            voice = voice,
+            voiceEnabled = voiceEnabled,
+            voice = if (voiceEnabled) voice else KeyboardUiState.Idle,
             volume = volume,
             action = action,
             inputMode = inputMode,
@@ -417,9 +419,9 @@ fun KeyboardScreen(
                 }
             }
     ) {
-        val availableWidth = maxWidth - KeyboardHorizontalPadding * 2
+        val availableWidth = (maxWidth - KeyboardHorizontalPadding * 2
             - systemPadding.calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)
-            - systemPadding.calculateRightPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)
+            - systemPadding.calculateRightPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)).coerceAtLeast(1.dp)
         // Share the safe area below the toolbar equally across all four rows.
         val textRowHeight = (maxHeight - keyboardTopPadding - keyboardBottomPadding -
             if (emojiSearchActive) KeyboardUiDefaults.EmojiSearchPanelHeightDp.dp else KeyboardUiDefaults.ToolbarHeight) / 4
@@ -448,7 +450,8 @@ fun KeyboardScreen(
                     secondaryAction = toolbarState.secondaryAction,
                     candidates = activeCandidateList,
                     showHandwritingCandidates = isHandwritingPanel || activeCandidateList.isNotEmpty(),
-                    voiceState = state,
+                    voiceState = if (renderState.voiceEnabled) state else KeyboardUiState.Idle,
+                    voiceEnabled = renderState.voiceEnabled,
                     volume = volume,
                     handwritingBusy = if (isHandwritingPanel) handwritingBusy else false,
                     handwritingError = if (isHandwritingPanel) handwritingFailure else null,

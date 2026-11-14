@@ -38,10 +38,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.compose.ui.res.stringResource
 import com.madeinhk.cantonesevoicekeyboard.ModelAssetPack
+import com.madeinhk.cantonesevoicekeyboard.BuildConfig
 import com.madeinhk.cantonesevoicekeyboard.ModelDownloadStatus
 import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
 import com.madeinhk.cantonesevoicekeyboard.DebugAudio
@@ -51,7 +51,6 @@ import com.madeinhk.cantonesevoicekeyboard.PromptedHandwriting
 import com.madeinhk.cantonesevoicekeyboard.Settings as KeyboardSettingsNavKey
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
-import com.madeinhk.cantonesevoicekeyboard.data.DefaultDataRepository
 import com.madeinhk.cantonesevoicekeyboard.theme.*
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.SettingsIcon
 
@@ -59,7 +58,6 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.SettingsIcon
 fun MainScreen(
   onItemClick: (NavKey) -> Unit,
   modifier: Modifier = Modifier,
-  viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
 ) {
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -70,6 +68,7 @@ fun MainScreen(
   var quickVersion by remember {
     mutableIntStateOf(KeyboardSettings.getQuickVersion(context))
   }
+  val voiceEnabled by KeyboardSettings.voiceInputEnabledFlow.collectAsState()
   var permissionGranted by remember { mutableStateOf(false) }
   var keyboardEnabled by remember { mutableStateOf(false) }
   var keyboardSelected by remember { mutableStateOf(false) }
@@ -80,8 +79,8 @@ fun MainScreen(
 
   // Observe the model asset-pack download live (progress, install, ready, failure).
   // retryKey re-launches the collection so the user can retry after a failure.
-  LaunchedEffect(retryKey) {
-    ModelAssetPack.downloadStatusFlow(context).collect { modelStatus = it }
+  LaunchedEffect(retryKey, voiceEnabled, permissionGranted) {
+    ModelAssetPack.downloadStatusFlow(context, requestDownload = voiceEnabled && permissionGranted).collect { modelStatus = it }
   }
 
   fun refreshStatus() {
@@ -119,6 +118,10 @@ fun MainScreen(
     }
   }
 
+  val downloadConfirmation = rememberLauncherForActivityResult(
+    ActivityResultContracts.StartIntentSenderForResult()
+  ) { retryKey++ }
+
   // Permission launcher
   val permissionLauncher = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.RequestPermission(),
@@ -129,6 +132,8 @@ fun MainScreen(
   )
 
   MainScreenContent(
+    voiceEnabled = voiceEnabled,
+    onVoiceEnabledChange = { KeyboardSettings.setVoiceInputEnabled(context, it) },
     permissionGranted = permissionGranted,
     keyboardEnabled = keyboardEnabled,
     keyboardSelected = keyboardSelected,
@@ -141,7 +146,7 @@ fun MainScreen(
       KeyboardSettings.setQuickVersion(context, ver)
       quickVersion = ver
     },
-    inferredReason = if (!KeyboardSettings.hasUserConfiguredLayouts(context)) context.getString(R.string.setup_step_layout_inferred) else null,
+    inferredReason = if (!KeyboardSettings.hasUserConfiguredLayouts(context)) stringResource(R.string.setup_step_layout_inferred) else null,
     modelStatus = modelStatus,
     onGrantPermission = { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
     onEnableKeyboard = { context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) },
@@ -149,7 +154,14 @@ fun MainScreen(
       val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
       imm.showInputMethodPicker()
     },
-    onModelRetry = { retryKey++ },
+    onModelRetry = { ModelAssetPack.requestDownload(context, retry = true); retryKey++ },
+    onConfirmModelDownload = {
+      val manager = com.google.android.play.core.assetpacks.AssetPackManagerFactory.getInstance(context)
+      if (modelStatus == ModelDownloadStatus.RequiresConfirmation && voiceEnabled &&
+          ModelAssetPack.hasUnmeteredNetwork(context)) {
+        if (!manager.showConfirmationDialog(downloadConfirmation)) retryKey++
+      }
+    },
     storeDebugAudio = storeDebugAudio,
     onStoreDebugAudioChange = { enabled ->
       DebugAudioSettings.setStoreDebugAudioEnabled(context, enabled)
@@ -174,6 +186,8 @@ fun MainScreen(
  */
 @Composable
 fun MainScreenContent(
+  voiceEnabled: Boolean = true,
+  onVoiceEnabledChange: (Boolean) -> Unit = {},
   permissionGranted: Boolean,
   keyboardEnabled: Boolean,
   keyboardSelected: Boolean,
@@ -187,6 +201,7 @@ fun MainScreenContent(
   onEnableKeyboard: () -> Unit,
   onPickKeyboard: () -> Unit,
   onModelRetry: () -> Unit,
+  onConfirmModelDownload: () -> Unit = {},
   storeDebugAudio: Boolean,
   onStoreDebugAudioChange: (Boolean) -> Unit,
   onOpenDebugAudio: () -> Unit = {},
@@ -223,7 +238,12 @@ fun MainScreenContent(
         onQuickVersionChange = onQuickVersionChange
       )
 
-      val allCompleted = keyboardEnabled && keyboardSelected && permissionGranted
+      VoiceInputSettingsCard(
+        enabled = voiceEnabled,
+        onEnabledChange = onVoiceEnabledChange,
+      )
+
+      val allCompleted = keyboardEnabled && keyboardSelected && (!voiceEnabled || permissionGranted)
 
       if (allCompleted) {
         // Celebratory "Ready to type" card
@@ -231,6 +251,7 @@ fun MainScreenContent(
       } else {
         // Streamlined, sequential 3-step setup flow
         KeyboardSetupFlowCard(
+          voiceEnabled = voiceEnabled,
           keyboardEnabled = keyboardEnabled,
           keyboardSelected = keyboardSelected,
           permissionGranted = permissionGranted,
@@ -246,12 +267,12 @@ fun MainScreenContent(
       TestSandboxCard()
 
       // Model Sync Status (compact when ready)
-      ModelStatusCard(status = modelStatus, onRetry = onModelRetry)
+      if (voiceEnabled && permissionGranted) ModelStatusCard(status = modelStatus, onRetry = onModelRetry, onConfirmDownload = onConfirmModelDownload)
 
       Spacer(modifier = Modifier.height(6.dp))
 
       // Collapsible developer tools at bottom
-      DeveloperOptionsCard(
+      if (BuildConfig.INTERNAL_TOOLS) DeveloperOptionsCard(
         storeDebugAudio = storeDebugAudio,
         onStoreDebugAudioChange = onStoreDebugAudioChange,
         onOpenDebugAudio = onOpenDebugAudio,
@@ -491,7 +512,7 @@ fun KeyboardReadyCard(
           )
           Spacer(modifier = Modifier.height(2.dp))
           Text(
-            text = stringResource(id = R.string.setup_all_done_desc),
+            text = stringResource(R.string.setup_all_done_desc, stringResource(R.string.app_name)),
             color = textVariantColor,
             fontSize = 12.sp,
             lineHeight = 16.sp
@@ -540,6 +561,7 @@ fun KeyboardReadyCard(
 
 @Composable
 fun KeyboardSetupFlowCard(
+  voiceEnabled: Boolean = true,
   keyboardEnabled: Boolean,
   keyboardSelected: Boolean,
   permissionGranted: Boolean,
@@ -553,11 +575,12 @@ fun KeyboardSetupFlowCard(
 
   val completedCount = (if (keyboardEnabled) 1 else 0) +
                        (if (keyboardSelected) 1 else 0) +
-                       (if (permissionGranted) 1 else 0)
+                       (if (voiceEnabled && permissionGranted) 1 else 0)
+  val stepCount = if (voiceEnabled) 3 else 2
   val activeStepIndex = when {
     !keyboardEnabled -> 1
     !keyboardSelected -> 2
-    else -> 3
+    else -> stepCount
   }
 
   Card(
@@ -587,7 +610,7 @@ fun KeyboardSetupFlowCard(
           fontWeight = FontWeight.Bold
         )
         Text(
-          text = stringResource(id = R.string.setup_step_progress, activeStepIndex, 3),
+          text = stringResource(id = R.string.setup_step_progress, activeStepIndex, stepCount),
           color = primaryColor,
           fontSize = 13.sp,
           fontWeight = FontWeight.Bold
@@ -597,7 +620,7 @@ fun KeyboardSetupFlowCard(
       Spacer(modifier = Modifier.height(8.dp))
 
       LinearProgressIndicator(
-        progress = { completedCount / 3f },
+        progress = { completedCount.toFloat() / stepCount },
         modifier = Modifier
           .fillMaxWidth()
           .height(4.dp)
@@ -612,7 +635,7 @@ fun KeyboardSetupFlowCard(
       SetupStepRow(
         stepNumber = 1,
         title = stringResource(id = R.string.setup_step_enable_title),
-        description = stringResource(id = R.string.setup_step_enable_desc),
+        description = stringResource(R.string.setup_step_enable_desc, stringResource(R.string.app_name)),
         isCompleted = keyboardEnabled,
         isActive = !keyboardEnabled,
         actionText = stringResource(id = R.string.setup_step_enable_action),
@@ -629,13 +652,14 @@ fun KeyboardSetupFlowCard(
         stepNumber = 2,
         title = stringResource(id = R.string.setup_step_switch_title),
         description = if (!keyboardEnabled) stringResource(id = R.string.setup_step_locked_hint)
-                      else stringResource(id = R.string.setup_step_switch_desc),
+                      else stringResource(R.string.setup_step_switch_desc, stringResource(R.string.app_name)),
         isCompleted = keyboardSelected,
         isActive = keyboardEnabled && !keyboardSelected,
         actionText = stringResource(id = R.string.setup_step_switch_action),
         onActionClick = onPickKeyboard
       )
 
+      if (voiceEnabled) {
       HorizontalDivider(
         modifier = Modifier.padding(vertical = 12.dp),
         color = outlineColor.copy(alpha = 0.2f)
@@ -652,6 +676,7 @@ fun KeyboardSetupFlowCard(
         actionText = stringResource(id = R.string.setup_step_voice_action),
         onActionClick = onGrantPermission
       )
+      }
     }
   }
 }
@@ -759,115 +784,11 @@ fun SetupStepRow(
 }
 
 @Composable
-fun SetupStepCard(
-  stepNumber: Int,
-  title: String,
-  description: String,
-  isCompleted: Boolean,
-  actionText: String,
-  onActionClick: () -> Unit,
-  modifier: Modifier = Modifier
-) {
-  val outlineColor = MaterialTheme.colorScheme.outline
-  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
-
-  Card(
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(vertical = 6.dp),
-    shape = RoundedCornerShape(16.dp),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface
-    ),
-    border = BorderStroke(
-      width = 1.dp,
-      color = if (isCompleted) SuccessGreen.copy(alpha = 0.3f) else outlineColor
-    )
-  ) {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      Row(
-        modifier = Modifier.weight(1f),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Box(
-          modifier = Modifier
-            .size(36.dp)
-            .clip(CircleShape)
-            .background(
-              if (isCompleted) SuccessGreen.copy(alpha = 0.15f)
-              else outlineColor
-            )
-            .border(
-              width = 1.5.dp,
-              color = if (isCompleted) SuccessGreen else textVariantColor,
-              shape = CircleShape
-            ),
-          contentAlignment = Alignment.Center
-        ) {
-          if (isCompleted) {
-            Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-          } else {
-            Text(stepNumber.toString(), color = textVariantColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-          }
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column {
-          Text(
-            text = title,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-          )
-          Spacer(modifier = Modifier.height(2.dp))
-          Text(
-            text = description,
-            color = textVariantColor,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Normal
-          )
-        }
-      }
-
-      Spacer(modifier = Modifier.width(12.dp))
-
-      if (isCompleted) {
-        Text(
-          text = stringResource(id = R.string.setup_step_completed),
-          color = SuccessGreen,
-          fontSize = 14.sp,
-          fontWeight = FontWeight.Bold,
-          modifier = Modifier.padding(horizontal = 8.dp)
-        )
-      } else {
-        Button(
-          onClick = onActionClick,
-          shape = RoundedCornerShape(20.dp),
-          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-          Text(
-            text = actionText,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold
-          )
-        }
-      }
-    }
-  }
-}
-
-@Composable
 fun ModelStatusCard(
   status: ModelDownloadStatus,
   modifier: Modifier = Modifier,
-  onRetry: () -> Unit = {}
+  onRetry: () -> Unit = {},
+  onConfirmDownload: () -> Unit = {},
 ) {
   val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
   val primaryColor = MaterialTheme.colorScheme.primary
@@ -924,6 +845,8 @@ fun ModelStatusCard(
     is ModelDownloadStatus.Downloading ->
       stringResource(id = R.string.model_status_downloading, status.percent)
     is ModelDownloadStatus.Installing -> stringResource(id = R.string.model_status_installing)
+    is ModelDownloadStatus.WaitingForWifi -> stringResource(R.string.model_status_waiting_wifi)
+    is ModelDownloadStatus.RequiresConfirmation -> stringResource(R.string.model_status_confirmation)
     is ModelDownloadStatus.Pending -> stringResource(id = R.string.model_status_preparing)
     is ModelDownloadStatus.NotStarted -> stringResource(id = R.string.model_status_preparing)
     is ModelDownloadStatus.Failed -> stringResource(id = R.string.model_status_failed)
@@ -959,6 +882,8 @@ fun ModelStatusCard(
             Text("✓", color = accent, fontWeight = FontWeight.Bold, fontSize = 16.sp)
           is ModelDownloadStatus.Failed ->
             Text("⚠", color = accent, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+          is ModelDownloadStatus.WaitingForWifi, is ModelDownloadStatus.RequiresConfirmation ->
+            Text("↓", color = accent, fontWeight = FontWeight.Bold, fontSize = 22.sp)
           is ModelDownloadStatus.Downloading ->
             CircularProgressIndicator(
               progress = { status.fraction },
@@ -991,6 +916,11 @@ fun ModelStatusCard(
           fontSize = 12.sp,
           fontWeight = FontWeight.Normal
         )
+        if (status is ModelDownloadStatus.RequiresConfirmation) {
+          TextButton(onClick = onConfirmDownload) {
+            Text(stringResource(R.string.model_download_confirm))
+          }
+        }
         if (status is ModelDownloadStatus.Downloading) {
           Spacer(modifier = Modifier.height(8.dp))
           LinearProgressIndicator(

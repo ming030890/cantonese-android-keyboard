@@ -57,6 +57,7 @@ internal fun UnifiedKeyboardToolbar(
     candidates: List<HandwritingCandidate>,
     showHandwritingCandidates: Boolean,
     voiceState: KeyboardUiState,
+    voiceEnabled: Boolean = true,
     volume: Float,
     handwritingBusy: Boolean,
     handwritingError: String?,
@@ -105,10 +106,9 @@ internal fun UnifiedKeyboardToolbar(
                     stringResource(R.string.keyboard_status_loading_model),
                     keyboardColors.keyboardKeyOnSurface,
                 )
-                voiceState == KeyboardUiState.DownloadingModel -> ToolbarStatusText(
-                    stringResource(R.string.keyboard_status_downloading_model),
-                    keyboardColors.keyboardKeyOnSurface,
-                )
+                voiceState is KeyboardUiState.ModelNotReady -> {
+                    ToolbarStatusText(voiceState.message, keyboardColors.keyboardKeyOnSurface)
+                }
                 voiceState is KeyboardUiState.Error -> {
                     ToolbarStatusText(voiceState.message, keyboardColors.keyboardKeyOnSurface)
                 }
@@ -172,7 +172,7 @@ internal fun UnifiedKeyboardToolbar(
                 )
             }
         }
-        VoiceToolbarVisual(
+        if (voiceEnabled) VoiceToolbarVisual(
             volume = volume,
             state = voiceState,
             key = keys.voice,
@@ -218,7 +218,6 @@ private fun VoiceToolbarVisual(
     ) {
         when (state) {
             KeyboardUiState.LoadingModel,
-            KeyboardUiState.DownloadingModel,
             KeyboardUiState.Transcribing,
             -> Box(
                 modifier = Modifier
@@ -260,6 +259,7 @@ private fun VoiceToolbarVisual(
                     )
                 }
             }
+            is KeyboardUiState.ModelNotReady,
             KeyboardUiState.Idle -> MicIcon(
                 modifier = Modifier.size(KeyboardUiDefaults.ToolbarIconSize),
                 color = keyboardColors.keyboardKeyOnSurface,

@@ -4,27 +4,24 @@ import android.content.Context
 import android.system.ErrnoException
 import android.system.Os
 import android.util.Log
-import com.google.android.play.core.assetpacks.AssetPackManager
 import com.google.android.play.core.assetpacks.AssetPackManagerFactory
 import com.google.android.play.core.assetpacks.AssetPackState
-import com.google.android.play.core.assetpacks.AssetPackStateUpdateListener
 import com.google.android.play.core.assetpacks.model.AssetPackStatus
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.flow.first
 import java.io.File
-import kotlin.coroutines.resume
 
 /**
  * High-level download state of the model, suitable for driving UI.
  *
- * The model is split across two fast-follow Play Asset Delivery packs; this
- * state aggregates both packs into a single progress signal so the UI can
+ * The model is split across five on-demand Play Asset Delivery packs; this
+ * state aggregates all packs into a single progress signal so the UI can
  * treat the model as one logical resource.
  */
 sealed interface ModelDownloadStatus {
     data object NotStarted : ModelDownloadStatus
+    data object WaitingForWifi : ModelDownloadStatus
+    data object RequiresConfirmation : ModelDownloadStatus
     data object Pending : ModelDownloadStatus
     data class Downloading(val bytesDownloaded: Long, val totalBytes: Long) : ModelDownloadStatus {
         val fraction: Float =
@@ -37,18 +34,18 @@ sealed interface ModelDownloadStatus {
 }
 
 /**
- * Resolves the Qwen ASR model directory. The model ships as two sharded
- * fast-follow Play Asset Delivery packs ([PACK_A], [PACK_B]) so each stays
+ * Resolves the Qwen ASR model directory. The model ships as five sharded
+ * on-demand Play Asset Delivery packs ([PACK_A] through [PACK_E]) so each stays
  * under Play's 512 MiB per-pack ceiling.
  *
  * Files in each pack are mmap'd directly by the native loader from their
- * Play-managed locations; we never copy them. To present both packs as one
+ * Play-managed locations; we never copy them. To present all packs as one
  * logical model directory (as the native `MultiSafetensors::open` expects),
  * we symlink every file from each pack's `qwen-asr-m4-lmhead-int8/` into a single
  * staging directory in internal storage. Symlinks consume only inodes — zero
  * byte duplication.
  *
- * The staging step is idempotent and fast (~four `symlink` syscalls), so it
+ * The staging step is idempotent and fast (a handful of `symlink` syscalls), so it
  * re-runs on every resolve to absorb pack-update path changes.
  */
 object ModelAssetPack {
@@ -64,183 +61,176 @@ object ModelAssetPack {
     private const val TAG = "ModelAssetPack"
 
 
-    /** True if both packs are already downloaded and the staged dir can be built. */
+    /** True if all packs are already downloaded and the staged dir can be built. */
     fun isModelAvailable(context: Context): Boolean = stageModelDir(context) != null
 
-    /**
-     * Emits live aggregated [ModelDownloadStatus] for the model. Combines the
-     * worst-status of the two packs (any failure -> Failed, any pending ->
-     * Pending, otherwise sums of download progress) and emits Ready only once
-     * both packs are extracted on disk.
-     */
-    fun downloadStatusFlow(context: Context): Flow<ModelDownloadStatus> = callbackFlow {
-        val appContext = context.applicationContext
-        val manager = AssetPackManagerFactory.getInstance(appContext)
+    private val status = kotlinx.coroutines.flow.MutableStateFlow<ModelDownloadStatus>(ModelDownloadStatus.NotStarted)
+    private val mainHandler by lazy { android.os.Handler(android.os.Looper.getMainLooper()) }
+    private var initialized = false
+    private var requested = false
+    private var fetchStarted = false
+    private var downloadOwner: String? = null
+    private var lastAllowed = false
+    private val latest = HashMap<String, AssetPackState>()
 
-        if (stageModelDir(appContext) != null) {
-            trySend(ModelDownloadStatus.Ready)
-            close()
-            return@callbackFlow
-        }
+    fun hasUnmeteredNetwork(context: Context): Boolean {
+        val connectivity = context.getSystemService(android.net.ConnectivityManager::class.java)
+        val capabilities = connectivity.getNetworkCapabilities(connectivity.activeNetwork) ?: return false
+        return capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED) &&
+            capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+    }
 
-        val latest = HashMap<String, AssetPackState>()
+    internal fun downloadAllowed(enabled: Boolean, permission: Boolean, unmetered: Boolean) =
+        enabled && permission && unmetered
 
-        fun emitCombined() {
-            val combined = combine(appContext, latest)
-            Log.i(TAG, "downloadStatusFlow combined=$combined latest=${latest.values.joinToString { describeState(it) }}")
-            trySend(combined)
-        }
+    internal fun voiceDownloadEnabled(context: Context): Boolean =
+        KeyboardSettings.isVoiceInputEnabled(context) &&
+            androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
 
-        val listener = AssetPackStateUpdateListener { state ->
-            if (state.name() in PACKS) {
+    private fun allowed(context: Context): Boolean = downloadAllowed(
+        KeyboardSettings.isVoiceInputEnabled(context),
+        androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED,
+        hasUnmeteredNetwork(context),
+    )
+
+    /** A process-wide listener also guards downloads after the setup screen closes. */
+    private fun initialize(context: Context) {
+        if (initialized) return
+        initialized = true
+        val manager = AssetPackManagerFactory.getInstance(context)
+        manager.registerListener { state ->
+            if (state.name() in PACKS) mainHandler.post {
                 latest[state.name()] = state
-                emitCombined()
+                reconcile(context)
             }
         }
-        manager.registerListener(listener)
-
-        manager.getPackStates(PACKS)
-            .addOnSuccessListener { states ->
-                PACKS.forEach { p -> states.packStates()[p]?.let { latest[p] = it } }
-                Log.i(TAG, "getPackStates success: ${latest.values.joinToString { describeState(it) }}")
-                emitCombined()
-                manager.fetch(PACKS)
+        val connectivity = context.getSystemService(android.net.ConnectivityManager::class.java)
+        connectivity.registerDefaultNetworkCallback(object : android.net.ConnectivityManager.NetworkCallback() {
+            override fun onCapabilitiesChanged(network: android.net.Network, capabilities: android.net.NetworkCapabilities) {
+                mainHandler.post { reconcile(context) }
             }
-            .addOnFailureListener {
-                Log.w(TAG, "getPackStates failed; requesting fetch anyway", it)
-                manager.fetch(PACKS)
+            override fun onLost(network: android.net.Network) {
+                mainHandler.post { reconcile(context) }
             }
+        })
+        manager.getPackStates(PACKS).addOnSuccessListener { states ->
+            latest.putAll(states.packStates())
+            reconcile(context)
+        }.addOnFailureListener { reconcile(context) }
+    }
 
-        awaitClose { manager.unregisterListener(listener) }
+    private fun reconcile(context: Context) {
+        val manager = AssetPackManagerFactory.getInstance(context)
+        val enabled = KeyboardSettings.isVoiceInputEnabled(context)
+        val permitted = allowed(context)
+        if (!permitted) {
+            // PAD also pauses large downloads on loss of Wi-Fi. Explicitly cancel here
+            // to respect metered Wi-Fi and a voice opt-out, too. Never consent to mobile data.
+            if (fetchStarted || lastAllowed) manager.cancel(PACKS)
+            fetchStarted = false
+        }
+        lastAllowed = permitted
+        status.value = when {
+            !enabled -> ModelDownloadStatus.NotStarted
+            stageModelDir(context) != null -> ModelDownloadStatus.Ready
+            !permitted && requested -> ModelDownloadStatus.WaitingForWifi
+            else -> combineStates(latest)
+        }
+        if (requested && permitted && downloadOwner != null && !fetchStarted && status.value != ModelDownloadStatus.Ready) {
+            fetchStarted = true
+            status.value = ModelDownloadStatus.Pending
+            val owner = downloadOwner
+            manager.fetch(PACKS).addOnSuccessListener { states ->
+                if (downloadOwner != owner) return@addOnSuccessListener
+                latest.putAll(states.packStates())
+                // Recheck after asynchronous fetch: a setting/network may have changed.
+                reconcile(context)
+            }.addOnFailureListener { error ->
+                if (downloadOwner != owner) return@addOnFailureListener
+                if (allowed(context)) {
+                    val code = (error as? com.google.android.play.core.assetpacks.AssetPackException)?.errorCode
+                        ?: com.google.android.play.core.assetpacks.model.AssetPackErrorCode.INTERNAL_ERROR
+                    status.value = ModelDownloadStatus.Failed(code)
+                } else reconcile(context)
+            }
+        }
+    }
+
+    fun requestDownload(context: Context, retry: Boolean = false) {
+        val app = context.applicationContext
+        mainHandler.post {
+            initialize(app)
+            requested = voiceDownloadEnabled(app)
+            reconcile(app)
+            if (requested && status.value != ModelDownloadStatus.Ready) {
+                VoiceModelDownloadWorker.enqueue(app, retry)
+            }
+        }
+    }
+
+    fun cancelDownload(context: Context) {
+        val app = context.applicationContext
+        mainHandler.post {
+            requested = false
+            downloadOwner = null
+            VoiceModelDownloadWorker.cancel(app)
+            AssetPackManagerFactory.getInstance(app).cancel(PACKS)
+            fetchStarted = false
+            status.value = ModelDownloadStatus.NotStarted
+        }
+    }
+
+    internal suspend fun beginDownload(context: Context, owner: String) =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main.immediate) {
+            initialize(context)
+            downloadOwner = owner
+            requested = voiceDownloadEnabled(context)
+            fetchStarted = false
+            reconcile(context)
+        }
+
+    internal suspend fun endDownload(context: Context, owner: String) =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main.immediate) {
+            if (downloadOwner == owner) {
+                downloadOwner = null
+                fetchStarted = false
+                if (status.value != ModelDownloadStatus.Ready &&
+                    status.value != ModelDownloadStatus.RequiresConfirmation && status.value !is ModelDownloadStatus.Failed) {
+                    AssetPackManagerFactory.getInstance(context).cancel(PACKS)
+                }
+            }
+        }
+
+    /** Observation alone never starts a download. */
+    fun downloadStatusFlow(context: Context, requestDownload: Boolean = false): Flow<ModelDownloadStatus> {
+        val app = context.applicationContext
+        mainHandler.post { initialize(app); reconcile(app) }
+        if (requestDownload) requestDownload(app)
+        return status
+    }
+
+    /** Wait for the policy-controlled download; never fetch directly from a model loader. */
+    suspend fun resolveModelDir(context: Context): File? {
+        if (!KeyboardSettings.isVoiceInputEnabled(context)) return null
+        stageModelDir(context)?.let { return it }
+        val result = downloadStatusFlow(context, requestDownload = true).first { state ->
+            state is ModelDownloadStatus.Ready || state is ModelDownloadStatus.Failed ||
+                !KeyboardSettings.isVoiceInputEnabled(context)
+        }
+        return if (result == ModelDownloadStatus.Ready) stageModelDir(context) else null
     }
 
     /**
-     * Returns the staged model directory, fetching asset packs if
-     * necessary. Suspends until all packs are available. Returns `null`
-     * if any pack could not be made available.
-     */
-    suspend fun resolveModelDir(context: Context, onDownloadStarted: () -> Unit = {}): File? {
-        val appContext = context.applicationContext
-        stageModelDir(appContext)?.let {
-            Log.i(TAG, "resolveModelDir: staged model already available at ${it.absolutePath}")
-            return it
-        }
-
-        val manager = AssetPackManagerFactory.getInstance(appContext)
-        val ready = awaitAllPacks(manager, onDownloadStarted)
-        Log.i(TAG, "resolveModelDir: awaitAllPacks ready=$ready")
-        if (!ready) return null
-        return stageModelDir(appContext).also {
-            Log.i(TAG, "resolveModelDir: stage after fetch result=${it?.absolutePath}")
-        }
-    }
-
-    private suspend fun awaitAllPacks(
-        manager: AssetPackManager,
-        onDownloadStarted: () -> Unit = {},
-    ): Boolean = suspendCancellableCoroutine { cont ->
-        val completed = HashSet<String>()
-        var notifiedDownloadStarted = false
-
-        fun notifyDownloadIfNeeded() {
-            if (!notifiedDownloadStarted) {
-                notifiedDownloadStarted = true
-                onDownloadStarted()
-            }
-        }
-
-        fun tryComplete(): Boolean {
-            if (completed.containsAll(PACKS)) {
-                if (!cont.isCompleted) {
-                    cont.resume(true)
-                }
-                return true
-            }
-            return false
-        }
-
-        val listener = object : AssetPackStateUpdateListener {
-            override fun onStateUpdate(state: AssetPackState) {
-                if (state.name() !in PACKS || cont.isCompleted) return
-                when (state.status()) {
-                    AssetPackStatus.COMPLETED -> {
-                        Log.i(TAG, "awaitAllPacks completed update: ${describeState(state)}")
-                        completed.add(state.name())
-                        if (tryComplete()) {
-                            manager.unregisterListener(this)
-                        }
-                    }
-                    AssetPackStatus.DOWNLOADING, AssetPackStatus.TRANSFERRING -> {
-                        notifyDownloadIfNeeded()
-                    }
-                    AssetPackStatus.FAILED, AssetPackStatus.CANCELED -> {
-                        Log.e(TAG, "Pack '${state.name()}' ended: status=${state.status()}, errorCode=${state.errorCode()}")
-                        manager.unregisterListener(this)
-                        if (!cont.isCompleted) cont.resume(false)
-                    }
-                    else -> Log.i(TAG, "awaitAllPacks update: ${describeState(state)}")
-                }
-            }
-        }
-
-        manager.registerListener(listener)
-        cont.invokeOnCancellation { manager.unregisterListener(listener) }
-
-        // Fast-path 1: Query existing pack states. If Google Play already downloaded the packs
-        // during app install / update, they are already COMPLETED and will not emit onStateUpdate.
-        manager.getPackStates(PACKS)
-            .addOnSuccessListener { states ->
-                if (cont.isCompleted) return@addOnSuccessListener
-                var hasActiveDownload = false
-                states.packStates().forEach { (name, state) ->
-                    if (state.status() == AssetPackStatus.COMPLETED) {
-                        completed.add(name)
-                    } else if (state.status() == AssetPackStatus.DOWNLOADING || state.status() == AssetPackStatus.TRANSFERRING) {
-                        hasActiveDownload = true
-                    }
-                }
-                if (hasActiveDownload) notifyDownloadIfNeeded()
-                if (tryComplete()) {
-                    manager.unregisterListener(listener)
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "getPackStates in awaitAllPacks failed", e)
-            }
-
-        // Fast-path 2: Start fetch and inspect immediate result.
-        manager.fetch(PACKS)
-            .addOnSuccessListener { states ->
-                if (cont.isCompleted) return@addOnSuccessListener
-                var hasActiveDownload = false
-                states.packStates().forEach { (name, state) ->
-                    if (state.status() == AssetPackStatus.COMPLETED) {
-                        completed.add(name)
-                    } else if (state.status() == AssetPackStatus.DOWNLOADING || state.status() == AssetPackStatus.TRANSFERRING) {
-                        hasActiveDownload = true
-                    }
-                }
-                if (hasActiveDownload) notifyDownloadIfNeeded()
-                if (tryComplete()) {
-                    manager.unregisterListener(listener)
-                }
-            }
-            .addOnFailureListener { e ->
-                if (!cont.isCompleted) {
-                    Log.e(TAG, "Failed to start asset pack fetch", e)
-                    manager.unregisterListener(listener)
-                    cont.resume(false)
-                }
-            }
-    }
-
-    /**
-     * If both packs are extracted on disk, builds (or refreshes) a single
+     * If all packs are extracted on disk, builds (or refreshes) a single
      * staging dir in internal storage containing symlinks to every file in
      * each pack's `qwen-asr-m4-lmhead-int8/` directory, and returns it.
      *
      * Returns null if either pack is not yet available.
      */
+    @Synchronized
     private fun stageModelDir(context: Context): File? {
         val appContext = context.applicationContext
         val manager = AssetPackManagerFactory.getInstance(appContext)
@@ -307,24 +297,23 @@ object ModelAssetPack {
         return staged
     }
 
-    private fun describeState(state: AssetPackState): String =
-        "${state.name()} status=${state.status()} bytes=${state.bytesDownloaded()}/${state.totalBytesToDownload()} error=${state.errorCode()}"
-
-    private fun combine(context: Context, latest: Map<String, AssetPackState>): ModelDownloadStatus {
-        if (stageModelDir(context) != null) return ModelDownloadStatus.Ready
-        if (latest.size < PACKS.size) return ModelDownloadStatus.NotStarted
-
+    internal fun combineStates(latest: Map<String, AssetPackState>): ModelDownloadStatus {
         latest.values.firstOrNull {
             it.status() == AssetPackStatus.FAILED || it.status() == AssetPackStatus.CANCELED
         }?.let { return ModelDownloadStatus.Failed(it.errorCode()) }
 
+        if (latest.values.any { it.status() == AssetPackStatus.REQUIRES_USER_CONFIRMATION }) {
+            return ModelDownloadStatus.RequiresConfirmation
+        }
+        if (latest.values.any { it.status() == AssetPackStatus.WAITING_FOR_WIFI }) {
+            return ModelDownloadStatus.WaitingForWifi
+        }
+        if (latest.size < PACKS.size) return ModelDownloadStatus.NotStarted
         if (latest.values.any { it.status() == AssetPackStatus.TRANSFERRING }) {
             return ModelDownloadStatus.Installing
         }
         if (latest.values.any {
-                it.status() == AssetPackStatus.PENDING ||
-                    it.status() == AssetPackStatus.WAITING_FOR_WIFI ||
-                    it.status() == AssetPackStatus.REQUIRES_USER_CONFIRMATION
+                it.status() == AssetPackStatus.PENDING
             }) {
             return ModelDownloadStatus.Pending
         }

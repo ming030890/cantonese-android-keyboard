@@ -7,6 +7,20 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SystemKeyboardSubtypeScenarioTest {
+    @Test fun inferredDefaultsSurviveStaleEnglishSubtypeAndReopen() {
+        val cases = listOf(
+            emptyList<KeyboardLayoutInference.ImeInfo>() to KeyboardInputMode.Handwriting,
+            listOf(KeyboardLayoutInference.ImeInfo(label = "速成鍵盤")) to KeyboardInputMode.Quick,
+        )
+        for ((existingImes, expectedMode) in cases) {
+            val state = KeyboardScenarios.inferredLayoutStartup(existingImes)
+            assertEquals(expectedMode, state.inputMode)
+            assertTrue(state.handwritingCandidates.isEmpty())
+            assertTrue(state.englishCandidates.isEmpty())
+            assertEquals(KeyboardToolbarContent.Clipboard, state.toolbar())
+        }
+    }
+
     @Test fun pinEditorUsesNumbersAcrossReopenAndReturnsToSelectedTextLayout() {
         KeyboardScenario(clipboardText = null).use { s ->
             val pin = EditorInfo().apply {
@@ -98,6 +112,6 @@ class SystemKeyboardSubtypeScenarioTest {
             assertArrayEquals(intArrayOf(KeyboardSubtypes.ENGLISH), KeyboardSubtypes.enabledIds(s.enabledLayouts))
             assertEquals("", s.editor.text)
         }
-        assertArrayEquals(intArrayOf(1001, 1002, 1003), KeyboardSubtypes.enabledIds(KeyboardSettings.DEFAULT_LAYOUTS))
+        assertArrayEquals(intArrayOf(KeyboardSubtypes.HANDWRITING), KeyboardSubtypes.enabledIds(KeyboardSettings.DEFAULT_LAYOUTS))
     }
 }

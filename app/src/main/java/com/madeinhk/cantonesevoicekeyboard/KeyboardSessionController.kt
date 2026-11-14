@@ -34,7 +34,6 @@ internal class KeyboardSessionController(
         settings = KeyboardSessionSettings(
             enabledLayouts = { KeyboardSettings.getEnabledLayouts(service) },
             quickVersion = { KeyboardSettings.getQuickVersion(service) },
-            autocorrectEnabled = { KeyboardSettings.isAutocorrectEnabled(service, it) },
             autoCapitalizationEnabled = { KeyboardSettings.isAutoCapitalizationEnabled(service) },
         ),
         context = service,
@@ -71,10 +70,14 @@ internal class KeyboardSessionController(
     private val suggestions = dependencies.suggestions
     private val english = dependencies.english
     init {
+        handwriting.onRecognitionApplied = { _handwritingSession.value++ }
         quick.canRefreshPersonalization = {
             _keyboardInputMode.value == KeyboardInputMode.Quick && english?.inspectingWord != true
         }
         english?.onContextRevised = { refreshPredictions() }
+        english?.onAutocorrectEpisode = { episode ->
+            AutocorrectTelemetryStore.record(context, episode)
+        }
         english?.autoCapitalizationEnabled = settings.autoCapitalizationEnabled
         english?.quickEnglishEnabled = { autocorrectActive(KeyboardInputMode.Quick) }
         english?.attachQuick(quick)
@@ -176,6 +179,7 @@ internal class KeyboardSessionController(
 
     /** Read after an event or after advancing the test scheduler for asynchronous work. */
     fun renderState() = KeyboardRenderState(
+        voiceEnabled = voice.enabled,
         voice = uiState.value,
         volume = volumeLevel.value,
         action = keyboardAction.value,
@@ -428,6 +432,7 @@ internal class KeyboardSessionController(
         suggestions.onInlineSuggestionsResponse(response)
 
     fun toggleRecording() {
+        if (!voice.enabled) return
         if (!voice.isRecording()) {
             finishEnglishLiteral()
             quick.accept()
@@ -667,7 +672,6 @@ internal class KeyboardSessionController(
 
     private fun updateEditorPresentation(info: EditorInfo?) {
         editorAllowsEnglish = englishAllowed(info?.inputType)
-        if (!editorAllowsEnglish) TypingDiagnostics.update("editor_disallows_correction")
         _keyboardAction.value = keyboardActionFor(info)
         val targetMode = keyboardInputModeFor(info)
         if (targetMode == KeyboardInputMode.Number || targetMode == KeyboardInputMode.AlphaNum) {
@@ -686,6 +690,8 @@ internal class KeyboardSessionController(
     }
 
     private fun finishSession(releaseModel: Boolean) {
+        english?.flushAutocorrectEpisodes()
+        AutocorrectTelemetryStore.flushIfOnWifi(context)
         quick.discard()
         voice.finish(releaseModel, inputViewSession)
         handwriting.finish(releaseModel, inputViewSession)
@@ -693,7 +699,7 @@ internal class KeyboardSessionController(
 
     private fun advanceSession(): Long {
         inputViewSession++
-        _handwritingSession.value = inputViewSession
+        _handwritingSession.value++
         return inputViewSession
     }
 }

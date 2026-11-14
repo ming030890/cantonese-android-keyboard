@@ -26,13 +26,15 @@ val hasReleaseSigning = ksFile != null && ksPassword != null &&
 
 android {
     namespace = "com.madeinhk.cantonesevoicekeyboard"
-    compileSdk = 36
+    compileSdk {
+        version = release(37) { minorApiLevel = 0 }
+    }
 
     defaultConfig {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 77
+        versionCode = 80
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -40,7 +42,7 @@ android {
         }
     }
 
-    // The Qwen ASR model is delivered as FIVE fast-follow Play Asset Delivery
+    // The Qwen ASR model is delivered as FIVE on-demand Play Asset Delivery
     // packs so each stays under Play's 512 MiB per-pack ceiling. Shard 1 +
     // tokenizer files live in :model_pack_a; shards 2..5 live in :model_pack_b..e.
     // See scripts/reshard_model.py for the build-time split.
@@ -59,7 +61,10 @@ android {
     }
 
     buildTypes {
+        val internalTrack = providers.gradleProperty("internalTrack").orElse("true").get().toBoolean()
         release {
+            buildConfigField("boolean", "INTERNAL_TOOLS", "false")
+            buildConfigField("boolean", "INTERNAL_TRACK", internalTrack.toString())
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "native-lm-rules.pro")
@@ -68,6 +73,8 @@ android {
             }
         }
         debug {
+            buildConfigField("boolean", "INTERNAL_TOOLS", "true")
+            buildConfigField("boolean", "INTERNAL_TRACK", "true")
             // Side-by-side diagnostics when the installed Play app has a different signing key.
             if (providers.gradleProperty("voiceBenchmark").orElse("false").get().toBoolean()) {
                 applicationIdSuffix = ".voicebenchmark"
@@ -92,7 +99,7 @@ android {
             "!CVS", "!thumbs.db", "!picasa.ini", "!*~",
             "*.md", "*.aff", "en_US.dic", "README_en_US.txt",
             "compiled_vocabulary.json", "provenance.json",
-            "revision.txt", "*LICENSE.txt", "LICENSE",
+            "revision.txt",
         )
         ignores.add("typing")
         ignoreAssetsPattern = ignores.joinToString(":")
@@ -153,14 +160,16 @@ dependencies {
   implementation(libs.play.asset.delivery)
 
   // Core Android dependencies
-  implementation(libs.androidx.core.ktx)
-  implementation(libs.androidx.lifecycle.runtime.ktx)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.lifecycle.runtime)
   implementation(libs.androidx.activity.compose)
+  implementation(libs.kotlinx.coroutines.android)
 
   // Arch Components
   implementation(libs.androidx.lifecycle.runtime.compose)
-  implementation(libs.androidx.lifecycle.viewmodel.compose)
-  implementation(libs.androidx.work.runtime.ktx)
+  implementation(libs.androidx.lifecycle.viewmodel)
+  // Play Asset Delivery also uses WorkManager; pin its current runtime explicitly.
+  implementation(libs.androidx.work.runtime)
 
   // Compose
   implementation(libs.androidx.compose.ui)
@@ -174,14 +183,13 @@ dependencies {
 
   // Local tests: jUnit, coroutines, Android runner
   testImplementation(libs.junit)
-  testImplementation("org.json:json:20240303")
+  testImplementation(libs.json)
   testImplementation(libs.kotlinx.coroutines.test)
 
   // Instrumented tests: jUnit rules and runners
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.runner)
-  androidTestImplementation(libs.androidx.test.espresso.core)
 
   // Navigation
   implementation(libs.androidx.navigation3.ui)
@@ -193,6 +201,19 @@ tasks.register("verifyKeyboard") {
     group = "verification"
     description = "Verify keyboard event sequences, screenshot baselines, and debug assembly."
     dependsOn("testDebugUnitTest", "testDebugScreenshotTestDefaultTestSuite", "assembleDebug")
+}
+
+tasks.register<Exec>("verifyReleaseAssets") {
+    group = "verification"
+    description = "Verify required distribution notices are present in source assets."
+    commandLine("python3", rootProject.file("scripts/verify_release_assets.py").absolutePath,
+        "--project", rootProject.projectDir.absolutePath)
+}
+
+tasks.register("verifyRelease") {
+    group = "verification"
+    description = "Verify keyboard regressions, release lint, and release unit tests."
+    dependsOn("verifyKeyboard", "lintRelease", "testReleaseUnitTest", "verifyReleaseAssets")
 }
 
 // Opt-in host JNI integration tests use the same Rust exports as Android.

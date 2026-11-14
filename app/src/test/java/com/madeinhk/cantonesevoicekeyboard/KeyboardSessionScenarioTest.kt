@@ -142,7 +142,7 @@ class KeyboardSessionScenarioTest {
     @Test
     fun statusAndAutofillPrecedenceMatchRendering() = KeyboardScenario().use { s ->
         s.start()
-        for (state in listOf(KeyboardUiState.LoadingModel, KeyboardUiState.DownloadingModel,
+        for (state in listOf(KeyboardUiState.LoadingModel, KeyboardUiState.ModelNotReady("Downloading model…"),
                              KeyboardUiState.Recording, KeyboardUiState.Transcribing,
                              KeyboardUiState.Error("failed"))) {
             s.voice.state.value = state

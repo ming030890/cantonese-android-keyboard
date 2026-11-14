@@ -9,6 +9,7 @@ object DebugAudioSettings {
     private const val KEY_SYNC_FOLDER_URI = "sync_folder_uri"
 
     fun isStoreDebugAudioEnabled(context: Context): Boolean =
+        BuildConfig.INTERNAL_TOOLS &&
         context
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_STORE_DEBUG_AUDIO, false)
@@ -22,6 +23,7 @@ object DebugAudioSettings {
     }
 
     fun getSyncFolderUri(context: Context): Uri? =
+        if (!BuildConfig.INTERNAL_TOOLS) null else
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_SYNC_FOLDER_URI, null)
             ?.let(Uri::parse)

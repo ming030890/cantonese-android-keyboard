@@ -343,3 +343,26 @@ fun ScenarioQuickLearnedCandidates() = ScenarioScreen(remember {
     }
     KeyboardScenario(clipboardText = null, personalization = history).use { s -> s.type("of"); s.snapshot() }
 })
+
+
+@PreviewTest
+@Preview(name = "Voice disabled keeps candidates without mic", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioVoiceDisabled() = ScenarioScreen(remember { KeyboardScenarios.voiceDisabled() })
+
+@PreviewTest
+@Preview(name = "Mic tap waits for unmetered network", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioVoiceWaitingForNetwork() = ScenarioScreen(remember { KeyboardScenarios.voiceWaitingForNetwork() })
+
+@PreviewTest
+@Preview(name = "Default handwriting without existing Quick", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioDefaultHandwriting() = ScenarioScreen(remember { KeyboardScenarios.inferredLayoutStartup(emptyList()) })
+
+@PreviewTest
+@Preview(name = "Default Quick with existing Quick", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioDefaultQuick() = ScenarioScreen(remember {
+    KeyboardScenarios.inferredLayoutStartup(listOf(com.madeinhk.cantonesevoicekeyboard.KeyboardLayoutInference.ImeInfo(label = "速成鍵盤")))
+})

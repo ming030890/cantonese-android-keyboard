@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -15,25 +16,40 @@ import com.madeinhk.cantonesevoicekeyboard.ui.main.DebugAudioScreen
 import com.madeinhk.cantonesevoicekeyboard.ui.main.DebugHandwritingScreen
 import com.madeinhk.cantonesevoicekeyboard.ui.main.PromptedHandwritingScreen
 
+internal fun destinationAvailable(key: NavKey, internalTools: Boolean): Boolean = when (key) {
+  DebugAudio, DebugHandwriting, PromptedHandwriting -> internalTools
+  else -> true
+}
+
 @Composable
 fun MainNavigation(initialDestination: NavKey = Main) {
   val backStack = rememberNavBackStack(initialDestination)
+  val openDestination: (NavKey) -> Unit = { key ->
+    if (destinationAvailable(key, BuildConfig.INTERNAL_TOOLS)) backStack.add(key)
+  }
 
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeLastOrNull() },
-    entryProvider =
-      entryProvider {
-        entry<Main> {
-          MainScreen(onItemClick = { navKey -> backStack.add(navKey) }, modifier = Modifier.safeDrawingPadding().padding(16.dp))
+    entryProvider = entryProvider<NavKey>(
+      fallback = { key ->
+        check(!destinationAvailable(key, BuildConfig.INTERNAL_TOOLS)) { "Unknown destination: $key" }
+        // A saved internal screen may be restored after upgrading to a public build.
+        NavEntry(key) {
+          MainScreen(onItemClick = openDestination, modifier = Modifier.safeDrawingPadding().padding(16.dp))
         }
-        entry<Settings> {
-          SettingsScreen(
-            onBack = { backStack.removeLastOrNull() },
-            onItemClick = { navKey -> backStack.add(navKey) },
-            modifier = Modifier.safeDrawingPadding()
-          )
-        }
+      }
+    ) {
+      entry<Main> {
+        MainScreen(onItemClick = openDestination, modifier = Modifier.safeDrawingPadding().padding(16.dp))
+      }
+      entry<Settings> {
+        SettingsScreen(
+          onBack = { backStack.removeLastOrNull() },
+          modifier = Modifier.safeDrawingPadding()
+        )
+      }
+      if (BuildConfig.INTERNAL_TOOLS) {
         entry<DebugAudio> {
           DebugAudioScreen(
             onBack = { backStack.removeLastOrNull() },
@@ -52,6 +68,7 @@ fun MainNavigation(initialDestination: NavKey = Main) {
             modifier = Modifier.safeDrawingPadding()
           )
         }
-      },
+      }
+    },
   )
 }

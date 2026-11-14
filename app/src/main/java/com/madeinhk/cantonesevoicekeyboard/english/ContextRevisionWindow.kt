@@ -12,6 +12,8 @@ internal class ContextRevisionWindow(
     private val worker: CoroutineDispatcher,
     private val canApply: () -> Boolean,
     private val onRevision: () -> Unit,
+    private val onWordRevised: (String, String) -> Unit = { _, _ -> },
+    private val onUndoRevision: (String, String) -> Unit = { _, _ -> },
 ) {
     private data class Word(val original: String, var left: String, val centers: FloatArray,
                             val points: FloatArray, var suffix: String, var followingWords:Int=0)
@@ -92,6 +94,7 @@ internal class ContextRevisionWindow(
                 words.clear();words.addAll(remaining);++revision
                 cursor=expectedCursor+fixed.length-w.original.length
                 undo=Undo(w.suffix,replacement,cursor!!,w.original,correction)
+                onWordRevised(w.original,fixed)
                 onRevision()
                 applied=true;break
             }
@@ -118,6 +121,7 @@ internal class ContextRevisionWindow(
         if(editor.cursorSelection()!=(saved.cursor to saved.cursor) ||
             !editor.replaceTextBeforeCursor(saved.replacement,saved.original)) return false
         engine()?.rejected(saved.typedWord.lowercase(Locale.ROOT),saved.fixedWord.lowercase(Locale.ROOT))
+        onUndoRevision(saved.typedWord,saved.fixedWord)
         onRevision()
         return true
     }

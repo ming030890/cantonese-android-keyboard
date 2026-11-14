@@ -133,7 +133,6 @@ class VoiceRestartScenarioTest {
         override fun preloadEncoder() {}
         override fun preloadDecoder() {}
         override fun setLanguage(language: String): Boolean = true
-        override fun setChineseVariant(variant: String): Boolean = true
         override fun free() {}
     }
 

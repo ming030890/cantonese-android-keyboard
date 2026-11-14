@@ -1,0 +1,10 @@
+[
+  {
+    "language": "zh-HK",
+    "text": "• 提升速成多詞連打排序表現，並加入本機速成選字習慣學習功能。\n• 加入智能英文語境自動修正、大小寫還原，以及支援搜尋同膚色樣式嘅表情符號面板。\n• 語音輸入改為可選用功能，支援不限數據 Wi-Fi 下載控制，並大幅縮減應用程式體積。\n• 改善設定及引導畫面嘅淺色與深色主題顯示。"
+  },
+  {
+    "language": "en-US",
+    "text": "• Improved multi-word Cantonese Quick (速成) phrase ranking and optional on-device selection learning.\n• Added contextual English autocorrect, model casing restoration, and emoji search with skin-tone variants.\n• Made offline voice typing optional with Wi-Fi download controls and lighter app size.\n• Updated light and dark theme styling across setup and Settings."
+  }
+]

@@ -1,4 +1,4 @@
 package com.madeinhk.cantonesevoicekeyboard.hwr
 
-internal const val HandwritingInferenceIdleDelayMillis = 200L
-internal const val HandwritingInkClearDelayMillis = 1_000L
+// Keep multi-stroke characters together; clear ink only when this request is applied.
+internal const val HandwritingInferenceIdleDelayMillis = 1_000L

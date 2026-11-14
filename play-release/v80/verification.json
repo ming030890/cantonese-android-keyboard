@@ -1,0 +1,26 @@
+{
+  "testDebugUnitTest": {
+    "tests": 319,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 28
+  },
+  "testReleaseUnitTest": {
+    "tests": 319,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 28
+  },
+  "lintRelease": {
+    "Error": 0,
+    "Warning": 63,
+    "Fatal": 0
+  },
+  "releaseGate": "passed",
+  "screenshotChecks": 119,
+  "productionBuildFlags": {
+    "versionCode": 80,
+    "INTERNAL_TRACK": false,
+    "INTERNAL_TOOLS": false
+  }
+}

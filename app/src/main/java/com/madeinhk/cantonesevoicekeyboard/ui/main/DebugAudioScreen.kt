@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -79,6 +80,7 @@ private data class EditingRecording(
 @Composable
 fun DebugAudioScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
     var recordings by remember { mutableStateOf(emptyList<DebugRecording>()) }
@@ -102,8 +104,8 @@ fun DebugAudioScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             syncing = false
             reload()
             val message = result.fold(
-                onSuccess = { context.getString(R.string.debug_sync_result, it.uploaded, it.failed) },
-                onFailure = { context.getString(R.string.debug_sync_failed) }
+                onSuccess = { resources.getString(R.string.debug_sync_result, it.uploaded, it.failed) },
+                onFailure = { resources.getString(R.string.debug_sync_failed) }
             )
             snackbar.showSnackbar(message)
         }
@@ -118,7 +120,7 @@ fun DebugAudioScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 )
             }
             DebugAudioSettings.setSyncFolderUri(context, uri)
-            scope.launch { snackbar.showSnackbar(context.getString(R.string.debug_folder_saved)) }
+            scope.launch { snackbar.showSnackbar(resources.getString(R.string.debug_folder_saved)) }
         }
     }
 
@@ -133,7 +135,7 @@ fun DebugAudioScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             backfillProgress = null
             reload()
             snackbar.showSnackbar(
-                context.getString(R.string.debug_backfill_result, result.completed, result.failed)
+                resources.getString(R.string.debug_backfill_result, result.completed, result.failed)
             )
         }
     }

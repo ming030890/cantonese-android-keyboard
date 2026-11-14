@@ -10,7 +10,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -21,23 +20,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation3.runtime.NavKey
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
 import com.madeinhk.cantonesevoicekeyboard.R
 
@@ -45,7 +37,6 @@ import com.madeinhk.cantonesevoicekeyboard.R
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    onItemClick: (NavKey) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -61,6 +52,9 @@ fun SettingsScreen(
     var autoCapitalization by remember {
         mutableStateOf(KeyboardSettings.isAutoCapitalizationEnabled(context))
     }
+
+    var showLicenses by remember { mutableStateOf(false) }
+    if (showLicenses) OpenSourceLicensesDialog(onDismiss = { showLicenses = false })
 
     var quickLearning by remember { mutableStateOf(KeyboardSettings.isQuickLearningEnabled(context)) }
     SettingsScreenContent(
@@ -97,7 +91,9 @@ fun SettingsScreen(
             KeyboardSettings.setAutoCapitalizationEnabled(context, enabled)
             autoCapitalization = enabled
         },
+        voiceOptions = { VoiceInputSettings() },
         onBack = onBack,
+        onLicenses = { showLicenses = true },
         modifier = modifier
     )
 }
@@ -116,7 +112,9 @@ fun SettingsScreenContent(
     quickLearning: Boolean = true,
     onQuickLearningChange: (Boolean) -> Unit = {},
     onClearQuickHistory: () -> Unit = {},
+    voiceOptions: @Composable () -> Unit = { VoiceInputSettingsCard(enabled = true, onEnabledChange = {}) },
     onConfigureSystemLayouts: (() -> Unit)? = null,
+    onLicenses: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val lightTheme = MaterialTheme.colorScheme.background.luminance() > 0.5f
@@ -179,6 +177,9 @@ fun SettingsScreenContent(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+                voiceOptions()
+
                 // Layout-specific Settings (Quick 3 and 5 only shown when Quick is enabled)
                 if (enabledLayouts.contains(KeyboardSettings.LAYOUT_QUICK)) {
                     Spacer(modifier = Modifier.height(28.dp))
@@ -226,6 +227,9 @@ fun SettingsScreenContent(
                     onCheckedChange = onHapticFeedbackChange
                 )
 
+                if (onLicenses != null) {
+                    TextButton(onClick = onLicenses) { Text(stringResource(R.string.open_source_licenses)) }
+                }
                 Spacer(modifier = Modifier.height(48.dp))
             }
         }

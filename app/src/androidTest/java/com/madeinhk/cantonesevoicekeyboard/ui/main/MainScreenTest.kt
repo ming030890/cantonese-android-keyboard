@@ -20,7 +20,7 @@ class MainScreenTest {
   @Test
   fun firstItem_exists() {
     // Assert elements of the setup walkthrough app exist
-    composeTestRule.onNodeWithText("Cantonese Voice Keyboard").assertExists()
+    composeTestRule.onNodeWithText("Cantonese Keyboard").assertExists()
   }
 }
 

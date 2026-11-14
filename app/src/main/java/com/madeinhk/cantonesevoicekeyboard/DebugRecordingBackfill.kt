@@ -33,7 +33,6 @@ object DebugRecordingBackfill {
                     return@withContext DebugBackfillResult(0, missing.size)
                 }
                 engine.setLanguage("Cantonese")
-                engine.setChineseVariant("")
                 engine.setPrompt("")
                 engine.setSegmentSec(0f)
 

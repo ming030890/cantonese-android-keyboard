@@ -1,14 +1,18 @@
-# Native ASR bridge — JNI calls these by name/signature.
--keep class com.qwenasr.** { *; }
--keepclasseswithmembernames class com.qwenasr.** {
-    native <methods>;
-}
-# Listener implementations are invoked from native code.
--keep class * implements com.qwenasr.QAsrEngine$VadListener { *; }
+# Native exports use the original JVM class and method names.
+# Ordinary Kotlin members remain eligible for shrinking and optimization.
+-keep,allowoptimization class com.qwenasr.QAsrEngine { native <methods>; }
+-keep,allowoptimization class com.qwenasr.QAsrEngine$Companion { native <methods>; }
 
-# Play Asset Delivery pulls in WorkManager, which initializes before the app's
-# Activity. Room creates WorkDatabase_Impl reflectively, so keep these internals
-# stable in minified release builds.
--keep class androidx.work.** { *; }
--keep class androidx.room.** { *; }
--keep class androidx.sqlite.** { *; }
+# Native code invokes these interface methods by name on the supplied object.
+-keep,allowoptimization interface com.qwenasr.QAsrEngine$VadListener { *; }
+-keepclassmembers,allowoptimization class * implements com.qwenasr.QAsrEngine$VadListener {
+    public void onTranscriptDelta(java.lang.String);
+    public void onHypothesisChanged(java.lang.String);
+    public void onTranscriptComplete();
+    public void onTranscriptError();
+}
+
+# Play Asset Delivery uses WorkManager. Room resolves this generated database
+# implementation by name; preserve that reflection boundary, not entire packages.
+-keepnames class androidx.work.impl.WorkDatabase
+-keep,allowoptimization class androidx.work.impl.WorkDatabase_Impl { public <init>(); }

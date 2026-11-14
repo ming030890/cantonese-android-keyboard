@@ -155,6 +155,8 @@ model quality or a requirement that real models return this exact ranking.
 | HW-03 | Recognition returns candidates | Display those candidates; selecting one commits the selected text once and requests next-word predictions. | Baseline; real `hw03` coordinator sequence; snapshot scenario only mocks recognition output |
 | HW-04 | Handwriting inference error | Show the handwriting error on the handwriting layout. Do not show that error on English/Quick/number layouts. | Baseline; `hw04`, error scenario screenshot |
 | HW-03b | Recognition alternatives include labels outside the neural vocabulary | Preserve visual evidence; use the weakest supported contextual prior for classes lacking a finite fallback. Missing LM scores must not create an advantage over visually plausible modeled alternatives. | Native OOV-prior regression, 181-capture replay, `HandwritingAlternativesScenarioTest`, alternatives screenshot |
+| HW-07 | Stroke recognition returns no candidates; add strokes and retry | Keep ink, show recognition retry feedback, and clear the error when a new request starts. Raster preprocessing runs only for enabled debug capture. Display ink uses rounded smoothed curves and theme colors; the recognizer receives raw points. | `HandwritingSynchronizationScenarioTest`; light/dark ink screenshots |
+| HW-06 | Finish strokes; recognition completes; write a second character | After the one-second stroke idle window, apply the result and reset the canvas together. Keep ink while recognition is pending or fails; continued strokes invalidate old results. Keep alternatives available until the next character starts. | `HandwritingSynchronizationScenarioTest`; existing recognition/result screenshot coverage |
 | HW-05 | Multiple strokes, late results, changed characters, session closes | Cancel obsolete recognition; no late result may edit a different session. | Integration gap for recognizer callback wiring; existing recognition queue/debouncer unit tests cover their components |
 
 ## Voice
@@ -771,3 +773,119 @@ races, protected editors, bilingual slots, later pages, preview/full consistency
 stale publication, corruption fallback and version separation are covered. History
 refreshes affect only the active Quick row and preserve English composition and
 cursor-word inspection.
+
+
+## Release cleanup (2026-11-07)
+
+- Handwriting recognition never writes an unconditional stroke dump or logs input
+  context/candidates. Explicit internal recording remains governed by its opt-in
+  switch and the editor privacy policy.
+- Public release builds set `INTERNAL_TOOLS=false`: saved developer preferences
+  cannot enable collection or folder sync, and internal navigation/screens are
+  unavailable. Debug builds retain internal recording and review tools.
+- The model download UI distinguishes preparation, waiting for Wi-Fi and required
+  Play confirmation. Only required Play confirmation exposes its dialog, guarded by an unmetered
+  connection. Waiting for Wi-Fi never offers mobile data. Model status remains
+  available in the setup flow. `ModelDownloadStatusTest` covers state precedence and
+  aggregation; dedicated screenshots cover English and Traditional Chinese.
+- Keyboard touch-width calculations subtract horizontal system insets as part of
+  one expression. The existing surface padding remains the owner of those insets.
+- Direct vibration fallback declares `VIBRATE` in the release manifest.
+- `verifyRelease` runs keyboard verification, release unit tests, release lint and
+  notice checks. Deployment checks notices inside the final AAB and requires a
+  fresh ASR native build; stale prebuilt binaries are not accepted for deployment.
+
+
+### Native/dependency release follow-up (2026-11-08)
+
+- Native dependencies are restored from pinned upstream revisions into a persistent
+  checksum-verified cache. `deploy.sh --release --native-only` builds both JNI
+  libraries, verifies staged assets, and records native build provenance.
+- Release minification and optimized resource shrinking remain enabled. JNI class,
+  native method and ASR callback names are preserved; WorkManager's generated Room
+  database is the explicit reflection boundary. Package-wide Work/Room/SQLite and
+  app-wrapper keep rules are removed.
+- WorkManager remains required by Play Asset Delivery and is upgraded explicitly.
+  The handwriting collection worker itself now lives only in the debug source set.
+- The real-JNI unified regression now distinguishes compact Chinese metadata
+  (100 items) from the complete displayed list for two-letter Quick codes. It
+  asserts that every displayed Chinese candidate remains in its original order,
+  including beyond item 100. Runtime ranking is unchanged.
+- `scripts/run_minified_native_smoke.sh` is an emulator-only fixture. It loads
+  native entry points from the installed minified APK, checks the generated
+  WorkManager database class, and verifies normal Activity startup. Its Java
+  code lives outside application/test source sets and needs no test-runner
+  dependencies in the product. It does not validate speech-model delivery.
+
+
+### Optional voice (2026-11-08)
+
+- Voice defaults on, with independent toggles in onboarding and Settings. Turning
+  it off removes the mic and bypasses the microphone setup step. A stale Record
+  event cannot commit composition or invoke voice while it is off.
+- Speech packs are on-demand. Permission and voice opt-in are both required to
+  queue a download. WorkManager requires an unmetered network; an active network
+  guard cancels on metered Wi-Fi as well as cellular. No mobile-data override.
+- Opening/reopening the IME shows normal candidates/clipboard with an idle mic.
+  Loading, download and readiness messages require a mic tap. Download completion
+  asks for another tap, never starts recording in the background. Typing dismisses
+  that feedback and prevents later download updates replacing text candidates.
+- `OptionalVoiceScenarioTest` uses production controller/key handling and the real
+  voice coordinator with fake model status. Screenshot scenarios show candidates
+  without a mic and the network wait after a mic tap. Live Play delivery remains
+  an Android integration check, separate from host state and UI verification.
+
+
+Cleanup validation: `verifyRelease` and `assembleRelease` pass. Debug and release
+suites each have 312 passing tests and one opt-in skip; screenshot comparison
+passes. Release lint reports no errors, no unused resources, and 58 warnings.
+
+### User-facing copy review (2026-11-08)
+
+- English, Traditional Chinese and Simplified Chinese setup copy names the
+  action each setup button opens.
+- Voice download messages explain the network requirement and confirmation step;
+  microphone and handwriting errors include a recovery action. Toolbar messages
+  stay concise so the action remains visible.
+- Recording and handwriting review controls use consistent review/delete wording.
+  Their shared sync result describes samples rather than recordings.
+- Emoji picker controls, categories, empty states and accessibility descriptions
+  use localized resources. The search hint specifies English, matching the
+  existing catalogue keywords; search behavior is unchanged.
+- Narrow setup previews cover all three languages, with Chinese emoji previews
+  alongside existing settings, download and production-controller snapshots.
+
+### Remove external Chinese script conversion (2026-11-08)
+
+- ASR no longer depends on zhconv/OpenCC. Remove the optional conversion setter
+  across Kotlin, JNI, C and Rust; live voice and saved-recording backfill use the
+  existing decoded text directly. The learned Cantonese adapter remains active
+  when its model assets are present.
+- CLI conversion flags and the yue-tools conversion command are removed. Rust
+  and Python evaluation helpers now preserve Chinese scripts; old script-folded
+  scores require their original normalization and are not comparable to new runs.
+
+### Settings setup shortcut removed (2026-11-08)
+
+- Settings no longer links to the similar Keyboard setup page. Remove the shortcut,
+  its navigation callback and unused localized label. Initial onboarding remains
+  available through the existing main screen.
+- Settings keeps its layout controls, voice options and open-source licenses.
+  Existing Settings screenshot previews already omit the optional setup shortcut
+  and represent the resulting layout.
+
+### Initial keyboard choice and voice copy (2026-11-08)
+
+- On first configuration, select Quick only if another enabled keyboard identifies
+  Quick/速成 through its subtype metadata or visible keyboard/subtype name. A Hong
+  Kong/Cantonese locale or full Cangjie layout alone does not select Quick.
+- If Quick is not detected or system keyboard information is unavailable, select
+  Handwriting only. The separate English layout is disabled by default and remains
+  available for explicit selection in Settings. Saved user selections are preserved.
+- Setup and Settings no longer describe voice typing as optional; its existing
+  switch and permission/download behavior are unchanged.
+- `KeyboardLayoutInferenceTest` covers Quick evidence, handwriting fallback,
+  English exclusion and locale/Cangjie false positives. The production-controller
+  `inferredDefaultsSurviveStaleEnglishSubtypeAndReopen` scenario checks startup
+  and reopening after an unavailable English subtype; dedicated snapshots render
+  the resulting Quick and Handwriting defaults.

@@ -1,0 +1,131 @@
+{
+  "path": "app/build/outputs/bundle/release/app-release.aab",
+  "format": "aab",
+  "package": "com.madeinhk.cantonesevoicekeyboard",
+  "version_code": 80,
+  "version_name": "1.0",
+  "min_sdk": 32,
+  "target_sdk": 36,
+  "target_sdk_policy": {
+    "app_type": "mobile",
+    "minimum": 36,
+    "effective_date": "2026-08-31",
+    "source": "https://developer.android.com/google/play/requirements/target-sdk"
+  },
+  "findings": [
+    {
+      "scanner": "manifest",
+      "check": "exported_component",
+      "severity": "warning",
+      "message": "service com.google.android.play.core.assetpacks.AssetPackExtractionService is exported without a permission guard",
+      "entry": "com.google.android.play.core.assetpacks.AssetPackExtractionService",
+      "hint": "any installed app can reach this component; add android:permission or set exported=false"
+    },
+    {
+      "scanner": "permissions",
+      "check": "dangerous_permissions",
+      "severity": "info",
+      "message": "android.permission.RECORD_AUDIO (Microphone access)",
+      "entry": "android.permission.RECORD_AUDIO",
+      "hint": "disclose audio collection in the Data safety form",
+      "ref": "https://support.google.com/googleplay/android-developer/answer/10787469"
+    },
+    {
+      "scanner": "permissions",
+      "check": "dangerous_permissions",
+      "severity": "info",
+      "message": "android.permission.FOREGROUND_SERVICE (Foreground service)",
+      "entry": "android.permission.FOREGROUND_SERVICE",
+      "hint": "from Android 14 each service also needs a typed FOREGROUND_SERVICE_* permission"
+    },
+    {
+      "scanner": "permissions",
+      "check": "dangerous_permissions",
+      "severity": "info",
+      "message": "android.permission.RECEIVE_BOOT_COMPLETED (Start at boot)",
+      "entry": "android.permission.RECEIVE_BOOT_COMPLETED",
+      "hint": "background startup is scrutinized for battery impact"
+    },
+    {
+      "scanner": "secrets",
+      "check": "misplaced_files",
+      "severity": "warning",
+      "message": "build contains a developer-environment artifact",
+      "entry": "BUNDLE-METADATA/com.android.tools.build.gradle/app-metadata.properties",
+      "hint": "exclude it from your assets/resources source sets"
+    },
+    {
+      "scanner": "size",
+      "check": "bundle_size",
+      "severity": "warning",
+      "message": "compressed size 1.7 GB is approaching the 2.0 GB limit",
+      "hint": "install rates fall as download size grows; this is the archive's compressed size, an approximation of the generated download"
+    },
+    {
+      "scanner": "size",
+      "check": "size_breakdown",
+      "severity": "info",
+      "message": "compressed size by category: assets 1.7 GB, other 5.9 MB, native 3.0 MB, dex 1.4 MB, resources 179.3 KB, resource-table 35.3 KB, meta-inf 15.5 KB"
+    },
+    {
+      "scanner": "size",
+      "check": "largest_entries",
+      "severity": "info",
+      "message": "largest entries: model_pack_c/assets/qwen-asr-m4-lmhead-int8/model-00003-of-00005.safetensors (416.6 MB), model_pack_b/assets/qwen-asr-m4-lmhead-int8/model-00002-of-00005.safetensors (407.8 MB), model_pack_d/assets/qwen-asr-m4-lmhead-int8/model-00004-of-00005.safetensors (375.2 MB), model_pack_a/assets/qwen-asr-m4-lmhead-int8/model-00001-of-00005.safetensors (280.5 MB), model_pack_e/assets/qwen-asr-m4-lmhead-int8/model-00005-of-00005.safetensors (266.2 MB)",
+      "hint": "compress or lazily download these assets to cut install size"
+    }
+  ],
+  "infos": 5,
+  "warnings": 3,
+  "errors": 0,
+  "scanners": [
+    {
+      "id": "manifest",
+      "findings": 1
+    },
+    {
+      "id": "permissions",
+      "findings": 3
+    },
+    {
+      "id": "native_libs",
+      "findings": 0
+    },
+    {
+      "id": "metadata",
+      "findings": 0
+    },
+    {
+      "id": "secrets",
+      "findings": 1
+    },
+    {
+      "id": "billing",
+      "findings": 0
+    },
+    {
+      "id": "privacy",
+      "findings": 0
+    },
+    {
+      "id": "policy",
+      "findings": 0
+    },
+    {
+      "id": "size",
+      "findings": 3
+    }
+  ],
+  "checks_run": [
+    "manifest",
+    "permissions",
+    "native_libs",
+    "metadata",
+    "secrets",
+    "billing",
+    "privacy",
+    "policy",
+    "size"
+  ],
+  "total_size_bytes": 1859141006
+}

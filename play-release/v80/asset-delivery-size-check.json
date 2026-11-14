@@ -1,0 +1,20 @@
+{
+  "compressedModuleBytes": {
+    "BUNDLE-METADATA": 6105286,
+    "BundleConfig.pb": 281,
+    "base": 19251950,
+    "model_pack_a": 296635364,
+    "model_pack_b": 427659116,
+    "model_pack_c": 436862725,
+    "model_pack_d": 393427193,
+    "model_pack_e": 279183193,
+    "META-INF": 15898
+  },
+  "assetDelivery": "on-demand",
+  "passed": true,
+  "baseUnder200MiB": true,
+  "eachPackUnder512MiB": true,
+  "archiveBudget": "2G",
+  "policyReference": "https://support.google.com/googleplay/android-developer/answer/9859372",
+  "cliFinding": "Default gplay 200MB check counts on-demand asset packs in the whole archive; verified separately here. This is not the base install size."
+}

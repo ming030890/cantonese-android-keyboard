@@ -5,6 +5,7 @@ import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 
 /** A value snapshot usable by Compose, scenario assertions, and screenshot previews. */
 data class KeyboardRenderState(
+    val voiceEnabled: Boolean = true,
     val voice: KeyboardUiState = KeyboardUiState.Idle,
     val volume: Float = 0f,
     val action: KeyboardAction = KeyboardAction.Enter,
@@ -23,7 +24,7 @@ data class KeyboardRenderState(
 ) {
     internal fun toolbar(mode: KeyboardInputMode = inputMode, hasAutofill: Boolean = false): KeyboardToolbarContent =
         keyboardToolbarContent(
-            voice = voice,
+            voice = if (voiceEnabled) voice else KeyboardUiState.Idle,
             secondaryAction = toolbarPresentation(mode, hasAutofill, clipboard != null && !inspectingWord).secondaryAction,
             hasCandidates = when (mode) {
                 KeyboardInputMode.Quick -> quickCandidates.isNotEmpty()

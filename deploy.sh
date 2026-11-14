@@ -29,8 +29,9 @@ QWEN_ASR_DIR="${QWEN_ASR_DIR:-$PROJECT_DIR/../QwenASR}"
 QWEN_ASR_TARGET_DIR="${QWEN_ASR_TARGET_DIR:-/private/tmp/qwen-asr-android-release-target}"
 
 # Where the converted model lives on the build machine. scripts/reshard_model.py
-# combines and splits its model*.safetensors tensors into five ≤480 MiB shards.
-SOURCE_MODEL_DIR="${SOURCE_MODEL_DIR:-/Volumes/SSD/Confucius4-R2T2-kleidiai-packed}"
+# combines and splits its model*.safetensors tensors into five <512 MiB shards.
+SOURCE_MODEL_DIR="${SOURCE_MODEL_DIR:-/Volumes/SSD/Qwen3-ASR-1.7B-Cantonese-HK-kleidiai-g32}"
+SHARD_LIMIT_MIB="${SHARD_LIMIT_MIB:-508}"
 # Five asset pack module asset dirs. Shard 1 + tokenizer files go in pack A,
 # shards 2..5 in packs B..E. Files placed here are delivered to the device by Play
 # Asset Delivery (fast-follow), and locally by bundletool's --local-testing.
@@ -194,6 +195,7 @@ if [ -d "$SOURCE_MODEL_DIR" ]; then
     echo -e "${COLOR_INFO}Running reshard_model.py from $SOURCE_MODEL_DIR...${COLOR_RESET}"
     python3 "$RESHARD_SCRIPT" \
         --source "$SOURCE_MODEL_DIR" \
+        --limit-mib "$SHARD_LIMIT_MIB" \
         --packs "$PACK_A_ASSETS" "$PACK_B_ASSETS" "$PACK_C_ASSETS" "$PACK_D_ASSETS" "$PACK_E_ASSETS"
     echo -e "${COLOR_SUCCESS}Shards staged into all 5 asset packs.${COLOR_RESET}"
 elif [ "$ALL_SHARDS_EXIST" = "true" ]; then
@@ -203,13 +205,6 @@ else
     echo -e "${COLOR_ERROR}Either place shards under packs A-E,${COLOR_RESET}"
     echo -e "${COLOR_ERROR}or place the source model at '$SOURCE_MODEL_DIR' so the script can shard it.${COLOR_RESET}"
     exit 1
-fi
-
-ADAPTER_SOURCE_DIR="$PROJECT_DIR/../dataset/cantonese-zhconv/results"
-if [ -f "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.safetensors" ] && [ -f "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.json" ]; then
-    cp "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.safetensors" "$PACK_A_ASSETS/"
-    cp "$ADAPTER_SOURCE_DIR/cantonese_zhconv_adapter.json" "$PACK_A_ASSETS/"
-    echo -e "${COLOR_SUCCESS}In-decoder Cantonese conversion adapter staged into pack A.${COLOR_RESET}"
 fi
 
 # ---------------------------------------------------------------------------

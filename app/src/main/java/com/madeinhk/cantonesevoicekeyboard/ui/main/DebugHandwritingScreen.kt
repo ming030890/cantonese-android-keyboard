@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -59,6 +58,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -85,6 +85,7 @@ private data class EditingHandwriting(
 @Composable
 fun DebugHandwritingScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
     var records by remember { mutableStateOf(emptyList<DebugHandwritingRecord>()) }
@@ -105,8 +106,8 @@ fun DebugHandwritingScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             reload()
             snackbar.showSnackbar(
                 result.fold(
-                    onSuccess = { context.getString(R.string.debug_sync_result, it.uploaded, it.failed) },
-                    onFailure = { context.getString(R.string.debug_sync_failed) },
+                    onSuccess = { resources.getString(R.string.debug_sync_result, it.uploaded, it.failed) },
+                    onFailure = { resources.getString(R.string.debug_sync_failed) },
                 )
             )
         }
@@ -121,7 +122,7 @@ fun DebugHandwritingScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 )
             }
             DebugHandwritingSettings.setSyncFolderUri(context, uri)
-            scope.launch { snackbar.showSnackbar(context.getString(R.string.debug_folder_saved)) }
+            scope.launch { snackbar.showSnackbar(resources.getString(R.string.debug_folder_saved)) }
         }
     }
 

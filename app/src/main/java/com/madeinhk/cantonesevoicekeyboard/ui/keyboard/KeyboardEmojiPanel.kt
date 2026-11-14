@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material3.Icon
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.madeinhk.cantonesevoicekeyboard.R
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -60,9 +61,11 @@ private val categoryIcons = listOf(
     R.drawable.gm_filled_emoji_symbols_vd_theme_24,
     R.drawable.gm_filled_flag_vd_theme_24,
 )
-private val categoryNames = listOf(
-    "Recent emoji", "Smileys and emotions", "People", "Animals and nature", "Food and drink",
-    "Travel and places", "Activities", "Objects", "Symbols", "Flags",
+private val categoryNameResources = listOf(
+    R.string.emoji_category_recent, R.string.emoji_category_emotions, R.string.emoji_category_people,
+    R.string.emoji_category_nature, R.string.emoji_category_food, R.string.emoji_category_travel,
+    R.string.emoji_category_activity, R.string.emoji_category_objects, R.string.emoji_category_symbols,
+    R.string.emoji_category_flags,
 )
 
 @Composable
@@ -76,6 +79,7 @@ internal fun EmojiPickerPanel(
     initialRecentEmoji: List<String>? = null,
 ) {
     val context = LocalContext.current
+    val categoryNames = categoryNameResources.map { stringResource(it) }
     val preview = LocalInspectionMode.current
     val haptics = LocalHapticFeedback.current
     val catalog by produceState<EmojiCatalog?>(null, context) {
@@ -154,7 +158,7 @@ internal fun EmojiPickerPanel(
 
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth().height(42.dp), verticalAlignment = Alignment.CenterVertically) {
-            EmojiControl("‹", if (search.active) "Close search" else "Back to keyboard", Modifier.width(42.dp), foreground) {
+            EmojiControl("‹", if (search.active) stringResource(R.string.emoji_close_search) else stringResource(R.string.emoji_back_to_keyboard), Modifier.width(42.dp), foreground) {
                 if (search.active) onSearchChanged(search.close()) else onBackToKeyboard()
             }
             Row(
@@ -168,11 +172,11 @@ internal fun EmojiPickerPanel(
             ) {
                 KeyboardActionIcon(KeyboardAction.Search, modifier = Modifier.size(20.dp), color = foreground)
                 Spacer(Modifier.width(8.dp))
-                Text(search.query.ifEmpty { "Search emoji" }, color = foreground,
+                Text(search.query.ifEmpty { stringResource(R.string.emoji_search) }, color = foreground,
                     fontSize = 16.sp, maxLines = 1, modifier = Modifier.weight(1f))
                 if (search.active) Text("│", color = selectionText)
             }
-            if (search.active) EmojiControl("×", "Clear search", Modifier.width(42.dp), foreground) {
+            if (search.active) EmojiControl("×", stringResource(R.string.emoji_clear_search), Modifier.width(42.dp), foreground) {
                 onSearchChanged(search.clear())
             }
         }
@@ -193,9 +197,9 @@ internal fun EmojiPickerPanel(
         }
         if (search.active || variantEntry != null) Text(
             when {
-                variantEntry != null -> "Choose a variant"
-                search.active && search.query.isNotEmpty() -> "${filtered.size} results"
-                else -> if (recent.emoji.isEmpty()) "Smileys and emotions" else "Recent emoji"
+                variantEntry != null -> stringResource(R.string.emoji_choose_variant)
+                search.active && search.query.isNotEmpty() -> stringResource(R.string.emoji_results, filtered.size)
+                else -> if (recent.emoji.isEmpty()) stringResource(R.string.emoji_category_emotions) else stringResource(R.string.emoji_category_recent)
             },
             fontSize = 12.sp, color = foreground.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, top = 4.dp, bottom = 2.dp),
@@ -217,7 +221,7 @@ internal fun EmojiPickerPanel(
                                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp))
                         }
                         if (entries.isEmpty()) item(key = "$id.empty", span = { GridItemSpan(maxLineSpan) }) {
-                            Text(if (available == null) "Loading emoji…" else "Your recent emoji will appear here",
+                            Text(if (available == null) stringResource(R.string.emoji_loading) else stringResource(R.string.emoji_recent_empty),
                                 color = foreground.copy(alpha = 0.7f), fontSize = 14.sp,
                                 modifier = Modifier.padding(12.dp))
                         }
@@ -228,8 +232,8 @@ internal fun EmojiPickerPanel(
                     }
                 }
             } else if (filtered.isEmpty()) {
-                Text(if (available == null) "Loading emoji…" else if (category == "recent" && search.query.isBlank())
-                    "Your recent emoji will appear here" else "No emoji found. Try another search.",
+                Text(if (available == null) stringResource(R.string.emoji_loading) else if (category == "recent" && search.query.isBlank())
+                    stringResource(R.string.emoji_recent_empty) else stringResource(R.string.emoji_no_results),
                     color = foreground.copy(alpha = 0.7f), fontSize = 14.sp,
                     modifier = Modifier.align(Alignment.Center).padding(12.dp))
             } else {
@@ -244,13 +248,13 @@ internal fun EmojiPickerPanel(
         if (!search.active) {
             Row(Modifier.fillMaxWidth().height(42.dp), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                EmojiControl("ABC", "Back to keyboard", Modifier.width(60.dp), foreground, onBackToKeyboard)
+                EmojiControl("ABC", stringResource(R.string.emoji_back_to_keyboard), Modifier.width(60.dp), foreground, onBackToKeyboard)
                 Box(Modifier.width(64.dp).height(36.dp).clip(RoundedCornerShape(22.dp)).background(selection), contentAlignment = Alignment.Center) {
                     SmileIcon(modifier = Modifier.size(24.dp), color = selectionText)
                 }
                 Spacer(Modifier.weight(1f))
-                if (variantEntry != null) EmojiControl("‹", "Close variants", Modifier.width(42.dp), foreground) { variantEntry = null }
-                EmojiControl("⌫", "Delete", Modifier.width(48.dp), foreground, onDelete)
+                if (variantEntry != null) EmojiControl("‹", stringResource(R.string.emoji_close_variants), Modifier.width(42.dp), foreground) { variantEntry = null }
+                EmojiControl("⌫", stringResource(R.string.keyboard_delete), Modifier.width(48.dp), foreground, onDelete)
             }
         }
     }
@@ -272,7 +276,7 @@ private fun EmojiCell(emoji: String, name: String, hasVariants: Boolean, onClick
     Box(Modifier.fillMaxWidth().height(52.dp)
         .semantics { contentDescription = name }
         .combinedClickable(onClick = onClick, onLongClick = if (hasVariants) onLongClick else null,
-            onLongClickLabel = if (hasVariants) "Choose skin tone or variant" else null),
+            onLongClickLabel = if (hasVariants) stringResource(R.string.emoji_choose_skin_tone) else null),
         contentAlignment = Alignment.Center) {
         Text(emoji, fontSize = 32.sp)
         if (hasVariants) Text("◢", fontSize = 7.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
