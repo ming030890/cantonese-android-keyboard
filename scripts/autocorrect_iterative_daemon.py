@@ -49,6 +49,11 @@ PROD_CHANNEL_JSON = (
     / "english_channel_data"
     / "channel.json"
 )
+VALID_WORDS_TXT = (
+    REPO_ROOT / "QwenASR" / "crates" / "cantonese-ngram" / "src" / "english_valid_words.txt"
+)
+ASSETS_DIR = APP_ROOT / "app" / "src" / "main" / "assets"
+SUGGESTION_PROBE_BIN = Path("/private/tmp/cng-host-test/release/suggestion_probe")
 
 ACTIONABLE_SIGNALS = {
     "undo_keep_literal",
@@ -332,126 +337,284 @@ def update_channel_from_episodes(
     return updated, edit_count
 
 
-def heuristic_feature_vector(
-    ep: dict[str, Any],
-    feature_names: list[str],
-    mean: np.ndarray,
+_SCOWL_CACHE: set[str] | None = None
+_QWERTY_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
+
+
+def _get_scowl_words() -> set[str]:
+    global _SCOWL_CACHE
+    if _SCOWL_CACHE is None:
+        if VALID_WORDS_TXT.exists():
+            _SCOWL_CACHE = {
+                l.strip().lower()
+                for l in VALID_WORDS_TXT.read_text(encoding="utf-8").splitlines()
+                if l.strip()
+            }
+        else:
+            _SCOWL_CACHE = set()
+    return _SCOWL_CACHE
+
+
+def _qwerty_pos(c: str) -> tuple[int, int] | None:
+    for r, row in enumerate(_QWERTY_ROWS):
+        if c in row:
+            return (r, row.index(c))
+    return None
+
+
+def _qwerty_adjacent(a: str, b: str) -> bool:
+    a, b = a.lower(), b.lower()
+    if a == b:
+        return False
+    if a == " ":
+        return b in "cvbnm"
+    if b == " ":
+        return a in "cvbnm"
+    pa, pb = _qwerty_pos(a), _qwerty_pos(b)
+    return bool(pa and pb and abs(pa[0] - pb[0]) <= 1 and abs(pa[1] - pb[1]) <= 1)
+
+
+def _edit_penalty(typed: str, word: str, edits: int) -> float:
+    if edits == 0:
+        return 0.0
+    NEIGHBOR = 0.574436466482213
+    OTHER = 3.7162379435897606
+    SWAP = 0.9146548439690982
+    EXTRA = 4.541078382355206
+    MISSING = 1.9126156502899054
+    t_l, w_l = typed.lower(), word.lower()
+    if len(t_l) == len(w_l):
+        adj = sum(1 for a, b in zip(t_l, w_l) if a != b and _qwerty_adjacent(a, b))
+        non_adj = sum(1 for a, b in zip(t_l, w_l) if a != b and not _qwerty_adjacent(a, b))
+        if adj + non_adj == edits:
+            cost = adj * NEIGHBOR + non_adj * OTHER
+        else:
+            foreign = sum(1 for b in w_l if b not in t_l)
+            cost = edits * SWAP + foreign * OTHER
+    else:
+        base = EXTRA if len(t_l) > len(w_l) else MISSING
+        return base + max(0, edits - 1) * 4.5
+    if edits >= 2:
+        cost += (edits - 1) * 3.0
+    return cost
+
+
+def extract_exact_22_features(
+    typed: str,
+    known: bool,
+    cand: dict[str, Any],
+    runner: dict[str, Any] | None,
+    lit_score: float | None,
+    margin_cap: float = 20.0,
 ) -> np.ndarray:
-    """
-    Construct a 22-feature vector aligned with `shared-english-acceptance-v4-dictionary-ffn`
-    when native probe features are not embedded in the episode.
-    """
-    x = mean.copy()
-    name_to_idx = {name: i for i, name in enumerate(feature_names)}
-    typed = str(ep.get("typed", "")).lower()
-    target = str(ep.get("target", "")).lower()
-    top_cand = str(ep.get("top_candidate") or ep.get("auto_committed") or target).lower()
-    known = bool(ep.get("known", False))
-    top_edits = int(ep.get("top_edits") or 1)
-    top_score = float(ep.get("top_score") or 2.0)
+    """Exact replica of `cnn_spelling.rs::accept()` 22-feature vector."""
+    scowl_words = _get_scowl_words()
+    t_c = typed.lower().replace("’", "'")
+    word = str(cand["word"])
+    w_c = word.lower()
+    completed = int(cand.get("completedChars", cand.get("completed_chars", 0)))
+    score = float(cand["score"])
+    edits = int(cand["edits"])
+    is_split = " " in word
+    pen = 1.5 if is_split else (0.0 if completed > 0 else _edit_penalty(t_c, w_c, edits))
+    raw_score = score + pen
 
-    def set_f(name: str, val: float) -> None:
-        if name in name_to_idx:
-            x[name_to_idx[name]] = val
+    if runner is not None:
+        r_word = str(runner["word"])
+        r_comp = int(runner.get("completedChars", runner.get("completed_chars", 0)))
+        r_score = float(runner["score"])
+        r_edits = int(runner["edits"])
+        r_split = " " in r_word
+        r_pen = (
+            1.5
+            if r_split
+            else (0.0 if r_comp > 0 else _edit_penalty(t_c, r_word.lower(), r_edits))
+        )
+        r_raw = r_score + r_pen
+        raw_margin = min(raw_score - r_raw, margin_cap)
+        pen_margin = min(score - r_score, margin_cap)
+    else:
+        raw_margin = margin_cap
+        pen_margin = margin_cap
 
-    set_f("literal_score", 0.0)
-    set_f("top_score", top_score)
-    set_f("top_lm", top_score * 0.7)
-    set_f("margin", max(0.2, top_score * 0.35))
-    set_f("edit_distance", float(top_edits))
-    set_f("length_inv", 1.0 / max(1.0, float(len(typed))))
-    set_f("first_char_match", 1.0 if typed[:1] == top_cand[:1] else 0.0)
-    set_f("last_char_match", 1.0 if typed[-1:] == top_cand[-1:] else 0.0)
-    set_f("len_diff", float(len(top_cand) - len(typed)) / 4.0)
-    set_f("literal_known", 1.0 if known else 0.0)
-    has_apos = ("'" in top_cand) and ("'" not in typed)
-    set_f("apostrophe_insertion", 1.0 if has_apos else 0.0)
-    is_trans = (
-        len(typed) == len(top_cand)
-        and len(typed) >= 2
-        and sorted(typed) == sorted(top_cand)
-        and typed != top_cand
+    ls = float(lit_score) if lit_score is not None else 0.0
+    score_over_lit = (raw_score - ls) if lit_score is not None else 0.0
+    len_typed = float(len(t_c))
+    len_word = float(len(word))
+    len_diff = float(abs(len(t_c) - len(word)))
+    edit_ratio = float(edits) / max(1.0, len_typed)
+
+    adj = non_adj = swap = extra = missing = 0.0
+    if len(t_c) == len(word):
+        diffs = [(a, b) for a, b in zip(t_c, w_c) if a != b]
+        if len(diffs) == edits:
+            adj = float(sum(1 for a, b in diffs if _qwerty_adjacent(a, b)))
+            non_adj = float(sum(1 for a, b in diffs if not _qwerty_adjacent(a, b)))
+        else:
+            swap = float(edits)
+            non_adj = float(sum(1 for b in w_c if b not in t_c))
+    elif len(t_c) > len(word):
+        extra = 1.0
+    else:
+        missing = 1.0
+
+    first_diff = 1.0 if (t_c and w_c and t_c[0] != w_c[0]) else 0.0
+    is_space_split = 1.0 if is_split else 0.0
+    apos = 1.0 if ("'" in typed or "’" in typed) else 0.0
+    comp_feat = float(completed)
+    typed_scowl = 1.0 if t_c in scowl_words else 0.0
+    cand_scowl = (
+        1.0
+        if (all(p in scowl_words for p in w_c.split(" ")) if is_split else (w_c in scowl_words))
+        else 0.0
     )
-    set_f("pure_transposition", 1.0 if is_trans else 0.0)
-    has_touch = bool(ep.get("points"))
-    set_f("has_touch", 1.0 if has_touch else 0.0)
-    return x
+
+    return np.array(
+        [
+            raw_score,
+            ls,
+            score_over_lit,
+            raw_margin,
+            pen_margin,
+            1.0 if known else 0.0,
+            len_typed,
+            len_word,
+            len_diff,
+            float(edits),
+            edit_ratio,
+            adj,
+            non_adj,
+            swap,
+            extra,
+            missing,
+            first_diff,
+            is_space_split,
+            apos,
+            comp_feat,
+            typed_scowl,
+            cand_scowl,
+        ],
+        dtype=np.float64,
+    )
 
 
 def forward_ffn(
     X: np.ndarray,
     mean: np.ndarray,
-    inv_std: np.ndarray,
+    scales: np.ndarray,
     W1: np.ndarray,
     b1: np.ndarray,
     W2: np.ndarray,
     b2: float,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    Z_in = (X - mean) * inv_std
+    disabled_indices: list[int],
+    threshold_logit: float = 0.0,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    Z_in = (X - mean) / scales
+    for idx in disabled_indices:
+        Z_in[:, idx] = 0.0
     H_pre = Z_in @ W1.T + b1
     H = np.maximum(0.0, H_pre)
     logits = H @ W2 + b2
-    probs = 1.0 / (1.0 + np.exp(-np.clip(logits, -30.0, 30.0)))
-    return Z_in, H, probs
+    probs = 1.0 / (1.0 + np.exp(-np.clip(logits - threshold_logit, -30.0, 30.0)))
+    return Z_in, H, logits, probs
 
 
 def fine_tune_acceptance_model(
     base_model: dict[str, Any],
     episodes: list[dict[str, Any]],
-    steps: int = 120,
-    lr: float = 1.5e-3,
-    l2_anchor: float = 0.25,
+    steps: int = 250,
+    lr: float = 2e-3,
+    l2_anchor: float = 0.15,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """
-    Warm-start fine-tune the 22-24-1 ReLU acceptance network from user edit episodes
-    with L2 anchoring to the base production weights and disabled_input_indices=[1].
+    Warm-start fine-tune the 22-24-1 ReLU acceptance network (`shared-english-acceptance-v4-dictionary-ffn`)
+    using exact CNN features from `suggestion_probe`, L2-anchored to production weights.
     """
-    feature_names: list[str] = list(base_model["feature_names"])
     disabled_indices: list[int] = list(base_model.get("disabled_input_indices", [1]))
-    in_dim = len(feature_names)
-    hidden_dim = int(base_model["hidden_size"])
+    mean = np.array(base_model["means"], dtype=np.float64)
+    scales = np.array(base_model["scales"], dtype=np.float64)
+    W1_0 = np.array(base_model["w1"], dtype=np.float64)
+    b1_0 = np.array(base_model["b1"], dtype=np.float64)
+    W2_0 = np.array(base_model["w2"], dtype=np.float64)
+    b2_0 = float(base_model["b2"])
+    threshold = float(base_model["threshold"])
+    t_logit = float(np.log(threshold / (1.0 - threshold)))
+    margin_cap = float(base_model.get("margin_cap", 20.0))
 
-    mean = np.array(base_model["input_mean"], dtype=np.float64)
-    inv_std = np.array(base_model["input_inv_std"], dtype=np.float64)
-    W1_0 = np.array(base_model["hidden_weights"], dtype=np.float64).reshape(hidden_dim, in_dim)
-    b1_0 = np.array(base_model["hidden_bias"], dtype=np.float64)
-    W2_0 = np.array(base_model["output_weights"], dtype=np.float64)
-    b2_0 = float(base_model["output_bias"])
+    # Query `suggestion_probe` in batch for exact CNN candidate & runner scores
+    reqs = [
+        {"left": str(ep.get("left", "")), "code": str(ep.get("typed", "")), "version": 0, "legacy": True}
+        for ep in episodes
+    ]
+    probe_lines: list[str] = []
+    if SUGGESTION_PROBE_BIN.exists() and ASSETS_DIR.exists() and reqs:
+        inp = "\n".join(json.dumps(r, ensure_ascii=False) for r in reqs) + "\n"
+        out = subprocess.check_output(
+            [str(SUGGESTION_PROBE_BIN), str(ASSETS_DIR)],
+            input=inp.encode("utf-8"),
+        ).decode("utf-8")
+        probe_lines = [l for l in out.splitlines() if l.strip()]
 
     xs: list[np.ndarray] = []
     ys: list[float] = []
     ws: list[float] = []
+    cats: list[str] = []
 
-    for ep in episodes:
+    for idx_ep, ep in enumerate(episodes):
+        if idx_ep >= len(probe_lines):
+            break
+        res = json.loads(probe_lines[idx_ep]).get("english", {})
         sig = str(ep.get("signal", ""))
-        typed = str(ep.get("typed", "")).lower()
-        committed = str(ep.get("auto_committed", "")).lower()
-        target = str(ep.get("target", "")).lower()
-        top_cand = str(ep.get("top_candidate") or committed or target).lower()
+        typed = str(ep.get("typed", ""))
+        target = str(ep.get("target", ""))
+        if len(typed) < 2:
+            continue
+        cands = res.get("candidates", [])
+        non_lit = [c for c in cands if str(c["word"]).lower() != typed.lower()]
+        if not non_lit:
+            continue
+        c0 = non_lit[0]
+        c1 = non_lit[1] if len(non_lit) > 1 else None
+        comp0 = int(c0.get("completedChars", c0.get("completed_chars", 0)))
+        if comp0 > 0 and sig == "candidate_selected":
+            continue
 
-        if sig in {"undo_keep_literal", "candidate_keep_literal"}:
-            xs.append(heuristic_feature_vector(ep, feature_names, mean))
+        x = extract_exact_22_features(
+            typed=typed,
+            known=bool(res.get("known", False)),
+            cand=c0,
+            runner=c1,
+            lit_score=res.get("literalScore"),
+            margin_cap=margin_cap,
+        )
+
+        if sig == "unchallenged_keep":
+            xs.append(x)
             ys.append(0.0)
-            ws.append(4.0)
-        elif sig in {
-            "undo_then_edit",
-            "backspace_retype_repair",
-            "backspace_then_select",
-            "candidate_selected",
-            "cursor_inspect_repair",
-        }:
-            if committed != typed and committed != target:
-                xs.append(heuristic_feature_vector(ep, feature_names, mean))
-                ys.append(0.0)
-                ws.append(3.5)
-            elif top_cand == target and target != typed:
-                xs.append(heuristic_feature_vector(ep, feature_names, mean))
+            ws.append(3.0)
+            cats.append("unchallenged_keep")
+        elif sig in {"undo_keep_literal", "candidate_keep_literal"}:
+            xs.append(x)
+            ys.append(0.0)
+            ws.append(8.0)
+            cats.append("keep_literal")
+        elif sig == "accepted_correction":
+            if str(c0["word"]).lower() == target.lower():
+                xs.append(x)
                 ys.append(1.0)
-                ws.append(3.0)
-        elif sig == "accepted_correction" and committed != typed:
-            xs.append(heuristic_feature_vector(ep, feature_names, mean))
-            ys.append(1.0)
-            ws.append(0.5)
+                ws.append(1.5)
+                cats.append("accepted_correction")
+        else:
+            if str(c0["word"]).lower() == target.lower() and comp0 == 0:
+                xs.append(x)
+                ys.append(1.0)
+                ws.append(4.0)
+                cats.append("repair_top1_target")
+            elif str(c0["word"]).lower() != target.lower():
+                xs.append(x)
+                ys.append(0.0)
+                ws.append(4.0)
+                cats.append("repair_top1_wrong")
 
     if not xs:
         return json.loads(json.dumps(base_model)), {
@@ -465,7 +628,6 @@ def fine_tune_acceptance_model(
     X = np.vstack(xs)
     y = np.array(ys, dtype=np.float64)
     w = np.array(ws, dtype=np.float64)
-    w = w / np.mean(w)
 
     W1 = W1_0.copy()
     b1 = b1_0.copy()
@@ -475,7 +637,9 @@ def fine_tune_acceptance_model(
     for idx in disabled_indices:
         W1[:, idx] = 0.0
 
-    _, _, probs_before = forward_ffn(X, mean, inv_std, W1, b1, W2, b2)
+    _, _, logits_before, probs_before = forward_ffn(
+        X, mean, scales, W1, b1, W2, b2, disabled_indices, t_logit
+    )
     eps = 1e-7
     before_loss = float(
         np.mean(
@@ -486,11 +650,14 @@ def fine_tune_acceptance_model(
             )
         )
     )
-    before_acc = float(np.mean((probs_before >= 0.5) == (y >= 0.5)))
+    preds_before = logits_before >= t_logit
+    before_acc = float(np.mean(preds_before == (y >= 0.5)))
 
     n = float(len(y))
     for _ in range(steps):
-        Z_in, H, probs = forward_ffn(X, mean, inv_std, W1, b1, W2, b2)
+        Z_in, H, _, probs = forward_ffn(
+            X, mean, scales, W1, b1, W2, b2, disabled_indices, t_logit
+        )
         d_logits = (probs - y) * w / n
         grad_W2 = H.T @ d_logits + l2_anchor * (W2 - W2_0)
         grad_b2 = float(np.sum(d_logits)) + l2_anchor * (b2 - b2_0)
@@ -511,7 +678,9 @@ def fine_tune_acceptance_model(
         for idx in disabled_indices:
             W1[:, idx] = 0.0
 
-    _, _, probs_after = forward_ffn(X, mean, inv_std, W1, b1, W2, b2)
+    _, _, logits_after, probs_after = forward_ffn(
+        X, mean, scales, W1, b1, W2, b2, disabled_indices, t_logit
+    )
     after_loss = float(
         np.mean(
             w
@@ -521,13 +690,23 @@ def fine_tune_acceptance_model(
             )
         )
     )
-    after_acc = float(np.mean((probs_after >= 0.5) == (y >= 0.5)))
+    preds_after = logits_after >= t_logit
+    after_acc = float(np.mean(preds_after == (y >= 0.5)))
+
+    cat_totals = Counter(cats)
+    cat_before = Counter()
+    cat_after = Counter()
+    for pb, pa, yi, cat in zip(preds_before, preds_after, y, cats):
+        if pb == (yi >= 0.5):
+            cat_before[cat] += 1
+        if pa == (yi >= 0.5):
+            cat_after[cat] += 1
 
     updated_model = json.loads(json.dumps(base_model))
-    updated_model["hidden_weights"] = [round(float(v), 6) for v in W1.reshape(-1)]
-    updated_model["hidden_bias"] = [round(float(v), 6) for v in b1]
-    updated_model["output_weights"] = [round(float(v), 6) for v in W2]
-    updated_model["output_bias"] = round(float(b2), 6)
+    updated_model["w1"] = [[round(float(v), 12) for v in row] for row in W1]
+    updated_model["b1"] = [round(float(v), 12) for v in b1]
+    updated_model["w2"] = [round(float(v), 12) for v in W2]
+    updated_model["b2"] = round(float(b2), 12)
 
     metrics = {
         "trained_samples": len(y),
@@ -537,6 +716,8 @@ def fine_tune_acceptance_model(
         "after_loss": round(after_loss, 5),
         "before_accuracy": round(before_acc, 4),
         "after_accuracy": round(after_acc, 4),
+        "category_breakdown_before": {k: f"{cat_before[k]}/{cat_totals[k]}" for k in sorted(cat_totals)},
+        "category_breakdown_after": {k: f"{cat_after[k]}/{cat_totals[k]}" for k in sorted(cat_totals)},
     }
     return updated_model, metrics
 

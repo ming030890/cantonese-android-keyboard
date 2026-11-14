@@ -19,7 +19,7 @@
     "right_context_tokens": 0
   },
   "fusion_source": "config/language_model/handwriting_fusion_cnn_v2.json",
-  "fusion_sha256": "502c1f614ad822ec112653a1095bf7f898b972a0d02bc5c80ef46b17c8f11303",
+  "fusion_sha256": "b579bd1090dff325c7cfd5e746000c09c2cca1c4137291db6458fdf12effa3a9",
   "neural_short_contexts": true,
   "count_table_packaged": false,
   "experimental": true,
@@ -36,7 +36,7 @@
     "qualification_report": "config/language_model/qualification_audit_20261108.json",
     "production_qualified": false,
     "acceptance_source": "../QwenASR/crates/cantonese-ngram/src/english_acceptance.json",
-    "acceptance_sha256": "2a76593959d2e0c00d7829529c636745f1e4dcbd29d570b3b5adf6fd47607f0f",
+    "acceptance_sha256": "f50aebe919c535c4c03a66959e592de924f3e07eaa058bba1974558283bb0441",
     "touch_evidence_used": false,
     "primary_metric": "whole-message ITE plus mixed Cantonese/English controller replay",
     "known_word_policy": "Learned original-word versus replacement evidence",
@@ -45,7 +45,7 @@
       "schema": "english-noisy-channel-v1",
       "candidate_source": "169575 dictionary forms; TRAIN unigram counts and explicitly imputed UK-root priors",
       "files": {
-        "channel.json": "8cf8056a762d8617f97c6b7eba193b851bd5f0890e7683b454fe0f9097a55689",
+        "channel.json": "b728093224bd62df7ef472b6ce6f49bf28f7f752b80a49581e77aacae67532ea",
         "lexicon.tsv": "465762ffdb780b169ab021c3e2a2d5b453dae6dafc2befa49d1f4378a70bc6f0",
         "metadata.json": "21313aef2ab502d983a33a82f7054036127b8a3dd7a09aeb534815794eb94670",
         "policy.json": "ef10933720d06d75ebe6076742cf25004705896436fda1752aaf2bca454938dd",

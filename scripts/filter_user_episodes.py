@@ -38,70 +38,71 @@ REPO_ROOT = APP_ROOT.parent
 DEFAULT_EPISODES_FILE = APP_ROOT / "data" / "user_autocorrect" / "episodes.jsonl"
 DEFAULT_CLEAN_FILE = APP_ROOT / "data" / "user_autocorrect" / "episodes_clean.jsonl"
 DEFAULT_REJECTED_FILE = APP_ROOT / "data" / "user_autocorrect" / "episodes_rejected.jsonl"
-WORDS_TSV = REPO_ROOT / "QwenASR" / "crates" / "cantonese-ngram" / "src" / "english_valid_words.txt"
-
-# Domain/technical terms attested by the user that may not be in a general dictionary
-USER_ATTESTED_WHITELIST = {
-    "asr",
-    "gplay",
-    "viet",
-    "tbf",
-    "deeplink",
-    "github",
-    "qwen",
-    "kleidiai",
-    "safetensors",
-    "aab",
-    "apk",
-}
+CNG_SRC = REPO_ROOT / "QwenASR" / "crates" / "cantonese-ngram" / "src"
+WORDS_TSV = CNG_SRC / "english_valid_words.txt"
+LEXICON_TSV = CNG_SRC / "english_channel_data" / "lexicon.tsv"
+PRIORS_TSV = CNG_SRC / "english_channel_data" / "priors.tsv"
 
 
-def load_known_words() -> set[str]:
-    words = set(USER_ATTESTED_WHITELIST)
-    if WORDS_TSV.exists():
-        for line in WORDS_TSV.read_text(encoding="utf-8").splitlines():
-            parts = line.strip().split("\t")
-            if parts and parts[0]:
-                w = parts[0].lower()
-                if len(w) > 1 or w in {"a", "i"}:
-                    words.add(w)
-    # Common contractions
-    words.update(
-        {
-            "don't",
-            "won't",
-            "can't",
-            "didn't",
-            "doesn't",
-            "isn't",
-            "aren't",
-            "wasn't",
-            "weren't",
-            "haven't",
-            "hasn't",
-            "hadn't",
-            "wouldn't",
-            "couldn't",
-            "shouldn't",
-            "i'm",
-            "i've",
-            "i'll",
-            "i'd",
-            "you're",
-            "you've",
-            "you'll",
-            "we're",
-            "we've",
-            "they're",
-            "it's",
-            "that's",
-            "there's",
-            "what's",
-            "who's",
-            "let's",
-        }
-    )
-    return words
+def load_known_words() -> tuple[set[str], set[str]]:
+    """
+    Returns (valid_vocab, cng_spellings):
+      - valid_vocab: union of all bundled lexicons (`english_valid_words.txt`,
+        `lexicon.tsv`, `priors.tsv`) for general English validity.
+      - cng_spellings: the 34,293 canonical spellings in `priors.tsv` (`model.cng`
+        `english_word_ids`) that the on-device candidate generator can actually produce.
+    """
+    words: set[str] = set()
+    cng_spellings: set[str] = set()
+    for path in (WORDS_TSV, LEXICON_TSV, PRIORS_TSV):
+        if path.exists():
+            for line in path.read_text(encoding="utf-8").splitlines():
+                parts = line.strip().split("\t")
+                if parts and parts[0]:
+                    w = parts[0].lower().replace("’", "'")
+                    if len(w) > 1 or w in {"a", "i"}:
+                        words.add(w)
+                        if path == PRIORS_TSV:
+                            cng_spellings.add(w)
+    # Common contractions & single-letter words ([byte:61]='a', [byte:69]='i' in model.cng)
+    contractions = {
+        "a",
+        "i",
+        "don't",
+        "won't",
+        "can't",
+        "didn't",
+        "doesn't",
+        "isn't",
+        "aren't",
+        "wasn't",
+        "weren't",
+        "haven't",
+        "hasn't",
+        "hadn't",
+        "wouldn't",
+        "couldn't",
+        "shouldn't",
+        "i'm",
+        "i've",
+        "i'll",
+        "i'd",
+        "you're",
+        "you've",
+        "you'll",
+        "we're",
+        "we've",
+        "they're",
+        "it's",
+        "that's",
+        "there's",
+        "what's",
+        "who's",
+        "let's",
+    }
+    words.update(contractions)
+    cng_spellings.update(contractions)
+    return words, cng_spellings
 
 
 def osa_distance(a: str, b: str) -> int:
@@ -198,19 +199,57 @@ def recover_final_word_from_future_left(
     return None
 
 
+def extract_bounded_left(left: str) -> str:
+    """
+    Extract the context after the last hard sentence/paragraph boundary
+    (`\\n`, `\\r`, `.`, `!`, `?`, `。`, `！`, `？`), matching `tokenizer.rs::boundaries()`.
+    Protects URLs (`http...`, `www...`) and decimal numbers (`12.34`).
+    """
+    if not left:
+        return ""
+    url_spans = [m.span() for m in re.finditer(r"(?i)https?://[^\s<>]+|www\.[^\s<>]+", left)]
+    last_boundary = 0
+    for idx, ch in enumerate(left):
+        if any(s <= idx < e for s, e in url_spans):
+            continue
+        prev_ch = left[idx - 1] if idx > 0 else ""
+        next_ch = left[idx + 1] if idx + 1 < len(left) else ""
+        is_hard = ch in "。！？!?\n\r" or (
+            ch == "."
+            and prev_ch != "."
+            and next_ch != "."
+            and not (prev_ch.isdigit() and next_ch.isdigit())
+        )
+        if is_hard:
+            last_boundary = idx + 1
+    return left[last_boundary:].lstrip(" \t")
+
+
 def filter_episodes(
     episodes: list[dict[str, Any]],
     known_words: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     if known_words is None:
-        known_words = load_known_words()
+        known_words, cng_spellings = load_known_words()
+    else:
+        _, cng_spellings = load_known_words()
 
-    # Pass 0: Identify user-attested literal words (undo_keep_literal at least once
-    # AND confirmed in subsequent left context).
-    attested_literals = set(USER_ATTESTED_WHITELIST)
+    # Pass 0: Automatically mine self-attested literal words (no hardcoded whitelist):
+    # any word where the user explicitly triggered `undo_keep_literal` or repaired to `target`
+    # AND left `target` intact in subsequent `left` context.
+    attested_literals: set[str] = set()
     for i, ep in enumerate(episodes):
-        if ep.get("signal") == "undo_keep_literal":
-            t = str(ep.get("target", "")).lower()
+        sig0 = str(ep.get("signal", ""))
+        if sig0 in {
+            "undo_keep_literal",
+            "candidate_keep_literal",
+            "backspace_retype_repair",
+            "undo_then_edit",
+            "candidate_selected",
+        }:
+            t = str(ep.get("target", "")).lower().replace("’", "'")
+            if len(t) < 2 and t not in {"a", "i"}:
+                continue
             base_left, pfx = split_trailing_word_prefix(str(ep.get("left", "")))
             full_t = pfx.lower() + t
             final_w = recover_final_word_from_future_left(
@@ -220,8 +259,11 @@ def filter_episodes(
                 str(ep.get("auto_committed", "")),
                 episodes[i + 1 : i + 8],
             )
-            if final_w and final_w.lower() == full_t:
-                attested_literals.add(full_t)
+            if final_w and final_w.lower().replace("’", "'") == full_t:
+                if sig0 in {"undo_keep_literal", "candidate_keep_literal"} or is_plausible_typo_or_prefix(
+                    pfx + str(ep.get("typed", "")), full_t
+                ):
+                    attested_literals.add(full_t)
 
     valid_vocab = known_words | attested_literals
 
@@ -299,9 +341,27 @@ def filter_episodes(
         }:
             # Check if this is a keep-literal signal
             if sig in {"undo_keep_literal", "candidate_keep_literal"}:
-                # Verify that the user actually kept `target` in future context (or it's in valid_vocab)
-                # In [85], typed='menriom' -> undo_keep_literal, but future context has 'menrion' (user was editing a typo, not keeping 'menriom'!)
-                if future_word and future_word.lower() != target.lower():
+                # An `undo_keep_literal` event is frequently emitted by `flushPending()` when
+                # the user presses Backspace once to start clearing/deleting a word (e.g.
+                # `github` -> `GitHub` then clearing the search box, or `ca` -> `Ca` then
+                # clearing, or `menriom` -> `mention` then editing).
+                # Therefore, a keep-literal signal is ONLY valid if `future_word` explicitly
+                # confirms that `target` remained in the text (exact case match for casing
+                # undos, or case-insensitive match for lexical undos).
+                is_casing_only_undo = typed.lower() == auto_c.lower() and typed != auto_c
+                if future_word is None:
+                    ep["reject_reason"] = f"unconfirmed_undo_literal_cleared_or_end:{target}"
+                    rejected.append(ep)
+                    stats["rejected_aborted_undo_literal"] += 1
+                    continue
+
+                if is_casing_only_undo:
+                    if future_word != target:
+                        ep["reject_reason"] = f"casing_undo_not_kept_in_future:{target}!={future_word}"
+                        rejected.append(ep)
+                        stats["rejected_aborted_undo_literal"] += 1
+                        continue
+                elif future_word.lower() != target.lower():
                     if future_word.lower() in valid_vocab and is_plausible_typo_or_prefix(typed, future_word):
                         ep["signal"] = "undo_then_edit"
                         ep["target"] = future_word
@@ -324,7 +384,7 @@ def filter_episodes(
                 stats["kept_clean_keep_literal"] += 1
                 continue
 
-            # Otherwise it's a repair signal (typed -> target)
+            # Otherwise it's a repair/selection signal (typed -> target)
             # Filter 2: Chained-Edit / Intermediate-Typo Recovery via future `left` context
             if target.lower() not in valid_vocab or (
                 future_word
@@ -361,6 +421,29 @@ def filter_episodes(
                     ep["filter_note"] = f"chained_repair_recovered:{target}->{future_word}"
                     target = future_word
                     stats["recovered_chained_repair"] += 1
+
+            # If the user selected a candidate (`candidate_selected`), e.g. `democrac` -> `Democrat`
+            # or `ther` -> `the`, but then immediately overwrote or deleted it in `future_word`
+            # (e.g. `Democrat` -> `Demo Party`, `Hi the` -> `Hi folks`), reject as aborted!
+            next_left_0 = str(episodes[i + 1].get("left", "")) if i + 1 < len(episodes) else ""
+            if sig == "candidate_selected" and (
+                (
+                    future_word
+                    and future_word.lower() != target.lower()
+                    and not future_word.lower().startswith(target.lower())
+                )
+                or (
+                    not left
+                    and next_left_0
+                    and len(target) >= 4
+                    and next_left_0.strip() != target
+                    and target.lower().startswith(next_left_0.strip().lower())
+                )
+            ):
+                ep["reject_reason"] = f"candidate_selected_overwritten_in_future:{target}->{future_word or next_left_0.strip()}"
+                rejected.append(ep)
+                stats["rejected_overwritten_candidate_selection"] += 1
+                continue
 
             # Filter 4: Mind-change / rephrasing check (even when `target` is in valid_vocab, e.g. 'asian' -> 'east')
             if future_word and future_word.lower() == target.lower():
@@ -436,6 +519,12 @@ def filter_episodes(
                 continue
             cleaned.append(ep)
             stats["kept_clean_unchallenged"] += 1
+
+    for ep in cleaned:
+        b_left = extract_bounded_left(str(ep.get("left", "")))
+        ep["bounded_left"] = b_left
+        ep["bounded_sentence_start"] = (b_left.strip() == "")
+        ep["target_in_cng_vocab"] = (str(ep.get("target", "")).lower().replace("’", "'") in cng_spellings)
 
     return cleaned, rejected, dict(stats)
 
