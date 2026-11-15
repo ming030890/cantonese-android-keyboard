@@ -68,6 +68,9 @@ internal class EnglishInputCoordinator(
         private set
     private data class Undo(val original: String, val committed: String, val quick: Boolean, val cursor: Int?)
     private var undo: Undo? = null
+    private data class SwipeCommit(val prefixSpace: String, val word: String, val cursor: Int?)
+    private var swipeCommit: SwipeCommit? = null
+    val hasSwipeCandidates get() = swipeCommit != null
     private var pendingBoundaryCursor: Int? = null
     private val _candidates = MutableStateFlow<List<HandwritingCandidate>>(emptyList())
     val candidates = _candidates.asStateFlow()
@@ -218,6 +221,12 @@ internal class EnglishInputCoordinator(
         if (inspectingWord) reset()
         contextWindow.onTyping()
         undo = null
+        if (word.isEmpty() && letter.length == 1 && letter[0].isAsciiLetter() && activeSwipeCommit() != null) {
+            swipeCommit = null
+            editor.commitText(" ")
+        } else {
+            swipeCommit = null
+        }
         if (word.isEmpty()) {
             val selection = editor.cursorSelection()
             if (selection == null || selection.first == selection.second) {
@@ -249,6 +258,7 @@ internal class EnglishInputCoordinator(
         if (inspectingWord) reset()
         contextWindow.onTyping()
         undo = null
+        swipeCommit = null
         if (word.isEmpty()) {
             val preceding = editor.getTextBeforeCursor(text.length + 256).orEmpty().removeSuffix(text)
             safeStart = safeWordStart(preceding)
@@ -348,8 +358,67 @@ internal class EnglishInputCoordinator(
         (word == word.lowercase(Locale.ROOT) || word == word.uppercase(Locale.ROOT) ||
             word.drop(1) == word.drop(1).lowercase(Locale.ROOT))
 
+    private fun activeSwipeCommit(): SwipeCommit? {
+        val record = swipeCommit ?: return null
+        val selection = editor.cursorSelection()
+        if (selection != null && (selection.first != selection.second ||
+                (record.cursor != null && record.cursor != selection.first))) {
+            swipeCommit = null
+            return null
+        }
+        val expected = record.prefixSpace + record.word
+        if (!editor.getTextBeforeCursor(expected.length).orEmpty().endsWith(expected)) {
+            swipeCommit = null
+            return null
+        }
+        return record
+    }
+
+    fun swipe(
+        centersPx: FloatArray,
+        pointsXyt: FloatArray,
+        shiftMode: Int,
+        onApplied: () -> Unit = {},
+    ) {
+        if (closed || centersPx.size != 52 || pointsXyt.size < 6 || pointsXyt.size % 3 != 0) return
+        if (inspectingWord) reset()
+        if (word.isNotEmpty()) finish()
+        cancelSuggestionWork()
+        contextWindow.onTyping()
+        undo = null
+        swipeCommit = null
+        quick = false
+        quickSnapshot = null
+        val id = ++request
+        val before = editor.getTextBeforeCursor(512).orEmpty()
+        val plannedSpace = if (needsSwipeLeadingSpace(before)) " " else ""
+        val leftForLm = before + plannedSpace
+        val centersCopy = centersPx.copyOf()
+        val pointsCopy = pointsXyt.copyOf()
+        scope.launch {
+            val decoded = withContext(worker) {
+                runCatching {
+                    if (engine == null) engine = loader()
+                    engine?.swipe(leftForLm, centersCopy, pointsCopy, shiftMode).orEmpty()
+                }.onFailure(onError).getOrDefault(emptyList())
+            }
+            if (closed || id != request || word.isNotEmpty()) return@launch
+            val top = decoded.firstOrNull()?.word?.takeIf { it.isNotEmpty() } ?: return@launch
+            val liveBefore = editor.getTextBeforeCursor(64).orEmpty()
+            val actualSpace = if (needsSwipeLeadingSpace(liveBefore)) " " else ""
+            editor.commitText(actualSpace + top)
+            swipeCommit = SwipeCommit(actualSpace, top, editor.cursorSelection()?.first)
+            candidateRequest = id
+            val rows = decoded.map { it.word }.distinct().take(8)
+                .mapIndexed { idx, candidate -> HandwritingCandidate(candidate, idx) }
+            _candidates.value = rows
+            onCursorCandidates(rows)
+            onApplied()
+        }
+    }
+
     fun refreshNextWords() {
-        if (!sharedSuggestions || word.isNotEmpty() || inspectingWord || closed) return
+        if (!sharedSuggestions || word.isNotEmpty() || inspectingWord || closed || activeSwipeCommit() != null) return
         val left=editor.getTextBeforeCursor(512).orEmpty()
         val right=editor.getTextAfterCursor(256).orEmpty()
         if (unifiedEngine != null) {
@@ -385,11 +454,20 @@ internal class EnglishInputCoordinator(
         }
         if (word.isEmpty()) {
             if(selected!=null && canSelect(selected)) {
+                activeSwipeCommit()?.let { record ->
+                    val expected = record.prefixSpace + record.word
+                    val replaced = if (selected == record.word) true else {
+                        editor.replaceTextBeforeCursor(expected, record.prefixSpace + selected)
+                    }
+                    reset()
+                    return replaced
+                }
                 val left=editor.getTextBeforeCursor(1).orEmpty()
                 editor.commitText((if(left.lastOrNull()?.isLetterOrDigit()==true) " " else "")+selected)
                 reset(preserveDisplay = hasUnifiedSuggestions);return true
             }
-            undo = null; return false
+            if (swipeCommit != null) reset() else undo = null
+            return false
         }
         val allowCorrection = correct && engine?.supportsAutomaticCorrection != false
         val original = word
@@ -494,6 +572,12 @@ internal class EnglishInputCoordinator(
                 return true
             }
         }
+        activeSwipeCommit()?.let { record ->
+            val expected = record.prefixSpace + record.word
+            val deleted = editor.replaceTextBeforeCursor(expected, "")
+            reset()
+            if (deleted) return true
+        }
         if (!quick && word.isNotEmpty()) {
             val nextWord = word.dropLast(1)
             editor.setComposingText(nextWord)
@@ -507,7 +591,7 @@ internal class EnglishInputCoordinator(
     fun reset(cancelLookup: Boolean = true, preserveContext: Boolean = false, preserveDisplay: Boolean = false) {
         if(!preserveContext) contextWindow.clear()
         if (cancelLookup) cancelSuggestionWork()
-        if (inspectingWord) onCursorCandidates(emptyList())
+        if (inspectingWord || swipeCommit != null) onCursorCandidates(emptyList())
         cursorWord = null
         _cursorWordActive.value = false
         pending = null; ++request; word = ""; taps.clear(); centers = FloatArray(0)
@@ -515,7 +599,7 @@ internal class EnglishInputCoordinator(
         resultWord = null; prediction = EnglishPrediction()
         if (!preserveDisplay) _candidates.value = emptyList()
         apostropheBase = null
-        suppress = false; undo = null; safeStart = true
+        suppress = false; undo = null; swipeCommit = null; safeStart = true
     }
 
     fun onSelectionChanged(newStart: Int, newEnd: Int, composingEnd: Int) {
@@ -528,18 +612,24 @@ internal class EnglishInputCoordinator(
         if (newStart != newEnd || (word.isNotEmpty() && newStart != composingEnd)) {
             // The platform owns the composition now; don't write through a moved cursor.
             editor.finishComposingText(); reset()
-        } else if (word.isEmpty() && undo != null) {
-            // Own commit callbacks preserve undo only while its exact suffix remains at the cursor.
-            val selection = editor.cursorSelection()
-            if ((selection != null && (selection.first != selection.second ||
-                    (undo!!.cursor != null && undo!!.cursor != selection.first))) ||
-                !editor.getTextBeforeCursor(undo!!.committed.length).orEmpty().endsWith(undo!!.committed)) undo = null
+        } else if (word.isEmpty()) {
+            if (undo != null) {
+                // Own commit callbacks preserve undo only while its exact suffix remains at the cursor.
+                val selection = editor.cursorSelection()
+                if ((selection != null && (selection.first != selection.second ||
+                        (undo!!.cursor != null && undo!!.cursor != selection.first))) ||
+                    !editor.getTextBeforeCursor(undo!!.committed.length).orEmpty().endsWith(undo!!.committed)) undo = null
+            }
+            if (swipeCommit != null && activeSwipeCommit() == null) {
+                _candidates.value = emptyList()
+                onCursorCandidates(emptyList())
+            }
         }
     }
 
     /** Inspect committed text without acquiring composition or applying automatic correction. */
     fun inspectWordAtCursor(): Boolean {
-        if (closed || word.isNotEmpty()) return false
+        if (closed || word.isNotEmpty() || activeSwipeCommit() != null) return false
         val selection = editor.cursorSelection()
         val before = editor.getTextBeforeCursor(512).orEmpty()
         val after = editor.getTextAfterCursor(256).orEmpty()
@@ -609,6 +699,12 @@ internal class EnglishInputCoordinator(
 }
 
 internal fun Char.isAsciiLetter() = this in 'a'..'z' || this in 'A'..'Z'
+
+internal fun needsSwipeLeadingSpace(before: String): Boolean {
+    val last = before.lastOrNull() ?: return false
+    if (last.isWhitespace()) return false
+    return last.isAsciiLetter() || last.isDigit() || last in ".,!?;:)]}"
+}
 
 internal fun extractWordBeforeCursor(textBeforeCursor: String?): String {
     if (textBeforeCursor.isNullOrEmpty()) return ""

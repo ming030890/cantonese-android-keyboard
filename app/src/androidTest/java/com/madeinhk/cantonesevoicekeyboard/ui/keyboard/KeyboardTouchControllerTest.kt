@@ -100,6 +100,50 @@ class KeyboardTouchControllerTest {
         assertEquals(listOf("down:a", "cancel:a"), fixture.events)
     }
 
+    @Test
+    fun swipeDetectorCancelsKeyPressOnDragWhilePreservingRolloverTaps() {
+        val events = mutableListOf<String>()
+        val swipes = mutableListOf<Int>()
+        val registry = KeyboardKeyRegistry()
+        registry.updateSurfaceSize(1000, 300)
+        listOf("qwertyuiop", "asdfghjkl", "zxcvbnm").forEachIndexed { row, letters ->
+            letters.forEachIndexed { col, ch ->
+                val k = registry.key("$ch", KeyData("$ch", KeyboardKeyKind.Text, text = "$ch"), "row$row")
+                registry.mount(k)
+                registry.updateVisualBounds(k, Rect(col * 100f + 5f, row * 80f + 5f, col * 100f + 95f, row * 80f + 75f))
+            }
+        }
+        val swipeDetector = KeyboardSwipeDetector(registry, isEnabled = { true }) { _, pts ->
+            swipes += pts.size / 3
+        }
+        val controller = KeyboardTouchController(
+            keyRegistry = registry,
+            inputDispatcher = RecordingDispatcher(events),
+            inputReceiver = RecordingReceiver(events),
+            onGestureDown = swipeDetector::onPointerDown,
+            onGestureMove = swipeDetector::onPointerMove,
+            onGestureUp = swipeDetector::onPointerUp,
+            onGestureCancel = swipeDetector::onCancel,
+        )
+
+        // Single-finger drag from 'q' (x=50) across 'w' (x=150) to 'e' (x=250) cancels 'q' tap and emits swipe
+        controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(1), floatArrayOf(50f)))
+        controller.onMotionEvent(event(MotionEvent.ACTION_MOVE, 0, intArrayOf(1), floatArrayOf(150f)))
+        controller.onMotionEvent(event(MotionEvent.ACTION_MOVE, 0, intArrayOf(1), floatArrayOf(250f)))
+        controller.onMotionEvent(event(MotionEvent.ACTION_UP, 0, intArrayOf(1), floatArrayOf(250f)))
+        assertEquals(listOf("down:q", "cancel:q"), events)
+        assertEquals(1, swipes.size)
+
+        // Two-thumb rollover ('q' down, 'w' pointer-down) finalizes 'q' and 'w' taps without emitting swipe
+        events.clear()
+        controller.onMotionEvent(event(MotionEvent.ACTION_DOWN, 0, intArrayOf(1), floatArrayOf(50f)))
+        controller.onMotionEvent(event(MotionEvent.ACTION_POINTER_DOWN, 1, intArrayOf(1, 2), floatArrayOf(50f, 150f)))
+        controller.onMotionEvent(event(MotionEvent.ACTION_POINTER_UP, 0, intArrayOf(1, 2), floatArrayOf(50f, 150f)))
+        controller.onMotionEvent(event(MotionEvent.ACTION_UP, 0, intArrayOf(2), floatArrayOf(150f)))
+        assertEquals(listOf("down:q", "up:q", "down:w", "up:w"), events)
+        assertEquals(1, swipes.size)
+    }
+
     private class Fixture {
         val events = mutableListOf<String>()
         var haptics = 0

@@ -28,6 +28,7 @@ internal interface EnglishCandidateEngine {
     fun reconsiderObserved(word:String,centers:FloatArray,points:FloatArray,left:String,right:String)=
         reconsider(word.lowercase(Locale.ROOT).replace('’','\''),centers,points,left,right)
     fun rankCandidates(left: String, right: String, candidates: List<String>, observed: String = ""): List<String> = candidates
+    fun swipe(left: String, centers: FloatArray, points: FloatArray, shiftMode: Int = 0): List<EnglishCandidate> = emptyList()
     fun selected(word: String, replacement: String, centers: FloatArray, points: FloatArray) {}
     fun rejected(word: String, replacement: String) {}
 }

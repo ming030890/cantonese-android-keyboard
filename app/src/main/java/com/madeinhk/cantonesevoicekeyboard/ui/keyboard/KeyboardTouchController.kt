@@ -52,7 +52,10 @@ class KeyboardTouchController(
     private val inputReceiver: KeyboardInputReceiver,
     private var performHaptic: (KeyData) -> Unit = {},
     private val onLongPress: (KeyboardPointerState, KeyModel) -> Boolean = { _, _ -> false },
+    private val onGestureDown: ((KeyboardPointerState, MotionEvent) -> Unit)? = null,
     private val onGestureMove: ((KeyboardPointerState, MotionEvent) -> Boolean)? = null,
+    private val onGestureUp: ((KeyboardPointerState, MotionEvent) -> Unit)? = null,
+    private val onGestureCancel: (() -> Unit)? = null,
 ) {
     private val activePointers = ArrayList<KeyboardPointerState>(5)
     var debugVersion by mutableIntStateOf(0)
@@ -112,6 +115,7 @@ class KeyboardTouchController(
             cancelPointer(activePointers[index])
         }
         activePointers.clear()
+        onGestureCancel?.invoke()
         debugVersion++
     }
 
@@ -130,7 +134,12 @@ class KeyboardTouchController(
         pointer.lastPosition = Offset(event.getX(pointerIndex), event.getY(pointerIndex))
         activePointers.add(pointer)
         pressKeyAtCurrentPosition(event, pointer)
-        if (pointer.activeKey == null) activePointers.removeAt(activePointers.lastIndex)
+        if (pointer.activeKey == null) {
+            activePointers.removeAt(activePointers.lastIndex)
+            if (event.pointerCount > 1) onGestureDown?.invoke(pointer, event)
+        } else {
+            onGestureDown?.invoke(pointer, event)
+        }
         debugVersion++
     }
 
@@ -161,7 +170,13 @@ class KeyboardTouchController(
         val pointer = findPointerById(event.getPointerId(pointerIndex)) ?: return
         pointer.pointerIndex = pointerIndex
         pointer.lastPosition = Offset(event.getX(pointerIndex), event.getY(pointerIndex))
+        val wasGesture = pointer.gestureTriggered
         handlePointerUp(pointer)
+        if (wasGesture) {
+            onGestureUp?.invoke(pointer, event)
+        } else if (activePointers.isEmpty()) {
+            onGestureCancel?.invoke()
+        }
         debugVersion++
     }
 

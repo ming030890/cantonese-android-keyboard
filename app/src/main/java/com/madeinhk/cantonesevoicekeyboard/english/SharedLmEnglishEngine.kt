@@ -28,6 +28,19 @@ internal class SharedLmEnglishEngine(
             correction=if(result.isNull("correction")) null else result.getString("correction"),
             known=result.getBoolean("known"),replaceBefore=typed.length,reason="shared_lm_spelling")
     },
+    private val swipeDecode: (Long, String, FloatArray, FloatArray, Int) -> List<EnglishCandidate> = { handle, left, centers, points, shiftMode ->
+        val rows = JSONArray(checkNotNull(nativeSwipe(handle, left, centers, points, shiftMode)))
+        (0 until rows.length()).map { i ->
+            val row = rows.getJSONObject(i)
+            EnglishCandidate(
+                word = row.getString("word"),
+                score = row.getDouble("score"),
+                editCost = 0.0,
+                edits = 0,
+                completedChars = 0,
+            )
+        }
+    },
 ) : EnglishCandidateEngine {
     override val supportsAutomaticCorrection = true
     // Native acceptance already decides whether the English repair is confident.
@@ -49,9 +62,13 @@ internal class SharedLmEnglishEngine(
     override fun rankCandidates(left: String, right: String, candidates: List<String>, observed: String): List<String> =
         rank(contextHandle(), left, right, candidates, observed)
 
+    override fun swipe(left: String, centers: FloatArray, points: FloatArray, shiftMode: Int): List<EnglishCandidate> =
+        swipeDecode(contextHandle(), left, centers, points, shiftMode)
+
     companion object {
         @JvmStatic private external fun nativeSuggest(handle: Long, left: String, typed: String): String?
         @JvmStatic private external fun nativeComplete(handle: Long, left: String, prefix: String): Array<String>?
         @JvmStatic private external fun nativeRank(handle: Long, left: String, right: String, words: Array<String>, observed: String): String?
+        @JvmStatic private external fun nativeSwipe(handle: Long, left: String, centers: FloatArray, points: FloatArray, shiftMode: Int): String?
     }
 }

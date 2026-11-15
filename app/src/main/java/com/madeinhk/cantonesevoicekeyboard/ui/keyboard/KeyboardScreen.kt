@@ -51,8 +51,10 @@ fun KeyboardScreen(
     englishCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow(emptyList()),
     cursorWordActive: StateFlow<Boolean> = MutableStateFlow(false),
     chinesePunctuation: StateFlow<Boolean?> = MutableStateFlow(null),
+    swipeEnabled: StateFlow<Boolean> = MutableStateFlow(true),
     onQuickKey: (String) -> Unit = {},
     onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
+    onSwipeGesture: (centersPx: FloatArray, pointsXyt: FloatArray) -> Unit = { _, _ -> },
     onVisiblePanelChanged: (KeyboardInputMode?) -> Unit = {},
     onToggleShift: () -> Unit = {},
     onToggleRecording: () -> Unit,
@@ -97,6 +99,7 @@ fun KeyboardScreen(
     val englishCandidates by englishCandidates.collectAsState()
     val inspectingWord by cursorWordActive.collectAsState()
     val chinesePunctuation by chinesePunctuation.collectAsState()
+    val swipeAllowed by swipeEnabled.collectAsState()
     KeyboardScreen(
         renderState = KeyboardRenderState(
             voiceEnabled = voiceEnabled,
@@ -116,10 +119,12 @@ fun KeyboardScreen(
             quickCandidates = quickCandidates,
             englishCandidates = englishCandidates,
             chinesePunctuation = chinesePunctuation,
+            swipeEnabled = swipeAllowed,
         ),
         autofillView = autofillView,
         onQuickKey = onQuickKey,
         onTouchEvidence = onTouchEvidence,
+        onSwipeGesture = onSwipeGesture,
         onVisiblePanelChanged = onVisiblePanelChanged,
         onToggleShift = onToggleShift,
         onToggleRecording = onToggleRecording,
@@ -154,6 +159,7 @@ fun KeyboardScreen(
     autofillView: View? = null,
     onQuickKey: (String) -> Unit = {},
     onTouchEvidence: (com.madeinhk.cantonesevoicekeyboard.english.EnglishTouchEvidence?) -> Unit = {},
+    onSwipeGesture: (centersPx: FloatArray, pointsXyt: FloatArray) -> Unit = { _, _ -> },
     onVisiblePanelChanged: (KeyboardInputMode?) -> Unit = {},
     onToggleShift: () -> Unit = {},
     onToggleRecording: () -> Unit,
@@ -281,11 +287,33 @@ fun KeyboardScreen(
     val inputDispatcher = remember(searchReceiver) {
         CoroutineKeyboardInputDispatcher(searchReceiver)
     }
-    val touchController = remember(keyRegistry, inputDispatcher, searchReceiver) {
+    val currentSwipeCallback by rememberUpdatedState(onSwipeGesture)
+    val swipeActiveAllowed by rememberUpdatedState(
+        renderState.swipeEnabled &&
+            (activePanel == KeyboardPanel.AlphaNum || activePanel == KeyboardPanel.Quick) &&
+            !emojiSearchActive
+    )
+    val swipeDetector = remember(keyRegistry) {
+        KeyboardSwipeDetector(
+            keyRegistry = keyRegistry,
+            isEnabled = { swipeActiveAllowed },
+            onSwipeCompleted = { centersPx, pointsXyt ->
+                if (localShiftState == ShiftState.Shifted) {
+                    localShiftState = ShiftState.Off
+                }
+                currentSwipeCallback(centersPx, pointsXyt)
+            },
+        )
+    }
+    val touchController = remember(keyRegistry, inputDispatcher, searchReceiver, swipeDetector) {
         KeyboardTouchController(
             keyRegistry = keyRegistry,
             inputDispatcher = inputDispatcher,
-            inputReceiver = searchReceiver
+            inputReceiver = searchReceiver,
+            onGestureDown = swipeDetector::onPointerDown,
+            onGestureMove = swipeDetector::onPointerMove,
+            onGestureUp = swipeDetector::onPointerUp,
+            onGestureCancel = swipeDetector::onCancel,
         )
     }
     val hostView = LocalView.current
@@ -308,7 +336,7 @@ fun KeyboardScreen(
         inputReceiver.onCandidateNext = {
             candidatePage++
         }
-        inputReceiver.onOpenEmoji = { emojiSearch = emojiSearch.close(); searchSymbols = false; onVisiblePanelChanged(null); activePanel = KeyboardPanel.Emoji }
+        inputReceiver.onOpenEmoji = { swipeDetector.onCancel(); emojiSearch = emojiSearch.close(); searchSymbols = false; onVisiblePanelChanged(null); activePanel = KeyboardPanel.Emoji }
         inputReceiver.onToggleUppercase = {
             localShiftState = when (localShiftState) {
                 ShiftState.Off -> ShiftState.Shifted
@@ -319,6 +347,7 @@ fun KeyboardScreen(
         }
         inputReceiver.onToggleMoreSymbols = { showMoreSymbols = !showMoreSymbols }
         inputReceiver.onModeSwitch = modeSwitch@{ target ->
+            swipeDetector.onCancel()
             if (emojiSearchActive && target in listOf("number.english", "alpha")) {
                 searchSymbols = target == "number.english"
                 return@modeSwitch
@@ -428,6 +457,12 @@ fun KeyboardScreen(
             }
             .drawWithContent {
                 drawContent()
+                @Suppress("UNUSED_VARIABLE")
+                val swipeFrame = swipeDetector.trailVersion
+                val trail = swipeDetector.currentTrailOffsets()
+                if (trail.size >= 2) {
+                    drawSwipeTrail(trail, primaryColor)
+                }
                 if (debugTouchBounds) {
                     drawKeyboardDiagnostics(keyRegistry, touchController)
                 }

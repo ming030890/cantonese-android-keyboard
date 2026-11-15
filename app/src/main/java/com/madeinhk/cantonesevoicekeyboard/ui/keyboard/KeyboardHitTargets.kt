@@ -132,6 +132,35 @@ class KeyboardKeyRegistry {
             (position.x - origin.x) / width, (position.y - origin.y) / width, centers)
     }
 
+    /**
+     * Raw isotropic-pixel visual-bounds centers `[cx_a, cy_a, ..., cx_z, cy_z]` and median letter
+     * key width for screen-size-invariant swipe featurization.
+     */
+    fun englishSwipeGeometry(): EnglishSwipeGeometry? {
+        val letters = mountedKeys.filter { key ->
+            val text = key.currentData?.text
+            key.currentData?.kind == KeyboardKeyKind.Text &&
+                text?.length == 1 &&
+                text[0].lowercaseChar() in 'a'..'z' &&
+                key.geometry.visualBounds.width > 0f &&
+                key.geometry.visualBounds.height > 0f
+        }
+        if (letters.size < 26) return null
+        val centers = FloatArray(52) { Float.NaN }
+        var seenMask = 0
+        for (key in letters) {
+            val ch = key.currentData!!.text!![0].lowercaseChar()
+            val letterIdx = ch - 'a'
+            val center = key.geometry.visualBounds.center
+            centers[letterIdx * 2] = center.x
+            centers[letterIdx * 2 + 1] = center.y
+            seenMask = seenMask or (1 shl letterIdx)
+        }
+        if (seenMask != (1 shl 26) - 1) return null
+        val medianWidth = letters.map { it.geometry.visualBounds.width }.sorted()[letters.size / 2]
+        return EnglishSwipeGeometry(centersPx = centers, medianKeyWidthPx = medianWidth)
+    }
+
     private fun findById(id: String): KeyModel? {
         for (key in allKeys) {
             if (key.id == id) return key
@@ -207,6 +236,11 @@ private fun Rect.translate(dx: Float, dy: Float): Rect = Rect(
     top + dy,
     right + dx,
     bottom + dy,
+)
+
+class EnglishSwipeGeometry(
+    val centersPx: FloatArray,
+    val medianKeyWidthPx: Float,
 )
 
 private fun <T> ArrayList<T>.containsIdentity(value: T): Boolean =

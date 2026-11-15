@@ -29,6 +29,7 @@ internal class KeyboardScenario(
     boundaryDispatcher: CoroutineDispatcher? = null,
     previewDispatcher: CoroutineDispatcher? = null,
     var autoCapitalizationEnabled: Boolean = false,
+    sharedSuggestions: Boolean? = null,
     handwritingFactory: ((KeyboardEditor, () -> Long, () -> Boolean) -> HandwritingSession)? = null,
     personalization: com.madeinhk.cantonesevoicekeyboard.quick.QuickPersonalization? = null,
 ) : AutoCloseable {
@@ -47,7 +48,7 @@ internal class KeyboardScenario(
         com.madeinhk.cantonesevoicekeyboard.english.EnglishInputCoordinator(editor, { engine },
             scope ?: CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Unconfined),
             englishDispatcher ?: if (scope == null) kotlinx.coroutines.Dispatchers.Unconfined else lookupDispatcher,
-            sharedSuggestions = unifiedEngine != null || engine is com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine,
+            sharedSuggestions = sharedSuggestions ?: (unifiedEngine != null || engine is com.madeinhk.cantonesevoicekeyboard.english.SharedLmEnglishEngine),
             unifiedEngine = unifiedEngine,
             boundaryWorker = boundaryDispatcher ?: englishDispatcher ?: if (scope == null) kotlinx.coroutines.Dispatchers.Unconfined else lookupDispatcher,
             previewWorker = previewDispatcher ?: englishDispatcher ?: if (scope == null) kotlinx.coroutines.Dispatchers.Unconfined else lookupDispatcher)
@@ -118,6 +119,7 @@ internal class KeyboardScenario(
         controller.onSelectionChanged(position, end, -1)
     }
     fun choose(text: String) = press(KeyboardKeyKind.Candidate, text)
+    fun swipe(centersPx: FloatArray, pointsXyt: FloatArray) = controller.onSwipeGesture(centersPx, pointsXyt)
     fun snapshot() = controller.renderState()
     override fun close() = controller.destroy()
 }
