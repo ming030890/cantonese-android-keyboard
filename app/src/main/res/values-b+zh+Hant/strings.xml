@@ -86,6 +86,7 @@
     <string name="keyboard_status_transcribing">識別緊…</string>
     <string name="keyboard_status_recognizing">識別緊…</string>
     <string name="keyboard_key_space">空格</string>
+    <string name="keyboard_handwriting_confirm_candidate">選用 %1$s</string>
     <string name="keyboard_toolbar_settings">設定</string>
     <string name="keyboard_toolbar_voice">語音輸入</string>
     <string name="keyboard_toolbar_clipboard_preview">貼上 %1$s</string>

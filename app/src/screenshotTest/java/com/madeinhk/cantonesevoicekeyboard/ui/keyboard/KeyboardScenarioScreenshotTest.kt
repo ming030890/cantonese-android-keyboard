@@ -116,9 +116,14 @@ fun ScenarioBilingualProblemPreview() = ScenarioScreen(remember { KeyboardScenar
 fun ScenarioUnboundedChinesePreview() = ScenarioScreen(remember { KeyboardScenarios.unboundedChinesePreview() })
 
 @PreviewTest
-@Preview(name = "Handwriting visual alternatives", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Preview(name = "Handwriting visual alternatives", widthDp = 412, heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp)
 @Composable
 fun ScenarioHandwritingAlternatives() = ScenarioScreen(remember { KeyboardScenarios.handwritingAlternatives() })
+
+@PreviewTest
+@Preview(name = "Handwriting visual alternatives dark", widthDp = 412, heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp)
+@Composable
+fun ScenarioHandwritingAlternativesDark() = ScenarioScreen(remember { KeyboardScenarios.handwritingAlternatives() }, darkTheme = true)
 
 @PreviewTest
 @Preview(name = "Mixed Chinese phrase ranking", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
@@ -289,12 +294,12 @@ fun ScenarioContinuePunctuation() = ScenarioScreen(remember { KeyboardScenarios.
 fun ScenarioClipboardAfterNewCopy() = ScenarioScreen(remember { KeyboardScenarios.clipboardAfterNewCopy() })
 
 @PreviewTest
-@Preview(name = "Handwriting recognizing", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Preview(name = "Handwriting recognizing", widthDp = 412, heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp)
 @Composable
 fun ScenarioHandwritingRecognizing() = ScenarioScreen(remember { KeyboardScenarios.handwritingRecognizing() })
 
 @PreviewTest
-@Preview(name = "Handwriting error", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Preview(name = "Handwriting error", widthDp = 412, heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp)
 @Composable
 fun ScenarioHandwritingError() = ScenarioScreen(remember { KeyboardScenarios.handwritingError() })
 
@@ -304,8 +309,8 @@ fun ScenarioHandwritingError() = ScenarioScreen(remember { KeyboardScenarios.han
 fun ScenarioRichClipboard() = ScenarioScreen(remember { KeyboardScenarios.richClipboard() })
 
 @Composable
-private fun ScenarioScreen(state: KeyboardRenderState, page: Int = 0) {
-    CantoneseVoiceKeyboardTheme(dynamicColor = false, darkTheme = false) {
+private fun ScenarioScreen(state: KeyboardRenderState, page: Int = 0, darkTheme: Boolean = false) {
+    CantoneseVoiceKeyboardTheme(dynamicColor = false, darkTheme = darkTheme) {
         KeyboardScreen(
             renderState = state,
             initialHandwritingCandidatePage = page,
@@ -356,7 +361,7 @@ fun ScenarioVoiceDisabled() = ScenarioScreen(remember { KeyboardScenarios.voiceD
 fun ScenarioVoiceWaitingForNetwork() = ScenarioScreen(remember { KeyboardScenarios.voiceWaitingForNetwork() })
 
 @PreviewTest
-@Preview(name = "Default handwriting without existing Quick", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Preview(name = "Default handwriting without existing Quick", widthDp = 412, heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp)
 @Composable
 fun ScenarioDefaultHandwriting() = ScenarioScreen(remember { KeyboardScenarios.inferredLayoutStartup(emptyList()) })
 

@@ -135,6 +135,7 @@ internal class KeyboardSessionController(
         else text
     }
     val handwritingCandidates = handwriting.candidates
+    val handwritingComposing = handwriting.composingCandidate
     val cursorWordActive = english?.cursorWordActive ?: MutableStateFlow(false)
     val englishCandidates = english?.candidates ?: MutableStateFlow(emptyList<com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate>())
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -188,6 +189,7 @@ internal class KeyboardSessionController(
         clipboard = clipboardSuggestion.value,
         inspectingWord = cursorWordActive.value,
         handwritingCandidates = handwritingCandidates.value,
+        handwritingComposing = handwritingComposing.value,
         quickCandidates = quickCandidates.value,
         englishCandidates = englishCandidates.value,
         chinesePunctuation = chinesePunctuation.value,
@@ -387,9 +389,17 @@ internal class KeyboardSessionController(
     /** Symbols keep the originating language owner; emoji ends the literal word. */
     fun onVisiblePanelChanged(mode: KeyboardInputMode?) {
         pendingTouch = null
-        if (mode == null) { finishEnglishLiteral(); quick.accept(); return }
-        if (mode == KeyboardInputMode.Number) return
-        if (mode != textPanel) { finishEnglishLiteral(); quick.accept() }
+        if (mode == null) {
+            finishEnglishLiteral()
+            quick.accept()
+            if (handwriting.hasActiveInput()) { handwriting.accept(); refreshPunctuation() }
+            return
+        }
+        if (mode == KeyboardInputMode.Number) {
+            if (handwriting.hasActiveInput()) { handwriting.accept(); refreshPunctuation() }
+            return
+        }
+        if (mode != textPanel) { finishEnglishLiteral(); quick.accept(); handwriting.accept() }
         textPanel = mode
         refreshAutoCapitalization()
     }
@@ -537,6 +547,10 @@ internal class KeyboardSessionController(
         if (finishEnglishBoundary(" ")) { refreshPredictions(); return }
         if (quick.hasActiveInput()) {
             quick.onSpace()
+            refreshPunctuation()
+            refreshAutoCapitalization()
+        } else if (handwriting.hasActiveInput()) {
+            handwriting.onSpace()
             refreshPunctuation()
             refreshAutoCapitalization()
         } else {

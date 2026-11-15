@@ -48,6 +48,7 @@ internal interface VoiceSession {
 internal interface HandwritingSession {
     var onRecognitionApplied: () -> Unit
     val candidates: StateFlow<List<HandwritingCandidate>>
+    val composingCandidate: StateFlow<String?>
     val recognizing: StateFlow<Boolean>
     val error: StateFlow<String?>
     fun onInputStarted()
@@ -56,6 +57,7 @@ internal interface HandwritingSession {
                   pixels: ByteArray, width: Int, height: Int)
     fun onStrokeStarted(startsNewCharacter: Boolean)
     fun selectCandidate(text: String)
+    fun onSpace()
     fun hasActiveInput(): Boolean
     fun refreshPredictions()
     fun accept(replacement: String? = null)

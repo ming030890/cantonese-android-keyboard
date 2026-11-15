@@ -13,6 +13,7 @@ data class KeyboardRenderState(
     val clipboard: ClipboardSuggestion? = null,
     val inspectingWord: Boolean = false,
     val handwritingCandidates: List<HandwritingCandidate> = emptyList(),
+    val handwritingComposing: String? = null,
     val quickCandidates: List<HandwritingCandidate> = emptyList(),
     val englishCandidates: List<HandwritingCandidate> = emptyList(),
     val handwritingBusy: Boolean = false,

@@ -92,6 +92,27 @@ class KeyboardInputTest {
     }
 
     @Test
+    fun handwritingGestureRouterKeepsStrokeCapturedAcrossBottomBarUntilLift() {
+        val router = HandwritingGestureRouter()
+        val canvasBounds = Rect(4f, 52f, 408f, 367f)
+
+        // Stroke starts inside canvas and drags downward into the bottom bar (y = 395).
+        assertTrue(router.shouldPassToCanvas(true, canvasBounds, MotionEvent.ACTION_DOWN, 200f, 220f))
+        assertTrue(router.strokeCapturedByCanvas)
+        assertTrue(router.shouldPassToCanvas(true, canvasBounds, MotionEvent.ACTION_MOVE, 200f, 395f))
+        assertTrue(router.shouldPassToCanvas(true, canvasBounds, MotionEvent.ACTION_UP, 200f, 395f))
+        assertFalse(router.strokeCapturedByCanvas)
+
+        // Subsequent tap directly on the bottom bar routes to bottom keys instead of canvas.
+        assertFalse(router.shouldPassToCanvas(true, canvasBounds, MotionEvent.ACTION_DOWN, 200f, 395f))
+        assertFalse(router.shouldPassToCanvas(true, canvasBounds, MotionEvent.ACTION_MOVE, 200f, 395f))
+        assertFalse(router.shouldPassToCanvas(true, canvasBounds, MotionEvent.ACTION_UP, 200f, 395f))
+
+        // Touch in the 4dp horizontal margin alongside the canvas does not leak to bottom/toolbar keys.
+        assertTrue(router.shouldPassToCanvas(true, canvasBounds, MotionEvent.ACTION_DOWN, 2f, 250f))
+    }
+
+    @Test
     fun candidateToolbarCreatesSemanticTargetsAlongsideFixedVoiceKey() {
         val registry = KeyboardKeyRegistry()
         val keys = registerTextToolbarKeys(

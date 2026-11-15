@@ -153,6 +153,7 @@
     <string name="keyboard_status_transcribing">Transcribing…</string>
     <string name="keyboard_status_recognizing">Recognizing…</string>
     <string name="keyboard_key_space">Space</string>
+    <string name="keyboard_handwriting_confirm_candidate">Choose %1$s</string>
     <string name="keyboard_toolbar_settings">Settings</string>
     <string name="keyboard_toolbar_voice">Voice typing</string>
     <string name="keyboard_toolbar_clipboard_preview">Paste %1$s</string>

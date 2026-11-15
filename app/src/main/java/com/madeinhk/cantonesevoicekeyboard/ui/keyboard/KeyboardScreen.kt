@@ -12,12 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.madeinhk.cantonesevoicekeyboard.KeyboardUiState
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.ShiftState
@@ -26,7 +30,6 @@ import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-private val AlphaBottomRowSpacing = KeyboardUiDefaults.WritingPanelSpacing
 private val KeyboardHorizontalPadding = KeyboardUiDefaults.KeyboardHorizontalPadding
 
 @Composable
@@ -42,6 +45,7 @@ fun KeyboardScreen(
     handwritingRecognizing: StateFlow<Boolean>,
     handwritingError: StateFlow<String?>,
     handwritingSession: StateFlow<Long>,
+    handwritingComposing: StateFlow<String?> = MutableStateFlow(null),
     keyboardSession: StateFlow<Long> = MutableStateFlow(0L),
     quickCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow<List<HandwritingCandidate>>(emptyList()),
     englishCandidates: StateFlow<List<HandwritingCandidate>> = MutableStateFlow(emptyList()),
@@ -83,6 +87,7 @@ fun KeyboardScreen(
     val autofillView by autofillSuggestionView.collectAsState()
     val clipboard by clipboardSuggestion.collectAsState()
     val handwritingCandidates by handwritingCandidates.collectAsState()
+    val handwritingComposing by handwritingComposing.collectAsState()
     val handwritingBusy by handwritingRecognizing.collectAsState()
     val handwritingError by handwritingError.collectAsState()
     val handwritingSession by handwritingSession.collectAsState()
@@ -102,6 +107,7 @@ fun KeyboardScreen(
             clipboard = clipboard,
             inspectingWord = inspectingWord,
             handwritingCandidates = handwritingCandidates,
+            handwritingComposing = handwritingComposing,
             handwritingBusy = handwritingBusy,
             handwritingError = handwritingError,
             handwritingSession = handwritingSession,
@@ -238,6 +244,7 @@ fun KeyboardScreen(
     var emojiPickerBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
     var autofillBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
     var handwritingBoundsInSurface by remember { mutableStateOf(Rect.Zero) }
+    val handwritingGestureRouter = remember { HandwritingGestureRouter() }
     val keyRegistry = remember { KeyboardKeyRegistry() }
     val toolbarVisible = activePanel != KeyboardPanel.Emoji
     val toolbarState = toolbarPresentation(
@@ -338,6 +345,10 @@ fun KeyboardScreen(
         if (autofillView == null) {
             autofillBoundsInSurface = Rect.Zero
         }
+        if (!isHandwritingPanel) {
+            handwritingBoundsInSurface = Rect.Zero
+            handwritingGestureRouter.reset()
+        }
     }
     DisposableEffect(touchController) {
         onDispose { touchController.dispose() }
@@ -355,17 +366,15 @@ fun KeyboardScreen(
     val keyboardHeight = when {
         emojiSearchActive -> KeyboardUiDefaults.EmojiSearchSurfaceHeightDp.dp
         activePanel == KeyboardPanel.Emoji -> KeyboardUiDefaults.EmojiSurfaceHeightDp.dp
+        activePanel == KeyboardPanel.Handwriting -> KeyboardUiDefaults.HandwritingSurfaceHeightDp.dp
         else -> KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp
     }
     val isWritingPanel = isTextPanel || activePanel == KeyboardPanel.Handwriting
     val keyboardTopPadding =
         if (isWritingPanel) KeyboardUiDefaults.WritingTopPadding else 12.dp
     val keyboardBottomPadding = systemPadding.calculateBottomPadding()
-    val keyboardVerticalArrangement = when {
-        isTextPanel -> Arrangement.Top
-        isWritingPanel -> Arrangement.spacedBy(AlphaBottomRowSpacing)
-        else -> Arrangement.SpaceBetween
-    }
+    val keyboardVerticalArrangement =
+        if (isWritingPanel) Arrangement.Top else Arrangement.SpaceBetween
     // Main Keyboard container with premium glassmorphic/charcoal aesthetics
     BoxWithConstraints(
         modifier = Modifier
@@ -377,13 +386,20 @@ fun KeyboardScreen(
                 keyRegistry.updateSurfaceCoordinates(coordinates)
             }
             .pointerInteropFilter { event ->
+                val passToHandwriting = handwritingGestureRouter.shouldPassToCanvas(
+                    handwritingPanelActive = activePanel == KeyboardPanel.Handwriting,
+                    handwritingBounds = handwritingBoundsInSurface,
+                    actionMasked = event.actionMasked,
+                    x = event.x,
+                    y = event.y,
+                )
                 val passToAutofill = shouldPassToAutofillView(
                     autofillViewPresent = autofillView != null,
                     autofillBounds = autofillBoundsInSurface,
                     x = event.x,
                     y = event.y
                 )
-                if (shouldDismissAutofillOnTouch(
+                if (!passToHandwriting && shouldDismissAutofillOnTouch(
                         autofillViewPresent = autofillView != null,
                         autofillBounds = autofillBoundsInSurface,
                         action = event.actionMasked,
@@ -400,12 +416,7 @@ fun KeyboardScreen(
                         y = event.y
                     )
                     || passToAutofill
-                    || shouldPassToHandwritingCanvas(
-                        handwritingPanelActive = activePanel == KeyboardPanel.Handwriting,
-                        handwritingBounds = handwritingBoundsInSurface,
-                        x = event.x,
-                        y = event.y,
-                    )
+                    || passToHandwriting
                 ) {
                     false
                 } else {
@@ -634,7 +645,9 @@ fun KeyboardScreen(
                         ModeKeyLabel("?123")
                     }
 
-                    // Space Key
+                    // Space Key (morphs into "✓ <1st candidate>" while handwriting has a live match)
+                    val handwritingConfirmCandidate = renderState.handwritingComposing
+                        ?.takeIf { isHandwritingPanel && it.isNotEmpty() }
                     KeyVisual(
                         key = keyRegistry.key(
                             id = "bottom.space",
@@ -643,17 +656,54 @@ fun KeyboardScreen(
                         ),
                         keyRegistry = keyRegistry,
                         modifier = Modifier.weight(2.85f),
+                        backgroundColor = if (handwritingConfirmCandidate != null) {
+                            keyboardColors.voiceActiveContainer
+                        } else {
+                            Color.Unspecified
+                        },
+                        borderColor = if (handwritingConfirmCandidate != null) {
+                            primaryColor.copy(alpha = 0.55f)
+                        } else {
+                            Color.Unspecified
+                        },
                         shape = RoundedCornerShape(8.dp),
                         pressedScale = 0.92f,
                         restingElevation = 2.dp,
                         verticalPadding = 8.dp,
                         utilityStyle = true,
+                        accessibilityDescription = handwritingConfirmCandidate?.let {
+                            stringResource(R.string.keyboard_handwriting_confirm_candidate, it)
+                        },
                     ) {
-                        Text(
-                            text = stringResource(R.string.keyboard_key_space),
-                            color = textVariantColor,
-                            style = keyboardTypography.keyboardSpaceKey
-                        )
+                        if (handwritingConfirmCandidate != null) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                            ) {
+                                KeyboardActionIcon(
+                                    action = KeyboardAction.Done,
+                                    modifier = Modifier.size(16.dp),
+                                    color = primaryColor,
+                                )
+                                Text(
+                                    text = handwritingConfirmCandidate,
+                                    color = keyboardColors.keyboardKeyOnSurface,
+                                    style = keyboardTypography.keyboardModeSwitchKey.copy(
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Medium,
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = stringResource(R.string.keyboard_key_space),
+                                color = textVariantColor,
+                                style = keyboardTypography.keyboardSpaceKey
+                            )
+                        }
                     }
 
                     // Delete Key

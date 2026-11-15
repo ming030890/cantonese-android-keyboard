@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenIdleScreenshot() {
@@ -33,7 +33,7 @@ fun KeyboardScreenIdleScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenLoadingScreenshot() {
@@ -46,7 +46,7 @@ fun KeyboardScreenLoadingScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenRecordingScreenshot() {
@@ -62,7 +62,7 @@ fun KeyboardScreenRecordingScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenErrorScreenshot() {
@@ -77,7 +77,7 @@ fun KeyboardScreenErrorScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenSearchActionScreenshot() {
@@ -197,7 +197,7 @@ fun KeyboardScreenQuickUppercaseScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenClipboardPreviewScreenshot() {
@@ -218,7 +218,7 @@ fun KeyboardScreenClipboardPreviewScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenSensitivePasteScreenshot() {
@@ -234,7 +234,7 @@ fun KeyboardScreenSensitivePasteScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenHandwritingCandidatesScreenshot() {
@@ -252,7 +252,7 @@ fun KeyboardScreenHandwritingCandidatesScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenAutofillPlaceholderScreenshot() {
@@ -268,7 +268,7 @@ fun KeyboardScreenAutofillPlaceholderScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenTranscribingScreenshot() {
@@ -298,7 +298,7 @@ fun KeyboardScreenDarkThemeScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenHandwritingRecognizingScreenshot() {
@@ -314,7 +314,7 @@ fun KeyboardScreenHandwritingRecognizingScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenHandwritingErrorScreenshot() {
@@ -330,7 +330,7 @@ fun KeyboardScreenHandwritingErrorScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenLaterCandidatePageScreenshot() {
@@ -349,7 +349,7 @@ fun KeyboardScreenLaterCandidatePageScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenSendActionScreenshot() {
@@ -365,7 +365,7 @@ fun KeyboardScreenSendActionScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenDoneActionScreenshot() {
@@ -381,7 +381,7 @@ fun KeyboardScreenDoneActionScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 412,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenPreviousActionScreenshot() {
@@ -463,7 +463,7 @@ fun KeyboardScreenCompactQuickScreenshot() {
     showBackground = true,
     backgroundColor = 0xFF0D1117,
     widthDp = 360,
-    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+    heightDp = KeyboardUiDefaults.HandwritingSurfaceHeightDp
 )
 @Composable
 fun KeyboardScreenCompactHandwritingScreenshot() {
@@ -535,6 +535,9 @@ private fun KeyboardScreenScreenshotContent(
     } else {
         null
     }
+    val handwritingComposing = candidates.firstOrNull()?.text.takeIf {
+        inputMode == KeyboardInputMode.Handwriting && clipboard == null
+    }
     CantoneseVoiceKeyboardTheme(darkTheme = darkTheme, dynamicColor = false) {
         KeyboardScreen(
             uiState = MutableStateFlow(state),
@@ -542,6 +545,7 @@ private fun KeyboardScreenScreenshotContent(
             keyboardAction = MutableStateFlow(action),
             keyboardInputMode = MutableStateFlow(inputMode),
             handwritingCandidates = MutableStateFlow(candidates),
+            handwritingComposing = MutableStateFlow(handwritingComposing),
             quickCandidates = MutableStateFlow(candidates),
             handwritingRecognizing = MutableStateFlow(handwritingRecognizing),
             handwritingError = MutableStateFlow(handwritingError),

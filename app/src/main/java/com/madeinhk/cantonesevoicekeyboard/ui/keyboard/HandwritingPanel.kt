@@ -42,8 +42,27 @@ internal fun HandwritingPanel(
     // A recognition result advances this key in the same main-thread update as editor text.
     var strokes by remember(sessionKey) { mutableStateOf<List<HandwritingStroke>>(emptyList()) }
     var activeStroke by remember(sessionKey) { mutableStateOf<HandwritingStroke>(emptyList()) }
+    var activePointerId by remember(sessionKey) { mutableStateOf(MotionEvent.INVALID_POINTER_ID) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     val hintColor = MaterialTheme.colorScheme.onSurfaceVariant
+
+    fun finishActiveStroke(finalSamples: List<StrokePoint>) {
+        if (activeStroke.isEmpty()) {
+            activePointerId = MotionEvent.INVALID_POINTER_ID
+            return
+        }
+        val completedStroke = activeStroke + finalSamples
+        val completed = strokes + listOf(completedStroke)
+        strokes = completed
+        activeStroke = emptyList()
+        activePointerId = MotionEvent.INVALID_POINTER_ID
+        val width = canvasSize.width.coerceAtLeast(1)
+        val height = canvasSize.height.coerceAtLeast(1)
+        onStrokesChanged(
+            completed, width.toFloat(), height.toFloat(),
+            ByteArray(0), width, height,
+        )
+    }
 
     Box(
         modifier = modifier
@@ -58,29 +77,45 @@ internal fun HandwritingPanel(
             .pointerInteropFilter { event ->
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
+                        activePointerId = event.getPointerId(0)
                         onStrokeStarted(strokes.isEmpty())
                         activeStroke = listOf(StrokePoint(event.x, event.y, event.eventTime))
                     }
                     MotionEvent.ACTION_MOVE -> {
-                        if (activeStroke.isNotEmpty()) {
-                            activeStroke = activeStroke + event.handwritingStrokeSamples()
+                        val pointerIndex = event.findPointerIndex(activePointerId)
+                        if (pointerIndex >= 0 && activeStroke.isNotEmpty()) {
+                            activeStroke = activeStroke + event.handwritingStrokeSamples(pointerIndex)
                         }
                     }
-                    MotionEvent.ACTION_UP -> {
-                        if (activeStroke.isNotEmpty()) {
-                            val completedStroke = activeStroke + event.handwritingStrokeSamples()
-                            val completed = strokes + listOf(completedStroke)
-                            strokes = completed
-                            activeStroke = emptyList()
-                            val width = canvasSize.width.coerceAtLeast(1)
-                            val height = canvasSize.height.coerceAtLeast(1)
-                            onStrokesChanged(
-                                completed, width.toFloat(), height.toFloat(),
-                                ByteArray(0), width, height,
+                    MotionEvent.ACTION_POINTER_UP -> {
+                        val liftedIndex = event.actionIndex
+                        if (liftedIndex in 0 until event.pointerCount &&
+                            event.getPointerId(liftedIndex) == activePointerId
+                        ) {
+                            finishActiveStroke(
+                                listOf(
+                                    StrokePoint(
+                                        event.getX(liftedIndex),
+                                        event.getY(liftedIndex),
+                                        event.eventTime,
+                                    )
+                                )
                             )
                         }
                     }
-                    MotionEvent.ACTION_CANCEL -> activeStroke = emptyList()
+                    MotionEvent.ACTION_UP -> {
+                        val pointerIndex = event.findPointerIndex(activePointerId)
+                        if (pointerIndex >= 0) {
+                            finishActiveStroke(event.handwritingStrokeSamples(pointerIndex))
+                        } else {
+                            activePointerId = MotionEvent.INVALID_POINTER_ID
+                            activeStroke = emptyList()
+                        }
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        activePointerId = MotionEvent.INVALID_POINTER_ID
+                        activeStroke = emptyList()
+                    }
                 }
                 true
             },
@@ -106,11 +141,17 @@ internal data class HandwritingBitmap(
     val height: Int,
 )
 
-private fun MotionEvent.handwritingStrokeSamples(): List<StrokePoint> = buildList(historySize + 1) {
+private fun MotionEvent.handwritingStrokeSamples(pointerIndex: Int = 0): List<StrokePoint> = buildList(historySize + 1) {
     for (index in 0 until historySize) {
-        add(StrokePoint(getHistoricalX(index), getHistoricalY(index), getHistoricalEventTime(index)))
+        add(
+            StrokePoint(
+                getHistoricalX(pointerIndex, index),
+                getHistoricalY(pointerIndex, index),
+                getHistoricalEventTime(index),
+            )
+        )
     }
-    add(StrokePoint(x, y, eventTime))
+    add(StrokePoint(getX(pointerIndex), getY(pointerIndex), eventTime))
 }
 
 internal fun handwritingStrokeWidthPx(width: Float, height: Float): Float =

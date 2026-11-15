@@ -79,6 +79,7 @@ class CantoneseInputMethodService :
                         keyboardInputMode = controller.keyboardInputMode,
                         shiftState = controller.shiftState,
                         handwritingCandidates = controller.handwritingCandidates,
+                        handwritingComposing = controller.handwritingComposing,
                         handwritingRecognizing = controller.handwritingRecognizing,
                         handwritingError = controller.handwritingError,
                         handwritingSession = controller.handwritingSession,

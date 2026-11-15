@@ -9,6 +9,7 @@ object KeyboardUiDefaults {
     // Includes the system navigation area when hosted in the edge-to-edge IME window.
     // 369 dp is approximately 969 px at 420 dpi, matching Gboard on a 1080 px Pixel display.
     const val KeyboardSurfaceHeightDp = 369
+    const val HandwritingSurfaceHeightDp = 424
 
     const val EmojiSurfaceHeightDp = 560
     const val EmojiSearchPanelHeightDp = 224
@@ -58,12 +59,11 @@ object KeyboardUiDefaults {
 
 fun handwritingCanvasHeight(navigationBarHeight: Dp): Dp =
     (
-        KeyboardUiDefaults.KeyboardSurfaceHeightDp.dp -
+        KeyboardUiDefaults.HandwritingSurfaceHeightDp.dp -
             navigationBarHeight -
             KeyboardUiDefaults.WritingTopPadding -
-            KeyboardUiDefaults.WritingBottomPadding -
             KeyboardUiDefaults.ToolbarHeight -
-            KeyboardUiDefaults.WritingPanelSpacing
+            KeyboardUiDefaults.RowHeight
         ).coerceAtLeast(1.dp)
 
 data class KeyboardHapticConfig(

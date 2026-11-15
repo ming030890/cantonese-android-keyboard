@@ -215,22 +215,45 @@ internal class ScenarioVoice(private val editor: KeyboardEditor? = null) : Voice
 internal class ScenarioHandwriting(private val editor: KeyboardEditor) : HandwritingSession {
     override var onRecognitionApplied: () -> Unit = {}
     override val candidates = MutableStateFlow<List<HandwritingCandidate>>(emptyList())
+    override val composingCandidate = MutableStateFlow<String?>(null)
     override val recognizing = MutableStateFlow(false)
     override val error = MutableStateFlow<String?>(null)
     private var active = false
     override fun onInputStarted() = discard()
     override fun onInputViewStarted(session: Long) = Unit
     override fun recognize(strokes: List<List<StrokePoint>>, canvasWidth: Float, canvasHeight: Float,
-                           pixels: ByteArray, width: Int, height: Int) { recognizing.value = true }
+                           pixels: ByteArray, width: Int, height: Int) { active = true; recognizing.value = true }
     override fun onStrokeStarted(startsNewCharacter: Boolean) { active = true }
-    override fun selectCandidate(text: String) { editor.commitText(text); discard() }
+    override fun selectCandidate(text: String) {
+        val hadActive = active
+        editor.commitText(text)
+        discard(resetCanvas = hadActive)
+    }
+    override fun onSpace() {
+        if (!active) { editor.commitText(" "); return }
+        (composingCandidate.value ?: candidates.value.firstOrNull()?.text)?.let(editor::commitText)
+        discard(resetCanvas = true)
+    }
     override fun hasActiveInput() = active
     override fun refreshPredictions() = Unit
     override fun accept(replacement: String?) {
-        if (active) (replacement ?: candidates.value.firstOrNull()?.text)?.let(editor::commitText)
-        discard()
+        val hadActive = active
+        if (active) (replacement ?: composingCandidate.value ?: candidates.value.firstOrNull()?.text)?.let(editor::commitText)
+        discard(resetCanvas = hadActive)
     }
-    override fun discard() { active = false; candidates.value = emptyList(); recognizing.value = false; error.value = null }
+    override fun discard() = discard(resetCanvas = active, clearEditorComposing = active)
+    private fun discard(resetCanvas: Boolean, clearEditorComposing: Boolean = false) {
+        if (clearEditorComposing && editor.getTextBeforeCursor(1) != null) {
+            editor.setComposingText("")
+            editor.finishComposingText()
+        }
+        active = false
+        candidates.value = emptyList()
+        composingCandidate.value = null
+        recognizing.value = false
+        error.value = null
+        if (resetCanvas) onRecognitionApplied()
+    }
     override fun finish(releaseModel: Boolean, session: Long) = discard()
     override fun destroy() = discard()
 }
@@ -562,6 +585,7 @@ internal object KeyboardScenarios {
         clipboardText = null).use { s ->
         s.start(); s.controller.onHandwritingStrokeStarted(true)
         s.editor.setComposingText("不")
+        s.handwriting.composingCandidate.value = "不"
         s.handwriting.candidates.value = capturedHandwritingAlternatives.mapIndexed { i, text -> HandwritingCandidate(text, i) }
         s.snapshot()
     }

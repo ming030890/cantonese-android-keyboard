@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.dp
 class KeyboardUiDefaultsTest {
     @Test
     fun handwritingCanvasUsesTheRemainingKeyboardSurfaceHeight() {
-        assertEquals(269.dp, handwritingCanvasHeight(24.dp))
-        assertEquals(293.dp, handwritingCanvasHeight(0.dp))
+        assertEquals(291.dp, handwritingCanvasHeight(24.dp))
+        assertEquals(315.dp, handwritingCanvasHeight(0.dp))
     }
 
     @Test
