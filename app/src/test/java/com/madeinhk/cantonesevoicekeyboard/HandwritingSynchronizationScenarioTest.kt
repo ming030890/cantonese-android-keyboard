@@ -128,13 +128,17 @@ class HandwritingSynchronizationScenarioTest {
             assertEquals(listOf("亻", "丿"), s.snapshot().handwritingCandidates.map { it.text })
             assertEquals(initialCanvas, s.snapshot().handwritingSession)
 
-            // Even after pausing 3 seconds, ink remains on canvas so user can continue strokes.
-            advanceTimeBy(3_000); runCurrent()
+            // Starting a second stroke before 1s elapses cancels auto-commit, even if drawing
+            // the stroke itself takes longer than 1s.
+            advanceTimeBy(999); runCurrent()
+            assertEquals("亻", s.editor.composing)
+            assertEquals(initialCanvas, s.snapshot().handwritingSession)
+            s.controller.onHandwritingStrokeStarted(false)
+            advanceTimeBy(2_000); runCurrent()
             assertEquals("亻", s.editor.composing)
             assertEquals(initialCanvas, s.snapshot().handwritingSession)
 
             // Stroke 2 refines the character to "你" on the same canvas.
-            s.controller.onHandwritingStrokeStarted(false)
             submit(2)
             runCurrent()
             assertEquals("你", s.editor.composing)
@@ -143,33 +147,50 @@ class HandwritingSynchronizationScenarioTest {
             assertEquals(KeyboardToolbarContent.Candidates, s.snapshot().toolbar())
             assertEquals(initialCanvas, s.snapshot().handwritingSession)
 
-            // Pressing Space commits the 1st candidate ("你") without adding an ASCII space,
-            // resets the canvas, clears the Spacebar confirm label, and shows next-word predictions.
-            s.press(KeyboardKeyKind.Space)
+            // Once "你" has been shown for 1 full second with no new stroke, it auto-commits,
+            // clears the canvas and Spacebar confirm label, and loads next-word predictions.
+            advanceTimeBy(999); runCurrent()
+            assertEquals("", s.editor.text)
+            assertEquals("你", s.editor.composing)
+            assertEquals(initialCanvas, s.snapshot().handwritingSession)
+
+            advanceTimeBy(1); runCurrent()
             assertEquals("你", s.editor.text)
             assertEquals("", s.editor.composing)
             assertNull(s.snapshot().handwritingComposing)
             assertEquals(initialCanvas + 1, s.snapshot().handwritingSession)
             assertEquals(listOf("哋"), s.snapshot().handwritingCandidates.map { it.text })
 
-            // Pressing Space again when canvas is idle inserts a literal space.
+            // Pressing Space when canvas is idle inserts a literal space.
             s.press(KeyboardKeyKind.Space)
             assertEquals("你 ", s.editor.text)
 
-            // Next character: both the #1 candidate ("好") and alternatives ("女子") appear in
-            // the top candidate bar; selecting an alternative commits it and resets the canvas.
+            // Fast Spacebar confirm before 1s commits immediately without adding an ASCII space.
             s.controller.onHandwritingStrokeStarted(true)
             submit(3)
             runCurrent()
             assertEquals("好", s.editor.composing)
-            assertEquals("好", s.snapshot().handwritingComposing)
-            assertEquals(listOf("好", "女子"), s.snapshot().handwritingCandidates.map { it.text })
-            assertEquals(initialCanvas + 1, s.snapshot().handwritingSession)
-            s.choose("女子")
-            assertEquals("你 女子", s.editor.text)
+            s.press(KeyboardKeyKind.Space)
+            assertEquals("你 好", s.editor.text)
             assertEquals("", s.editor.composing)
             assertNull(s.snapshot().handwritingComposing)
             assertEquals(initialCanvas + 2, s.snapshot().handwritingSession)
+
+            // Browsing candidate pages cancels auto-commit so the user can pick an alternative calmly.
+            s.controller.onHandwritingStrokeStarted(true)
+            submit(3)
+            runCurrent()
+            assertEquals("好", s.editor.composing)
+            assertEquals(listOf("好", "女子"), s.snapshot().handwritingCandidates.map { it.text })
+            s.controller.onHandwritingCandidatePageChanged()
+            advanceTimeBy(2_000); runCurrent()
+            assertEquals("好", s.editor.composing)
+            assertEquals(initialCanvas + 2, s.snapshot().handwritingSession)
+            s.choose("女子")
+            assertEquals("你 好女子", s.editor.text)
+            assertEquals("", s.editor.composing)
+            assertNull(s.snapshot().handwritingComposing)
+            assertEquals(initialCanvas + 3, s.snapshot().handwritingSession)
 
             // Tapping the #1 candidate directly in the top candidate bar also commits and resets.
             s.controller.onHandwritingStrokeStarted(true)
@@ -178,10 +199,10 @@ class HandwritingSynchronizationScenarioTest {
             assertEquals("好", s.snapshot().handwritingCandidates.first().text)
             assertEquals("好", s.snapshot().handwritingComposing)
             s.choose("好")
-            assertEquals("你 女子好", s.editor.text)
+            assertEquals("你 好女子好", s.editor.text)
             assertEquals("", s.editor.composing)
             assertNull(s.snapshot().handwritingComposing)
-            assertEquals(initialCanvas + 3, s.snapshot().handwritingSession)
+            assertEquals(initialCanvas + 4, s.snapshot().handwritingSession)
 
             // Closing a session cancels pending text and canvas updates.
             s.controller.onHandwritingStrokeStarted(true)
@@ -189,7 +210,7 @@ class HandwritingSynchronizationScenarioTest {
             s.hide()
             val hiddenCanvas = s.snapshot().handwritingSession
             advanceTimeBy(2_000); runCurrent()
-            assertEquals("你 女子好", s.editor.text)
+            assertEquals("你 好女子好", s.editor.text)
             assertEquals(hiddenCanvas, s.snapshot().handwritingSession)
         }
     }

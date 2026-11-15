@@ -47,6 +47,9 @@ internal interface VoiceSession {
 
 internal interface HandwritingSession {
     var onRecognitionApplied: () -> Unit
+    var onCharacterCommitted: () -> Unit
+        get() = {}
+        set(_) {}
     val candidates: StateFlow<List<HandwritingCandidate>>
     val composingCandidate: StateFlow<String?>
     val recognizing: StateFlow<Boolean>
@@ -56,6 +59,7 @@ internal interface HandwritingSession {
     fun recognize(strokes: List<List<StrokePoint>>, canvasWidth: Float, canvasHeight: Float,
                   pixels: ByteArray, width: Int, height: Int)
     fun onStrokeStarted(startsNewCharacter: Boolean)
+    fun onCandidatePageChanged() {}
     fun selectCandidate(text: String)
     fun onSpace()
     fun hasActiveInput(): Boolean

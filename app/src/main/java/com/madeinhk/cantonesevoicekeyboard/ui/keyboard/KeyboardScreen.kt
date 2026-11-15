@@ -64,6 +64,7 @@ fun KeyboardScreen(
     onPasteClipboard: () -> Unit,
     onHandwritingChanged: (strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>, canvasWidth: Float, canvasHeight: Float, pixels: ByteArray, width: Int, height: Int) -> Unit,
     onHandwritingStrokeStarted: (startsNewCharacter: Boolean) -> Unit = {},
+    onHandwritingCandidatePageChanged: () -> Unit = {},
     onHandwritingCandidateSelected: (String) -> Unit,
     onAutofillTapped: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
@@ -130,6 +131,7 @@ fun KeyboardScreen(
         onPasteClipboard = onPasteClipboard,
         onHandwritingChanged = onHandwritingChanged,
         onHandwritingStrokeStarted = onHandwritingStrokeStarted,
+        onHandwritingCandidatePageChanged = onHandwritingCandidatePageChanged,
         onHandwritingCandidateSelected = onHandwritingCandidateSelected,
         onAutofillTapped = onAutofillTapped,
         onEmojiPicked = onEmojiPicked,
@@ -163,6 +165,7 @@ fun KeyboardScreen(
     onPasteClipboard: () -> Unit,
     onHandwritingChanged: (strokes: List<List<com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint>>, canvasWidth: Float, canvasHeight: Float, pixels: ByteArray, width: Int, height: Int) -> Unit,
     onHandwritingStrokeStarted: (startsNewCharacter: Boolean) -> Unit = {},
+    onHandwritingCandidatePageChanged: () -> Unit = {},
     onHandwritingCandidateSelected: (String) -> Unit,
     onAutofillTapped: () -> Unit = {},
     onEmojiPicked: (String) -> Unit,
@@ -472,6 +475,9 @@ fun KeyboardScreen(
                     onAutofillBoundsChanged = { autofillBoundsInSurface = it },
                     handwritingCandidatePage = candidatePage,
                     onHandwritingCandidatePageChanged = { page ->
+                        if (isHandwritingPanel && page != candidatePage) {
+                            onHandwritingCandidatePageChanged()
+                        }
                         candidatePage = page
                     },
                 )

@@ -3,8 +3,12 @@ package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 import android.graphics.Bitmap
 import android.graphics.Paint
 import android.view.MotionEvent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +26,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.HandwritingCanvasGeometry
 
 import com.madeinhk.cantonesevoicekeyboard.hwr.StrokePoint
+import com.madeinhk.cantonesevoicekeyboard.theme.BrandTheme
 
 private typealias HandwritingStroke = List<StrokePoint>
 
@@ -121,6 +127,24 @@ internal fun HandwritingPanel(
             },
         contentAlignment = Alignment.Center,
     ) {
+        val padShape = RoundedCornerShape(KeyboardUiDefaults.StandardKeyCornerRadius)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    horizontal = KeyboardUiDefaults.HorizontalKeyInset,
+                    vertical = KeyboardUiDefaults.VerticalKeyInset,
+                )
+                .background(
+                    color = BrandTheme.colors.keyboardKeySurface,
+                    shape = padShape,
+                )
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    shape = padShape,
+                ),
+        )
         HandwritingInk(
             strokes = strokes + listOfNotNull(activeStroke.takeIf { it.isNotEmpty() }),
             modifier = Modifier.fillMaxSize(),

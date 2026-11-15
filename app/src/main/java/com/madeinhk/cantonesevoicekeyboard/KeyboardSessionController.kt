@@ -596,6 +596,10 @@ internal class KeyboardSessionController(
         handwriting.onStrokeStarted(startsNewCharacter)
     }
 
+    fun onHandwritingCandidatePageChanged() {
+        handwriting.onCandidatePageChanged()
+    }
+
     fun selectCandidate(text: String) {
         if (english != null && (_keyboardInputMode.value == KeyboardInputMode.AlphaNum || english.inspectingWord) &&
             !english.canSelect(text)) return
@@ -715,5 +719,12 @@ internal class KeyboardSessionController(
         inputViewSession++
         _handwritingSession.value++
         return inputViewSession
+    }
+
+    init {
+        handwriting.onCharacterCommitted = {
+            refreshPunctuation()
+            refreshAutoCapitalization()
+        }
     }
 }

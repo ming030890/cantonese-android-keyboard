@@ -103,6 +103,7 @@ class CantoneseInputMethodService :
                         onPasteClipboard = controller::pasteClipboard,
                         onHandwritingChanged = controller::recognizeHandwriting,
                         onHandwritingStrokeStarted = controller::onHandwritingStrokeStarted,
+                        onHandwritingCandidatePageChanged = controller::onHandwritingCandidatePageChanged,
                         onHandwritingCandidateSelected = controller::selectHandwritingCandidate,
                         onKeyboardInputModeSelected = controller::selectKeyboardInputMode,
                         onAutofillTapped = controller::onAutofillTapped,

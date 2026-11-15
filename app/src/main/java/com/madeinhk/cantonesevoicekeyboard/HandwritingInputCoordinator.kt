@@ -2,6 +2,7 @@ package com.madeinhk.cantonesevoicekeyboard
 
 import android.content.Context
 import android.util.Log
+import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingAutoCommitDelayMillis
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingBusyIndicatorDelayMillis
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingLiveRecognitionDelayMillis
@@ -10,6 +11,7 @@ import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognitionQueue
 import com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingRecognizer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -52,6 +54,7 @@ internal class HandwritingInputCoordinator(
     private val internalJob = if (coroutineScope == null) SupervisorJob() else null
     private val scope = coroutineScope ?: CoroutineScope(internalJob!! + Dispatchers.Main.immediate)
     override var onRecognitionApplied: () -> Unit = {}
+    override var onCharacterCommitted: () -> Unit = {}
     @Volatile private var recognizer: HandwritingRecognitionEngine? = recognitionEngine
     private var loadingJob: Job? = null
     @Volatile private var debugRecordingId: String? = null
@@ -67,6 +70,7 @@ internal class HandwritingInputCoordinator(
     private val pendingSpaceCommits = mutableMapOf<Long, String?>()
     private var hasCanvasInk = false
     private var busyIndicatorJob: Job? = null
+    private var autoCommitJob: Job? = null
     private var composition: String? = null
     private var isShowingPredictions = false
     private var predictionJob: Job? = null
@@ -102,6 +106,7 @@ internal class HandwritingInputCoordinator(
     ) {
         if (!isInputViewVisible() || (strokes.isEmpty() && pixels.isEmpty())) return
         cancelPredictions()
+        cancelAutoCommit()
         hasCanvasInk = true
         val version = ++requestVersion
         latestVersions[characterId] = version
@@ -134,11 +139,44 @@ internal class HandwritingInputCoordinator(
         busyIndicatorJob = null
     }
 
+    private fun scheduleAutoCommit(targetCharacterId: Long) {
+        cancelAutoCommit()
+        val expectedGeneration = generation
+        val job = scope.launch(start = CoroutineStart.LAZY) {
+            val currentJob = coroutineContext[Job]
+            delay(HandwritingAutoCommitDelayMillis)
+            if (autoCommitJob === currentJob &&
+                expectedGeneration == generation &&
+                targetCharacterId == characterId &&
+                !latestVersions.containsKey(targetCharacterId) &&
+                composition != null &&
+                isInputViewVisible()
+            ) {
+                autoCommitJob = null
+                accept()
+                refreshPredictions()
+            }
+        }
+        autoCommitJob = job
+        job.invokeOnCompletion {
+            if (autoCommitJob === job) {
+                autoCommitJob = null
+            }
+        }
+        job.start()
+    }
+
+    private fun cancelAutoCommit() {
+        autoCommitJob?.cancel()
+        autoCommitJob = null
+    }
+
     override fun onStrokeStarted(startsNewCharacter: Boolean) {
         if (!isInputViewVisible()) return
         stopVoiceInput()
         cancelPredictions()
         cancelBusyIndicator()
+        cancelAutoCommit()
         if (startsNewCharacter) {
             if (composition != null || hasCanvasInk) {
                 accept()
@@ -152,8 +190,13 @@ internal class HandwritingInputCoordinator(
         }
     }
 
+    override fun onCandidatePageChanged() {
+        cancelAutoCommit()
+    }
+
     override fun selectCandidate(text: String) {
         if (text.isEmpty()) return
+        cancelAutoCommit()
         if (isShowingPredictions) {
             cancelPredictions()
             fun wordChar(c: Char?) = c != null && (c in 'a'..'z' || c in 'A'..'Z' || c in '0'..'9')
@@ -171,6 +214,7 @@ internal class HandwritingInputCoordinator(
 
     override fun onSpace() {
         cancelPredictions()
+        cancelAutoCommit()
         if (!hasActiveInput()) {
             editor.commitText(" ")
             refreshPredictions()
@@ -191,6 +235,7 @@ internal class HandwritingInputCoordinator(
             editor.setComposingText(accepted)
             editor.finishComposingText()
             markChosen(debugRecordingId, accepted)
+            onCharacterCommitted()
         }
         characterId++
         clearState()
@@ -261,6 +306,7 @@ internal class HandwritingInputCoordinator(
             editor.setComposingText(accepted)
             editor.finishComposingText()
             markChosen(debugRecordingId, accepted)
+            onCharacterCommitted()
         }
         characterId++
         clearState()
@@ -434,7 +480,9 @@ internal class HandwritingInputCoordinator(
                 composition = topCandidate
                 _composingCandidate.value = topCandidate
                 editor.setComposingText(topCandidate)
+                scheduleAutoCommit(request.characterId)
             } else {
+                cancelAutoCommit()
                 if (composition != null) {
                     composition = null
                     _composingCandidate.value = null
@@ -449,6 +497,7 @@ internal class HandwritingInputCoordinator(
         } catch (error: Throwable) {
             Log.e(TAG, "Handwriting recognition failed", error)
             if (isLatest(request) && request.characterId == characterId) {
+                cancelAutoCommit()
                 _error.value = context?.getString(R.string.error_handwriting_recognition_failed) ?: "Not recognized. Write it again."
                 _candidates.value = emptyList()
                 _composingCandidate.value = null
@@ -474,6 +523,7 @@ internal class HandwritingInputCoordinator(
     private fun cancelAll(): List<Job> {
         generation++
         cancelBusyIndicator()
+        cancelAutoCommit()
         latestVersions.clear()
         pendingSpaceCommits.clear()
         return queue.cancelAll()
@@ -490,6 +540,7 @@ internal class HandwritingInputCoordinator(
     private fun clearState() {
         cancelPredictions()
         cancelBusyIndicator()
+        cancelAutoCommit()
         composition = null
         _composingCandidate.value = null
         _candidates.value = emptyList()
