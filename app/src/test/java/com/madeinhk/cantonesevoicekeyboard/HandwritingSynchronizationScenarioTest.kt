@@ -7,9 +7,13 @@ import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardKeyKind
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardToolbarContent
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -220,6 +224,49 @@ class HandwritingSynchronizationScenarioTest {
             runCurrent()
             assertEquals("快", s.editor.text)
             assertEquals("", s.editor.composing)
+        }
+    }
+
+    @Test fun immediateMainDispatcherZeroDelayRecognitionDoesNotCrashAndCommitsOnSpace() = runTest {
+        val immediateMain = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
+        val worker = StandardTestDispatcher(testScheduler)
+        val engine = object : HandwritingRecognitionEngine {
+            override fun predict(pixels: ByteArray, width: Int, height: Int, topK: Int): List<HandwritingCandidate> =
+                when (pixels[0].toInt()) {
+                    1 -> listOf(HandwritingCandidate("一", 0), HandwritingCandidate("丨", 1))
+                    else -> listOf(HandwritingCandidate("十", 0), HandwritingCandidate("千", 1))
+                }
+            override fun close() {}
+        }
+        try {
+            KeyboardScenario(initialMode = KeyboardInputMode.Handwriting, clipboardText = null,
+                scope = immediateMain, handwritingFactory = { editor, session, visible ->
+                    HandwritingInputCoordinator(editor = editor, currentSession = session,
+                        isInputViewVisible = visible, stopVoiceInput = {}, coroutineScope = immediateMain,
+                        recognitionEngine = engine, recognitionDispatcher = worker)
+                }).use { s ->
+                s.start()
+                s.controller.onHandwritingStrokeStarted(true)
+                s.controller.recognizeHandwriting(emptyList(), 1f, 1f, byteArrayOf(1), 1, 1)
+                runCurrent()
+                assertEquals("一", s.editor.composing)
+                assertEquals("一", s.snapshot().handwritingComposing)
+                assertEquals(listOf("一", "丨"), s.snapshot().handwritingCandidates.map { it.text })
+
+                s.controller.onHandwritingStrokeStarted(false)
+                s.controller.recognizeHandwriting(emptyList(), 1f, 1f, byteArrayOf(2), 1, 1)
+                runCurrent()
+                assertEquals("十", s.editor.composing)
+                assertEquals("十", s.snapshot().handwritingComposing)
+                assertEquals(listOf("十", "千"), s.snapshot().handwritingCandidates.map { it.text })
+
+                s.press(KeyboardKeyKind.Space)
+                assertEquals("十", s.editor.text)
+                assertEquals("", s.editor.composing)
+                assertNull(s.snapshot().handwritingComposing)
+            }
+        } finally {
+            immediateMain.cancel()
         }
     }
 }

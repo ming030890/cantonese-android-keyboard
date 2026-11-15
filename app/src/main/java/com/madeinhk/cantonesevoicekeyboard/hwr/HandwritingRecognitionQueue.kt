@@ -1,6 +1,7 @@
 package com.madeinhk.cantonesevoicekeyboard.hwr
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,11 +22,11 @@ internal class HandwritingRecognitionQueue<T>(
 
     fun submit(characterId: Long, request: T): Job {
         jobs.remove(characterId)?.cancel()
-        lateinit var job: Job
-        job = scope.launch {
+        val job = scope.launch(start = CoroutineStart.LAZY) {
+            val currentJob = coroutineContext[Job]
             delay(idleDelayMillis)
             processingMutex.withLock {
-                if (jobs[characterId] === job) {
+                if (jobs[characterId] === currentJob) {
                     process(characterId, request)
                 }
             }
@@ -36,6 +37,7 @@ internal class HandwritingRecognitionQueue<T>(
                 jobs.remove(characterId)
             }
         }
+        job.start()
         return job
     }
 

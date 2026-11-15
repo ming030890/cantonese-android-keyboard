@@ -1,11 +1,16 @@
 package com.madeinhk.cantonesevoicekeyboard.hwr
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -80,5 +85,36 @@ class HandwritingRecognitionQueueTest {
         releaseFirst.complete(Unit)
         runCurrent()
         assertEquals(listOf(1L, 2L), processed)
+    }
+
+    @Test
+    fun immediateDispatcherWithZeroDelayExecutesAndCleansUpWithoutUninitializedJob() = runTest {
+        val immediateScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
+        try {
+            val processed = mutableListOf<String>()
+            val holdSecond = CompletableDeferred<Unit>()
+            val queue = HandwritingRecognitionQueue<String>(immediateScope, 0L) { _, request ->
+                if (request == "suspending") {
+                    holdSecond.await()
+                }
+                processed += request
+            }
+
+            // Synchronous completion inline inside submit() on an immediate dispatcher.
+            val syncJob = queue.submit(characterId = 1L, request = "sync")
+            assertTrue(syncJob.isCompleted)
+            assertEquals(listOf("sync"), processed)
+            assertTrue(queue.jobsSnapshot().isEmpty())
+
+            // Suspending work that enters processingMutex.withLock synchronously before suspending.
+            val suspendingJob = queue.submit(characterId = 1L, request = "suspending")
+            assertEquals(listOf(suspendingJob), queue.jobsSnapshot())
+            holdSecond.complete(Unit)
+            assertTrue(suspendingJob.isCompleted)
+            assertEquals(listOf("sync", "suspending"), processed)
+            assertTrue(queue.jobsSnapshot().isEmpty())
+        } finally {
+            immediateScope.cancel()
+        }
     }
 }
