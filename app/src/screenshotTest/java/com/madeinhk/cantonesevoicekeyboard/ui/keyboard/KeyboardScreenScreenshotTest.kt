@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.widget.TextView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
@@ -503,6 +504,48 @@ fun KeyboardScreenCompactEmojiScreenshot() {
         state = KeyboardUiState.Idle,
         initialEmojiPanel = true,
     )
+}
+
+@PreviewTest
+@Preview(
+    name = "Keyboard swipe turtle trail",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp,
+)
+@Composable
+fun KeyboardScreenSwipeTrailScreenshot() {
+    CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
+        val primaryColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+        val density = androidx.compose.ui.platform.LocalDensity.current.density
+        androidx.compose.foundation.layout.Box(
+            modifier = androidx.compose.ui.Modifier.drawWithContent {
+                drawContent()
+                val samplePoints = listOf(
+                    245f to 164f,
+                    220f to 146f,
+                    192f to 124f,
+                    156f to 104f,
+                    118f to 96f,
+                    148f to 114f,
+                    196f to 136f,
+                    254f to 156f,
+                    312f to 162f,
+                    356f to 102f,
+                ).map { (xDp, yDp) ->
+                    androidx.compose.ui.geometry.Offset(xDp * density, yDp * density)
+                }
+                drawSwipeTrail(samplePoints, primaryColor)
+            },
+        ) {
+            KeyboardScreenScreenshotContent(
+                state = KeyboardUiState.Idle,
+                inputMode = KeyboardInputMode.AlphaNum,
+                darkTheme = true,
+            )
+        }
+    }
 }
 
 @Composable

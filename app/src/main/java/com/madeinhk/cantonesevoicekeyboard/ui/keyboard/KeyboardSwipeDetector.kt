@@ -253,19 +253,53 @@ class KeyboardSwipeDetector(
 
 internal fun DrawScope.drawSwipeTrail(points: List<Offset>, color: Color) {
     if (points.size < 2) return
-    val minWidth = 2.5f * density
-    val maxWidth = 8.5f * density
-    val totalSegments = (points.size - 1).coerceAtLeast(1)
-    for (i in 0 until points.size - 1) {
-        val progress = (i + 1).toFloat() / totalSegments.toFloat()
-        val width = minWidth + (maxWidth - minWidth) * progress
-        val alpha = (0.12f + 0.68f * progress * progress).coerceIn(0f, 0.85f)
-        drawLine(
-            color = color.copy(alpha = alpha),
-            start = points[i],
-            end = points[i + 1],
-            strokeWidth = width,
-            cap = StrokeCap.Round,
+    val bands = 4
+    val minWidth = 3.0f * density
+    val maxWidth = 9.5f * density
+    for (band in 0 until bands) {
+        val bandFraction = band.toFloat() / bands.toFloat()
+        val startIndex = ((points.size - 1) * bandFraction * 0.78f).toInt().coerceIn(0, points.size - 2)
+        val path = buildSmoothTrailPath(points, startIndex)
+        val width = minWidth + (maxWidth - minWidth) * ((band + 1).toFloat() / bands.toFloat())
+        if (band == bands - 1) {
+            drawPath(
+                path = path,
+                color = TurtleMascotPalette.CapAqua.copy(alpha = 0.22f),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(
+                    width = width * 1.85f,
+                    cap = StrokeCap.Round,
+                    join = androidx.compose.ui.graphics.StrokeJoin.Round,
+                ),
+            )
+        }
+        drawPath(
+            path = path,
+            color = color.copy(alpha = 0.22f + 0.10f * band),
+            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                width = width,
+                cap = StrokeCap.Round,
+                join = androidx.compose.ui.graphics.StrokeJoin.Round,
+            ),
         )
+    }
+    drawTurtleSwipeHead(points = points, trailColor = color)
+}
+
+private fun buildSmoothTrailPath(points: List<Offset>, startIndex: Int): androidx.compose.ui.graphics.Path {
+    return androidx.compose.ui.graphics.Path().apply {
+        val first = points[startIndex]
+        moveTo(first.x, first.y)
+        if (points.size - startIndex == 2) {
+            val last = points.last()
+            lineTo(last.x, last.y)
+            return@apply
+        }
+        for (i in startIndex + 1 until points.size - 1) {
+            val curr = points[i]
+            val next = points[i + 1]
+            quadraticTo(curr.x, curr.y, (curr.x + next.x) * 0.5f, (curr.y + next.y) * 0.5f)
+        }
+        val end = points.last()
+        lineTo(end.x, end.y)
     }
 }

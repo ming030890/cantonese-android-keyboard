@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -436,13 +437,21 @@ fun MiniHandwritingPreview() {
             MiniMicIcon()
         }
 
-        // Clean Open Handwriting Canvas
+        // Clean Open Handwriting Canvas with subtle turtle watermark
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(vertical = 2.dp)
-        )
+                .padding(vertical = 2.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_watermark),
+                contentDescription = null,
+                tint = PrimaryTextColor.copy(alpha = 0.16f),
+                modifier = Modifier.size(26.dp),
+            )
+        }
 
         // Bottom Function Row: ?123, globe, English, ⌫, ↵
         Row(
@@ -609,15 +618,10 @@ fun MiniKeyWithHint(
 
 @Composable
 fun MiniGridIcon() {
-    val iconColor = PrimaryTextColor.copy(alpha = 0.7f)
-    Canvas(modifier = Modifier.size(9.dp)) {
-        val s = size.width * 0.38f
-        val gap = size.width * 0.18f
-        drawRoundRect(iconColor, Offset(0f, 0f), Size(s, s), CornerRadius(1.dp.toPx()))
-        drawRoundRect(iconColor, Offset(s + gap, 0f), Size(s, s), CornerRadius(1.dp.toPx()))
-        drawRoundRect(iconColor, Offset(0f, s + gap), Size(s, s), CornerRadius(1.dp.toPx()))
-        drawRoundRect(iconColor, Offset(s + gap, s + gap), Size(s, s), CornerRadius(1.dp.toPx()))
-    }
+    com.madeinhk.cantonesevoicekeyboard.ui.keyboard.TurtleBrandIcon(
+        modifier = Modifier.size(11.dp),
+        color = PrimaryTextColor.copy(alpha = 0.78f),
+    )
 }
 
 @Composable

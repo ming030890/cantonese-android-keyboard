@@ -361,10 +361,10 @@ fun MicLogo(modifier: Modifier = Modifier) {
         .border(1.5.dp, primaryColor.copy(alpha = 0.2f), CircleShape)
     )
     
-    // Inner logo container
+    // Inner logo container showcasing the app's baby turtle mascot
     Box(
       modifier = Modifier
-        .size(70.dp)
+        .size(74.dp)
         .clip(CircleShape)
         .background(
           brush = Brush.radialGradient(
@@ -377,65 +377,11 @@ fun MicLogo(modifier: Modifier = Modifier) {
         .border(1.dp, outlineColor, CircleShape),
       contentAlignment = Alignment.Center
     ) {
-      Canvas(modifier = Modifier.size(32.dp)) {
-        val w = size.width
-        val h = size.height
-
-        // Draw similar Mic shape as KeyboardScreen to establish identity
-        val micW = w * 0.36f
-        val micH = h * 0.48f
-        val micX = (w - micW) / 2f
-        val micY = h * 0.16f
-
-        drawRoundRect(
-          color = primaryColor,
-          topLeft = Offset(micX, micY),
-          size = Size(micW, micH),
-          cornerRadius = CornerRadius(micW / 2f, micW / 2f)
-        )
-
-        val standW = w * 0.54f
-        val standH = h * 0.22f
-        val standX = (w - standW) / 2f
-        val standY = micY + micH * 0.52f
-
-        val standPath = Path().apply {
-          arcTo(
-            rect = Rect(standX, standY - standH * 0.2f, standX + standW, standY + standH),
-            startAngleDegrees = 0f,
-            sweepAngleDegrees = 180f,
-            forceMoveTo = true
-          )
-        }
-
-        drawPath(
-          path = standPath,
-          color = primaryColor,
-          style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
-        )
-
-        val stemX = w / 2f
-        val stemYStart = standY + standH
-        val stemYEnd = h * 0.82f
-
-        drawLine(
-          color = primaryColor,
-          start = Offset(stemX, stemYStart),
-          end = Offset(stemX, stemYEnd),
-          strokeWidth = 2.5.dp.toPx(),
-          cap = StrokeCap.Round
-        )
-
-        val baseXStart = w * 0.32f
-        val baseXEnd = w * 0.68f
-        drawLine(
-          color = primaryColor,
-          start = Offset(baseXStart, stemYEnd),
-          end = Offset(baseXEnd, stemYEnd),
-          strokeWidth = 2.5.dp.toPx(),
-          cap = StrokeCap.Round
-        )
-      }
+      androidx.compose.foundation.Image(
+        painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_hero),
+        contentDescription = null,
+        modifier = Modifier.size(56.dp),
+      )
     }
   }
 }
@@ -490,18 +436,13 @@ fun KeyboardReadyCard(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
       ) {
-        Box(
-          modifier = Modifier
-            .size(42.dp)
-            .clip(CircleShape)
-            .background(SuccessGreen.copy(alpha = 0.15f))
-            .border(2.dp, SuccessGreen, CircleShape),
-          contentAlignment = Alignment.Center
-        ) {
-          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Black, fontSize = 20.sp)
-        }
+        androidx.compose.foundation.Image(
+          painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_celebrate),
+          contentDescription = null,
+          modifier = Modifier.size(50.dp),
+        )
 
-        Spacer(modifier = Modifier.width(14.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
         Column(modifier = Modifier.weight(1f)) {
           Text(
@@ -869,38 +810,38 @@ fun ModelStatusCard(
         .padding(16.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Box(
-        modifier = Modifier
-          .size(36.dp)
-          .clip(CircleShape)
-          .background(accent.copy(alpha = 0.15f))
-          .border(width = 1.5.dp, color = accent, shape = CircleShape),
-        contentAlignment = Alignment.Center
-      ) {
-        when (status) {
-          is ModelDownloadStatus.Ready ->
-            Text("✓", color = accent, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-          is ModelDownloadStatus.Failed ->
+      if (status is ModelDownloadStatus.Failed || status is ModelDownloadStatus.Downloading) {
+        Box(
+          modifier = Modifier
+            .size(38.dp)
+            .clip(CircleShape)
+            .background(accent.copy(alpha = 0.15f))
+            .border(width = 1.5.dp, color = accent, shape = CircleShape),
+          contentAlignment = Alignment.Center
+        ) {
+          if (status is ModelDownloadStatus.Failed) {
             Text("⚠", color = accent, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-          is ModelDownloadStatus.WaitingForWifi, is ModelDownloadStatus.RequiresConfirmation ->
-            Text("↓", color = accent, fontWeight = FontWeight.Bold, fontSize = 22.sp)
-          is ModelDownloadStatus.Downloading ->
+          } else if (status is ModelDownloadStatus.Downloading) {
             CircularProgressIndicator(
               progress = { status.fraction },
-              modifier = Modifier.size(20.dp),
-              strokeWidth = 2.dp,
+              modifier = Modifier.size(22.dp),
+              strokeWidth = 2.2.dp,
               color = accent
             )
-          else ->
-            CircularProgressIndicator(
-              modifier = Modifier.size(20.dp),
-              strokeWidth = 2.dp,
-              color = accent
-            )
+          }
         }
+      } else {
+        androidx.compose.foundation.Image(
+          painter = androidx.compose.ui.res.painterResource(
+            if (status is ModelDownloadStatus.Ready) R.drawable.mascot_turtle_celebrate
+            else R.drawable.mascot_turtle_downloading
+          ),
+          contentDescription = null,
+          modifier = Modifier.size(44.dp),
+        )
       }
 
-      Spacer(modifier = Modifier.width(16.dp))
+      Spacer(modifier = Modifier.width(14.dp))
 
       Column(modifier = Modifier.weight(1f)) {
         Text(
@@ -922,14 +863,29 @@ fun ModelStatusCard(
           }
         }
         if (status is ModelDownloadStatus.Downloading) {
-          Spacer(modifier = Modifier.height(8.dp))
-          LinearProgressIndicator(
-            progress = { status.fraction },
-            modifier = Modifier
-              .fillMaxWidth()
-              .clip(RoundedCornerShape(4.dp)),
-            color = accent
-          )
+          Spacer(modifier = Modifier.height(4.dp))
+          BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val crawlerSize = 26.dp
+            val clampedProgress = status.fraction.coerceIn(0f, 1f)
+            val crawlerX = (maxWidth - crawlerSize).coerceAtLeast(0.dp) * clampedProgress
+            Column(modifier = Modifier.fillMaxWidth()) {
+              androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_downloading),
+                contentDescription = null,
+                modifier = Modifier
+                  .offset(x = crawlerX)
+                  .size(crawlerSize),
+              )
+              Spacer(modifier = Modifier.height(2.dp))
+              LinearProgressIndicator(
+                progress = { clampedProgress },
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .clip(RoundedCornerShape(4.dp)),
+                color = accent
+              )
+            }
+          }
         } else if (status is ModelDownloadStatus.Pending || status is ModelDownloadStatus.Installing) {
           Spacer(modifier = Modifier.height(8.dp))
           LinearProgressIndicator(

@@ -98,13 +98,15 @@ internal fun UnifiedKeyboardToolbar(
             when {
                 voiceState == KeyboardUiState.Recording -> VoiceToolbarStatus(
                     label = stringResource(R.string.keyboard_status_recording),
+                    mood = TurtleVoiceMood.Listening,
                 )
                 voiceState == KeyboardUiState.Transcribing -> VoiceToolbarStatus(
                     label = stringResource(R.string.keyboard_status_transcribing),
+                    mood = TurtleVoiceMood.Thinking,
                 )
-                voiceState == KeyboardUiState.LoadingModel -> ToolbarStatusText(
-                    stringResource(R.string.keyboard_status_loading_model),
-                    keyboardColors.keyboardKeyOnSurface,
+                voiceState == KeyboardUiState.LoadingModel -> VoiceToolbarStatus(
+                    label = stringResource(R.string.keyboard_status_loading_model),
+                    mood = TurtleVoiceMood.Sleeping,
                 )
                 voiceState is KeyboardUiState.ModelNotReady -> {
                     ToolbarStatusText(voiceState.message, keyboardColors.keyboardKeyOnSurface)
@@ -198,8 +200,21 @@ private fun ToolbarStatusText(text: String, color: Color) {
 }
 
 @Composable
-private fun VoiceToolbarStatus(label: String) {
-    ToolbarStatusText(label, BrandTheme.colors.keyboardKeyOnSurface)
+private fun VoiceToolbarStatus(
+    label: String,
+    mood: TurtleVoiceMood,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        TurtleVoiceStatusFace(
+            mood = mood,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        ToolbarStatusText(label, BrandTheme.colors.keyboardKeyOnSurface)
+    }
 }
 
 @Composable
@@ -338,8 +353,8 @@ private fun ToolbarSettingsVisual(
         keyRegistry = keyRegistry,
         accessibilityDescription = stringResource(R.string.keyboard_toolbar_settings),
     ) {
-        SettingsIcon(
-            modifier = Modifier.size(KeyboardUiDefaults.ToolbarSettingsIconSize),
+        TurtleBrandIcon(
+            modifier = Modifier.size(25.dp),
             color = BrandTheme.colors.keyboardKeyOnSurface,
         )
     }

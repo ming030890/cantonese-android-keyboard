@@ -6,8 +6,12 @@ import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -150,11 +154,22 @@ internal fun HandwritingPanel(
             modifier = Modifier.fillMaxSize(),
         )
         if (strokes.isEmpty() && activeStroke.isEmpty()) {
-            Text(
-                text = stringResource(R.string.keyboard_handwriting_hint),
-                color = hintColor,
-                style = com.madeinhk.cantonesevoicekeyboard.theme.KeyboardStatusTextStyle,
-            )
+            androidx.compose.foundation.layout.Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                androidx.compose.material3.Icon(
+                    painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_watermark),
+                    contentDescription = null,
+                    tint = BrandTheme.colors.keyboardKeyOnSurface.copy(alpha = 0.16f),
+                    modifier = Modifier.size(68.dp),
+                )
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.keyboard_handwriting_hint),
+                    color = hintColor,
+                    style = com.madeinhk.cantonesevoicekeyboard.theme.KeyboardStatusTextStyle,
+                )
+            }
         }
     }
 }

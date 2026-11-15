@@ -221,9 +221,24 @@ internal fun EmojiPickerPanel(
                                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp))
                         }
                         if (entries.isEmpty()) item(key = "$id.empty", span = { GridItemSpan(maxLineSpan) }) {
-                            Text(if (available == null) stringResource(R.string.emoji_loading) else stringResource(R.string.emoji_recent_empty),
-                                color = foreground.copy(alpha = 0.7f), fontSize = 14.sp,
-                                modifier = Modifier.padding(12.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            ) {
+                                if (available != null) {
+                                    androidx.compose.foundation.Image(
+                                        painter = painterResource(R.drawable.mascot_turtle_search_empty),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(28.dp),
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                }
+                                Text(
+                                    if (available == null) stringResource(R.string.emoji_loading) else stringResource(R.string.emoji_recent_empty),
+                                    color = foreground.copy(alpha = 0.7f),
+                                    fontSize = 14.sp,
+                                )
+                            }
                         }
                         items(entries, key = { "$id.${it.emoji}" }) { entry ->
                             EmojiCell(entry.emoji, entry.name, entry.variants.size > 1,
@@ -232,10 +247,26 @@ internal fun EmojiPickerPanel(
                     }
                 }
             } else if (filtered.isEmpty()) {
-                Text(if (available == null) stringResource(R.string.emoji_loading) else if (category == "recent" && search.query.isBlank())
-                    stringResource(R.string.emoji_recent_empty) else stringResource(R.string.emoji_no_results),
-                    color = foreground.copy(alpha = 0.7f), fontSize = 14.sp,
-                    modifier = Modifier.align(Alignment.Center).padding(12.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.align(Alignment.Center).padding(8.dp),
+                ) {
+                    if (available != null) {
+                        androidx.compose.foundation.Image(
+                            painter = painterResource(R.drawable.mascot_turtle_search_empty),
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                        )
+                        Spacer(Modifier.height(4.dp))
+                    }
+                    Text(
+                        if (available == null) stringResource(R.string.emoji_loading)
+                        else if (category == "recent" && search.query.isBlank()) stringResource(R.string.emoji_recent_empty)
+                        else stringResource(R.string.emoji_no_results),
+                        color = foreground.copy(alpha = 0.7f),
+                        fontSize = 14.sp,
+                    )
+                }
             } else {
                 LazyVerticalGrid(columns = GridCells.Fixed(8), state = gridState) {
                     items(filtered, key = { it.emoji }) { entry ->
