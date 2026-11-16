@@ -18,7 +18,7 @@ def stage(project,source,verification,backup,fusion_json=None):
         raise ValueError('Actual native verification required before replacing assets')
     raw=source.read_bytes()
     magic=raw[:8]
-    if magic not in (b'KBCNN01\0',b'KBLM03\0\0'):raise ValueError('Expected shared KBCNN01 or KBLM03 bundle')
+    if magic!=b'KBLM03\0\0':raise ValueError('Expected shared KBLM03 bundle')
     size=struct.unpack('<I',raw[8:12])[0];meta=json.loads(raw[12:12+size])
     assets=project/'app/src/main/assets'
     native=project.parent/'QwenASR/crates/cantonese-ngram/src'
@@ -51,15 +51,11 @@ def stage(project,source,verification,backup,fusion_json=None):
             selection='Explicit unit fusion weight for shared causal LM integration',
             inputs=dict(handwriting_model_sha256=sha(assets/'handwriting/model.safetensors'),
                         labels_sha256=sha(assets/'handwriting/labels.txt'),counts_sha256=hashlib.sha256(b'').hexdigest()))
-    fusion_source=project/'config/language_model/handwriting_fusion_cnn_v2.json'
+    fusion_source=project/'config/language_model/handwriting_fusion.json'
     fusion_source.write_text(json.dumps(fusion,indent=2)+'\n')
     shutil.copy2(fusion_source,assets/'language_model/handwriting_fusion.json')
-    if magic==b'KBCNN01\0':
-        config={k:meta[k] for k in ('vocab_size','embed_dim','hidden_dim','ffn_dim','dilations','context_tokens','right_context_tokens')}
-        fmt='KBCNN_INT8_V1'
-    else:
-        config={k:meta[k] for k in ('vocab_size','head_vocab_size','d_embed_head','d_embed_tail','d_model','d_ff','n_blocks','block_types','conv_kernel','n_q_heads','n_kv_heads','d_head','window_size','context_tokens','right_context_tokens')}
-        fmt='KBLM_INT8_V3'
+    config={k:meta[k] for k in ('vocab_size','head_vocab_size','d_embed_head','d_embed_tail','d_model','d_ff','n_blocks','block_types','conv_kernel','n_q_heads','n_kv_heads','d_head','window_size','context_tokens','right_context_tokens')}
+    fmt='KBLM_INT8_V3'
     english_policy=dict(prev_selected.get('english_policy',dict(
         candidate_source='TRAIN-attested LM vocabulary plus 169575 dictionary forms in the complementary English typing channel',
         implementation='../QwenASR/crates/cantonese-ngram/src/cnn.rs::english_suggestions',

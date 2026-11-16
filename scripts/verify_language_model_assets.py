@@ -23,58 +23,18 @@ def verify(project):
     project=project.resolve()
     assets=project/'app/src/main/assets';model=assets/'language_model/model.cng'
     with model.open('rb') as stream:
-        if stream.read(8) in (b'KBCNN01\0',b'KBLM03\0\0'):return verify_shared(project)
-    with model.open('rb') as stream:
-        header=stream.read(8)
-        if len(header)!=8 or header[:4] not in (b'CNG1',b'CNG2'):raise ValueError('Unsupported model format')
-        size=struct.unpack('<I',header[4:])[0]
-        if size>model.stat().st_size-8:raise ValueError('Truncated model metadata')
-        metadata=json.loads(stream.read(size))
-    neural_only=header[:4]==b'CNG1' and metadata.get('neural_short_contexts',False)
-    calibration=json.loads((assets/'language_model/handwriting_fusion.json').read_text())
-    if calibration['version']!=1:raise ValueError('Unsupported fusion calibration')
-    if calibration['neural_model_sha256']!=sha(model):raise ValueError('Fusion/model hash mismatch')
-    for name,file in [('handwriting_model_sha256','model.safetensors'),('labels_sha256','labels.txt')]:
-        if calibration['inputs'][name]!=sha(assets/'handwriting'/file):raise ValueError('Fusion handwriting input changed: '+file)
-    count_asset=assets/'handwriting/lm_csr.bin'
-    if neural_only:
-        if model.stat().st_size>10000000:raise ValueError('Neural model exceeds10MB')
-        if count_asset.exists():raise ValueError('Neural-only package still contains count table')
-        if calibration['inputs']['counts_sha256']!=hashlib.sha256(b'').hexdigest():raise ValueError('Neural-only calibration requires absent count table')
-        if calibration['weights']['unigram'] or calibration['weights']['bigram']:raise ValueError('Neural-only calibration uses count weights')
-    elif calibration['inputs']['counts_sha256']!=sha(count_asset):raise ValueError('Fusion count input changed')
-    weights=calibration['weights']
-    if set(weights)!={'unigram','bigram','neural'} or any(not math.isfinite(v) or not 0<=v<=16 for v in weights.values()):raise ValueError('Invalid fusion weights')
-    result={'passed':True,'format':header[:4].decode(),'model_sha256':sha(model),'bytes':model.stat().st_size,'fusion_weights':weights}
-    selection_path=project/'config/language_model/selected_model.json'
-    if selection_path.exists():
-        selection=json.loads(selection_path.read_text())
-        if selection['model_sha256']!=result['model_sha256'] or selection['model_bytes']!=result['bytes']:raise ValueError('Packaged model differs from selected release model')
-        if selection['config']!=metadata.get('config'):raise ValueError('Selected architecture mismatch')
-        if selection['fusion_sha256']!=sha(assets/'language_model/handwriting_fusion.json'):raise ValueError('Selected fusion mismatch')
-        if selection['neural_short_contexts']!=neural_only or selection['count_table_packaged']!=count_asset.exists():raise ValueError('Selected inference policy mismatch')
-        result['selected_model_verified']=True
-    if neural_only:result.update(neural_short_contexts=True,config=metadata['config'],count_table_packaged=False)
-    if header[:4]==b'CNG2':
-        result['memory_hidden_width']=next(t['shape'][0] for t in metadata['tensors'] if t['name']=='hidden.weight')
-        result['known_contexts']=len(metadata['keys'])
-        result['parent_share']=metadata['parent_share']
-    return result
+        if stream.read(8)!=b'KBLM03\0\0':raise ValueError('Unsupported model format; expected KBLM03')
+    return verify_shared(project)
 
 def verify_shared(project):
     assets=project/'app/src/main/assets';model=assets/'language_model/model.cng'
     raw=model.read_bytes();n=struct.unpack('<I',raw[8:12])[0]
-    if n>len(raw)-12:raise ValueError('Truncated CNN metadata')
+    if n>len(raw)-12:raise ValueError('Truncated KBLM03 metadata')
     meta=json.loads(raw[12:12+n]);selected=json.loads((project/'config/language_model/selected_model.json').read_text())
     magic=raw[:8]
-    if magic==b'KBCNN01\0':
-        if meta['format']!='KBCNN_INT8_V1' or meta['tokenizer']!='hybrid-word-first-utf8-v2':raise ValueError('Incorrect shared tokenizer')
-        if len(meta['tokens'])!=meta['vocab_size']:raise ValueError('CNN vocabulary mismatch')
-    elif magic==b'KBLM03\0\0':
-        if meta['format']!='KBLM_INT8_V3' or meta['tokenizer']!='hybrid-word-first-utf8-v3':raise ValueError('Incorrect shared tokenizer')
-        if meta['vocab_offset']+meta['vocab_bytes']>len(raw):raise ValueError('Truncated KBLM03 vocabulary')
-    else:
-        raise ValueError('Unsupported shared model magic')
+    if magic!=b'KBLM03\0\0':raise ValueError('Unsupported shared model magic; expected KBLM03')
+    if meta['format']!='KBLM_INT8_V3' or meta['tokenizer']!='hybrid-word-first-utf8-v3':raise ValueError('Incorrect shared tokenizer')
+    if meta['vocab_offset']+meta['vocab_bytes']>len(raw):raise ValueError('Truncated KBLM03 vocabulary')
     if selected['model_sha256']!=sha(model) or selected['model_bytes']!=len(raw):raise ValueError('Selected CNN mismatch')
     if selected['config']!={k:meta[k] for k in selected['config']}:raise ValueError('Selected CNN configuration mismatch')
     native=project.parent/'QwenASR/crates/cantonese-ngram/src'
@@ -161,17 +121,15 @@ def verify_package(project, package, app_build_dir=None):
         if actual!=sha(source):raise ValueError('Packaged file mismatch: '+entry)
         checked[entry]=actual
     with zipfile.ZipFile(package) as archive:
-        with (assets/'language_model/model.cng').open('rb') as stream:shared=stream.read(8) in (b'KBCNN01\0',b'KBLM03\0\0')
-        if shared:
-            obsolete=[n for n in archive.namelist() if n.startswith((prefix+'assets/typing/',prefix+'assets/english/'))]
-            if obsolete:raise ValueError('Obsolete English/spelling assets packaged')
-        count_asset=assets/'handwriting/lm_csr.bin'
-        if count_asset.exists():files.append('handwriting/lm_csr.bin')
-        elif prefix+'assets/handwriting/lm_csr.bin' in archive.namelist():raise ValueError('Obsolete count table packaged')
+        with (assets/'language_model/model.cng').open('rb') as stream:
+            if stream.read(8)!=b'KBLM03\0\0':raise ValueError('Expected KBLM03 model asset')
+        obsolete=[n for n in archive.namelist() if n.startswith((prefix+'assets/typing/',prefix+'assets/english/'))]
+        if obsolete:raise ValueError('Obsolete English/spelling assets packaged')
+        if prefix+'assets/handwriting/lm_csr.bin' in archive.namelist():raise ValueError('Obsolete count table packaged')
         if (assets/'licenses/SCOWL.txt').is_file():files.append('licenses/SCOWL.txt')
         dictionary_notices=assets/'licenses/english_dictionary'
         if dictionary_notices.is_dir():
-            files.extend(str(p.relative_to(assets)) for p in sorted(dictionary_notices.iterdir()) if p.is_file())
+            files.extend(str(p.relative_to(assets)) for p in sorted(dictionary_notices.iterdir()) if p.is_file() and p.name!='en_GB.dic')
         for file in files:check(archive,prefix+'assets/'+file,assets/file)
         for library in ['libcantonese_engine.so']:
             stripped=app_build_dir/f'intermediates/stripped_native_libs/{variant}/strip{variant.capitalize()}DebugSymbols/out/lib/arm64-v8a'/library

@@ -27,7 +27,7 @@
     "context_tokens": 32,
     "right_context_tokens": 0
   },
-  "fusion_source": "config/language_model/handwriting_fusion_cnn_v2.json",
+  "fusion_source": "config/language_model/handwriting_fusion.json",
   "fusion_sha256": "fffc3747c586aaa44a3b51fa2d990f7d114b8fa54942fbf4bfee1dde0f66a2bd",
   "neural_short_contexts": true,
   "count_table_packaged": false,
