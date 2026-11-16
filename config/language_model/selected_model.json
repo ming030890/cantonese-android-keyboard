@@ -1,33 +1,39 @@
 {
-  "format": "KBCNN_INT8_V1",
-  "model_source": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/shared_keyboard.cnn",
-  "model_sha256": "dc1fa55ec341067cd752e1ee799cbb255e42d4e96eb17dd7a149da7d17f2d8e1",
-  "model_bytes": 12675264,
+  "format": "KBLM_INT8_V3",
+  "model_source": "/Volumes/SSD/cantonese_ngram/runs/kblm_v3_001/model.cng",
+  "model_sha256": "4764a0581b1462c6cd50d133d0cb21bc6f0543966238797c97bab598f8fc0d0b",
+  "model_bytes": 6433728,
   "config": {
-    "vocab_size": 65536,
-    "embed_dim": 128,
-    "hidden_dim": 384,
-    "ffn_dim": 768,
-    "dilations": [
-      1,
-      2,
-      4,
-      8,
-      16
+    "vocab_size": 36864,
+    "head_vocab_size": 8192,
+    "d_embed_head": 160,
+    "d_embed_tail": 64,
+    "d_model": 224,
+    "d_ff": 448,
+    "n_blocks": 6,
+    "block_types": [
+      "conv",
+      "conv",
+      "attn",
+      "conv",
+      "conv",
+      "attn"
     ],
+    "conv_kernel": 4,
+    "n_q_heads": 4,
+    "n_kv_heads": 1,
+    "d_head": 56,
+    "window_size": 32,
     "context_tokens": 32,
     "right_context_tokens": 0
   },
   "fusion_source": "config/language_model/handwriting_fusion_cnn_v2.json",
-  "fusion_sha256": "b579bd1090dff325c7cfd5e746000c09c2cca1c4137291db6458fdf12effa3a9",
+  "fusion_sha256": "fffc3747c586aaa44a3b51fa2d990f7d114b8fa54942fbf4bfee1dde0f66a2bd",
   "neural_short_contexts": true,
   "count_table_packaged": false,
   "experimental": true,
   "production_approved": false,
-  "selection": "One shared Cantonese/English/handwriting LM; English spelling uses its vocabulary plus high-confidence learned typing-channel dictionary proposals",
-  "qualification": "Historical V2 guard failures refer to model 915bc80d53d225469e8bfe90d328ac1565647181e485cb3f0e9c32f47c946322. Release77 changed the weights; exact-current-artifact production qualification is not established by the retained historical report. See qualification_audit.",
-  "native_verification": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/native-verification.json",
-  "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/cnn_repair_002/integration/previous-assets",
+  "selection": "One shared Cantonese/English/Quick/Swipe/Handwriting LM; English spelling uses its vocabulary plus high-confidence learned typing-channel dictionary proposals",
   "english_policy": {
     "candidate_source": "TRAIN-attested LM vocabulary plus 169575 dictionary forms in the complementary English typing channel",
     "implementation": "../QwenASR/crates/cantonese-ngram/src/cnn.rs::english_suggestions",
@@ -36,7 +42,7 @@
     "qualification_report": "config/language_model/qualification_audit_20261108.json",
     "production_qualified": false,
     "acceptance_source": "../QwenASR/crates/cantonese-ngram/src/english_acceptance.json",
-    "acceptance_sha256": "f50aebe919c535c4c03a66959e592de924f3e07eaa058bba1974558283bb0441",
+    "acceptance_sha256": "3b23c400fab207b4db4f1da3da0dd712726397f1ab4c0142dfc361a8eb35e51f",
     "touch_evidence_used": false,
     "primary_metric": "whole-message ITE plus mixed Cantonese/English controller replay",
     "known_word_policy": "Learned original-word versus replacement evidence",
@@ -47,9 +53,9 @@
       "files": {
         "channel.json": "b728093224bd62df7ef472b6ce6f49bf28f7f752b80a49581e77aacae67532ea",
         "lexicon.tsv": "465762ffdb780b169ab021c3e2a2d5b453dae6dafc2befa49d1f4378a70bc6f0",
-        "metadata.json": "21313aef2ab502d983a33a82f7054036127b8a3dd7a09aeb534815794eb94670",
-        "policy.json": "ef10933720d06d75ebe6076742cf25004705896436fda1752aaf2bca454938dd",
-        "priors.tsv": "bdf3942f4dc5ee380f7ef43f3a7ac1cca877142e104f392bd09297fc0e793a2c"
+        "metadata.json": "fee94efab409cf22a7bcdd112e2cb576139db0bf2a8c6f6491467960cae9c69a",
+        "policy.json": "63974ee270eeb1ccaf0d8eb58a99b0074d1f28c2b86566b606a59f2ac4ff1ce6",
+        "priors.tsv": "d088396d86de463f6614626d265916b0cb66b4b943ce8bce3e3b932835b48847"
       },
       "qualification_report": "config/english_iteration/2026-10-30/noisy-channel/accepted-score.json",
       "routing": "Nonempty English left context; preserve existing mixed-language, punctuation and case restoration decisions",
@@ -65,7 +71,7 @@
     "historical_qualification_report": "config/english_iteration/2026-10-29/short-nn-v2/accepted-score.json",
     "legacy_regression_metric": "f0.5"
   },
-  "qualification_audit": "config/language_model/qualification_audit_20261108.json",
-  "native_verification_scope": "historical_parent_only; hash differs from current model",
-  "current_native_smoke": "config/language_model/current_native_smoke_20261108.json"
+  "qualification": "Experimental shared LM staged with full native recalibration; see qualification report",
+  "native_verification": "/Volumes/SSD/cantonese_ngram/runs/kblm_v3_001/native-verification.json",
+  "old_assets_backup": "/Volumes/SSD/cantonese_ngram/runs/kblm_v3_001/staged_assets_backup"
 }

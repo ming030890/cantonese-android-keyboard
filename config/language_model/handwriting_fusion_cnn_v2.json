@@ -1,14 +1,15 @@
 {
   "version": 1,
   "weights": {
-    "unigram": 0,
-    "bigram": 0,
-    "neural": 1.0
+    "unigram": 0.0,
+    "bigram": 0.0,
+    "neural": 1.25,
+    "neural_empty": 0.8
   },
-  "neural_model_sha256": "dc1fa55ec341067cd752e1ee799cbb255e42d4e96eb17dd7a149da7d17f2d8e1",
-  "calibrated": false,
+  "neural_model_sha256": "4764a0581b1462c6cd50d133d0cb21bc6f0543966238797c97bab598f8fc0d0b",
+  "calibrated": true,
   "internal_trial": true,
-  "selection": "Explicit initial fusion weight for shared-CNN integration; not a fitted calibration",
+  "selection": "Fitted on 1,000 unique OLHWDB TRAIN trajectories + v7 TRAIN text (6 context conditions); writer/document-disjoint audit verified; no test_datas.npy used",
   "inputs": {
     "handwriting_model_sha256": "1d00539878d7b1b9db922e0824184daf3f10bcd8331674bfd0f1f1c3c808e88d",
     "labels_sha256": "4256964156c45ff366bab2af62ceb89358295b19fc694d7fb9e420fa8b784934",

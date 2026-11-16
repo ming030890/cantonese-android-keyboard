@@ -23,7 +23,7 @@ def verify(project):
     project=project.resolve()
     assets=project/'app/src/main/assets';model=assets/'language_model/model.cng'
     with model.open('rb') as stream:
-        if stream.read(8)==b'KBCNN01\0':return verify_shared(project)
+        if stream.read(8) in (b'KBCNN01\0',b'KBLM03\0\0'):return verify_shared(project)
     with model.open('rb') as stream:
         header=stream.read(8)
         if len(header)!=8 or header[:4] not in (b'CNG1',b'CNG2'):raise ValueError('Unsupported model format')
@@ -66,8 +66,15 @@ def verify_shared(project):
     raw=model.read_bytes();n=struct.unpack('<I',raw[8:12])[0]
     if n>len(raw)-12:raise ValueError('Truncated CNN metadata')
     meta=json.loads(raw[12:12+n]);selected=json.loads((project/'config/language_model/selected_model.json').read_text())
-    if meta['format']!='KBCNN_INT8_V1' or meta['tokenizer']!='hybrid-word-first-utf8-v2':raise ValueError('Incorrect shared tokenizer')
-    if len(meta['tokens'])!=meta['vocab_size']:raise ValueError('CNN vocabulary mismatch')
+    magic=raw[:8]
+    if magic==b'KBCNN01\0':
+        if meta['format']!='KBCNN_INT8_V1' or meta['tokenizer']!='hybrid-word-first-utf8-v2':raise ValueError('Incorrect shared tokenizer')
+        if len(meta['tokens'])!=meta['vocab_size']:raise ValueError('CNN vocabulary mismatch')
+    elif magic==b'KBLM03\0\0':
+        if meta['format']!='KBLM_INT8_V3' or meta['tokenizer']!='hybrid-word-first-utf8-v3':raise ValueError('Incorrect shared tokenizer')
+        if meta['vocab_offset']+meta['vocab_bytes']>len(raw):raise ValueError('Truncated KBLM03 vocabulary')
+    else:
+        raise ValueError('Unsupported shared model magic')
     if selected['model_sha256']!=sha(model) or selected['model_bytes']!=len(raw):raise ValueError('Selected CNN mismatch')
     if selected['config']!={k:meta[k] for k in selected['config']}:raise ValueError('Selected CNN configuration mismatch')
     native=project.parent/'QwenASR/crates/cantonese-ngram/src'
@@ -154,7 +161,7 @@ def verify_package(project, package, app_build_dir=None):
         if actual!=sha(source):raise ValueError('Packaged file mismatch: '+entry)
         checked[entry]=actual
     with zipfile.ZipFile(package) as archive:
-        with (assets/'language_model/model.cng').open('rb') as stream:shared=stream.read(8)==b'KBCNN01\0'
+        with (assets/'language_model/model.cng').open('rb') as stream:shared=stream.read(8) in (b'KBCNN01\0',b'KBLM03\0\0')
         if shared:
             obsolete=[n for n in archive.namelist() if n.startswith((prefix+'assets/typing/',prefix+'assets/english/'))]
             if obsolete:raise ValueError('Obsolete English/spelling assets packaged')
