@@ -213,3 +213,19 @@ fun QuickLearningDisabledScreenshot() {
         }
     }
 }
+
+@PreviewTest
+@Preview(name = "Privacy and open source cards", widthDp = 380, heightDp = 320)
+@Preview(name = "Privacy and open source cards Chinese", locale = "b+zh+Hant+HK", widthDp = 380, heightDp = 320)
+@Composable
+fun PrivacyAndOpenSourceCardsScreenshot() {
+    CantoneseVoiceKeyboardTheme(darkTheme = true, dynamicColor = false) {
+        Box(Modifier.fillMaxSize().background(Color(0xFF121714)).padding(16.dp)) {
+            androidx.compose.foundation.layout.Column {
+                PrivacyNoticeCard(onClick = {})
+                androidx.compose.foundation.layout.Spacer(Modifier.padding(top = 12.dp))
+                OpenSourceNoticesCard(onClick = {})
+            }
+        }
+    }
+}

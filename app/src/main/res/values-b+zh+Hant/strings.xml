@@ -211,7 +211,15 @@
     <string name="model_status_waiting_wifi">請用不限數據用量嘅 Wi-Fi 下載。</string>
     <string name="model_status_confirmation">撳「繼續下載」，喺 Google Play 確認下載。</string>
     <string name="model_download_confirm">繼續下載</string>
-    <string name="open_source_licenses">開放原始碼授權</string>
+    <string name="settings_privacy_about_header">私隱與開放原始碼</string>
+    <string name="privacy_notice_title">私隱聲明</string>
+    <string name="privacy_notice_headline">我們絕不會將你輸入嘅內容傳送到任何伺服器。</string>
+    <string name="privacy_notice_card_summary">我們絕不會記錄或將你輸入嘅內容傳送到任何伺服器。打字預測、手寫識別及語音輸入全部喺你部裝置本機運行。</string>
+    <string name="privacy_notice_body">• 輸入內容只留喺本機：粵語速成、英文輸入、滑行輸入、手寫識別及語音轉文字全部喺你部裝置本機運行。我們絕不會記錄你打嘅字、寫嘅字同講嘅說話，亦絕不會將內容傳送到任何伺服器。\n\n• 離線語音輸入：只有當你撳咪高峰講嘢時，音訊先會喺本機記憶體即時轉成文字，絕不會儲存或上傳。開啟語音輸入後，Google Play 只會透過不限數據用量嘅 Wi-Fi 下載約 2 GB 語音模型。\n\n• 本機個人化與剪貼簿：可選用嘅速成選字學習及近期表格填寫建議只會儲存喺此裝置嘅私密空間（已停用雲端備份），你可隨時喺設定關閉或清除速成學習記錄。剪貼簿貼上建議只會喺打開鍵盤時於本機讀取目前複製嘅內容，絕不會儲存或上傳。</string>
+    <string name="privacy_notice_action">查看詳情</string>
+    <string name="open_source_licenses">開放原始碼聲明</string>
+    <string name="open_source_card_summary">離線語音輸入採用開放原始碼語音模型 Qwen3-ASR-1.7B-Cantonese-HK（微調自 Qwen/Qwen3-ASR-1.7B）、QwenASR 及 Silero VAD。</string>
+    <string name="open_source_asr_summary">離線語音識別（ASR）採用開放原始碼模型 joe2643/Qwen3-ASR-1.7B-Cantonese-HK（Apache License 2.0），基於 Alibaba Cloud / Qwen Team 嘅 Qwen/Qwen3-ASR-1.7B 微調並量化為 INT8 供本機離線推理，配合 QwenASR（MIT）、Silero VAD（MIT）、ARM KleidiAI（Apache 2.0）及 OpenBLAS（BSD-3-Clause）運行。</string>
     <string name="close">關閉</string>
     <string name="voice_input_title">語音輸入</string>
     <string name="voice_input_description">喺任何鍵盤講嘢打字，離線都用到。允許咪高峰權限後，會透過不限數據用量嘅 Wi-Fi 下載約 2 GB 資料。</string>

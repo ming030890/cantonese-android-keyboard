@@ -1,0 +1,10 @@
+[
+  {
+    "language": "zh-HK",
+    "text": "• 全新「烏龜鍵盤 － 廣東話」名稱及小烏龜吉祥物設計，支援 Android 主題圖示。\n• 新增英文滑行輸入（英文及速成鍵盤）、數字專用鍵盤及即時逐筆手寫識別。\n• 升級離線香港粵語及中英夾雜語音模型（Qwen3-ASR-1.7B-Cantonese-HK），並整合更輕快嘅本機語言模型。\n• 加入應用程式內私隱聲明及開放原始碼模型授權聲明：我們絕不會將你輸入嘅內容傳送到任何伺服器。"
+  },
+  {
+    "language": "en-US",
+    "text": "• Introducing 烏龜鍵盤 － 廣東話 with the new baby turtle mascot and Android themed icon support.\n• Added English swipe typing across English and Quick layouts, a dedicated numpad for numeric fields, and live per-stroke handwriting recognition.\n• Upgraded offline HK Cantonese & English voice typing (Qwen3-ASR-1.7B-Cantonese-HK) and a compact shared on-device language model.\n• Added in-app privacy and open-source notices: we never send what you type to any server."
+  }
+]

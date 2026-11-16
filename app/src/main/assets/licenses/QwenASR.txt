@@ -1,3 +1,5 @@
+QwenASR — https://github.com/huanglizhuo/QwenASR
+
 MIT License
 
 Copyright (c) 2025 Li Zhuo

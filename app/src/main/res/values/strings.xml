@@ -213,7 +213,15 @@
     <string name="model_status_waiting_wifi">Use Wi-Fi with no data limit.</string>
     <string name="model_status_confirmation">Tap Continue download to confirm with Google Play.</string>
     <string name="model_download_confirm">Continue download</string>
-    <string name="open_source_licenses">Open source licenses</string>
+    <string name="settings_privacy_about_header">Privacy &amp; open source</string>
+    <string name="privacy_notice_title">Privacy notice</string>
+    <string name="privacy_notice_headline">We never send what you type to any server.</string>
+    <string name="privacy_notice_card_summary">We never log or send what you type to any server. Typing predictions, handwriting recognition, and voice input all run on your device.</string>
+    <string name="privacy_notice_body">• What you type stays on your device: Cantonese Quick (速成), English typing, swipe typing, handwriting recognition, and voice transcription all run locally on your device. We never log or send the text you type, write, or speak to any server.\n\n• Offline voice typing: Microphone audio is processed in memory on your device only while you tap the microphone to speak, and is never saved or uploaded. If you enable voice typing, Google Play downloads the speech model (~2 GB) over Wi-Fi with no data limit.\n\n• Local personalization &amp; clipboard: Optional Quick word learning and recent form completions stay in private storage on this device (cloud backup is disabled). You can turn off or clear Quick history anytime in Settings. Clipboard paste suggestions inspect your active clipboard locally while the keyboard is open and never store or upload its contents.</string>
+    <string name="privacy_notice_action">View details</string>
+    <string name="open_source_licenses">Open source notices</string>
+    <string name="open_source_card_summary">Offline voice typing uses the open-source Qwen3-ASR-1.7B-Cantonese-HK speech model (fine-tuned from Qwen/Qwen3-ASR-1.7B), QwenASR, and Silero VAD.</string>
+    <string name="open_source_asr_summary">Offline speech recognition (ASR) is powered by the open-source model joe2643/Qwen3-ASR-1.7B-Cantonese-HK (Apache License 2.0), fine-tuned from Alibaba Cloud / Qwen Team’s Qwen/Qwen3-ASR-1.7B and quantized to INT8 for on-device inference, running on QwenASR (MIT) with Silero VAD (MIT), ARM KleidiAI (Apache 2.0), and OpenBLAS (BSD-3-Clause).</string>
     <string name="close">Close</string>
     <string name="voice_input_title">Voice typing</string>
     <string name="voice_input_description">Speak to type on any keyboard, even offline. After you allow microphone access, about 2 GB downloads over Wi-Fi with no data limit.</string>

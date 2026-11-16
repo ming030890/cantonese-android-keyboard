@@ -135,6 +135,9 @@ fun MainScreen(
     }
   )
 
+  var showPrivacyNotice by remember { mutableStateOf(false) }
+  if (showPrivacyNotice) PrivacyNoticeDialog(onDismiss = { showPrivacyNotice = false })
+
   MainScreenContent(
     voiceEnabled = voiceEnabled,
     onSkipVoice = {
@@ -160,6 +163,7 @@ fun MainScreen(
     onOpenDebugHandwriting = { onItemClick(DebugHandwriting) },
     onOpenPromptedHandwriting = { onItemClick(PromptedHandwriting) },
     onOpenSettings = { completeOnboarding() },
+    onPrivacyNotice = { showPrivacyNotice = true },
     modifier = modifier
   )
 }
@@ -189,6 +193,7 @@ fun MainScreenContent(
   onOpenDebugHandwriting: () -> Unit = {},
   onOpenPromptedHandwriting: () -> Unit = {},
   onOpenSettings: () -> Unit = {},
+  onPrivacyNotice: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
   val lightTheme = MaterialTheme.colorScheme.background.luminance() > 0.5f
@@ -342,6 +347,37 @@ fun MainScreenContent(
             .padding(bottom = 8.dp),
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+          Surface(
+            onClick = onPrivacyNotice,
+            shape = RoundedCornerShape(14.dp),
+            color = CardBackground,
+            border = BorderStroke(1.dp, CardBorderColor),
+            modifier = Modifier.fillMaxWidth(),
+          ) {
+            Row(
+              modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+              Text(
+                text = stringResource(R.string.privacy_notice_headline),
+                color = SecondaryTextColor,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
+                modifier = Modifier.weight(1f),
+              )
+              Spacer(modifier = Modifier.width(10.dp))
+              Text(
+                text = stringResource(R.string.privacy_notice_title),
+                color = MintAccentColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(12.dp))
+
           Button(
             onClick = primaryAction,
             modifier = Modifier

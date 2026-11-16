@@ -61,7 +61,7 @@ android {
     }
 
     buildTypes {
-        val internalTrack = providers.gradleProperty("internalTrack").orElse("true").get().toBoolean()
+        val internalTrack = providers.gradleProperty("internalTrack").orElse("false").get().toBoolean()
         release {
             buildConfigField("boolean", "INTERNAL_TOOLS", "false")
             buildConfigField("boolean", "INTERNAL_TRACK", internalTrack.toString())

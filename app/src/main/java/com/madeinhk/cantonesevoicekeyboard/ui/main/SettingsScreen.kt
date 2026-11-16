@@ -122,6 +122,9 @@ fun SettingsScreen(
         }
     }
 
+    var showPrivacyNotice by remember { mutableStateOf(false) }
+    if (showPrivacyNotice) PrivacyNoticeDialog(onDismiss = { showPrivacyNotice = false })
+
     var showLicenses by remember { mutableStateOf(false) }
     if (showLicenses) OpenSourceLicensesDialog(onDismiss = { showLicenses = false })
 
@@ -169,6 +172,7 @@ fun SettingsScreen(
         },
         voiceOptions = { VoiceInputSettings() },
         onBack = onBack,
+        onPrivacyNotice = { showPrivacyNotice = true },
         onLicenses = { showLicenses = true },
         developerOptions = if (BuildConfig.INTERNAL_TOOLS) ({
             DeveloperOptionsCard(
@@ -211,7 +215,8 @@ fun SettingsScreenContent(
     onClearQuickHistory: () -> Unit = {},
     voiceOptions: @Composable () -> Unit = { VoiceInputSettingsCard(enabled = true, onEnabledChange = {}) },
     onConfigureSystemLayouts: (() -> Unit)? = null,
-    onLicenses: (() -> Unit)? = null,
+    onPrivacyNotice: () -> Unit = {},
+    onLicenses: () -> Unit = {},
     developerOptions: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -321,15 +326,17 @@ fun SettingsScreenContent(
                     onCheckedChange = onHapticFeedbackChange
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                // Section 5: Privacy & Open Source
+                Spacer(modifier = Modifier.height(24.dp))
+                SectionHeader(text = stringResource(R.string.settings_privacy_about_header))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                if (onLicenses != null) {
-                    TextButton(onClick = onLicenses) {
-                        Text(stringResource(R.string.open_source_licenses), color = SecondaryTextColor)
-                    }
-                }
+                PrivacyNoticeCard(onClick = onPrivacyNotice)
+                Spacer(modifier = Modifier.height(12.dp))
+                OpenSourceNoticesCard(onClick = onLicenses)
+
                 if (developerOptions != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     developerOptions()
                 }
                 Spacer(modifier = Modifier.height(40.dp))
@@ -725,6 +732,102 @@ fun AutoCapitalizationCard(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
                 colors = settingsSwitchColors(),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun PrivacyNoticeCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        border = BorderStroke(1.dp, CardBorderColor),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.privacy_notice_title),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = PrimaryTextColor,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.privacy_notice_action),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MintAccentColor,
+                )
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = stringResource(R.string.privacy_notice_card_summary),
+                fontSize = 13.sp,
+                color = SecondaryTextColor,
+                lineHeight = 18.sp,
+            )
+        }
+    }
+}
+
+@Composable
+internal fun OpenSourceNoticesCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        border = BorderStroke(1.dp, CardBorderColor),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.open_source_licenses),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = PrimaryTextColor,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.privacy_notice_action),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MintAccentColor,
+                )
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = stringResource(R.string.open_source_card_summary),
+                fontSize = 13.sp,
+                color = SecondaryTextColor,
+                lineHeight = 18.sp,
             )
         }
     }

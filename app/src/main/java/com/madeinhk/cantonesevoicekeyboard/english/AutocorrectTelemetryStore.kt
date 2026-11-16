@@ -10,6 +10,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -31,9 +32,24 @@ internal object AutocorrectTelemetryStore {
         Thread(runnable, "AutocorrectTelemetry").apply { isDaemon = true }
     }
     private val lastSyncAttemptMs = AtomicLong(0L)
+    private val purgedForPublicRelease = AtomicBoolean(false)
+
+    private fun purgeLegacyDataIfDisabled(context: Context?) {
+        if (context == null || !purgedForPublicRelease.compareAndSet(false, true)) return
+        val appContext = context.applicationContext ?: context
+        executor.execute {
+            runCatching {
+                File(appContext.filesDir, DIR_NAME).takeIf { it.exists() }?.deleteRecursively()
+            }
+        }
+    }
 
     fun record(context: Context?, episode: AutocorrectEpisode) {
-        if (!BuildConfig.INTERNAL_TRACK || context == null) return
+        if (!BuildConfig.INTERNAL_TRACK) {
+            purgeLegacyDataIfDisabled(context)
+            return
+        }
+        if (context == null) return
         val appContext = context.applicationContext ?: context
         val line = episode.toJson().toString()
         executor.execute {
@@ -46,7 +62,11 @@ internal object AutocorrectTelemetryStore {
     }
 
     fun flushIfOnWifi(context: Context?) {
-        if (!BuildConfig.INTERNAL_TRACK || context == null) return
+        if (!BuildConfig.INTERNAL_TRACK) {
+            purgeLegacyDataIfDisabled(context)
+            return
+        }
+        if (context == null) return
         val appContext = context.applicationContext ?: context
         executor.execute {
             runCatching {
