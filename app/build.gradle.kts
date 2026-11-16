@@ -34,7 +34,7 @@ android {
         applicationId = "com.madeinhk.cantonesevoicekeyboard"
         minSdk = 32
         targetSdk = 36
-        versionCode = 84
+        versionCode = 85
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -93,11 +93,10 @@ android {
     }
 
     androidResources {
-        noCompress.addAll(listOf("cng", "bin"))
         val ignores = mutableListOf(
             "!.svn", "!.git", "!.ds_store", "!*.scc", ".*", "<dir>_*",
             "!CVS", "!thumbs.db", "!picasa.ini", "!*~",
-            "*.md", "*.aff", "en_US.dic", "README_en_US.txt",
+            "*.md", "*.aff", "en_US.dic", "en_GB.dic", "README_en_US.txt",
             "compiled_vocabulary.json", "provenance.json",
             "revision.txt",
         )
@@ -108,6 +107,7 @@ android {
     packaging {
       resources {
         excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        excludes += "DebugProbesKt.bin"
       }
     }
 
@@ -160,6 +160,7 @@ dependencies {
   implementation(libs.play.asset.delivery)
 
   // Core Android dependencies
+  implementation(libs.androidx.autofill)
   implementation(libs.androidx.core)
   implementation(libs.androidx.lifecycle.runtime)
   implementation(libs.androidx.activity.compose)

@@ -1,6 +1,8 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.main
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
@@ -8,9 +10,12 @@ import androidx.compose.ui.graphics.luminance
 
 internal val LocalSettingsLightTheme = staticCompositionLocalOf<Boolean?> { null }
 
-private val isSettingsLightTheme: Boolean
+internal val isSettingsLightTheme: Boolean
     @Composable get() = LocalSettingsLightTheme.current
         ?: (MaterialTheme.colorScheme.background.luminance() > 0.5f)
+
+internal val ScreenBackground: Color
+    @Composable get() = if (isSettingsLightTheme) Color(0xFFF7F9F5) else Color(0xFF121714)
 
 internal val CardBackground: Color
     @Composable get() = if (isSettingsLightTheme) Color(0xFFF0F5F1) else Color(0xFF1C231F)
@@ -41,3 +46,18 @@ internal val PrimaryTextColor: Color
 
 internal val SecondaryTextColor: Color
     @Composable get() = if (isSettingsLightTheme) Color(0xFF52675A) else Color(0xFF8E9C94)
+
+internal val StatusActiveGreen: Color
+    @Composable get() = if (isSettingsLightTheme) Color(0xFF1E7E48) else Color(0xFF6DD58C)
+
+internal val StatusWarningAmber: Color
+    @Composable get() = if (isSettingsLightTheme) Color(0xFFB26A00) else Color(0xFFFFB74D)
+
+@Composable
+internal fun settingsSwitchColors(): SwitchColors = SwitchDefaults.colors(
+    checkedThumbColor = MintOnAccentColor,
+    checkedTrackColor = MintAccentColor,
+    uncheckedThumbColor = SecondaryTextColor,
+    uncheckedTrackColor = MiniKeySurface,
+    uncheckedBorderColor = PillUnselectedBorder,
+)

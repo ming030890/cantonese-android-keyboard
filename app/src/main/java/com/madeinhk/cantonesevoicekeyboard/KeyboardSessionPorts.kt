@@ -96,4 +96,5 @@ internal data class KeyboardSessionDependencies(
     val handwriting: HandwritingSession,
     val suggestions: SuggestionSession,
     val english: com.madeinhk.cantonesevoicekeyboard.english.EnglishInputCoordinator? = null,
+    val specialFields: SpecialFieldStore = InMemorySpecialFieldStore(),
 )

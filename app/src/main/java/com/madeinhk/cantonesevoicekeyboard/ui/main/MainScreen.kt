@@ -8,51 +8,53 @@ import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation3.runtime.NavKey
-import androidx.compose.ui.res.stringResource
-import com.madeinhk.cantonesevoicekeyboard.ModelAssetPack
-import com.madeinhk.cantonesevoicekeyboard.BuildConfig
-import com.madeinhk.cantonesevoicekeyboard.ModelDownloadStatus
-import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
 import com.madeinhk.cantonesevoicekeyboard.DebugAudio
+import com.madeinhk.cantonesevoicekeyboard.DebugAudioSettings
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwriting
 import com.madeinhk.cantonesevoicekeyboard.DebugHandwritingSettings
-import com.madeinhk.cantonesevoicekeyboard.PromptedHandwriting
-import com.madeinhk.cantonesevoicekeyboard.Settings as KeyboardSettingsNavKey
-import com.madeinhk.cantonesevoicekeyboard.R
 import com.madeinhk.cantonesevoicekeyboard.KeyboardSettings
-import com.madeinhk.cantonesevoicekeyboard.theme.*
-import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.SettingsIcon
+import com.madeinhk.cantonesevoicekeyboard.ModelAssetPack
+import com.madeinhk.cantonesevoicekeyboard.ModelDownloadStatus
+import com.madeinhk.cantonesevoicekeyboard.PromptedHandwriting
+import com.madeinhk.cantonesevoicekeyboard.R
+import com.madeinhk.cantonesevoicekeyboard.Settings as KeyboardSettingsNavKey
+import com.madeinhk.cantonesevoicekeyboard.theme.CantoneseVoiceKeyboardTheme
 
 @Composable
 fun MainScreen(
@@ -62,42 +64,34 @@ fun MainScreen(
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
 
-  var enabledLayouts by remember {
-    mutableStateOf(KeyboardSettings.getEnabledLayouts(context))
-  }
-  var quickVersion by remember {
-    mutableIntStateOf(KeyboardSettings.getQuickVersion(context))
-  }
   val voiceEnabled by KeyboardSettings.voiceInputEnabledFlow.collectAsState()
-  var permissionGranted by remember { mutableStateOf(false) }
+  var permissionGranted by remember {
+    mutableStateOf(
+      ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    )
+  }
   var keyboardEnabled by remember { mutableStateOf(false) }
   var keyboardSelected by remember { mutableStateOf(false) }
-  var modelStatus by remember { mutableStateOf<ModelDownloadStatus>(ModelDownloadStatus.NotStarted) }
-  var storeDebugAudio by remember { mutableStateOf(DebugAudioSettings.isStoreDebugAudioEnabled(context)) }
-  var storeDebugHandwriting by remember { mutableStateOf(DebugHandwritingSettings.isStoreDebugHandwritingEnabled(context)) }
-  var retryKey by remember { mutableIntStateOf(0) }
+  var completedNavigationSent by remember { mutableStateOf(false) }
 
-  // Observe the model asset-pack download live (progress, install, ready, failure).
-  // retryKey re-launches the collection so the user can retry after a failure.
-  LaunchedEffect(retryKey, voiceEnabled, permissionGranted) {
-    ModelAssetPack.downloadStatusFlow(context, requestDownload = voiceEnabled && permissionGranted).collect { modelStatus = it }
+  fun completeOnboarding() {
+    if (completedNavigationSent) return
+    completedNavigationSent = true
+    KeyboardSettings.setOnboardingCompleted(context, true)
+    onItemClick(KeyboardSettingsNavKey)
   }
 
   fun refreshStatus() {
-    permissionGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    permissionGranted =
+      ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     keyboardEnabled = imm.enabledInputMethodList.any { it.packageName == context.packageName }
 
     val currentIme = Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
     keyboardSelected = currentIme?.contains(context.packageName) == true
-    storeDebugAudio = DebugAudioSettings.isStoreDebugAudioEnabled(context)
-    storeDebugHandwriting = DebugHandwritingSettings.isStoreDebugHandwritingEnabled(context)
-    enabledLayouts = KeyboardSettings.getEnabledLayouts(context)
-    quickVersion = KeyboardSettings.getQuickVersion(context)
   }
 
-  // Refresh status when window gains focus (e.g. returning from system dialog overlays like the IME picker)
   val windowInfo = LocalWindowInfo.current
   LaunchedEffect(windowInfo.isWindowFocused) {
     if (windowInfo.isWindowFocused) {
@@ -105,7 +99,6 @@ fun MainScreen(
     }
   }
 
-  // Observe lifecycle to reload when returning from system Settings page
   DisposableEffect(lifecycleOwner) {
     val observer = LifecycleEventObserver { _, event ->
       if (event == Lifecycle.Event.ON_RESUME) {
@@ -118,92 +111,78 @@ fun MainScreen(
     }
   }
 
-  val downloadConfirmation = rememberLauncherForActivityResult(
-    ActivityResultContracts.StartIntentSenderForResult()
-  ) { retryKey++ }
+  val allCompleted = keyboardEnabled && keyboardSelected && (!voiceEnabled || permissionGranted)
+  LaunchedEffect(allCompleted) {
+    if (allCompleted) {
+      if (voiceEnabled && permissionGranted) {
+        ModelAssetPack.requestDownload(context)
+      }
+      completeOnboarding()
+    }
+  }
 
-  // Permission launcher
   val permissionLauncher = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.RequestPermission(),
     onResult = { isGranted ->
       permissionGranted = isGranted
-      refreshStatus()
+      if (isGranted) {
+        ModelAssetPack.requestDownload(context)
+      } else {
+        // Never trap the user on Step 3 if they deny the OS permission dialog.
+        KeyboardSettings.setVoiceInputEnabled(context, false)
+      }
+      completeOnboarding()
     }
   )
 
   MainScreenContent(
     voiceEnabled = voiceEnabled,
-    onVoiceEnabledChange = { KeyboardSettings.setVoiceInputEnabled(context, it) },
+    onSkipVoice = {
+      KeyboardSettings.setVoiceInputEnabled(context, false)
+      completeOnboarding()
+    },
     permissionGranted = permissionGranted,
     keyboardEnabled = keyboardEnabled,
     keyboardSelected = keyboardSelected,
-    enabledLayouts = enabledLayouts,
-    onToggleLayout = { layoutId ->
-      enabledLayouts = KeyboardSettings.handleLayoutToggle(context, enabledLayouts, layoutId)
-    },
-    quickVersion = quickVersion,
-    onQuickVersionChange = { ver ->
-      KeyboardSettings.setQuickVersion(context, ver)
-      quickVersion = ver
-    },
-    inferredReason = if (!KeyboardSettings.hasUserConfiguredLayouts(context)) stringResource(R.string.setup_step_layout_inferred) else null,
-    modelStatus = modelStatus,
+    modelStatus = ModelDownloadStatus.NotStarted,
     onGrantPermission = { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
     onEnableKeyboard = { context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) },
     onPickKeyboard = {
       val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
       imm.showInputMethodPicker()
     },
-    onModelRetry = { ModelAssetPack.requestDownload(context, retry = true); retryKey++ },
-    onConfirmModelDownload = {
-      val manager = com.google.android.play.core.assetpacks.AssetPackManagerFactory.getInstance(context)
-      if (modelStatus == ModelDownloadStatus.RequiresConfirmation && voiceEnabled &&
-          ModelAssetPack.hasUnmeteredNetwork(context)) {
-        if (!manager.showConfirmationDialog(downloadConfirmation)) retryKey++
-      }
-    },
-    storeDebugAudio = storeDebugAudio,
-    onStoreDebugAudioChange = { enabled ->
-      DebugAudioSettings.setStoreDebugAudioEnabled(context, enabled)
-      storeDebugAudio = enabled
-    },
+    onModelRetry = {},
+    storeDebugAudio = DebugAudioSettings.isStoreDebugAudioEnabled(context),
+    onStoreDebugAudioChange = {},
     onOpenDebugAudio = { onItemClick(DebugAudio) },
-    storeDebugHandwriting = storeDebugHandwriting,
-    onStoreDebugHandwritingChange = { enabled ->
-        DebugHandwritingSettings.setStoreDebugHandwritingEnabled(context, enabled)
-        storeDebugHandwriting = enabled
-    },
+    storeDebugHandwriting = DebugHandwritingSettings.isStoreDebugHandwritingEnabled(context),
+    onStoreDebugHandwritingChange = {},
     onOpenDebugHandwriting = { onItemClick(DebugHandwriting) },
     onOpenPromptedHandwriting = { onItemClick(PromptedHandwriting) },
-    onOpenSettings = { onItemClick(KeyboardSettingsNavKey) },
+    onOpenSettings = { completeOnboarding() },
     modifier = modifier
   )
 }
 
 /**
- * Stateless layout for the setup screen. Holds no Android dependencies, so it
- * renders cleanly in @Preview / screenshot tests across light and dark themes.
+ * Full-screen, focused 1-step-at-a-time onboarding wizard.
+ * Holds no Android runtime dependencies so it renders cleanly in @Preview and screenshot tests.
  */
 @Composable
 fun MainScreenContent(
   voiceEnabled: Boolean = true,
-  onVoiceEnabledChange: (Boolean) -> Unit = {},
+  onSkipVoice: () -> Unit = {},
   permissionGranted: Boolean,
   keyboardEnabled: Boolean,
   keyboardSelected: Boolean,
-  enabledLayouts: Set<String> = KeyboardSettings.DEFAULT_LAYOUTS,
-  onToggleLayout: (String) -> Unit = {},
-  quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
-  onQuickVersionChange: (Int) -> Unit = {},
-  inferredReason: String? = null,
-  modelStatus: ModelDownloadStatus,
+  modelStatus: ModelDownloadStatus = ModelDownloadStatus.NotStarted,
   onGrantPermission: () -> Unit,
   onEnableKeyboard: () -> Unit,
   onPickKeyboard: () -> Unit,
-  onModelRetry: () -> Unit,
+  onModelRetry: () -> Unit = {},
   onConfirmModelDownload: () -> Unit = {},
-  storeDebugAudio: Boolean,
-  onStoreDebugAudioChange: (Boolean) -> Unit,
+  storeDebugAudio: Boolean = false,
+  onStoreDebugAudioChange: (Boolean) -> Unit = {},
   onOpenDebugAudio: () -> Unit = {},
   storeDebugHandwriting: Boolean = false,
   onStoreDebugHandwritingChange: (Boolean) -> Unit = {},
@@ -212,220 +191,308 @@ fun MainScreenContent(
   onOpenSettings: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
-  // Backdrop gradient comes from the theme (decided once per light/dark there),
-  // so this screen never has to infer the theme itself.
-  Box(
-    modifier = Modifier
-      .fillMaxSize()
-      .background(brush = BrandTheme.colors.backgroundGradient)
-  ) {
-    Column(
-      modifier = modifier
+  val lightTheme = MaterialTheme.colorScheme.background.luminance() > 0.5f
+  val stepCount = if (voiceEnabled) 3 else 2
+  val activeStep = when {
+    !keyboardEnabled -> 1
+    !keyboardSelected -> 2
+    else -> stepCount
+  }
+
+  CompositionLocalProvider(LocalSettingsLightTheme provides lightTheme) {
+    Box(
+      modifier = Modifier
         .fillMaxSize()
-        .verticalScroll(rememberScrollState()),
-      horizontalAlignment = Alignment.CenterHorizontally
+        .background(ScreenBackground)
     ) {
-      AppHeader(onOpenSettings = onOpenSettings)
+      Column(
+        modifier = modifier
+          .fillMaxSize()
+          .padding(horizontal = 24.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
+        // Top Brand + Progress Header
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+          Text(
+            text = stringResource(R.string.app_header_title),
+            color = SecondaryTextColor,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+          )
+          Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MintAccentColor.copy(alpha = 0.14f),
+          ) {
+            Text(
+              text = stringResource(R.string.setup_step_progress, activeStep, stepCount),
+              color = MintAccentColor,
+              fontSize = 12.sp,
+              fontWeight = FontWeight.SemiBold,
+              modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            )
+          }
+        }
 
-      // Layout Selection (inferred by default from existing keyboards)
-      SetupLayoutStepCard(
-        title = stringResource(id = R.string.setup_step_layout_title),
-        description = stringResource(id = R.string.setup_step_layout_desc),
-        inferredReason = inferredReason,
-        enabledLayouts = enabledLayouts,
-        onToggleLayout = onToggleLayout,
-        quickVersion = quickVersion,
-        onQuickVersionChange = onQuickVersionChange
-      )
+        Spacer(modifier = Modifier.height(14.dp))
 
-      VoiceInputSettingsCard(
-        enabled = voiceEnabled,
-        onEnabledChange = onVoiceEnabledChange,
-      )
+        // Segmented Capsule Progress Bar
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+          for (i in 1..stepCount) {
+            val filled = i <= activeStep
+            Box(
+              modifier = Modifier
+                .weight(1f)
+                .height(5.dp)
+                .clip(RoundedCornerShape(3.dp))
+                .background(if (filled) MintAccentColor else CardBorderColor)
+            )
+          }
+        }
 
-      val allCompleted = keyboardEnabled && keyboardSelected && (!voiceEnabled || permissionGranted)
+        // Center Hero Stage (1 focused action per step)
+        AnimatedContent(
+          targetState = activeStep,
+          modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth(),
+          transitionSpec = {
+            if (targetState > initialState) {
+              (slideInHorizontally(tween(260)) { it / 3 } + fadeIn(tween(260))) togetherWith
+                (slideOutHorizontally(tween(220)) { -it / 3 } + fadeOut(tween(180)))
+            } else {
+              (slideInHorizontally(tween(260)) { -it / 3 } + fadeIn(tween(260))) togetherWith
+                (slideOutHorizontally(tween(220)) { it / 3 } + fadeOut(tween(180)))
+            }
+          },
+          label = "onboardingStepTransition",
+        ) { step ->
+          val appName = stringResource(R.string.app_name)
+          val stepTitle = when (step) {
+            1 -> stringResource(R.string.setup_step_enable_title)
+            2 -> stringResource(R.string.setup_step_switch_title)
+            else -> stringResource(R.string.onboarding_voice_title)
+          }
+          val stepDesc = when (step) {
+            1 -> stringResource(R.string.setup_step_enable_desc, appName)
+            2 -> stringResource(R.string.setup_step_switch_desc, appName)
+            else -> stringResource(R.string.onboarding_voice_desc)
+          }
+          val stepBadge = when (step) {
+            1 -> "1"
+            2 -> "2"
+            else -> "🎤"
+          }
 
-      if (allCompleted) {
-        // Celebratory "Ready to type" card
-        KeyboardReadyCard()
-      } else {
-        // Streamlined, sequential 3-step setup flow
-        KeyboardSetupFlowCard(
-          voiceEnabled = voiceEnabled,
-          keyboardEnabled = keyboardEnabled,
-          keyboardSelected = keyboardSelected,
-          permissionGranted = permissionGranted,
-          onEnableKeyboard = onEnableKeyboard,
-          onPickKeyboard = onPickKeyboard,
-          onGrantPermission = onGrantPermission
-        )
+          Column(
+            modifier = Modifier
+              .fillMaxSize()
+              .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+          ) {
+            OnboardingTurtleHero(badgeText = stepBadge)
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+              text = stepTitle,
+              color = PrimaryTextColor,
+              fontSize = 26.sp,
+              lineHeight = 32.sp,
+              fontWeight = FontWeight.Bold,
+              textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+              text = stepDesc,
+              color = SecondaryTextColor,
+              fontSize = 15.sp,
+              lineHeight = 22.sp,
+              textAlign = TextAlign.Center,
+            )
+          }
+        }
+
+        // Bottom Pinned Action Bar
+        val primaryLabel = when (activeStep) {
+          1 -> stringResource(R.string.setup_step_enable_action)
+          2 -> stringResource(R.string.setup_step_switch_action)
+          else -> stringResource(R.string.onboarding_voice_allow)
+        }
+        val primaryAction: () -> Unit = when (activeStep) {
+          1 -> onEnableKeyboard
+          2 -> onPickKeyboard
+          else -> if (permissionGranted) onOpenSettings else onGrantPermission
+        }
+
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+          horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          Button(
+            onClick = primaryAction,
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(54.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+              containerColor = MintAccentColor,
+              contentColor = MintOnAccentColor,
+            ),
+          ) {
+            Text(
+              text = primaryLabel,
+              fontSize = 16.sp,
+              fontWeight = FontWeight.SemiBold,
+            )
+          }
+
+          if (activeStep == 3 && voiceEnabled && !permissionGranted) {
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(
+              onClick = onSkipVoice,
+              modifier = Modifier.heightIn(min = 44.dp),
+            ) {
+              Text(
+                text = stringResource(R.string.setup_step_voice_skip),
+                color = SecondaryTextColor,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+              )
+            }
+          } else {
+            Spacer(modifier = Modifier.height(16.dp))
+          }
+        }
       }
+    }
+  }
+}
 
-      Spacer(modifier = Modifier.height(8.dp))
+@Composable
+private fun OnboardingTurtleHero(
+  badgeText: String,
+  modifier: Modifier = Modifier,
+) {
+  val accent = MintAccentColor
+  val cardBg = CardBackground
+  val screenBg = ScreenBackground
+  val border = CardBorderColor
 
-      // Interactive Test Sandbox (front and center!)
-      TestSandboxCard()
-
-      // Model Sync Status (compact when ready)
-      if (voiceEnabled && permissionGranted) ModelStatusCard(status = modelStatus, onRetry = onModelRetry, onConfirmDownload = onConfirmModelDownload)
-
-      Spacer(modifier = Modifier.height(6.dp))
-
-      // Collapsible developer tools at bottom
-      if (BuildConfig.INTERNAL_TOOLS) DeveloperOptionsCard(
-        storeDebugAudio = storeDebugAudio,
-        onStoreDebugAudioChange = onStoreDebugAudioChange,
-        onOpenDebugAudio = onOpenDebugAudio,
-        storeDebugHandwriting = storeDebugHandwriting,
-        onStoreDebugHandwritingChange = onStoreDebugHandwritingChange,
-        onOpenDebugHandwriting = onOpenDebugHandwriting,
-        onOpenPromptedHandwriting = onOpenPromptedHandwriting,
+  Box(
+    modifier = modifier.size(148.dp),
+    contentAlignment = Alignment.Center,
+  ) {
+    Box(
+      modifier = Modifier
+        .size(148.dp)
+        .clip(CircleShape)
+        .background(accent.copy(alpha = 0.08f))
+        .border(1.dp, accent.copy(alpha = 0.22f), CircleShape)
+    )
+    Box(
+      modifier = Modifier
+        .size(120.dp)
+        .clip(CircleShape)
+        .background(Brush.radialGradient(listOf(cardBg, screenBg)))
+        .border(1.dp, border, CircleShape),
+      contentAlignment = Alignment.Center,
+    ) {
+      Image(
+        painter = painterResource(R.drawable.mascot_turtle_hero),
+        contentDescription = null,
+        modifier = Modifier.size(92.dp),
       )
-
-      Spacer(modifier = Modifier.height(24.dp))
+    }
+    Box(
+      modifier = Modifier
+        .align(Alignment.BottomEnd)
+        .padding(6.dp)
+        .size(34.dp)
+        .clip(CircleShape)
+        .background(accent)
+        .border(2.dp, screenBg, CircleShape),
+      contentAlignment = Alignment.Center,
+    ) {
+      Text(
+        text = badgeText,
+        color = MintOnAccentColor,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+      )
     }
   }
 }
 
 @Composable
 fun AppHeader(
-  onOpenSettings: () -> Unit = {},
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
 ) {
-  Box(modifier = modifier.fillMaxWidth()) {
-    IconButton(
-      onClick = onOpenSettings,
-      modifier = Modifier
-        .align(Alignment.TopEnd)
-        .padding(top = 8.dp)
-        .size(40.dp)
-        .clip(CircleShape)
-        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-    ) {
-      SettingsIcon(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onSurface)
-    }
-
-    Column(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      MicLogo(modifier = Modifier.padding(top = 16.dp, bottom = 12.dp))
-      Text(
-        text = stringResource(id = R.string.app_header_title),
-        color = MaterialTheme.colorScheme.onBackground,
-        fontSize = 22.sp,
-        fontWeight = FontWeight.Black,
-        letterSpacing = 1.sp
-      )
-      Spacer(modifier = Modifier.height(4.dp))
-      Text(
-        text = stringResource(id = R.string.app_header_subtitle),
-        color = MaterialTheme.colorScheme.primary,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = 2.sp
-      )
-      Spacer(modifier = Modifier.height(16.dp))
-    }
+  Column(
+    modifier = modifier.fillMaxWidth(),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    MicLogo(modifier = Modifier.padding(top = 16.dp, bottom = 12.dp))
+    Text(
+      text = stringResource(id = R.string.app_header_title),
+      color = PrimaryTextColor,
+      fontSize = 22.sp,
+      fontWeight = FontWeight.Bold,
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+      text = stringResource(id = R.string.app_header_subtitle),
+      color = MintAccentColor,
+      fontSize = 12.sp,
+      fontWeight = FontWeight.SemiBold,
+    )
+    Spacer(modifier = Modifier.height(16.dp))
   }
 }
 
 @Composable
 fun MicLogo(modifier: Modifier = Modifier) {
-  val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-  val scale by infiniteTransition.animateFloat(
-    initialValue = 1.0f,
-    targetValue = 1.06f,
-    animationSpec = infiniteRepeatable(
-      animation = tween(1500, easing = EaseInOutSine),
-      repeatMode = RepeatMode.Reverse
-    ),
-    label = "logoPulse"
-  )
-
-  val primaryColor = MaterialTheme.colorScheme.primary
-  val outlineColor = MaterialTheme.colorScheme.outline
-  val surfaceColor = MaterialTheme.colorScheme.surface
-  val backgroundColor = MaterialTheme.colorScheme.background
-
   Box(
-    modifier = modifier,
-    contentAlignment = Alignment.Center
+    modifier = modifier
+      .size(64.dp)
+      .clip(CircleShape)
+      .background(CardBackground)
+      .border(1.dp, CardBorderColor, CircleShape),
+    contentAlignment = Alignment.Center,
   ) {
-    // Outer glowing ring
-    Box(
-      modifier = Modifier
-        .size(90.dp * scale)
-        .clip(CircleShape)
-        .background(primaryColor.copy(alpha = 0.08f))
-        .border(1.5.dp, primaryColor.copy(alpha = 0.2f), CircleShape)
+    Image(
+      painter = painterResource(R.drawable.mascot_turtle_hero),
+      contentDescription = null,
+      modifier = Modifier.size(48.dp),
     )
-    
-    // Inner logo container showcasing the app's baby turtle mascot
-    Box(
-      modifier = Modifier
-        .size(74.dp)
-        .clip(CircleShape)
-        .background(
-          brush = Brush.radialGradient(
-            colors = listOf(
-              surfaceColor,
-              backgroundColor
-            )
-          )
-        )
-        .border(1.dp, outlineColor, CircleShape),
-      contentAlignment = Alignment.Center
-    ) {
-      androidx.compose.foundation.Image(
-        painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_hero),
-        contentDescription = null,
-        modifier = Modifier.size(56.dp),
-      )
-    }
   }
 }
 
 @Composable
-fun SetupLayoutStepCard(
-  title: String,
-  description: String,
-  enabledLayouts: Set<String>,
-  onToggleLayout: (String) -> Unit,
-  stepNumber: Int = 1,
-  quickVersion: Int = KeyboardSettings.DEFAULT_QUICK_VERSION,
-  onQuickVersionChange: (Int) -> Unit = {},
-  inferredReason: String? = null,
-  modifier: Modifier = Modifier,
-) {
-  KeyboardLayoutsSelectorCard(
-    enabledLayouts = enabledLayouts,
-    onToggleLayout = onToggleLayout,
-    quickVersion = quickVersion,
-    onQuickVersionChange = onQuickVersionChange,
-    title = title,
-    description = description,
-    inferredReason = inferredReason,
-    modifier = modifier
-  )
-}
-
-@Composable
 fun KeyboardReadyCard(
+  onOpenSettings: (() -> Unit)? = null,
   modifier: Modifier = Modifier,
 ) {
-  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
-  val primaryColor = MaterialTheme.colorScheme.primary
-
   Card(
     modifier = modifier
       .fillMaxWidth()
       .padding(vertical = 6.dp),
-    shape = RoundedCornerShape(16.dp),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface
-    ),
-    border = BorderStroke(1.5.dp, SuccessGreen.copy(alpha = 0.5f))
+    shape = RoundedCornerShape(20.dp),
+    colors = CardDefaults.cardColors(containerColor = CardBackground),
+    border = BorderStroke(1.dp, StatusActiveGreen.copy(alpha = 0.45f)),
   ) {
     Column(
       modifier = Modifier
@@ -434,66 +501,42 @@ fun KeyboardReadyCard(
     ) {
       Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
       ) {
-        androidx.compose.foundation.Image(
-          painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_celebrate),
+        Image(
+          painter = painterResource(R.drawable.mascot_turtle_celebrate),
           contentDescription = null,
-          modifier = Modifier.size(50.dp),
+          modifier = Modifier.size(48.dp),
         )
-
         Spacer(modifier = Modifier.width(12.dp))
-
         Column(modifier = Modifier.weight(1f)) {
           Text(
             text = stringResource(id = R.string.setup_all_done_title),
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold
+            color = PrimaryTextColor,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
           )
           Spacer(modifier = Modifier.height(2.dp))
           Text(
             text = stringResource(R.string.setup_all_done_desc, stringResource(R.string.app_name)),
-            color = textVariantColor,
-            fontSize = 12.sp,
-            lineHeight = 16.sp
+            color = SecondaryTextColor,
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
           )
         }
       }
-
-      Spacer(modifier = Modifier.height(12.dp))
-
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Surface(
+      if (onOpenSettings != null) {
+        Spacer(modifier = Modifier.height(12.dp))
+        Button(
+          onClick = onOpenSettings,
+          modifier = Modifier.fillMaxWidth(),
           shape = RoundedCornerShape(12.dp),
-          color = primaryColor.copy(alpha = 0.12f),
-          border = BorderStroke(1.dp, primaryColor.copy(alpha = 0.3f))
+          colors = ButtonDefaults.buttonColors(
+            containerColor = MintAccentColor,
+            contentColor = MintOnAccentColor,
+          ),
         ) {
-          Text(
-            text = "🎤 " + stringResource(R.string.settings_feature_voice_typing),
-            color = primaryColor,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-          )
-        }
-
-        Surface(
-          shape = RoundedCornerShape(12.dp),
-          color = SuccessGreen.copy(alpha = 0.12f),
-          border = BorderStroke(1.dp, SuccessGreen.copy(alpha = 0.3f))
-        ) {
-          Text(
-            text = "✓ " + stringResource(R.string.setup_step_completed),
-            color = SuccessGreen,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-          )
+          Text(stringResource(R.string.setup_all_done_settings), fontWeight = FontWeight.SemiBold)
         }
       }
     }
@@ -509,14 +552,12 @@ fun KeyboardSetupFlowCard(
   onEnableKeyboard: () -> Unit,
   onPickKeyboard: () -> Unit,
   onGrantPermission: () -> Unit,
+  onSkipVoice: (() -> Unit)? = null,
   modifier: Modifier = Modifier,
 ) {
-  val outlineColor = MaterialTheme.colorScheme.outline
-  val primaryColor = MaterialTheme.colorScheme.primary
-
   val completedCount = (if (keyboardEnabled) 1 else 0) +
-                       (if (keyboardSelected) 1 else 0) +
-                       (if (voiceEnabled && permissionGranted) 1 else 0)
+    (if (keyboardSelected) 1 else 0) +
+    (if (voiceEnabled && permissionGranted) 1 else 0)
   val stepCount = if (voiceEnabled) 3 else 2
   val activeStepIndex = when {
     !keyboardEnabled -> 1
@@ -528,11 +569,9 @@ fun KeyboardSetupFlowCard(
     modifier = modifier
       .fillMaxWidth()
       .padding(vertical = 6.dp),
-    shape = RoundedCornerShape(16.dp),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface
-    ),
-    border = BorderStroke(1.dp, outlineColor)
+    shape = RoundedCornerShape(20.dp),
+    colors = CardDefaults.cardColors(containerColor = CardBackground),
+    border = BorderStroke(1.dp, CardBorderColor),
   ) {
     Column(
       modifier = Modifier
@@ -542,19 +581,19 @@ fun KeyboardSetupFlowCard(
       Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
       ) {
         Text(
           text = stringResource(id = R.string.setup_flow_title),
-          color = MaterialTheme.colorScheme.onSurface,
+          color = PrimaryTextColor,
           fontSize = 16.sp,
-          fontWeight = FontWeight.Bold
+          fontWeight = FontWeight.SemiBold,
         )
         Text(
           text = stringResource(id = R.string.setup_step_progress, activeStepIndex, stepCount),
-          color = primaryColor,
+          color = MintAccentColor,
           fontSize = 13.sp,
-          fontWeight = FontWeight.Bold
+          fontWeight = FontWeight.SemiBold,
         )
       }
 
@@ -566,13 +605,12 @@ fun KeyboardSetupFlowCard(
           .fillMaxWidth()
           .height(4.dp)
           .clip(RoundedCornerShape(2.dp)),
-        color = primaryColor,
-        trackColor = outlineColor.copy(alpha = 0.2f)
+        color = MintAccentColor,
+        trackColor = CardBorderColor,
       )
 
       Spacer(modifier = Modifier.height(16.dp))
 
-      // Step 1: Turn on keyboard
       SetupStepRow(
         stepNumber = 1,
         title = stringResource(id = R.string.setup_step_enable_title),
@@ -580,43 +618,37 @@ fun KeyboardSetupFlowCard(
         isCompleted = keyboardEnabled,
         isActive = !keyboardEnabled,
         actionText = stringResource(id = R.string.setup_step_enable_action),
-        onActionClick = onEnableKeyboard
+        onActionClick = onEnableKeyboard,
       )
 
-      HorizontalDivider(
-        modifier = Modifier.padding(vertical = 12.dp),
-        color = outlineColor.copy(alpha = 0.2f)
-      )
+      HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = CardBorderColor)
 
-      // Step 2: Set as default keyboard
       SetupStepRow(
         stepNumber = 2,
         title = stringResource(id = R.string.setup_step_switch_title),
         description = if (!keyboardEnabled) stringResource(id = R.string.setup_step_locked_hint)
-                      else stringResource(R.string.setup_step_switch_desc, stringResource(R.string.app_name)),
+        else stringResource(R.string.setup_step_switch_desc, stringResource(R.string.app_name)),
         isCompleted = keyboardSelected,
         isActive = keyboardEnabled && !keyboardSelected,
         actionText = stringResource(id = R.string.setup_step_switch_action),
-        onActionClick = onPickKeyboard
+        onActionClick = onPickKeyboard,
       )
 
       if (voiceEnabled) {
-      HorizontalDivider(
-        modifier = Modifier.padding(vertical = 12.dp),
-        color = outlineColor.copy(alpha = 0.2f)
-      )
+        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = CardBorderColor)
 
-      // Step 3: Enable voice typing
-      SetupStepRow(
-        stepNumber = 3,
-        title = stringResource(id = R.string.setup_step_voice_title),
-        description = if (!keyboardSelected) stringResource(id = R.string.setup_step_locked_hint)
-                      else stringResource(id = R.string.setup_step_voice_desc),
-        isCompleted = permissionGranted,
-        isActive = keyboardSelected && !permissionGranted,
-        actionText = stringResource(id = R.string.setup_step_voice_action),
-        onActionClick = onGrantPermission
-      )
+        SetupStepRow(
+          stepNumber = 3,
+          title = stringResource(id = R.string.setup_step_voice_title),
+          description = if (!keyboardSelected) stringResource(id = R.string.setup_step_locked_hint)
+          else stringResource(id = R.string.setup_step_voice_desc),
+          isCompleted = permissionGranted,
+          isActive = keyboardSelected && !permissionGranted,
+          actionText = stringResource(id = R.string.setup_step_voice_action),
+          onActionClick = onGrantPermission,
+          secondaryActionText = if (onSkipVoice != null) stringResource(id = R.string.setup_step_voice_skip) else null,
+          onSecondaryActionClick = onSkipVoice,
+        )
       }
     }
   }
@@ -631,20 +663,18 @@ fun SetupStepRow(
   isActive: Boolean,
   actionText: String,
   onActionClick: () -> Unit,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  secondaryActionText: String? = null,
+  onSecondaryActionClick: (() -> Unit)? = null,
 ) {
-  val outlineColor = MaterialTheme.colorScheme.outline
-  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
-  val primaryColor = MaterialTheme.colorScheme.primary
-
   Row(
     modifier = modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.SpaceBetween
+    horizontalArrangement = Arrangement.SpaceBetween,
   ) {
     Row(
       modifier = Modifier.weight(1f),
-      verticalAlignment = Alignment.CenterVertically
+      verticalAlignment = Alignment.CenterVertically,
     ) {
       Box(
         modifier = Modifier
@@ -652,30 +682,30 @@ fun SetupStepRow(
           .clip(CircleShape)
           .background(
             when {
-              isCompleted -> SuccessGreen.copy(alpha = 0.15f)
-              isActive -> primaryColor.copy(alpha = 0.15f)
-              else -> outlineColor.copy(alpha = 0.2f)
+              isCompleted -> StatusActiveGreen.copy(alpha = 0.15f)
+              isActive -> MintAccentColor.copy(alpha = 0.15f)
+              else -> MiniKeySurface
             }
           )
           .border(
             width = 1.5.dp,
             color = when {
-              isCompleted -> SuccessGreen
-              isActive -> primaryColor
-              else -> textVariantColor.copy(alpha = 0.3f)
+              isCompleted -> StatusActiveGreen
+              isActive -> MintAccentColor
+              else -> CardBorderColor
             },
-            shape = CircleShape
+            shape = CircleShape,
           ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
       ) {
         if (isCompleted) {
-          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+          Text("✓", color = StatusActiveGreen, fontWeight = FontWeight.Bold, fontSize = 15.sp)
         } else {
           Text(
             stepNumber.toString(),
-            color = if (isActive) primaryColor else textVariantColor.copy(alpha = 0.5f),
+            color = if (isActive) MintAccentColor else SecondaryTextColor.copy(alpha = 0.6f),
             fontWeight = FontWeight.Bold,
-            fontSize = 13.sp
+            fontSize = 13.sp,
           )
         }
       }
@@ -685,19 +715,16 @@ fun SetupStepRow(
       Column {
         Text(
           text = title,
-          color = when {
-            isActive || isCompleted -> MaterialTheme.colorScheme.onSurface
-            else -> textVariantColor.copy(alpha = 0.6f)
-          },
+          color = if (isActive || isCompleted) PrimaryTextColor else SecondaryTextColor.copy(alpha = 0.7f),
           fontSize = 14.sp,
-          fontWeight = if (isActive) FontWeight.Bold else FontWeight.SemiBold
+          fontWeight = if (isActive) FontWeight.Bold else FontWeight.SemiBold,
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
           text = description,
-          color = if (isActive) textVariantColor else textVariantColor.copy(alpha = 0.5f),
-          fontSize = 11.sp,
-          lineHeight = 15.sp
+          color = if (isActive) SecondaryTextColor else SecondaryTextColor.copy(alpha = 0.6f),
+          fontSize = 12.sp,
+          lineHeight = 16.sp,
         )
       }
     }
@@ -707,18 +734,189 @@ fun SetupStepRow(
     if (isCompleted) {
       Text(
         text = stringResource(id = R.string.setup_step_completed),
-        color = SuccessGreen,
+        color = StatusActiveGreen,
         fontSize = 13.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 4.dp)
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(horizontal = 4.dp),
       )
     } else if (isActive) {
-      Button(
-        onClick = onActionClick,
-        shape = RoundedCornerShape(16.dp),
-        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+      Column(horizontalAlignment = Alignment.End) {
+        Button(
+          onClick = onActionClick,
+          shape = RoundedCornerShape(14.dp),
+          colors = ButtonDefaults.buttonColors(
+            containerColor = MintAccentColor,
+            contentColor = MintOnAccentColor,
+          ),
+          contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+        ) {
+          Text(text = actionText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        }
+        if (secondaryActionText != null && onSecondaryActionClick != null) {
+          TextButton(
+            onClick = onSecondaryActionClick,
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+            modifier = Modifier.heightIn(min = 28.dp),
+          ) {
+            Text(text = secondaryActionText, fontSize = 11.sp, color = SecondaryTextColor)
+          }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+internal fun ModelStatusInlineContent(
+  status: ModelDownloadStatus,
+  onRetry: () -> Unit = {},
+  onConfirmDownload: () -> Unit = {},
+  modifier: Modifier = Modifier,
+) {
+  val isReady = status is ModelDownloadStatus.Ready
+  val isError = status is ModelDownloadStatus.Failed
+  val accent = when {
+    isReady -> StatusActiveGreen
+    isError -> StatusWarningAmber
+    else -> MintAccentColor
+  }
+
+  if (isReady) {
+    Row(
+      modifier = modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Box(
+        modifier = Modifier
+          .size(22.dp)
+          .clip(CircleShape)
+          .background(StatusActiveGreen.copy(alpha = 0.16f)),
+        contentAlignment = Alignment.Center,
       ) {
-        Text(text = actionText, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text("✓", color = StatusActiveGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+      }
+      Spacer(modifier = Modifier.width(10.dp))
+      Text(
+        text = stringResource(id = R.string.model_status_compact_ready),
+        color = SecondaryTextColor,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Medium,
+      )
+    }
+    return
+  }
+
+  val subtitle = when (status) {
+    is ModelDownloadStatus.Ready -> stringResource(id = R.string.model_status_ready)
+    is ModelDownloadStatus.Downloading ->
+      stringResource(id = R.string.model_status_downloading, status.percent)
+    is ModelDownloadStatus.Installing -> stringResource(id = R.string.model_status_installing)
+    is ModelDownloadStatus.WaitingForWifi -> stringResource(id = R.string.model_status_waiting_wifi)
+    is ModelDownloadStatus.RequiresConfirmation -> stringResource(id = R.string.model_status_confirmation)
+    is ModelDownloadStatus.Pending -> stringResource(id = R.string.model_status_preparing)
+    is ModelDownloadStatus.NotStarted -> stringResource(id = R.string.model_status_preparing)
+    is ModelDownloadStatus.Failed -> stringResource(id = R.string.model_status_failed)
+  }
+
+  Row(
+    modifier = modifier
+      .fillMaxWidth()
+      .then(if (isError) Modifier.clickable { onRetry() } else Modifier),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    if (status is ModelDownloadStatus.Failed || status is ModelDownloadStatus.Downloading) {
+      Box(
+        modifier = Modifier
+          .size(36.dp)
+          .clip(CircleShape)
+          .background(accent.copy(alpha = 0.15f))
+          .border(width = 1.5.dp, color = accent, shape = CircleShape),
+        contentAlignment = Alignment.Center,
+      ) {
+        if (status is ModelDownloadStatus.Failed) {
+          Text("⚠", color = accent, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        } else if (status is ModelDownloadStatus.Downloading) {
+          CircularProgressIndicator(
+            progress = { status.fraction },
+            modifier = Modifier.size(20.dp),
+            strokeWidth = 2.dp,
+            color = accent,
+          )
+        }
+      }
+    } else {
+      Image(
+        painter = painterResource(R.drawable.mascot_turtle_downloading),
+        contentDescription = null,
+        modifier = Modifier.size(40.dp),
+      )
+    }
+
+    Spacer(modifier = Modifier.width(12.dp))
+
+    Column(modifier = Modifier.weight(1f)) {
+      Text(
+        text = stringResource(id = R.string.model_status_title),
+        color = PrimaryTextColor,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold,
+      )
+      Spacer(modifier = Modifier.height(2.dp))
+      Text(
+        text = subtitle,
+        color = SecondaryTextColor,
+        fontSize = 12.sp,
+        lineHeight = 17.sp,
+      )
+      if (status is ModelDownloadStatus.RequiresConfirmation) {
+        TextButton(
+          onClick = onConfirmDownload,
+          contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp),
+        ) {
+          Text(stringResource(R.string.model_download_confirm), color = MintAccentColor, fontWeight = FontWeight.SemiBold)
+        }
+      } else if (status is ModelDownloadStatus.Failed) {
+        TextButton(
+          onClick = onRetry,
+          contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp),
+        ) {
+          Text(stringResource(R.string.model_retry_action), color = StatusWarningAmber, fontWeight = FontWeight.SemiBold)
+        }
+      }
+      if (status is ModelDownloadStatus.Downloading) {
+        Spacer(modifier = Modifier.height(4.dp))
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+          val crawlerSize = 24.dp
+          val clampedProgress = status.fraction.coerceIn(0f, 1f)
+          val crawlerX = (maxWidth - crawlerSize).coerceAtLeast(0.dp) * clampedProgress
+          Column(modifier = Modifier.fillMaxWidth()) {
+            Image(
+              painter = painterResource(R.drawable.mascot_turtle_downloading),
+              contentDescription = null,
+              modifier = Modifier
+                .offset(x = crawlerX)
+                .size(crawlerSize),
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            LinearProgressIndicator(
+              progress = { clampedProgress },
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(4.dp)),
+              color = accent,
+              trackColor = CardBorderColor,
+            )
+          }
+        }
+      } else if (status is ModelDownloadStatus.Pending || status is ModelDownloadStatus.Installing) {
+        Spacer(modifier = Modifier.height(8.dp))
+        LinearProgressIndicator(
+          modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(4.dp)),
+          color = accent,
+          trackColor = CardBorderColor,
+        )
       }
     }
   }
@@ -731,171 +929,28 @@ fun ModelStatusCard(
   onRetry: () -> Unit = {},
   onConfirmDownload: () -> Unit = {},
 ) {
-  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
-  val primaryColor = MaterialTheme.colorScheme.primary
-
   val isReady = status is ModelDownloadStatus.Ready
   val isError = status is ModelDownloadStatus.Failed
-  val accent = when {
-    isReady -> SuccessGreen
-    isError -> AlertAmber
-    else -> primaryColor
-  }
-
-  // When model is ready, show a compact and clean status indicator
-  if (isReady) {
-    Card(
-      modifier = modifier
-        .fillMaxWidth()
-        .padding(vertical = 4.dp),
-      shape = RoundedCornerShape(12.dp),
-      colors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
-      ),
-      border = BorderStroke(1.dp, SuccessGreen.copy(alpha = 0.25f))
-    ) {
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Box(
-          modifier = Modifier
-            .size(24.dp)
-            .clip(CircleShape)
-            .background(SuccessGreen.copy(alpha = 0.15f)),
-          contentAlignment = Alignment.Center
-        ) {
-          Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-          text = stringResource(id = R.string.model_status_compact_ready),
-          color = textVariantColor,
-          fontSize = 12.sp,
-          fontWeight = FontWeight.Medium
-        )
-      }
-    }
-    return
-  }
-
-  val subtitle = when (status) {
-    is ModelDownloadStatus.Ready -> stringResource(id = R.string.model_status_ready)
-    is ModelDownloadStatus.Downloading ->
-      stringResource(id = R.string.model_status_downloading, status.percent)
-    is ModelDownloadStatus.Installing -> stringResource(id = R.string.model_status_installing)
-    is ModelDownloadStatus.WaitingForWifi -> stringResource(R.string.model_status_waiting_wifi)
-    is ModelDownloadStatus.RequiresConfirmation -> stringResource(R.string.model_status_confirmation)
-    is ModelDownloadStatus.Pending -> stringResource(id = R.string.model_status_preparing)
-    is ModelDownloadStatus.NotStarted -> stringResource(id = R.string.model_status_preparing)
-    is ModelDownloadStatus.Failed -> stringResource(id = R.string.model_status_failed)
+  val borderColor = when {
+    isReady -> StatusActiveGreen.copy(alpha = 0.3f)
+    isError -> StatusWarningAmber.copy(alpha = 0.4f)
+    else -> CardBorderColor
   }
 
   Card(
     modifier = modifier
       .fillMaxWidth()
-      .padding(vertical = 6.dp)
-      .then(if (isError) Modifier.clickable { onRetry() } else Modifier),
-    shape = RoundedCornerShape(16.dp),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface
-    ),
-    border = BorderStroke(width = 1.dp, color = accent.copy(alpha = 0.3f))
+      .padding(vertical = 4.dp),
+    shape = RoundedCornerShape(20.dp),
+    colors = CardDefaults.cardColors(containerColor = CardBackground),
+    border = BorderStroke(1.dp, borderColor),
   ) {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-      verticalAlignment = Alignment.CenterVertically
-    ) {
-      if (status is ModelDownloadStatus.Failed || status is ModelDownloadStatus.Downloading) {
-        Box(
-          modifier = Modifier
-            .size(38.dp)
-            .clip(CircleShape)
-            .background(accent.copy(alpha = 0.15f))
-            .border(width = 1.5.dp, color = accent, shape = CircleShape),
-          contentAlignment = Alignment.Center
-        ) {
-          if (status is ModelDownloadStatus.Failed) {
-            Text("⚠", color = accent, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-          } else if (status is ModelDownloadStatus.Downloading) {
-            CircularProgressIndicator(
-              progress = { status.fraction },
-              modifier = Modifier.size(22.dp),
-              strokeWidth = 2.2.dp,
-              color = accent
-            )
-          }
-        }
-      } else {
-        androidx.compose.foundation.Image(
-          painter = androidx.compose.ui.res.painterResource(
-            if (status is ModelDownloadStatus.Ready) R.drawable.mascot_turtle_celebrate
-            else R.drawable.mascot_turtle_downloading
-          ),
-          contentDescription = null,
-          modifier = Modifier.size(44.dp),
-        )
-      }
-
-      Spacer(modifier = Modifier.width(14.dp))
-
-      Column(modifier = Modifier.weight(1f)) {
-        Text(
-          text = stringResource(id = R.string.model_status_title),
-          color = MaterialTheme.colorScheme.onSurface,
-          fontSize = 16.sp,
-          fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(
-          text = subtitle,
-          color = textVariantColor,
-          fontSize = 12.sp,
-          fontWeight = FontWeight.Normal
-        )
-        if (status is ModelDownloadStatus.RequiresConfirmation) {
-          TextButton(onClick = onConfirmDownload) {
-            Text(stringResource(R.string.model_download_confirm))
-          }
-        }
-        if (status is ModelDownloadStatus.Downloading) {
-          Spacer(modifier = Modifier.height(4.dp))
-          BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val crawlerSize = 26.dp
-            val clampedProgress = status.fraction.coerceIn(0f, 1f)
-            val crawlerX = (maxWidth - crawlerSize).coerceAtLeast(0.dp) * clampedProgress
-            Column(modifier = Modifier.fillMaxWidth()) {
-              androidx.compose.foundation.Image(
-                painter = androidx.compose.ui.res.painterResource(R.drawable.mascot_turtle_downloading),
-                contentDescription = null,
-                modifier = Modifier
-                  .offset(x = crawlerX)
-                  .size(crawlerSize),
-              )
-              Spacer(modifier = Modifier.height(2.dp))
-              LinearProgressIndicator(
-                progress = { clampedProgress },
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .clip(RoundedCornerShape(4.dp)),
-                color = accent
-              )
-            }
-          }
-        } else if (status is ModelDownloadStatus.Pending || status is ModelDownloadStatus.Installing) {
-          Spacer(modifier = Modifier.height(8.dp))
-          LinearProgressIndicator(
-            modifier = Modifier
-              .fillMaxWidth()
-              .clip(RoundedCornerShape(4.dp)),
-            color = accent
-          )
-        }
-      }
+    Box(modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp)) {
+      ModelStatusInlineContent(
+        status = status,
+        onRetry = onRetry,
+        onConfirmDownload = onConfirmDownload,
+      )
     }
   }
 }
@@ -909,209 +964,128 @@ fun DeveloperOptionsCard(
   onStoreDebugHandwritingChange: (Boolean) -> Unit = {},
   onOpenDebugHandwriting: () -> Unit = {},
   onOpenPromptedHandwriting: () -> Unit = {},
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
 ) {
   var expanded by remember { mutableStateOf(false) }
-  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
-  val outlineColor = MaterialTheme.colorScheme.outline
 
   Card(
     modifier = modifier
       .fillMaxWidth()
       .padding(vertical = 6.dp),
-    shape = RoundedCornerShape(16.dp),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
-    ),
-    border = BorderStroke(1.dp, outlineColor.copy(alpha = 0.4f))
+    shape = RoundedCornerShape(20.dp),
+    colors = CardDefaults.cardColors(containerColor = CardBackground),
+    border = BorderStroke(1.dp, CardBorderColor),
   ) {
-    Column(
-      modifier = Modifier.padding(16.dp)
-    ) {
+    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
       Row(
         modifier = Modifier
           .fillMaxWidth()
           .clickable { expanded = !expanded },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
       ) {
         Text(
           text = stringResource(id = R.string.developer_tools_title),
-          color = textVariantColor,
-          fontSize = 13.sp,
-          fontWeight = FontWeight.SemiBold
+          color = SecondaryTextColor,
+          fontSize = 14.sp,
+          fontWeight = FontWeight.SemiBold,
         )
         Text(
           text = if (expanded) "▲" else "▼",
-          color = textVariantColor,
-          fontSize = 12.sp
+          color = SecondaryTextColor,
+          fontSize = 12.sp,
         )
       }
 
       if (expanded) {
         Spacer(modifier = Modifier.height(14.dp))
-        HorizontalDivider(color = outlineColor.copy(alpha = 0.2f))
+        HorizontalDivider(color = CardBorderColor)
         Spacer(modifier = Modifier.height(14.dp))
 
         Row(
           modifier = Modifier.fillMaxWidth(),
           verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.SpaceBetween
+          horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Column(modifier = Modifier.weight(1f)) {
             Text(
               text = stringResource(id = R.string.developer_store_audio_title),
-              color = MaterialTheme.colorScheme.onSurface,
-              fontSize = 14.sp,
-              fontWeight = FontWeight.SemiBold
+              color = PrimaryTextColor,
+              fontSize = 15.sp,
+              fontWeight = FontWeight.Medium,
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
               text = stringResource(id = R.string.developer_store_audio_desc),
-              color = textVariantColor,
+              color = SecondaryTextColor,
               fontSize = 12.sp,
-              lineHeight = 16.sp
+              lineHeight = 17.sp,
             )
           }
           Spacer(modifier = Modifier.width(16.dp))
           Switch(
             checked = storeDebugAudio,
-            onCheckedChange = onStoreDebugAudioChange
+            onCheckedChange = onStoreDebugAudioChange,
+            colors = settingsSwitchColors(),
           )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         TextButton(
           onClick = onOpenDebugAudio,
           enabled = storeDebugAudio,
-          modifier = Modifier.align(Alignment.End)
+          modifier = Modifier.align(Alignment.End),
         ) {
-          Text(stringResource(R.string.developer_manage_audio))
+          Text(stringResource(R.string.developer_manage_audio), color = if (storeDebugAudio) MintAccentColor else SecondaryTextColor)
         }
+
         Spacer(modifier = Modifier.height(12.dp))
         Row(
           modifier = Modifier.fillMaxWidth(),
           verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.SpaceBetween
+          horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Column(modifier = Modifier.weight(1f)) {
             Text(
               text = stringResource(id = R.string.developer_store_handwriting_title),
-              color = MaterialTheme.colorScheme.onSurface,
-              fontSize = 14.sp,
-              fontWeight = FontWeight.SemiBold
+              color = PrimaryTextColor,
+              fontSize = 15.sp,
+              fontWeight = FontWeight.Medium,
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
               text = stringResource(id = R.string.developer_store_handwriting_desc),
-              color = textVariantColor,
+              color = SecondaryTextColor,
               fontSize = 12.sp,
-              lineHeight = 16.sp
+              lineHeight = 17.sp,
             )
           }
           Spacer(modifier = Modifier.width(16.dp))
           Switch(
             checked = storeDebugHandwriting,
-            onCheckedChange = onStoreDebugHandwritingChange
+            onCheckedChange = onStoreDebugHandwritingChange,
+            colors = settingsSwitchColors(),
           )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         TextButton(
           onClick = onOpenDebugHandwriting,
           enabled = storeDebugHandwriting,
-          modifier = Modifier.align(Alignment.End)
+          modifier = Modifier.align(Alignment.End),
         ) {
-          Text(stringResource(R.string.developer_manage_handwriting))
+          Text(stringResource(R.string.developer_manage_handwriting), color = if (storeDebugHandwriting) MintAccentColor else SecondaryTextColor)
         }
         Button(
           onClick = onOpenPromptedHandwriting,
-          modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+          shape = RoundedCornerShape(12.dp),
+          colors = ButtonDefaults.buttonColors(
+            containerColor = MintAccentColor,
+            contentColor = MintOnAccentColor,
+          ),
         ) {
-          Text(stringResource(R.string.challenge_open))
-        }
-      }
-    }
-  }
-}
-
-@Composable
-fun TestSandboxCard(
-  modifier: Modifier = Modifier
-) {
-  var textState by remember { mutableStateOf("") }
-  val primaryColor = MaterialTheme.colorScheme.primary
-  val outlineColor = MaterialTheme.colorScheme.outline
-  val errorColor = MaterialTheme.colorScheme.error
-  val surfaceColor = MaterialTheme.colorScheme.surface
-  val textVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
-
-  Card(
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(vertical = 12.dp),
-    shape = RoundedCornerShape(20.dp),
-    colors = CardDefaults.cardColors(
-      containerColor = surfaceColor.copy(alpha = 0.8f)
-    ),
-    border = BorderStroke(1.dp, outlineColor)
-  ) {
-    Column(
-      modifier = Modifier.padding(16.dp)
-    ) {
-      Text(
-        text = stringResource(id = R.string.sandbox_title),
-        color = MaterialTheme.colorScheme.onSurface,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold
-      )
-      Spacer(modifier = Modifier.height(4.dp))
-      Text(
-        text = stringResource(id = R.string.sandbox_desc),
-        color = textVariantColor,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
-      )
-      
-      Spacer(modifier = Modifier.height(12.dp))
-      
-      OutlinedTextField(
-        value = textState,
-        onValueChange = { textState = it },
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(100.dp),
-        placeholder = {
-          Text(
-            text = stringResource(id = R.string.sandbox_placeholder),
-            color = PlaceholderGray,
-            fontSize = 14.sp
-          )
-        },
-        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp),
-        colors = OutlinedTextFieldDefaults.colors(
-          focusedTextColor = MaterialTheme.colorScheme.onSurface,
-          unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-          focusedBorderColor = primaryColor,
-          unfocusedBorderColor = outlineColor,
-          // Subtle adaptive fill: a faint tint of the content color reads correctly
-          // on both the light and dark card surfaces.
-          focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
-          unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
-        ),
-        shape = RoundedCornerShape(12.dp)
-      )
-      
-      if (textState.isNotEmpty()) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.End
-        ) {
-          TextButton(
-            onClick = { textState = "" },
-            colors = ButtonDefaults.textButtonColors(contentColor = errorColor)
-          ) {
-            Text(stringResource(id = R.string.sandbox_clear), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-          }
+          Text(stringResource(R.string.challenge_open), fontWeight = FontWeight.SemiBold)
         }
       }
     }
@@ -1122,6 +1096,14 @@ fun TestSandboxCard(
 @Composable
 fun MainScreenPreview() {
   CantoneseVoiceKeyboardTheme {
-    MainScreen(onItemClick = {})
+    MainScreenContent(
+      voiceEnabled = true,
+      permissionGranted = false,
+      keyboardEnabled = false,
+      keyboardSelected = false,
+      onGrantPermission = {},
+      onEnableKeyboard = {},
+      onPickKeyboard = {},
+    )
   }
 }

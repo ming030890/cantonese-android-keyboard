@@ -19,8 +19,8 @@ class MainScreenTest {
 
   @Test
   fun firstItem_exists() {
-    // Assert elements of the setup walkthrough app exist
-    composeTestRule.onNodeWithText("Cantonese Keyboard").assertExists()
+    val expectedTitle = composeTestRule.activity.getString(com.madeinhk.cantonesevoicekeyboard.R.string.app_header_title)
+    composeTestRule.onNodeWithText(expectedTitle).assertExists()
   }
 }
 

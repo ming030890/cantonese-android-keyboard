@@ -24,11 +24,27 @@
     <string name="setup_step_voice_title">允許咪高峰權限</string>
     <string name="setup_step_voice_desc">允許使用咪高峰，即可用語音輸入。</string>
     <string name="setup_step_voice_action">允許使用</string>
+    <string name="setup_step_voice_skip">暫時跳過</string>
+    <string name="onboarding_voice_title">開啟離線語音輸入</string>
+    <string name="onboarding_voice_desc">隨時用廣東話及英文講嘢打字，離線都用得。會透過不限數據用量嘅 Wi-Fi 下載約 2 GB 模型。</string>
+    <string name="onboarding_voice_allow">允許咪高峰權限</string>
+
+    <string name="home_status_active">使用中</string>
+    <string name="home_status_unselected">已啟用 • 正使用其他鍵盤</string>
+    <string name="home_status_disabled">尚未喺系統設定開啟</string>
+    <string name="home_banner_enable_title">鍵盤尚未開啟</string>
+    <string name="home_banner_enable_desc">請喺 Android 設定開啟「%1$s」。</string>
+    <string name="home_banner_enable_action">前往開啟</string>
+    <string name="home_banner_switch_title">切換至「%1$s」</string>
+    <string name="home_banner_switch_desc">設為目前使用嘅鍵盤即可開始打字。</string>
+    <string name="home_banner_switch_action">切換</string>
+    <string name="model_retry_action">重試</string>
 
     <string name="setup_flow_title">設定鍵盤</string>
     <string name="setup_step_progress">步驟 %1$d / %2$d</string>
     <string name="setup_all_done_title">可以開始打字</string>
-    <string name="setup_all_done_desc">已選用「%1$s」，撳下方輸入框試吓打字。</string>
+    <string name="setup_all_done_desc">已選用「%1$s」，可以開始使用。</string>
+    <string name="setup_all_done_settings">前往設定自訂</string>
     <string name="setup_step_locked_hint">請先完成上一步</string>
     <string name="developer_tools_title">開發者工具</string>
     <string name="model_status_compact_ready">離線語音輸入已就緒</string>
@@ -43,12 +59,6 @@
     <string name="model_status_downloading">下載中… %1$d%%</string>
     <string name="model_status_installing">安裝中…</string>
     <string name="model_status_failed">下載失敗，撳呢張卡片重試。</string>
-
-    <!-- Try-it-out Strings -->
-    <string name="sandbox_title">試吓用</string>
-    <string name="sandbox_desc">撳下方輸入框，打開鍵盤試吓打字。</string>
-    <string name="sandbox_placeholder">喺度試吓打字…</string>
-    <string name="sandbox_clear">清除文字</string>
 
     <!-- Developer Options -->
     <string name="developer_store_audio_title">儲存語音錄音</string>
@@ -112,7 +122,7 @@
     <string name="settings_layout_qwerty">英文</string>
     <string name="settings_layout_handwriting">手寫</string>
     <string name="settings_layout_quick">速成</string>
-    <string name="settings_all_layouts_voice">選擇鍵盤。</string>
+    <string name="settings_keyboards_header">鍵盤</string>
     <string name="settings_layout_specific_header">%1$s設定</string>
     <string name="settings_feature_voice_typing">可使用語音輸入</string>
     <string name="settings_quick_version_title">速成版本</string>

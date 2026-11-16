@@ -74,3 +74,9 @@ enum class KeyboardInputMode {
     AlphaNum,
     Quick,
 }
+
+enum class NumPadVariant {
+    Number,
+    Phone,
+    DateTime,
+}

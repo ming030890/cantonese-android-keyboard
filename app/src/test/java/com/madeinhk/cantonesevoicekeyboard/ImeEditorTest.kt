@@ -5,6 +5,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import java.lang.reflect.Proxy
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.NumPadVariant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -139,9 +140,53 @@ class ImeEditorTest {
             keyboardInputModeForInputType(InputType.TYPE_CLASS_NUMBER),
         )
         assertEquals(
+            KeyboardInputMode.Number,
+            keyboardInputModeForInputType(
+                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
+            ),
+        )
+        assertEquals(
+            KeyboardInputMode.Number,
+            keyboardInputModeForInputType(
+                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL or InputType.TYPE_NUMBER_FLAG_SIGNED,
+            ),
+        )
+        assertEquals(
+            NumPadVariant.Number,
+            numPadVariantForInputType(
+                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD,
+            ),
+        )
+        assertEquals(
+            NumPadVariant.Number,
+            numPadVariantForInputType(
+                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
+            ),
+        )
+        assertEquals(
+            NumPadVariant.Phone,
+            numPadVariantForInputType(InputType.TYPE_CLASS_PHONE),
+        )
+        assertEquals(
+            NumPadVariant.DateTime,
+            numPadVariantForInputType(InputType.TYPE_CLASS_DATETIME),
+        )
+        assertEquals(
             KeyboardInputMode.AlphaNum,
             keyboardInputModeForInputType(
                 InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD,
+            ),
+        )
+        assertEquals(
+            KeyboardInputMode.AlphaNum,
+            keyboardInputModeForInputType(
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+            ),
+        )
+        assertEquals(
+            KeyboardInputMode.AlphaNum,
+            keyboardInputModeForInputType(
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
             ),
         )
         assertEquals(

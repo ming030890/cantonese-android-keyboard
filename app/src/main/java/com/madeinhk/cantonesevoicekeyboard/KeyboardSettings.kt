@@ -12,7 +12,18 @@ object KeyboardSettings {
     private const val KEY_QUICK_VERSION = "quick_version"
     private const val KEY_AUTOCAPITALIZATION = "auto_capitalization"
     private const val KEY_VOICE_INPUT = "voice_input_enabled"
+    private const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
     const val DEFAULT_VOICE_INPUT = true
+
+    fun isOnboardingCompleted(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_ONBOARDING_COMPLETED, false)
+
+    fun setOnboardingCompleted(context: Context, completed: Boolean = true) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_ONBOARDING_COMPLETED, completed)
+            .apply()
+    }
 
     private val _voiceInputEnabledFlow = MutableStateFlow(DEFAULT_VOICE_INPUT)
     val voiceInputEnabledFlow: StateFlow<Boolean> = _voiceInputEnabledFlow.asStateFlow()

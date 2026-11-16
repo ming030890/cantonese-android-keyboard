@@ -150,7 +150,7 @@ private fun SettingsScreenScreenshotContent(
             onToggleLayout = {},
             quickVersion = quickVersion,
             onQuickVersionChange = {},
-            onBack = {}
+            onBack = null
         )
     }
 }

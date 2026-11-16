@@ -411,6 +411,23 @@ fun KeyboardScreenUppercaseScreenshot() {
 
 @PreviewTest
 @Preview(
+    name = "Keyboard symbol panel",
+    showBackground = true,
+    backgroundColor = 0xFF0D1117,
+    widthDp = 412,
+    heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp
+)
+@Composable
+fun KeyboardScreenSymbolPanelScreenshot() {
+    KeyboardScreenScreenshotContent(
+        state = KeyboardUiState.Idle,
+        inputMode = KeyboardInputMode.AlphaNum,
+        initialSymbolPanel = true,
+    )
+}
+
+@PreviewTest
+@Preview(
     name = "Keyboard alternate symbols",
     showBackground = true,
     backgroundColor = 0xFF0D1117,
@@ -421,7 +438,8 @@ fun KeyboardScreenUppercaseScreenshot() {
 fun KeyboardScreenAlternateSymbolsScreenshot() {
     KeyboardScreenScreenshotContent(
         state = KeyboardUiState.Idle,
-        inputMode = KeyboardInputMode.Number,
+        inputMode = KeyboardInputMode.AlphaNum,
+        initialSymbolPanel = true,
         initialShowMoreSymbols = true,
     )
 }
@@ -562,6 +580,7 @@ private fun KeyboardScreenScreenshotContent(
     handwritingRecognizing: Boolean = false,
     handwritingError: String? = null,
     initialUppercase: Boolean = false,
+    initialSymbolPanel: Boolean = false,
     initialShowMoreSymbols: Boolean = false,
     initialHandwritingCandidatePage: Int = 0,
 ) {
@@ -607,6 +626,7 @@ private fun KeyboardScreenScreenshotContent(
             onEmojiPicked = {},
             initialEmojiPanel = initialEmojiPanel,
             initialUppercase = initialUppercase,
+            initialSymbolPanel = initialSymbolPanel,
             initialShowMoreSymbols = initialShowMoreSymbols,
             initialHandwritingCandidatePage = initialHandwritingCandidatePage,
         )

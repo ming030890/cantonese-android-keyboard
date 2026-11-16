@@ -1,6 +1,8 @@
 package com.madeinhk.cantonesevoicekeyboard.ui.keyboard
 
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -150,8 +152,23 @@ internal fun UnifiedKeyboardToolbar(
                                         ),
                                     )
                                 },
-                            factory = { providerView },
-                            update = {},
+                            factory = { context -> FrameLayout(context) },
+                            update = { container ->
+                                if (container.childCount != 1 || container.getChildAt(0) !== providerView) {
+                                    container.removeAllViews()
+                                    (providerView.parent as? ViewGroup)?.removeView(providerView)
+                                    container.addView(
+                                        providerView,
+                                        FrameLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ),
+                                    )
+                                }
+                            },
+                            onRelease = { container ->
+                                container.removeAllViews()
+                            },
                         )
                     }
                 }
@@ -353,8 +370,8 @@ private fun ToolbarSettingsVisual(
         keyRegistry = keyRegistry,
         accessibilityDescription = stringResource(R.string.keyboard_toolbar_settings),
     ) {
-        TurtleBrandIcon(
-            modifier = Modifier.size(25.dp),
+        SettingsIcon(
+            modifier = Modifier.size(KeyboardUiDefaults.ToolbarSettingsIconSize),
             color = BrandTheme.colors.keyboardKeyOnSurface,
         )
     }

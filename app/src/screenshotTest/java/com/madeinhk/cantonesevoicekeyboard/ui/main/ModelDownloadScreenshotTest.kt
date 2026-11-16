@@ -122,10 +122,10 @@ private fun MainScreenMascotPreview(dark: Boolean) {
     CantoneseVoiceKeyboardTheme(darkTheme = dark, dynamicColor = false) {
         MainScreenContent(
             voiceEnabled = true,
-            permissionGranted = true,
-            keyboardEnabled = true,
-            keyboardSelected = true,
-            modelStatus = ModelDownloadStatus.Downloading(bytesDownloaded = 64L, totalBytes = 100L),
+            permissionGranted = false,
+            keyboardEnabled = false,
+            keyboardSelected = false,
+            modelStatus = ModelDownloadStatus.NotStarted,
             onGrantPermission = {},
             onEnableKeyboard = {},
             onPickKeyboard = {},

@@ -68,11 +68,42 @@ internal fun shouldPassToAutofillView(
     y: Float,
 ): Boolean = autofillViewPresent && autofillBounds.contains(Offset(x, y))
 
-internal fun shouldDismissAutofillOnTouch(
-    autofillViewPresent: Boolean,
-    autofillBounds: Rect,
-    action: Int,
-    x: Float,
-    y: Float,
-): Boolean = action == MotionEvent.ACTION_DOWN &&
-    shouldPassToAutofillView(autofillViewPresent, autofillBounds, x, y)
+/**
+ * Keeps an autofill tap or horizontal strip scroll routed to the hosted AndroidView from
+ * [MotionEvent.ACTION_DOWN] through [MotionEvent.ACTION_UP]/[MotionEvent.ACTION_CANCEL] without
+ * prematurely detaching the [android.widget.inline.InlineContentView] before click completion.
+ */
+internal class AutofillGestureRouter {
+    var gestureCapturedByAutofill: Boolean = false
+        private set
+
+    fun reset() {
+        gestureCapturedByAutofill = false
+    }
+
+    fun shouldPassToAutofill(
+        autofillViewPresent: Boolean,
+        autofillBounds: Rect,
+        actionMasked: Int,
+        x: Float,
+        y: Float,
+    ): Boolean {
+        if (!autofillViewPresent || autofillBounds.width <= 0f || autofillBounds.height <= 0f) {
+            gestureCapturedByAutofill = false
+            return false
+        }
+        return when (actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                gestureCapturedByAutofill = shouldPassToAutofillView(true, autofillBounds, x, y)
+                gestureCapturedByAutofill
+            }
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL -> {
+                val captured = gestureCapturedByAutofill
+                gestureCapturedByAutofill = false
+                captured
+            }
+            else -> gestureCapturedByAutofill
+        }
+    }
+}

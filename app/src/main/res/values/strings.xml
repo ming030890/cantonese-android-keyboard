@@ -24,11 +24,27 @@
     <string name="setup_step_voice_title">Allow microphone access</string>
     <string name="setup_step_voice_desc">Allow microphone access to use voice typing.</string>
     <string name="setup_step_voice_action">Allow access</string>
+    <string name="setup_step_voice_skip">Skip for now</string>
+    <string name="onboarding_voice_title">Enable offline voice typing</string>
+    <string name="onboarding_voice_desc">Speak Cantonese and English anywhere, even offline. About 2 GB downloads over Wi-Fi with no data limit.</string>
+    <string name="onboarding_voice_allow">Allow microphone access</string>
+
+    <string name="home_status_active">Active keyboard</string>
+    <string name="home_status_unselected">Enabled • Using another keyboard</string>
+    <string name="home_status_disabled">Turned off in Android settings</string>
+    <string name="home_banner_enable_title">Keyboard is turned off</string>
+    <string name="home_banner_enable_desc">Turn on %1$s in Android settings to use it.</string>
+    <string name="home_banner_enable_action">Turn on</string>
+    <string name="home_banner_switch_title">Switch to %1$s</string>
+    <string name="home_banner_switch_desc">Set as your active keyboard to start typing.</string>
+    <string name="home_banner_switch_action">Switch</string>
+    <string name="model_retry_action">Retry</string>
 
     <string name="setup_flow_title">Keyboard setup</string>
     <string name="setup_step_progress">Step %1$d of %2$d</string>
     <string name="setup_all_done_title">Ready to type</string>
-    <string name="setup_all_done_desc">%1$s is selected. Tap the box below to try it.</string>
+    <string name="setup_all_done_desc">%1$s is selected and ready to use.</string>
+    <string name="setup_all_done_settings">Customize in Settings</string>
     <string name="setup_step_locked_hint">Complete the previous step first</string>
     <string name="developer_tools_title">Developer tools</string>
     <string name="model_status_compact_ready">Offline voice typing is ready</string>
@@ -43,12 +59,6 @@
     <string name="model_status_downloading">Downloading… %1$d%%</string>
     <string name="model_status_installing">Installing…</string>
     <string name="model_status_failed">Download failed. Tap this card to retry.</string>
-
-    <!-- Try-it-out Strings -->
-    <string name="sandbox_title">Try it out</string>
-    <string name="sandbox_desc">Tap the box below to open your keyboard and try typing.</string>
-    <string name="sandbox_placeholder">Type here…</string>
-    <string name="sandbox_clear">Clear text</string>
 
     <!-- Developer Options -->
     <string name="developer_store_audio_title">Save voice recordings</string>
@@ -179,7 +189,7 @@
     <string name="settings_layout_qwerty">English</string>
     <string name="settings_layout_handwriting">Handwriting</string>
     <string name="settings_layout_quick">Quick</string>
-    <string name="settings_all_layouts_voice">Choose your keyboards.</string>
+    <string name="settings_keyboards_header">Keyboards</string>
     <string name="settings_layout_specific_header">%1$s settings</string>
     <string name="settings_feature_voice_typing">Voice typing available</string>
     <string name="settings_quick_version_title">Quick version</string>
@@ -208,7 +218,7 @@
     <string name="voice_input_title">Voice typing</string>
     <string name="voice_input_description">Speak to type on any keyboard, even offline. After you allow microphone access, about 2 GB downloads over Wi-Fi with no data limit.</string>
     <string name="voice_model_ready_tap">Ready. Tap the mic to speak.</string>
-    <string name="voice_model_open_setup">Confirm download in keyboard setup.</string>
+    <string name="voice_model_open_setup">Open keyboard settings to confirm voice download.</string>
     <string name="voice_model_download_progress">Voice download: %1$d%%</string>
     <!-- Emoji picker labels and accessibility descriptions -->
     <string name="emoji_search">Search emoji in English</string>

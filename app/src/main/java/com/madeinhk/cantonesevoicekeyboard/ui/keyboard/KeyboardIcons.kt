@@ -89,6 +89,29 @@ fun BackspaceIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
 }
 
 @Composable
+fun SpaceBarIcon(modifier: Modifier = Modifier, color: Color = Color.White) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val path = Path().apply {
+            moveTo(w * 0.18f, h * 0.42f)
+            lineTo(w * 0.18f, h * 0.66f)
+            lineTo(w * 0.82f, h * 0.66f)
+            lineTo(w * 0.82f, h * 0.42f)
+        }
+        drawPath(
+            path = path,
+            color = color,
+            style = Stroke(
+                width = 2.2.dp.toPx(),
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round,
+            ),
+        )
+    }
+}
+
+@Composable
 fun ShiftIcon(
     modifier: Modifier = Modifier,
     color: Color = Color.White,

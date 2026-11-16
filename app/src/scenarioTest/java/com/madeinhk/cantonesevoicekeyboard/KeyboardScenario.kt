@@ -39,6 +39,7 @@ internal class KeyboardScenario(
     private val sessionVoice = voiceFactory?.invoke(editor) ?: voice
     val handwriting = ScenarioHandwriting(editor)
     val suggestions = ScenarioSuggestions(editor, clipboardText)
+    val specialFields = InMemorySpecialFieldStore()
     var quickVersion = 3
     var enabledLayouts = setOf(KeyboardSettings.LAYOUT_QUICK, KeyboardSettings.LAYOUT_ENGLISH,
                                KeyboardSettings.LAYOUT_HANDWRITING)
@@ -57,7 +58,7 @@ internal class KeyboardScenario(
         editor,
         KeyboardSessionSettings({ enabledLayouts }, { quickVersion }, { it in autocorrectLayouts }, { autoCapitalizationEnabled }),
     ) { editor, session, visible -> KeyboardSessionDependencies(sessionVoice, quick,
-        handwritingFactory?.invoke(editor, session, visible) ?: handwriting, suggestions, english) }
+        handwritingFactory?.invoke(editor, session, visible) ?: handwriting, suggestions, english, specialFields) }
 
     // The same key receiver handles down/up/cancel in the real screen.
     var emojiSearch = EmojiSearchState()
@@ -272,10 +273,10 @@ internal class ScenarioSuggestions(private val editor: KeyboardEditor, text: Str
         clipboard.update(text?.let { ClipboardSnapshot(++token,
             listOf(ClipboardItemSnapshot(mimeTypes, if (sensitive) null else it)), sensitive) })
     }
-    override fun onInputStarted() { clipboard.start(); autofillSuggestionView.value = null }
+    override fun onInputStarted() { clipboard.start() }
     override fun onInputFinished() { clipboard.finish(); autofillSuggestionView.value = null }
     override fun onUserTyped() { clipboard.onUserTyped(); autofillSuggestionView.value = null }
-    override fun onSelectionChanged() { autofillSuggestionView.value = null }
+    override fun onSelectionChanged() = Unit
     override fun pasteClipboard() { clipboard.onPaste(); text?.let(editor::commitText) }
     override fun onAutofillTapped() { autofillSuggestionView.value = null }
     override fun createInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest =

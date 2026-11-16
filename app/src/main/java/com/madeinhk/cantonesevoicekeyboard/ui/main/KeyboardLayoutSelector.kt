@@ -618,8 +618,8 @@ fun MiniKeyWithHint(
 
 @Composable
 fun MiniGridIcon() {
-    com.madeinhk.cantonesevoicekeyboard.ui.keyboard.TurtleBrandIcon(
-        modifier = Modifier.size(11.dp),
+    com.madeinhk.cantonesevoicekeyboard.ui.keyboard.SettingsIcon(
+        modifier = Modifier.size(9.dp),
         color = PrimaryTextColor.copy(alpha = 0.78f),
     )
 }

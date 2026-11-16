@@ -74,12 +74,21 @@ class KeyboardInputTest {
     }
 
     @Test
-    fun providerRenderedAutofillViewIsDismissedOnTouchDownInsideBounds() {
+    fun autofillGestureRouterKeepsTapAndScrollCapturedThroughActionUp() {
+        val router = AutofillGestureRouter()
         val bounds = Rect(100f, 10f, 290f, 58f)
 
-        assertTrue(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_DOWN, 150f, 30f))
-        assertFalse(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_UP, 150f, 30f))
-        assertFalse(shouldDismissAutofillOnTouch(true, bounds, MotionEvent.ACTION_DOWN, 80f, 30f))
+        // Tap/scroll starting inside autofill stays routed to AndroidView even if finger drifts outside vertically.
+        assertTrue(router.shouldPassToAutofill(true, bounds, MotionEvent.ACTION_DOWN, 150f, 30f))
+        assertTrue(router.gestureCapturedByAutofill)
+        assertTrue(router.shouldPassToAutofill(true, bounds, MotionEvent.ACTION_MOVE, 120f, 70f))
+        assertTrue(router.shouldPassToAutofill(true, bounds, MotionEvent.ACTION_UP, 120f, 70f))
+        assertFalse(router.gestureCapturedByAutofill)
+
+        // Key press starting outside autofill never leaks into autofill even if pointer moves across toolbar.
+        assertFalse(router.shouldPassToAutofill(true, bounds, MotionEvent.ACTION_DOWN, 80f, 30f))
+        assertFalse(router.shouldPassToAutofill(true, bounds, MotionEvent.ACTION_MOVE, 150f, 30f))
+        assertFalse(router.shouldPassToAutofill(true, bounds, MotionEvent.ACTION_UP, 150f, 30f))
     }
 
     @Test

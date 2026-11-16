@@ -12,6 +12,7 @@ import com.madeinhk.cantonesevoicekeyboard.quick.QuickInputCoordinator
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardAction
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardRenderState
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.NumPadVariant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -57,7 +58,8 @@ internal class KeyboardSessionController(
                 onError = { android.util.Log.e("EnglishInputCoordinator", "English candidate engine failed", it) },
                 sharedSuggestions = true,
                 unifiedEngine = NativeSharedSuggestions(quick::englishContextHandle))
-            KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english)
+            val specialFields = SharedPreferencesSpecialFieldStore(service)
+            KeyboardSessionDependencies(voice, quick, handwriting, suggestions, english, specialFields)
         },
     )
 
@@ -69,6 +71,7 @@ internal class KeyboardSessionController(
     private val handwriting = dependencies.handwriting
     private val suggestions = dependencies.suggestions
     private val english = dependencies.english
+    private val specialFields = dependencies.specialFields
     init {
         handwriting.onRecognitionApplied = { _handwritingSession.value++ }
         quick.canRefreshPersonalization = {
@@ -90,6 +93,14 @@ internal class KeyboardSessionController(
     private var editorAllowsEnglish = true
     private val _swipeEnabled = MutableStateFlow(true)
     val swipeEnabled = _swipeEnabled.asStateFlow()
+    private var activeSpecialField: SpecialFieldKind? = null
+    private var userEditedCurrentField = false
+    private val _fieldCandidates = MutableStateFlow<List<com.madeinhk.cantonesevoicekeyboard.hwr.HandwritingCandidate>>(emptyList())
+    val fieldCandidates = _fieldCandidates.asStateFlow()
+    private val _emailBottomRow = MutableStateFlow(false)
+    val emailBottomRow = _emailBottomRow.asStateFlow()
+    private val _numPadVariant = MutableStateFlow(NumPadVariant.Number)
+    val numPadVariant = _numPadVariant.asStateFlow()
     private var textPanel = KeyboardInputMode.Quick
     private var pendingTouch: EnglishTouchEvidence? = null
     private val boundaryQueue by lazy { english?.let { BoundaryTransactionQueue(it.scope) } }
@@ -120,7 +131,10 @@ internal class KeyboardSessionController(
     val chinesePunctuation = _chinesePunctuation.asStateFlow()
 
     private fun refreshPunctuation(textBefore: String? = null) {
-        if (english?.word?.isNotEmpty() == true) {
+        if (_keyboardInputMode.value == KeyboardInputMode.Number ||
+            activeSpecialField == SpecialFieldKind.Email ||
+            english?.word?.isNotEmpty() == true
+        ) {
             _chinesePunctuation.value = false
             return
         }
@@ -190,6 +204,7 @@ internal class KeyboardSessionController(
         volume = volumeLevel.value,
         action = keyboardAction.value,
         inputMode = keyboardInputMode.value,
+        numPadVariant = _numPadVariant.value,
         shiftState = _shiftState.value,
         clipboard = clipboardSuggestion.value,
         inspectingWord = cursorWordActive.value,
@@ -197,6 +212,8 @@ internal class KeyboardSessionController(
         handwritingComposing = handwritingComposing.value,
         quickCandidates = quickCandidates.value,
         englishCandidates = englishCandidates.value,
+        fieldCandidates = fieldCandidates.value,
+        emailBottomRow = emailBottomRow.value,
         chinesePunctuation = chinesePunctuation.value,
         swipeEnabled = _swipeEnabled.value,
         handwritingBusy = handwritingRecognizing.value,
@@ -273,6 +290,7 @@ internal class KeyboardSessionController(
     fun onStartInput(info: EditorInfo?, restarting: Boolean, systemSubtypeId: Int? = null) {
         currentEditorInfo = info
         manualShift = false
+        if (!restarting) userEditedCurrentField = false
         systemSubtypeId?.let { id ->
             KeyboardSubtypes.mode(id, settings.enabledLayouts())?.let { lastUserSelectedLayout = it }
         }
@@ -285,8 +303,9 @@ internal class KeyboardSessionController(
         suggestions.onInputStarted()
         if (!restarting) voice.finish(releaseModel = false, session = inputViewSession)
         val initialText = if (Build.VERSION.SDK_INT >= 30) {
-            info?.getInitialTextBeforeCursor(64, 0)?.toString()
+            info?.getInitialTextBeforeCursor(256, 0)?.toString()
         } else null
+        refreshSpecialFieldCandidates(initialText)
         refreshAutoCapitalization(initialText)
     }
 
@@ -306,7 +325,7 @@ internal class KeyboardSessionController(
         voice.onInputViewStarted(session)
         handwriting.onInputViewStarted(session)
         val initialText = if (Build.VERSION.SDK_INT >= 30) {
-            info?.getInitialTextBeforeCursor(64, 0)?.toString()
+            info?.getInitialTextBeforeCursor(256, 0)?.toString()
         } else null
         refreshPredictions(initialText)
         // Opening the keyboard in the middle of committed text may not produce
@@ -316,6 +335,8 @@ internal class KeyboardSessionController(
     }
 
     private fun ensureValidInputMode() {
+        val forcedMode = keyboardInputModeFor(currentEditorInfo)
+        if (forcedMode == KeyboardInputMode.Number || forcedMode == KeyboardInputMode.AlphaNum) return
         val enabledLayouts = settings.enabledLayouts()
         if (!isLayoutSupported(_keyboardInputMode.value, enabledLayouts)) {
             _keyboardInputMode.value = defaultInputMode(enabledLayouts)
@@ -328,6 +349,8 @@ internal class KeyboardSessionController(
         // Commit unfinished literal input while this session still owns the editor.
         quick.accept()
         handwriting.discard()
+        recordActiveSpecialFieldIfAllowed(explicitSubmit = false)
+        _fieldCandidates.value = emptyList()
         advanceSession()
         suggestions.onInputFinished()
         finishSession(releaseModel = false)
@@ -339,6 +362,8 @@ internal class KeyboardSessionController(
         // Commit unfinished literal input while this session still owns the editor.
         quick.accept()
         handwriting.discard()
+        recordActiveSpecialFieldIfAllowed(explicitSubmit = false)
+        _fieldCandidates.value = emptyList()
         suggestions.onInputFinished()
         inputViewVisible = false
         finishSession(releaseModel = true)
@@ -350,16 +375,40 @@ internal class KeyboardSessionController(
         // Commit unfinished literal input while this session still owns the editor.
         quick.accept()
         handwriting.discard()
+        recordActiveSpecialFieldIfAllowed(explicitSubmit = false)
+        _fieldCandidates.value = emptyList()
         advanceSession()
         suggestions.onInputFinished()
         inputViewVisible = false
         finishSession(releaseModel = true)
     }
 
+    private fun refreshSpecialFieldCandidates(cachedTextBefore: String? = null) {
+        val kind = activeSpecialField
+        if (kind == null || quick.hasActiveInput() || handwriting.hasActiveInput()) {
+            _fieldCandidates.value = emptyList()
+            return
+        }
+        val before = cachedTextBefore ?: editor.getTextBeforeCursor(256).orEmpty()
+        val after = editor.getTextAfterCursor(256).orEmpty()
+        _fieldCandidates.value = specialFieldCandidates(kind, before + after, specialFields.values(kind))
+    }
+
+    private fun recordActiveSpecialFieldIfAllowed(explicitSubmit: Boolean) {
+        val kind = activeSpecialField ?: return
+        if (!explicitSubmit && !userEditedCurrentField) return
+        if (!editor.isPersonalizedLearningAllowed()) return
+        val before = editor.getTextBeforeCursor(256).orEmpty()
+        val after = editor.getTextAfterCursor(256).orEmpty()
+        specialFields.record(kind, before + after)
+        userEditedCurrentField = false
+    }
+
     private fun refreshPredictions(cachedTextBefore: String? = null) {
-        val textBefore = cachedTextBefore ?: editor.getTextBeforeCursor(64)
+        val textBefore = cachedTextBefore ?: editor.getTextBeforeCursor(256)
         refreshPunctuation(textBefore)
         refreshAutoCapitalization(textBefore)
+        refreshSpecialFieldCandidates(textBefore)
         if (!inputViewVisible || english?.inspectingWord == true || english?.hasSwipeCandidates == true) return
         when (_keyboardInputMode.value) {
             KeyboardInputMode.AlphaNum -> if(autocorrectActive()) english?.refreshNextWords()
@@ -399,15 +448,18 @@ internal class KeyboardSessionController(
             finishEnglishLiteral()
             quick.accept()
             if (handwriting.hasActiveInput()) { handwriting.accept(); refreshPunctuation() }
+            refreshSpecialFieldCandidates()
             return
         }
         if (mode == KeyboardInputMode.Number) {
             if (handwriting.hasActiveInput()) { handwriting.accept(); refreshPunctuation() }
+            refreshSpecialFieldCandidates()
             return
         }
         if (mode != textPanel) { finishEnglishLiteral(); quick.accept(); handwriting.accept() }
         textPanel = mode
         refreshAutoCapitalization()
+        refreshSpecialFieldCandidates()
     }
 
     private fun finishEnglishLiteral() {
@@ -465,6 +517,7 @@ internal class KeyboardSessionController(
         if (queueEditorAction { deleteSurroundingText() }) return
         voice.interrupt()
         suggestions.onUserTyped()
+        userEditedCurrentField = true
         pendingTouch = null
         if (english?.delete() == true) {
             if (english.quick && english.word.isNotEmpty()) quick.restoreComposingText(english.word)
@@ -472,11 +525,13 @@ internal class KeyboardSessionController(
                 refreshPredictions()
             } else {
                 refreshPunctuation()
+                refreshSpecialFieldCandidates()
             }
         } else if (quick.hasActiveInput()) {
             quick.onDelete()
             if (autocorrectActive(KeyboardInputMode.Quick)) english?.observeQuick(quick.getComposingText(), null)
             refreshPunctuation()
+            refreshSpecialFieldCandidates()
         } else if (handwriting.hasActiveInput()) {
             handwriting.discard()
             refreshPredictions()
@@ -492,6 +547,7 @@ internal class KeyboardSessionController(
         if (text.length == 1 && (text[0] in ",.!?;:" || text[0] in "，。！？；：") && waitForBoundary { commitText(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
+        userEditedCurrentField = true
 
         val charToCommit = if (text.length == 1 && text[0].isLetter() && _shiftState.value.isUppercase && text[0].isLowerCase()) {
             text.uppercase()
@@ -509,6 +565,7 @@ internal class KeyboardSessionController(
             english!!.type(charToCommit, evidence)
             refreshPunctuation()
             refreshAutoCapitalization()
+            refreshSpecialFieldCandidates()
             return
         }
         if (charToCommit.length == 1 && charToCommit[0] in "'’" && textPanel == KeyboardInputMode.Quick &&
@@ -516,6 +573,7 @@ internal class KeyboardSessionController(
             quick.restoreComposingText(quick.getComposingText() + charToCommit)
             english?.observeQuick(quick.getComposingText(), null)
             refreshPunctuation()
+            refreshSpecialFieldCandidates()
             return
         }
         val isBoundaryPunctuation = charToCommit.length == 1 && !charToCommit[0].isLetterOrDigit() && charToCommit[0] !in "_@/'’-"
@@ -538,6 +596,7 @@ internal class KeyboardSessionController(
         if (queueEditorAction { onSwipeGesture(centersPx, pointsXyt) }) return
         voice.interrupt()
         suggestions.onUserTyped()
+        userEditedCurrentField = true
         pendingTouch = null
         finishEnglishLiteral()
         if (quick.hasActiveInput()) quick.accept()
@@ -554,6 +613,7 @@ internal class KeyboardSessionController(
         coordinator.swipe(centersPx, pointsXyt, shiftMode) {
             refreshPunctuation()
             refreshAutoCapitalization()
+            refreshSpecialFieldCandidates()
         }
     }
 
@@ -561,6 +621,7 @@ internal class KeyboardSessionController(
         if (queueEditorAction { onQuickKey(char) }) return
         voice.interrupt()
         suggestions.onUserTyped()
+        userEditedCurrentField = true
         val typed = if (_shiftState.value.isUppercase) char.uppercase() else char
         if (english?.inspectingWord == true || english?.hasSwipeCandidates == true) english.reset()
         quick.onKey(typed)
@@ -572,6 +633,7 @@ internal class KeyboardSessionController(
         if (autocorrectActive(KeyboardInputMode.Quick)) english?.observeQuick(quick.getComposingText(), evidence)
         refreshPunctuation()
         refreshAutoCapitalization()
+        refreshSpecialFieldCandidates()
     }
 
     fun sendSpace() {
@@ -579,15 +641,19 @@ internal class KeyboardSessionController(
         voice.interrupt()
         suggestions.onUserTyped()
         pendingTouch = null
-        if (finishEnglishBoundary(" ")) { refreshPredictions(); return }
+        if (finishEnglishBoundary(" ")) { userEditedCurrentField = true; refreshPredictions(); return }
         if (quick.hasActiveInput()) {
+            userEditedCurrentField = true
             quick.onSpace()
             refreshPunctuation()
             refreshAutoCapitalization()
+            refreshSpecialFieldCandidates()
         } else if (handwriting.hasActiveInput()) {
+            userEditedCurrentField = true
             handwriting.onSpace()
             refreshPunctuation()
             refreshAutoCapitalization()
+            refreshSpecialFieldCandidates()
         } else {
             commitText(" ")
         }
@@ -602,6 +668,7 @@ internal class KeyboardSessionController(
         val finished = finishEnglishBoundary(delimiter.orEmpty())
         if (quick.hasActiveInput()) quick.accept()
         handwriting.accept()
+        recordActiveSpecialFieldIfAllowed(explicitSubmit = true)
         if (!finished || delimiter == null) editor.sendEnter()
         if (delimiter == null) english?.reset()
         refreshPredictions()
@@ -613,6 +680,7 @@ internal class KeyboardSessionController(
         finishEnglishLiteral()
         // Preserve literal Quick input; Chinese conversion requires explicit candidate selection.
         quick.accept()
+        userEditedCurrentField = true
         suggestions.pasteClipboard()
         refreshPredictions()
     }
@@ -624,11 +692,15 @@ internal class KeyboardSessionController(
         pixels: ByteArray,
         width: Int,
         height: Int,
-    ) = handwriting.recognize(strokes, canvasWidth, canvasHeight, pixels, width, height)
+    ) {
+        handwriting.recognize(strokes, canvasWidth, canvasHeight, pixels, width, height)
+        refreshSpecialFieldCandidates()
+    }
 
     fun onHandwritingStrokeStarted(startsNewCharacter: Boolean) {
         suggestions.onUserTyped()
         handwriting.onStrokeStarted(startsNewCharacter)
+        refreshSpecialFieldCandidates()
     }
 
     fun onHandwritingCandidatePageChanged() {
@@ -636,6 +708,32 @@ internal class KeyboardSessionController(
     }
 
     fun selectCandidate(text: String) {
+        if (activeSpecialField != null && _fieldCandidates.value.any { it.text == text }) {
+            if (queueEditorAction { selectCandidate(text) }) return
+            if (_shiftState.value == ShiftState.Shifted) {
+                _shiftState.value = ShiftState.Off
+                manualShift = false
+            }
+            voice.interrupt()
+            suggestions.onUserTyped()
+            userEditedCurrentField = true
+            finishEnglishLiteral()
+            if (quick.hasActiveInput()) quick.accept()
+            handwriting.accept()
+            val before = editor.getTextBeforeCursor(256).orEmpty()
+            val after = editor.getTextAfterCursor(256).orEmpty()
+            val applied = if (before.isEmpty() && after.isEmpty()) {
+                editor.commitText(text)
+                true
+            } else {
+                editor.replaceWordAtCursor(before, after, text)
+            }
+            if (applied && editor.isPersonalizedLearningAllowed()) {
+                specialFields.record(activeSpecialField!!, text)
+            }
+            refreshPredictions()
+            return
+        }
         if (english != null &&
             (_keyboardInputMode.value == KeyboardInputMode.AlphaNum || english.inspectingWord || english.hasSwipeCandidates) &&
             !english.canSelect(text)) return
@@ -652,6 +750,7 @@ internal class KeyboardSessionController(
         if (queueEditorAction { selectCandidate(text) }) return
         voice.interrupt()
         suggestions.onUserTyped()
+        userEditedCurrentField = true
         if (english?.canSelect(text) == true &&
             (english.inspectingWord || english.hasSwipeCandidates || textPanel == KeyboardInputMode.AlphaNum || quick.candidates.value.none { it.text == text })) {
             val wasQuick = english.quick
@@ -669,6 +768,7 @@ internal class KeyboardSessionController(
             handwriting.selectCandidate(text)
         }
         refreshPunctuation()
+        refreshSpecialFieldCandidates()
     }
 
     fun selectHandwritingCandidate(text: String) = selectCandidate(text)
@@ -730,6 +830,9 @@ internal class KeyboardSessionController(
     private fun updateEditorPresentation(info: EditorInfo?) {
         editorAllowsEnglish = englishAllowed(info?.inputType)
         _swipeEnabled.value = editorAllowsEnglish
+        activeSpecialField = specialFieldKindFor(info?.inputType)
+        _emailBottomRow.value = activeSpecialField == SpecialFieldKind.Email
+        _numPadVariant.value = numPadVariantFor(info)
         _keyboardAction.value = keyboardActionFor(info)
         val targetMode = keyboardInputModeFor(info)
         if (targetMode == KeyboardInputMode.Number || targetMode == KeyboardInputMode.AlphaNum) {
@@ -763,8 +866,10 @@ internal class KeyboardSessionController(
 
     init {
         handwriting.onCharacterCommitted = {
+            userEditedCurrentField = true
             refreshPunctuation()
             refreshAutoCapitalization()
+            refreshSpecialFieldCandidates()
         }
     }
 }

@@ -77,6 +77,7 @@ class CantoneseInputMethodService :
                         volumeLevel = controller.volumeLevel,
                         keyboardAction = controller.keyboardAction,
                         keyboardInputMode = controller.keyboardInputMode,
+                        numPadVariant = controller.numPadVariant,
                         shiftState = controller.shiftState,
                         handwritingCandidates = controller.handwritingCandidates,
                         handwritingComposing = controller.handwritingComposing,
@@ -86,6 +87,8 @@ class CantoneseInputMethodService :
                         keyboardSession = controller.keyboardSession,
                         quickCandidates = controller.quickCandidates,
                         englishCandidates = controller.englishCandidates,
+                        fieldCandidates = controller.fieldCandidates,
+                        emailBottomRow = controller.emailBottomRow,
                         cursorWordActive = controller.cursorWordActive,
                         chinesePunctuation = controller.chinesePunctuation,
                         swipeEnabled = controller.swipeEnabled,
@@ -230,7 +233,7 @@ class CantoneseInputMethodService :
         startActivity(
             Intent(this, MainActivity::class.java).apply {
                 putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_SETTINGS)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
         )
     }

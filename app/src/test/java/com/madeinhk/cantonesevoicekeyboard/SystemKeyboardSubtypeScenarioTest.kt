@@ -48,6 +48,43 @@ class SystemKeyboardSubtypeScenarioTest {
         }
     }
 
+    @Test fun moneyPhoneAndDateTimeEditorsSelectDedicatedNumPadVariantsAndKeepAsciiPunctuation() {
+        KeyboardScenario(initialText = "金額：", clipboardText = null).use { s ->
+            val money = EditorInfo().apply {
+                inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                imeOptions = EditorInfo.IME_ACTION_NEXT
+            }
+            s.controller.onStartInput(money, false, KeyboardSubtypes.QUICK)
+            s.controller.onStartInputView(money)
+            val moneyState = s.snapshot()
+            assertEquals(KeyboardInputMode.Number, moneyState.inputMode)
+            assertEquals(NumPadVariant.Number, moneyState.numPadVariant)
+            assertEquals(KeyboardAction.Next, moneyState.action)
+            assertEquals(false, moneyState.chinesePunctuation)
+            s.type("1,234.50")
+            assertEquals("金額：1,234.50", s.editor.text)
+            assertEquals("", s.editor.composing)
+
+            s.hide()
+            val phone = EditorInfo().apply { inputType = InputType.TYPE_CLASS_PHONE }
+            s.controller.onStartInput(phone, false, KeyboardSubtypes.QUICK)
+            s.controller.onStartInputView(phone)
+            assertEquals(KeyboardInputMode.Number, s.snapshot().inputMode)
+            assertEquals(NumPadVariant.Phone, s.snapshot().numPadVariant)
+
+            s.hide()
+            val dateTime = EditorInfo().apply { inputType = InputType.TYPE_CLASS_DATETIME }
+            s.controller.onStartInput(dateTime, false, KeyboardSubtypes.QUICK)
+            s.controller.onStartInputView(dateTime)
+            assertEquals(KeyboardInputMode.Number, s.snapshot().inputMode)
+            assertEquals(NumPadVariant.DateTime, s.snapshot().numPadVariant)
+
+            s.hide()
+            s.start()
+            assertEquals(KeyboardInputMode.Quick, s.snapshot().inputMode)
+        }
+    }
+
     @Test fun globeSelectionsSwitchAllLayoutsWithoutTypingAndSurviveReopen() {
         KeyboardScenario().use { s ->
             s.start()

@@ -65,6 +65,197 @@ internal fun NumberPanel(
 }
 
 @Composable
+internal fun NumPadPanel(
+    rowHeight: Dp,
+    action: KeyboardAction,
+    keyRegistry: KeyboardKeyRegistry,
+    variant: NumPadVariant = NumPadVariant.Number,
+    modifier: Modifier = Modifier,
+) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val keyboardColors = BrandTheme.colors
+    val keyboardTypography = BrandTheme.typography
+    val (bottomLeftKey, bottomRightKey) = when (variant) {
+        NumPadVariant.Number -> "," to "."
+        NumPadVariant.Phone -> "+" to "#"
+        NumPadVariant.DateTime -> "/" to ":"
+    }
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(AlphaRowSpacing),
+    ) {
+        NumPadDigitRow(
+            rowHeight = rowHeight,
+            digits = listOf("1", "2", "3"),
+            rowId = "numpad.row0",
+            keyRegistry = keyRegistry,
+        ) {
+            KeyVisual(
+                key = keyRegistry.key(
+                    id = "numpad.row0.minus",
+                    data = KeyData("numpad.row0.minus", KeyboardKeyKind.Text, text = "-"),
+                    rowId = "numpad.row0",
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.FunctionKeyWidthFactor),
+                backgroundColor = keyboardColors.keyboardModifierKeySurface,
+            ) {
+                Text(
+                    text = "-",
+                    color = keyboardColors.keyboardKeyOnSurface,
+                    style = keyboardTypography.keyboardUtilityKey,
+                )
+            }
+        }
+        NumPadDigitRow(
+            rowHeight = rowHeight,
+            digits = listOf("4", "5", "6"),
+            rowId = "numpad.row1",
+            keyRegistry = keyRegistry,
+        ) {
+            KeyVisual(
+                key = keyRegistry.key(
+                    id = "numpad.row1.space",
+                    data = KeyData("numpad.row1.space", KeyboardKeyKind.Space),
+                    rowId = "numpad.row1",
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.FunctionKeyWidthFactor),
+                backgroundColor = keyboardColors.keyboardModifierKeySurface,
+                accessibilityDescription = stringResource(R.string.keyboard_key_space),
+            ) {
+                SpaceBarIcon(
+                    modifier = Modifier.size(22.dp),
+                    color = keyboardColors.keyboardKeyOnSurface,
+                )
+            }
+        }
+        NumPadDigitRow(
+            rowHeight = rowHeight,
+            digits = listOf("7", "8", "9"),
+            rowId = "numpad.row2",
+            keyRegistry = keyRegistry,
+        ) {
+            KeyVisual(
+                key = keyRegistry.key(
+                    id = "numpad.row2.delete",
+                    data = KeyData("numpad.row2.delete", KeyboardKeyKind.Delete),
+                    rowId = "numpad.row2",
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.FunctionKeyWidthFactor),
+                backgroundColor = keyboardColors.keyboardModifierKeySurface,
+            ) {
+                BackspaceIcon(
+                    modifier = Modifier.size(22.dp),
+                    color = keyboardColors.keyboardKeyOnSurface,
+                )
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(rowHeight),
+            horizontalArrangement = Arrangement.spacedBy(KeyboardUiDefaults.BottomRowKeySpacing),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            KeyVisual(
+                key = keyRegistry.key(
+                    id = "numpad.row3.left",
+                    data = KeyData("numpad.row3.left", KeyboardKeyKind.Text, text = bottomLeftKey),
+                    rowId = "numpad.row3",
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.PhoneKeyWidthFactor),
+                backgroundColor = keyboardColors.keyboardModifierKeySurface,
+            ) {
+                Text(
+                    text = bottomLeftKey,
+                    color = keyboardColors.keyboardKeyOnSurface,
+                    style = keyboardTypography.keyboardUtilityKey,
+                )
+            }
+            CharacterKey(
+                key = keyRegistry.key(
+                    id = "numpad.row3.0",
+                    data = KeyData("numpad.row3.0", KeyboardKeyKind.Text, text = "0"),
+                    rowId = "numpad.row3",
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.PhoneKeyWidthFactor),
+                label = "0",
+                showPressPopup = false,
+            )
+            KeyVisual(
+                key = keyRegistry.key(
+                    id = "numpad.row3.right",
+                    data = KeyData("numpad.row3.right", KeyboardKeyKind.Text, text = bottomRightKey),
+                    rowId = "numpad.row3",
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.PhoneKeyWidthFactor),
+                backgroundColor = keyboardColors.keyboardModifierKeySurface,
+            ) {
+                Text(
+                    text = bottomRightKey,
+                    color = keyboardColors.keyboardKeyOnSurface,
+                    style = keyboardTypography.keyboardUtilityKey,
+                )
+            }
+            KeyVisual(
+                key = keyRegistry.key(
+                    id = "numpad.row3.enter",
+                    data = KeyData("numpad.row3.enter", KeyboardKeyKind.Enter),
+                    rowId = "numpad.row3",
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.FunctionKeyWidthFactor),
+                backgroundColor = primaryColor,
+                shape = CircleShape,
+            ) {
+                KeyboardActionIcon(
+                    action = action,
+                    modifier = Modifier.size(22.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NumPadDigitRow(
+    rowHeight: Dp,
+    digits: List<String>,
+    rowId: String,
+    keyRegistry: KeyboardKeyRegistry,
+    trailingFunctionKey: @Composable RowScope.() -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(rowHeight),
+        horizontalArrangement = Arrangement.spacedBy(KeyboardUiDefaults.BottomRowKeySpacing),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        digits.forEach { digit ->
+            CharacterKey(
+                key = keyRegistry.key(
+                    id = "$rowId.$digit",
+                    data = KeyData("$rowId.$digit", KeyboardKeyKind.Text, text = digit),
+                    rowId = rowId,
+                ),
+                keyRegistry = keyRegistry,
+                modifier = Modifier.weight(KeyboardUiDefaults.PhoneKeyWidthFactor),
+                label = digit,
+                showPressPopup = false,
+            )
+        }
+        trailingFunctionKey()
+    }
+}
+
+@Composable
 fun AlphaNumPanel(
     rowHeight: Dp,
     modifier: Modifier = Modifier,

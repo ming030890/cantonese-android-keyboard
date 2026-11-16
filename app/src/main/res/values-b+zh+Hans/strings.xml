@@ -24,11 +24,27 @@
     <string name="setup_step_voice_title">允许麦克风权限</string>
     <string name="setup_step_voice_desc">允许使用麦克风，即可用语音输入。</string>
     <string name="setup_step_voice_action">允许使用</string>
+    <string name="setup_step_voice_skip">暂时跳过</string>
+    <string name="onboarding_voice_title">开启离线语音输入</string>
+    <string name="onboarding_voice_desc">随时用粤语及英文说话打字，离线也能使用。将通过不限流量的 Wi-Fi 下载约 2 GB 模型。</string>
+    <string name="onboarding_voice_allow">允许麦克风权限</string>
+
+    <string name="home_status_active">使用中</string>
+    <string name="home_status_unselected">已启用 • 正使用其他键盘</string>
+    <string name="home_status_disabled">尚未在系统设置中开启</string>
+    <string name="home_banner_enable_title">键盘尚未开启</string>
+    <string name="home_banner_enable_desc">请在 Android 设置中开启“%1$s”。</string>
+    <string name="home_banner_enable_action">前往开启</string>
+    <string name="home_banner_switch_title">切换至“%1$s”</string>
+    <string name="home_banner_switch_desc">设为当前使用的键盘即可开始打字。</string>
+    <string name="home_banner_switch_action">切换</string>
+    <string name="model_retry_action">重试</string>
 
     <string name="setup_flow_title">设置键盘</string>
     <string name="setup_step_progress">步骤 %1$d / %2$d</string>
     <string name="setup_all_done_title">可以开始打字</string>
-    <string name="setup_all_done_desc">已选用“%1$s”，点按下方输入框试试打字。</string>
+    <string name="setup_all_done_desc">已选用“%1$s”，可以开始使用。</string>
+    <string name="setup_all_done_settings">前往设置自定义</string>
     <string name="setup_step_locked_hint">请先完成上一步</string>
     <string name="developer_tools_title">开发者工具</string>
     <string name="model_status_compact_ready">离线语音输入已就绪</string>
@@ -43,12 +59,6 @@
     <string name="model_status_downloading">下载中… %1$d%%</string>
     <string name="model_status_installing">安装中…</string>
     <string name="model_status_failed">下载失败，点按此卡片重试。</string>
-
-    <!-- Try-it-out Strings -->
-    <string name="sandbox_title">试一试</string>
-    <string name="sandbox_desc">点按下方输入框，打开键盘试试打字。</string>
-    <string name="sandbox_placeholder">在这里试试打字…</string>
-    <string name="sandbox_clear">清除文字</string>
 
     <!-- Developer Options -->
     <string name="developer_store_audio_title">保存语音录音</string>
@@ -112,7 +122,7 @@
     <string name="settings_layout_qwerty">英文</string>
     <string name="settings_layout_handwriting">手写</string>
     <string name="settings_layout_quick">速成</string>
-    <string name="settings_all_layouts_voice">选择键盘。</string>
+    <string name="settings_keyboards_header">键盘</string>
     <string name="settings_layout_specific_header">%1$s设置</string>
     <string name="settings_feature_voice_typing">可使用语音输入</string>
     <string name="settings_quick_version_title">速成版本</string>

@@ -9,6 +9,7 @@ import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputContentInfo
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardAction
 import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.KeyboardInputMode
+import com.madeinhk.cantonesevoicekeyboard.ui.keyboard.NumPadVariant
 
 internal class ImeEditor(
     private val connection: () -> InputConnection?,
@@ -208,8 +209,21 @@ internal fun keyboardInputModeForInputType(inputType: Int?): KeyboardInputMode {
             inputClass == InputType.TYPE_CLASS_PHONE ||
             inputClass == InputType.TYPE_CLASS_DATETIME -> KeyboardInputMode.Number
         inputClass == InputType.TYPE_CLASS_TEXT &&
-            inputVariation in PASSWORD_VARIATIONS -> KeyboardInputMode.AlphaNum
+            (inputVariation in PASSWORD_VARIATIONS || inputVariation in EMAIL_VARIATIONS) ->
+            KeyboardInputMode.AlphaNum
         else -> KeyboardInputMode.Handwriting
+    }
+}
+
+internal fun numPadVariantFor(editorInfo: EditorInfo?): NumPadVariant =
+    numPadVariantForInputType(editorInfo?.inputType)
+
+internal fun numPadVariantForInputType(inputType: Int?): NumPadVariant {
+    inputType ?: return NumPadVariant.Number
+    return when (inputType and InputType.TYPE_MASK_CLASS) {
+        InputType.TYPE_CLASS_PHONE -> NumPadVariant.Phone
+        InputType.TYPE_CLASS_DATETIME -> NumPadVariant.DateTime
+        else -> NumPadVariant.Number
     }
 }
 
@@ -217,4 +231,9 @@ private val PASSWORD_VARIATIONS = setOf(
     InputType.TYPE_TEXT_VARIATION_PASSWORD,
     InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
     InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+)
+
+private val EMAIL_VARIATIONS = setOf(
+    InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+    InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
 )

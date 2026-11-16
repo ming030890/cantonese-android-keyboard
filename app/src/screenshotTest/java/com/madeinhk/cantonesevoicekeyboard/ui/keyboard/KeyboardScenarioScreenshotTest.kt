@@ -96,6 +96,22 @@ fun ScenarioPinEditor() = ScenarioScreen(remember {
 })
 
 @PreviewTest
+@Preview(name = "Money amount editor numpad", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
+@Composable
+fun ScenarioMoneyAmountEditor() = ScenarioScreen(remember {
+    KeyboardScenario(clipboardText = null).use { scenario ->
+        val money = EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            imeOptions = EditorInfo.IME_ACTION_NEXT
+        }
+        scenario.controller.onStartInput(money, false, KeyboardSubtypes.QUICK)
+        scenario.controller.onStartInputView(money)
+        scenario.type("12.50")
+        scenario.snapshot()
+    }
+})
+
+@PreviewTest
 @Preview(name = "Candidates retained during rapid typing", widthDp = 412, heightDp = KeyboardUiDefaults.KeyboardSurfaceHeightDp)
 @Composable
 fun ScenarioUnifiedCandidatesPending() = ScenarioScreen(remember { KeyboardScenarios.unifiedCandidatesPending() })
