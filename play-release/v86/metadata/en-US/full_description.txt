@@ -1,8 +1,14 @@
-烏龜鍵盤 － 廣東話 (Turtle Keyboard) brings together Cantonese Quick (速成), Cantonese handwriting, English QWERTY and swipe typing, and offline Cantonese voice input in one clean, privacy-focused keyboard.
+烏龜鍵盤 － 廣東話 (Turtle Keyboard) is a privacy-first AI Cantonese keyboard built for everyday Hong Kong bilingual typing. We never log or send what you type to any server — every AI model runs locally on your device.
 
-Key features:
-• Mixed Cantonese & English Quick (速成): Type Chinese and English seamlessly on the same Quick 3 or Quick 5 keyboard, with swipe typing, multi-word phrase ranking, and optional on-device personal learning.
-• Cantonese Handwriting: Write Traditional Chinese characters and Hong Kong Cantonese characters with fast live per-stroke recognition and next-word predictions.
-• Smart English & Numeric Typing: Contextual autocorrect, swipe typing, next-word suggestions, auto-capitalization, dedicated numeric keypad, and a full emoji picker with search and skin-tone variants.
-• Offline Voice Input: Speak Cantonese and English to type on any layout, even offline, powered on-device by the open-source Qwen3-ASR-1.7B-Cantonese-HK speech model (based on Qwen/Qwen3-ASR-1.7B). The model downloads over Wi-Fi with no data limit only when you choose to enable voice typing.
-• Privacy by Design: We never log or send what you type to any server. Typing predictions, learned Quick selections, handwriting recognition, and voice transcription all run locally on your device.
+All supported input methods & smart features:
+• Offline AI Voice Input (Cantonese & English): Speak Cantonese and English code-switching naturally on any layout, even offline. Powered on-device by the open-source Qwen3-ASR-1.7B-Cantonese-HK speech model (based on Qwen/Qwen3-ASR-1.7B) with Silero VAD. Voice typing is optional and downloads (~2 GB) over Wi-Fi with no data limit only when enabled.
+• Cantonese Quick (速成 3 & Quick 5): Type Traditional Chinese and English seamlessly on the same Quick keyboard, with multi-word phrase ranking, English swipe typing directly on Quick, and optional on-device selection learning.
+• Cantonese & Traditional Chinese Handwriting: Write Hong Kong Cantonese and Traditional Chinese characters with live per-stroke on-device recognition, Spacebar quick-confirm, visual alternatives, and next-word predictions.
+• Smart English QWERTY & Swipe Typing: Smooth English swipe typing, contextual AI autocorrect powered by our compact on-device language model, next-word predictions, model casing restoration, sentence auto-capitalization, and smart punctuation.
+• Dedicated Numpad & Form Completions: Automatic 4-column numeric keypad for number, phone, PIN, money, and date/time fields, plus local email (@domain) and recent form-field suggestions.
+• Emoji Picker & Clipboard Paste: Full emoji picker with English keyword search, recent emoji, and skin-tone variants, plus local one-tap clipboard paste chips and Android inline autofill.
+
+Privacy-First by Design:
+• We never log or send what you type, write, or speak to any server.
+• All AI inference (speech recognition, handwriting recognition, language model predictions, and autocorrect) runs locally on your device.
+• Cloud backup is disabled, and you can clear learned Quick history anytime in Settings.
