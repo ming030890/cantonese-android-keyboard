@@ -1,10 +1,9 @@
-A privacy-first AI Cantonese keyboard for everyday Hong Kong typing. Everything runs on your device — we never log or send what you type to any server.
+Type and speak Cantonese the way Hong Kongers actually talk — completely private. Everything runs on your phone, so what you type never leaves your device.
 
-Input methods & features:
-• Offline AI Voice: Speak Cantonese and English mixed naturally. Powered on-device by open-source Qwen3-ASR-1.7B-Cantonese-HK (based on Qwen/Qwen3-ASR-1.7B). Downloads (~2 GB) over unlimited Wi-Fi only if enabled.
-• Cantonese Quick (速成 3 & 5): Type Chinese and English on one keyboard, with phrase ranking, English swipe typing, and optional local word learning.
-• Handwriting: Live per-stroke Cantonese & Traditional Chinese recognition with Spacebar confirm and next-word suggestions.
-• Smart English: Swipe typing, AI autocorrect, next-word predictions, auto-capitalization, and smart punctuation.
-• Numpad & Helpers: Auto numeric keypad for PINs/numbers, email & form suggestions, clipboard paste, and emoji search with skin tones.
+• Offline Cantonese + English Voice: Speak naturally in mixed Cantonese and English, even offline on the MTR. Downloads over unlimited Wi-Fi only if you turn it on.
+• Mixed Quick (速成 3 & 5): Type Chinese and English without switching keyboards, with smart phrase predictions and English swipe typing.
+• Fast Handwriting: Write Cantonese and Traditional Chinese characters naturally with instant recognition and next-word suggestions.
+• Smart English & Swipe: Glide to type, with smart autocorrect, auto-capitalization, and next-word predictions.
+• Everyday Helpers: Auto number pad for PINs and phone fields, quick email & clipboard paste suggestions, and emoji search.
 
-100% on-device. No text logging. Cloud backup disabled.
+Built for privacy: no account needed, no ads, and we never log or send what you type.
